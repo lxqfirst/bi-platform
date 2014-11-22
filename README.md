@@ -31,6 +31,7 @@
 构建中（To be soon）
 
 ##用户手册：
-构建中（2014-11-30），和[Milestonev1.1.0](https://github.com/Baidu-ecom/bi-platform/milestones/BI_Platform%201.1.0 "v1.1.0")同步发布
+[官网完善前，请参考WIKI](https://github.com/Baidu-ecom/bi-platform/wiki/BI-Platform项目文档-1.1.0 "请参考WIKI")
+（内容完善中，和[Milestonev1.1.0](https://github.com/Baidu-ecom/bi-platform/milestones/BI_Platform%201.1.0 "v1.1.0")同步发布）
 
 
