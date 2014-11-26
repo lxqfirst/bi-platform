@@ -16,7 +16,6 @@
 package com.baidu.rigel.biplatform.ma.rt;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.context.ApplicationContext;
