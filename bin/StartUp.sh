@@ -17,3 +17,4 @@ echo $CLASSPATH
 echo " begin start file server ... ...."
 $JAVA_HOME/bin/java 
 echo "Congratulation! you can using BI-Platform  with URL :[http://localhost:8090/silkroad/home.html ] and user [demo/demo] through Chrome Browser "
+ 
