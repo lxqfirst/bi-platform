@@ -19,7 +19,7 @@ var xui = {};
  *              (1) 各级名空间建立
  *              (2) 交叉引用/文件依赖的一种解决方案（闭包变量注入）
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.comion: 1.0.1
+ * @author:  sushuang(sushuangion: 1.0.1
 =======
  * @author:  sushuang(sushuang)
  * @version: 1.0.1
@@ -1919,7 +1919,7 @@ var xutil = {
  *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
  *              参见createSyncWrap方法
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  tangram.ajax, eil.ajax
 =======
  * @author:  sushuang(sushuang)
@@ -21680,7 +21680,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  * desc:    数据树
  *          在普通树控件的基础上进行扩展
 <<<<<<< HEAD
- * author:  cxl(chenxinle@baidu.com)
+ * author:  cxl(chenxinle)
  * date:    2012/03/12
  */
 (function () {
@@ -24024,7 +24024,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  *           支持日、周、月、季不同粒度时间选择，
  *           支持单选、多选、范围选
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -51721,7 +51721,7 @@ extend(Highcharts, {
  *           此图为“商机池”项目定制。
  *           时间紧，代码写得相当不考究。
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
 =======
  * @author:  sushuang(sushuang)
 >>>>>>> refs/heads/branch_1.1.0
@@ -52381,7 +52381,7 @@ extend(Highcharts, {
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可定制皮肤的左右结构的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {
@@ -53094,7 +53094,7 @@ extend(Highcharts, {
  *
  * @file:   可切换状态的button
 <<<<<<< HEAD
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {
@@ -53190,7 +53190,7 @@ extend(Highcharts, {
  * @file:   多维分析表格
  *         （行列锁定，跨多行，垮多列，树状表头等）
 <<<<<<< HEAD
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {
@@ -54410,7 +54410,7 @@ extend(Highcharts, {
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   面包屑导航
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {
@@ -54582,7 +54582,7 @@ extend(Highcharts, {
  }) ();
 /**
  * @file 基于ecui.ui.TreeView实现的树视图。
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 (function() {
     var core = ecui;
@@ -56750,8 +56750,8 @@ extend(Highcharts, {
  * path:    count-input.js
  * desc:    带计数的文本输入框(input与textarea)
 <<<<<<< HEAD
- * author:  cxl(chenxinle@baidu.com)
- *          modified by sushuang(sushuang@baidu.com) 
+ * author:  cxl(chenxinle)
+ *          modified by sushuang(sushuang) 
 =======
  * author:  cxl(chenxinle)
  *          modified by sushuang(sushuang)
@@ -56978,7 +56978,7 @@ extend(Highcharts, {
  * path:    input-tree.js
  * desc:    树层级输入框
 <<<<<<< HEAD
- * author:  cxl(chenxinle@baidu.com)
+ * author:  cxl(chenxinle)
  * date:    2012/03/12
  */
 (function () {
@@ -58587,7 +58587,7 @@ _uOptions     - 下拉选择框
 /**
  * @file 可拖放的items
 <<<<<<< HEAD
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 
 (function() {
@@ -59194,8 +59194,8 @@ xui.ui = {};
  *
  * @file:    基于highcharts的js图
 <<<<<<< HEAD
- *           (最早源自pl-charts.js by cxl(chenxinle@baidu.com))
- * @author:  sushuang(sushuang@baidu.com)
+ *           (最早源自pl-charts.js by cxl(chenxinle))
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, highcharts
  */
 
@@ -65043,7 +65043,7 @@ $namespace('di.shared.vui');
  *           一般在di.config.Dict中使用adapterMethods来引用此中方法，
  *           拷贝到目标对象中
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -65185,7 +65185,7 @@ $namespace('di.shared.model');
  *
 <<<<<<< HEAD
  * desc:   数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
 =======
  * desc:    [通用模型] 时间数据模型
  * author:  sushuang(sushuang)
@@ -65271,7 +65271,7 @@ $namespace('di.shared.model');
  *
  * desc:    [通用模型] 全局数据模型
 <<<<<<< HEAD
- * ushuang(sushuang@baidu.com)
+ * ushuang(sushuang)
 =======
  * author:  sushuang(sushuang)
 >>>>>>> refs/heads/branch_1.1.0
@@ -68161,7 +68161,7 @@ $namespace('di.shared.ui');
  *
  * @file:    BeakerChart的适配器
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
 =======
  * @author:  sushuang(sushuang)
 >>>>>>> refs/heads/branch_1.1.0
@@ -68292,7 +68292,7 @@ $namespace('di.shared.adapter');
  *
  * @file:    CalendarPlus的适配器
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -68456,7 +68456,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui input-tree的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -68574,7 +68574,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    input（单行输入，以及textarea）的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -68607,7 +68607,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */ce('di.shared.adapter');
 
@@ -68684,7 +68684,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui suggest的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -68771,7 +68771,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    HChart的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -68840,7 +68840,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -68939,7 +68939,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择控件的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -69089,7 +69089,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    CalendarPlus的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -69263,7 +69263,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    cube树原数据Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -69450,7 +69450,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -69719,7 +69719,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表单模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -69885,7 +69885,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -72213,7 +72213,7 @@ $namespace('di.shared.model');
  *
  * @file:    元数据选择Model
 <<<<<<< HEAD
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
 =======
  * @author:  sushuang(sushuang)
 >>>>>>> refs/heads/branch_1.1.0
@@ -72769,7 +72769,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
