@@ -4,7 +4,11 @@
  *
  * @file:    IST风格的日历
  *          （支持单日历时间段选择，周月季选择）
+<<<<<<< HEAD
  * @author:  sushuang(sushuang)
+=======
+ * @author:  sushuang(sushuang) 
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  *          (
  *              从Pulse版本的ecui中拷贝而来
  *              (pl-calendar.js by cxl(chenxinle))，

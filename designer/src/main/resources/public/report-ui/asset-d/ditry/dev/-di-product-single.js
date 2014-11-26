@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * xui
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -9,7 +10,33 @@
 /**
  * @namespace
  */
+=======
+/**
+ * xui
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:   工程基础
+ * @author:  sushuang(sushuang)
+ */
+
+/**
+ * @namespace
+ */
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 var xui = {};
+<<<<<<< HEAD
+/**
+ * xui.XPorject
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    一种Javascript工程组织方法
+ *          [功能]
+ *              (1) 各级名空间建立
+ *              (2) 交叉引用/文件依赖的一种解决方案（闭包变量注入）
+ * @author:  sushuang(sushuang)
+ * @version: 1.0.1
+ */
+=======
 /**
  * xui.XPorject
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -293,7 +320,3369 @@ var xui = {};
     }
     
 })();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+/**
+ * @usage [引入XProject]
+ *          为了在代码中方便使用XProject提供的方法，
+ *          可以在工程开始时在全局定义方法的别名。
+ *
+ *          例如：
+ *          window.$ns = xui.XProject.namespace;
+ *          window.$link = xui.XProject.link;
+ *          （下文中为书写简便假设已经做了如上别名定义）
+ * 
+ * @usage [名空间建立]
+ *          假设准备建立一个类：
+ *
+ *          // 直接建立了名空间
+ *          $ns('aaa.bbb.ccc');
+ *  
+ *          // 类的构造函数
+ *          aaa.bbb.ccc.SomeClass = function () {
+ *              // do something ...
+ *          }
+ *
+ *          或者直接：
+ *          // 类的构造函数
+ *          $ns('aaa.bbb.ccc').SomeClass = function () { 
+ *              // do something ...
+ *          }
+ *
+ *          或者这种风格：
+ *          // 文件开头声明名空间
+ *          $ns('aaa.bbb.ccc'); 
+ *          (function () {
+ *              // $ns()会返回最近一次声明名空间的结果
+ *              $ns().SomeClass = function () { 
+ *                  // do something ...
+ *              }
+ *          })();
+ *        
+ * @usage [依赖/交叉引用/link]
+ *          工程中对象的交叉引用不在这里考虑，
+ *          这里考虑的是类型/全局结构定义阶段的交叉引用，
+ *          如下例类型定义时：
+ *
+ *          (function () {
+ *              // 在闭包中定义外部引用的类，
+ *              // 这么做的好处至少有：方便压缩，易适应路径改动，代码简洁。
+ *              var OTHER_CONTROL1 = aaa.bbb.SomeClass;
+ *              var OTHER_SERVICE2 = tt.ee.SomeService;
+ *              var OTHER_MODEL3 = qq.uu.ii.SomeModel;
+ *              
+ *              // 构造函数，定义本类
+ *              $ns('aaa.bb').MyControl = function () { 
+ *                  this.otherControl = new OTHER_CONTROL();
+ *                  ...
+ *              }
+ *              ...
+ *          })();
+ *          这种情况下，如果多个类互相有引用（形成闭环），
+ *          则不知道如何排文件顺序，来使闭包中的类型/函数引用OK，
+ *          而C++/Java等常用的编译型面向对象语言都默认支持不需关心这些问题。
+ * 
+ *          这里使用这种解决方式：
+ *          (function () {
+ *              // 先在闭包中声明
+ *              var OTHER_CONTROL1, OTHER_SERVICE2, OTHER_MODEL3;
+ *              // 连接
+ *              $link(function () {
+ *                  OTHER_CONTROL1 = aaa.bbb.SomeClass;
+ *                  OTHER_SERVICE2 = tt.ee.SomeService;
+ *                  OTHER_MODEL3 = qq.uu.ii.SomeModel;
+ *              });
+ *              //构造函数，定义本类
+ *              $ns('aa.bb').MyControl = function () { 
+ *                  this.otherControl = new OTHER_CONTROL();
+ *                  // ...
+ *              }
+ *              // ...
+ *          })();
+ *            
+ *          在所有文件的最后，调用xui.XProject.doLink()，则实际注入所有的引用。
+ */
+
+<<<<<<< HEAD
+(function () {
+    
+    var XPROJECT = xui.XProject = {};
+    var NS_BASE = window;
+    var TRIMER = new RegExp(
+            "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
+        );
+=======
+/**
+ * xutil
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    工程直接使用的工具集
+ *          在基础提供的工具函数之外，可根据每个工程需要添加工具函数
+ * @author:  sushuang(sushuang)
+ */
+
+/**
+ * @namespace
+ */
+var xutil = {
+    lang: {},
+    number: {},
+    string: {},
+    fn: {},
+    object: {},
+    date: {},
+    url: {},
+    collection: {},
+    file: {},
+    dom: {},
+    uid: {},
+    graphic: {},
+    ajax: {}
+};
+/**
+ * xutil.LinkedHashMap
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    节点有序的哈希表
+ *           为哈希表提供线性表能力，适合管理有唯一性id的数据集合，
+ *           做为队列、链表等结构使用
+ * @author:  sushuang(sushuang)
+ * @depend:  none
+ */
+
+/**
+ * @usage 
+ *    (1) 作为HashMap
+ *        var h1 = new LinkedHashMap();
+ *        h1.set('name', 'ss');
+ *        h1.set('age', 123);
+ *        var name = h1.get('name');
+ * 
+ *    (2) 作为数组、链表（支持环链表，见next、previous方法）、队列
+ *        // 从id字段中取值做为HashMap的key
+ *        var h2 = new LinkedHashMap(null, 'id'); 
+ *        h2.addLast({ id: 23, name: 'ss' });
+ *        h2.addFirst({ id: 34, name: 'bbb' });
+ *        h2.appendAll(
+ *          [
+ *              { id: 99, name: 'xx' }, 
+ *              { id: 543, name: 'trr' }
+ *          ]
+ *        );
+ *        // 得到{id:23, name: 'ss'}
+ *        var data1 = h2.get(23); 
+ *        // 得到{id: 23, name: 'ss'}，按index取值
+ *        var data2 = h2.getAt(1); 
+ *        // 得到{id: 34, name: 'bbb'}
+ *        var data3 = h2.first(); 
+ *        // 遍历
+ *        foreach(function(key, item, index) { ... }) 
+ * 
+ *    (3) 从list中自动取得key，value初始化
+ *        // 如下设置为自动从'id'字段中取值做为HashMap的key，
+ *        // 以{id: 55, name: 'aa'}整个为数据项
+ *        var h3 = new LinkedHashMap([{ id: 55, name: 'aa' }], 'id');
+ *        h3.addLast({ id: 23, name: 'ss' });
+ *        // 如下设置为自动从id字段中取值做为HashMap的key，
+ *        // 以name字段值做为数据项
+ *        var h4 = new LinkedHashMap(null, 'id', 'name');
+ *        h4.addLast({ id: 23, name: 'ss' });
+ *        h4.addFirst('bb', 24); //同样效果
+ */
+(function () {
+
+    var namespace = xutil;
+    
+    /**
+     * 构造函数
+     * 可构造空LinkedHashMap，也可以list进行初始化
+     * 
+     * @public
+     * @constructor
+     * @param {Array.<Object>} list 初始化列表
+     *          为null则得到空LinkedHashMap
+     * @param {(string|Function)=} defautlKeyAttr 
+     *          表示list每个节点的哪个字段要做为HashMap的key，可缺省，
+     *          如果为Function：
+     *              param {*} list的每个节点
+     *              return {*} HashMap的key
+     * @param {(string|Function)=} defaultValueAttr 
+     *          表示list每个节点的哪个字段要做为HashMap的value，可缺省，
+     *          缺省则取list每个节点本身做为HashMap的value
+     *          如果为Function：
+     *              param {*} list的每个节点
+     *              return {*} HashMap的value
+     * @return {LinkedHashMap} 返回新实例
+     */
+    var LINKED_HASH_MAP = namespace.LinkedHashMap = 
+            function (list, defautlKeyAttr, defaultValueAttr) {
+                this._oMap = {};
+                this._oHead = null;
+                this._oTail = null;
+                this._nLength = 0;
+                this.setDefaultAttr(defautlKeyAttr, defaultValueAttr);
+                list && this.appendAll(list);
+            };
+    var LINKED_HASH_MAP_CLASS = LINKED_HASH_MAP.prototype;
+
+    /**
+     * 设置defautlKeyAttr和defaultValueAttr
+     *
+     * @public
+     * @param {(string|Function)=} defautlKeyAttr 参见构造函数中描述
+     * @param {(string|Function)=} defaultValueAttr 参见构造函数中描述
+     */
+    LINKED_HASH_MAP_CLASS.setDefaultAttr = function (
+        defautlKeyAttr, defaultValueAttr
+    ) {
+        this._sDefaultKeyAttr = defautlKeyAttr;
+        this._sDefaultValueAttr = defaultValueAttr;
+    };
+
+    /**
+     * 批量在最后追加数据
+     * 
+     * @public
+     * @param {Array} list 要增加的列表
+     * @param {(string|Function)=} keyAttr 
+     *      表示list每个节点的哪个字段要做为HashMap的key，
+     *      缺省则按defautlKeyAttr从list每个节点中取key
+     * @param {(string|Function)=} valueAttr 
+     *      表示list每个节点的哪个字段要做为HashMap的value，
+     *      缺省则按defautlValueAttr从list每个节点中取value，
+     *      无defautlValueAttr则取list每个节点本身做为HashMap的value
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.appendAll = function (list, keyAttr, valueAttr) {
+        keyAttr == null && (keyAttr = this._sDefaultKeyAttr);
+        if (keyAttr == null) { return this; }
+        valueAttr == null && (valueAttr = this._sDefaultValueAttr);
+
+        list = list || [];
+        for (var i = 0, len = list.length, item; i < len; i ++) {
+            if (!(item = list[i])) { continue; }
+            this.addLast(
+                this.$retieval(item, valueAttr), 
+                this.$retieval(item, keyAttr)
+            );
+        }
+        return this;
+    };
+
+    /**
+     * 在最后增加
+     * 用法一：
+     *      my.addLast('asdf', 11)
+     *      11为key，'asdf'为value
+     * 用法二：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa', 'vv');
+     *      则可以
+     *      my.addLast({ aa: 11, vv: 'asdf' })
+     *      自动提取11做为key，'asdf'做为value
+     * 用法三：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa');
+     *      则可以
+     *      my.addLast({ aa: 11, vv: 'asdf' })
+     *      自动提取11做为key，{ aa: 11, vv: 'asdf' }做为value
+     * 传两个参数则表示用法一，
+     * 传一个参数则表示用法二、三（即不传key参数）
+     *
+     * @public
+     * @param {(*|Object)} item 增加的数据
+     * @param {string=} key HashMap的关键字
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.addLast = function (item, key) {
+        if (key == null) {
+            // 用法一
+            key = this.$retieval(item, this._sDefaultKeyAttr);
+            item = this.$retieval(item, this._sDefaultValueAttr);
+        }
+
+        var node = { key: key, item: item, pre: null, next: null }; 
+        this._oMap[key] = node;
+        this.$insert(node, this._oTail, null);
+        return this;
+    };
+
+    /**
+     * 在最前增加
+     * 用法一：
+     *      my.addFirst('asdf', 11)
+     *      11为key，'asdf'为value
+     * 用法二：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa', 'vv');
+     *      则可以
+     *      my.addFirst({ aa: 11, vv: 'asdf' })
+     *      自动提取11做为key，'asdf'做为value
+     * 用法三：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa');
+     *      则可以
+     *      my.addFirst({ aa: 11, vv: 'asdf' })
+     *      自动提取11做为key，{ aa: 11, vv: 'asdf' }做为value
+     * 传两个参数则表示用法一，
+     * 传一个参数则表示用法二、三（即不传key参数）
+     *
+     * @public
+     * @param {(*|Object)} item 增加的数据
+     * @param {string=} key HashMap的关键字
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.addFirst = function (item, key) {
+        if (key == null) {
+            // 用法一
+            key = this.$retieval(item, this._sDefaultKeyAttr);
+            item = this.$retieval(item, this._sDefaultValueAttr);
+        }
+
+        var node = { key: key, item: item, pre: null, next: null };
+        this._oMap[key] = node;
+        this.$insert(node, null, this._oHead);
+        return this;
+    };
+
+    /**
+     * 在某项前插入
+     * 用法一：
+     *      my.insertBefore('asdf', 11, 333)
+     *      11为key，'asdf'为value，333为插入位置refKey  
+     * 用法二：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa', 'vv');
+     *      则可以
+     *      my.insertBefore({ aa: 11, vv: 'asdf' }, 333)
+     *      自动提取11做为key，'asdf'做为value
+     * 用法三：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa');
+     *      则可以
+     *      my.insertBefore({ aa: 11, vv: 'asdf' }, 333)
+     *      自动提取11做为key，{ aa: 11, vv: 'asdf' }做为value
+     * 传三个参数则表示用法一，
+     * 传两个参数则表示用法二、三（即不传key参数）
+     *
+     * @public
+     * @param {(*|Object)} item 增加的数据
+     * @param {string=} key item对应的HashMap的关键字
+     * @param {string} refKey 在refKey项前插入
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.insertBefore = function () {
+        var item;
+        var key;
+        var refKey;
+        var arg = arguments;
+        if (arg.length == 2) {
+            // 用法二、三
+            item = this.$retieval(arg[0], this._sDefaultValueAttr);
+            key = this.$retieval(arg[0], this._sDefaultKeyAttr);
+            refKey = arg[1];
+        }
+        else {
+            // 用法一
+            item = arg[0];
+            key = arg[1];
+            refKey = arg[2];
+        }        
+
+        var refNode = this._oMap[refKey];
+        var node = { key: key, item: item, pre: null, next: null };
+        if (refNode) {
+            this._oMap[key] = node;
+            this.$insert(node, refNode.pre, refNode);
+        }
+        return this;
+    };
+
+    /**
+     * 在某项后插入
+     * 用法一：
+     *      my.insertAfter('asdf', 11, 333)
+     *      11为key，'asdf'为value，333为插入位置refKey  
+     * 用法二：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa', 'vv');
+     *      则可以
+     *      my.insertAfter({ aa: 11, vv: 'asdf' }, 333)
+     *      自动提取11做为key，'asdf'做为value
+     * 用法三：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa');
+     *      则可以
+     *      my.insertAfter({ aa: 11, vv: 'asdf' }, 333)
+     *      自动提取11做为key，{ aa: 11, vv: 'asdf' }做为value
+     * 传三个参数则表示用法一，
+     * 传两个参数则表示用法二、三（即不传key参数）
+     * 
+     * @public
+     * @param {(*|Object)} item 增加的数据
+     * @param {string=} key item对应的HashMap的关键字，
+     * @param {string} refKey 在refKey项后插入
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.insertAfter = function () {
+        var item;
+        var key;
+        var refKey;
+        var arg = arguments;
+        if (arg.length == 2) {
+            // 用法二、三
+            item = this.$retieval(arg[0], this._sDefaultValueAttr);
+            key = this.$retieval(arg[0], this._sDefaultKeyAttr);
+            refKey = arg[1];
+        }
+        else {
+            // 用法一
+            item = arg[0];
+            key = arg[1];
+            refKey = arg[2];
+        }
+
+        var refNode = this._oMap[refKey];
+        var node = { key: key, item: item, pre: null, next: null };
+        if (refNode) {
+            this._oMap[key] = node;
+            this.$insert(node, refNode, refNode.next);
+        }
+        return this;
+    };
+
+    /**
+     * 在某位置插入
+     * 用法一：
+     *      my.insertAt('asdf', 11, 0)
+     *      11为key，'asdf'为value，0为插入位置index     
+     * 用法二：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa', 'vv');
+     *      则可以
+     *      my.insertAt({ aa: 11, vv: 'asdf' }, 0)
+     *      自动提取11做为key，'asdf'做为value
+     * 用法三：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa');
+     *      则可以
+     *      my.insertAt({ aa: 11, vv: 'asdf' }, 0)
+     *      自动提取11做为key，{ aa: 11, vv: 'asdf' }做为value
+     * 传三个参数则表示用法一，
+     * 传两个参数则表示用法二、三（即不传key参数）
+     *
+     * @public
+     * @param {(*|Object)} item 增加的数据
+     * @param {string=} key item对应的HashMap的关键字
+     * @param {Object} index 插入位置，从0开始
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.insertAt = function () {
+        var item;
+        var key;
+        var index;
+        var arg = arguments;
+        if (arg.length == 2) {
+            // 用法二、三
+            item = this.$retieval(arg[0], this._sDefaultValueAttr);
+            key = this.$retieval(arg[0], this._sDefaultKeyAttr);
+            index = arg[1];
+        }
+        else {
+            // 用法一
+            item = arg[0];
+            key = arg[1];
+            index = arg[2];
+        }
+
+        if (index != null && index == this.size()) {
+            this.addLast(item, key);
+        }
+        else {
+            var ref = this.getAt(index);
+            if (ref && ref.key != null) {
+                this.insertBefore(item, key, ref.key);
+            }
+        }
+        return this;
+    };
+
+    /**
+     * 全部清除LinkedHashMap内容
+     *
+     * @public
+     */
+    LINKED_HASH_MAP_CLASS.clean = function () {
+        this._oMap = {};
+        this._oHead = null;
+        this._oTail = null;
+        this._nLength = 0;
+        this._sDefaultKeyAttr = null;
+        this._sDefaultValueAttr = null;
+    };
+
+    /**
+     * 清除LinkedHashMap内容，但是不清除defaultKeyAttr和defaultValueAttr
+     *
+     * @public
+     */
+    LINKED_HASH_MAP_CLASS.cleanWithoutDefaultAttr = function () {
+        this._oMap = {};
+        this._oHead = null;
+        this._oTail = null;
+        this._nLength = 0;
+    };
+
+    /**
+     * 设置数据
+     * 用法一：
+     *      my.set(11, 'asdf')
+     *      11为key，'asdf'为value
+     * 用法二：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa', 'vv');
+     *      则可以
+     *      my.set({ aa: 11, vv: 'asdf' })
+     *      自动提取11做为key，'asdf'做为value
+     * 用法三：
+     *      如果这样初始化
+     *      var my = new LinkedHashMap(null, 'aa');
+     *      则可以
+     *      my.set({ aa: 11, vv: 'asdf' })
+     *      自动提取11做为key，{ aa: 11, vv: 'asdf' }做为value
+     * 传两个参数则表示用法一，
+     * 传一个参数则表示用法二、三（即不传key参数）
+     * 
+     * @public
+     * @param {Object=} key item对应的HashMap的关键字
+     * @param {(*|Object)} item 增加的数据
+     * @return {LinkedHashMap} 返回自身
+     */
+    LINKED_HASH_MAP_CLASS.set = function () {
+        var key;
+        var item;
+        var arg = arguments;
+        if (arg.length == 1) {
+            // 用法二、三
+            item = arg[0];
+        } 
+        else {
+            // 用法一
+            key = arg[0];
+            item = arg[1];
+        }
+
+        // 如果已存在
+        var node = this._oMap[key]
+        if (node) {
+            node.item = item;
+        }
+        // 新建
+        else {
+            this.addLast(item, key);
+        }
+        return this;
+    };
+    
+    /**
+     * 取得数据
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @return {*} 取得的数据，未取到则返回null
+     */
+    LINKED_HASH_MAP_CLASS.get = function (key) {
+        var node = this._oMap[key];
+        return node ? node.item : null;
+    };
+    
+    /**
+     * 按index取得数据
+     * 
+     * @public
+     * @param {Object} index 序号，从0开始
+     * @return {Object} ret 取得的数据，
+     *              例如：
+     *              { key:'321', value: { id: '321', name: 'ss' } }，
+     *              未取到则返回null
+     * @return {number} ret.key HashMap的key
+     * @return {*} ret.item 数据本身
+     */
+    LINKED_HASH_MAP_CLASS.getAt = function (index) {
+        var ret = {};
+        this.foreach(function (key, item, i) {
+            if (index == i) {
+                ret.key = key;
+                ret.item = item;
+                return false;
+            }
+        });
+        return ret.key != null ? ret : null;
+    };
+
+    /**
+     * 按key得到index
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @param {number} index 序号，从0开始，如果未找到，返回-1
+     */
+    LINKED_HASH_MAP_CLASS.getIndex = function (key) {
+        var index = -1;
+        this.foreach(function (k, item, i) {
+            if (k == key) {
+                index = i;
+                return false;
+            }
+        });
+        return index;
+    };
+    
+    /**
+     * 根据内容遍历，获取key
+     * 
+     * @public
+     * @param {Object} item 内容
+     * @param {Object} key item对应的HashMap的关键字
+     */
+    LINKED_HASH_MAP_CLASS.getKey = function (item) {
+        var key;
+        this.foreach(function (k, o, i) {
+            if (o.item == item) {
+                key = k;
+                return false;   
+            }
+        });
+        return key;
+    };
+
+    /**
+     * 是否包含
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @return {boolean} 是否包含
+     */
+    LINKED_HASH_MAP_CLASS.containsKey = function (key) {
+        return !!this.get(key);
+    };
+
+    /**
+     * 将所有数据以Array形式返回
+     * 
+     * @public
+     * @return {Array} 所有数据
+     */
+    LINKED_HASH_MAP_CLASS.list = function () {
+        var ret = [];
+        this.foreach(function (key, item) { ret.push(item); });
+        return ret;
+    };
+
+    /**
+     * 从链表首顺序遍历
+     * 
+     * @public
+     * @param {Function} visitFunc 每个节点的访问函数
+     *          param {string} key 每项的key
+     *          param {*} item 每项
+     *          param {number} index 遍历的计数
+     *          return {boolan} 如果返回为false，则不再继续遍历
+     */
+    LINKED_HASH_MAP_CLASS.foreach = function (visitFunc) {
+        var node = this._oHead;
+        var i = 0;
+        var goOn = true;
+        while (node) {
+            if (visitFunc(node.key, node.item, i++) === false) { 
+                break; 
+            }
+            node = node.next;
+        }
+    };
+
+    /**
+     * 删除key对应的项
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @return {*} 被删除的项
+     */
+    LINKED_HASH_MAP_CLASS.remove = function (key) {
+        var node = this._oMap[key];
+        if (node) {
+            delete this._oMap[key];
+            var preNode = node.pre;
+            var nextNode = node.next;
+            preNode && (preNode.next = nextNode);
+            nextNode && (nextNode.pre = preNode);
+            this._nLength --; 
+            (this._oHead == node) && (this._oHead = nextNode); 
+            (this._oTail == node) && (this._oTail = preNode);
+        }
+        return node ? node.item : null;
+    };
+
+    /**
+     * 得到LinkedHashMap大小
+     * 
+     * @public
+     * @return {number} LinkedHashMap大小
+     */
+    LINKED_HASH_MAP_CLASS.size = function () {
+        return this._nLength;
+    };
+
+    /**
+     * 得到第一个数据
+     * 
+     * @public
+     * @return {*} 第一个数据
+     */
+    LINKED_HASH_MAP_CLASS.first = function () {
+        return this._oHead ? this._oHead.item : null;
+    };
+    
+    /**
+     * 得到第一个key
+     * 
+     * @public
+     * @return {string} 第一个key
+     */
+    LINKED_HASH_MAP_CLASS.firstKey = function () {
+        return this._oHead ? this._oHead.key : null;
+    };
+
+    /**
+     * 得到最后一个数据
+     * 
+     * @public
+     * @return {*} 最后一个数据
+     */
+    LINKED_HASH_MAP_CLASS.last = function () {
+        return this._oTail ? this._oTail.item : null;
+    };
+    
+    /**
+     * 得到最后一个key
+     * 
+     * @public
+     * @return {string} 最后一个key
+     */
+    LINKED_HASH_MAP_CLASS.lastKey = function () {
+        return this._oTail ? this._oTail.key : null;
+    };
+
+    
+    /**
+     * 得到key对应的下一个项，未取到则返回null
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @param {boolean=} circular 如果到链尾，是否循环到链首，默认为false
+     * @return {*} 取得的数据
+     */
+    LINKED_HASH_MAP_CLASS.next = function (key, circular) {
+        var node = this.$next(key, circular);
+        return node ? node.item : null;
+    };
+    
+    /**
+     * 得到key对应的下一个key，未取到则返回null
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @param {boolean=} circular 如果到链尾，是否循环到链首，默认为false
+     * @return {string} 取得的key
+     */
+    LINKED_HASH_MAP_CLASS.nextKey = function (key, circular) {
+        var node = this.$next(key, circular);
+        return node ? node.key : null;
+    };
+    
+
+    /**
+     * 得到key对应的上一个项，未取到则返回null
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @param {boolean=} circular 如果到链尾，是否循环到链首，默认为false
+     * @return {*} 取得的数据
+     */
+    LINKED_HASH_MAP_CLASS.previous = function (key, circular) {
+        var node = this.$previous(key, circular);
+        return node ? node.item : null;
+    };
+    
+    /**
+     * 得到key对应的上一个key，未取到则返回null
+     * 
+     * @public
+     * @param {Object} key item对应的HashMap的关键字
+     * @param {boolean=} circular 如果到链尾，是否循环到链首，默认为false
+     * @return {string} 取得的key
+     */
+    LINKED_HASH_MAP_CLASS.previousKey = function (key, circular) {
+        var node = this.$previous(key, circular);
+        return node ? node.key : null;
+    };
+    
+    /**
+     * @protected
+     */
+    LINKED_HASH_MAP_CLASS.$next = function (key, circular) {
+        var node = this._oMap[key];
+        if (!node) { return null; }
+        var next = (circular && node == this._oTail) 
+                ? this._oHead : node.next;
+        return next;
+    };
+    
+    /**
+     * @protected
+     */
+    LINKED_HASH_MAP_CLASS.$previous = function (key, circular) {
+        var node = this._oMap[key];
+        if (!node) { return null; }
+        var pre = (circular && node == this._oHead) 
+                ? this._oTail : node.pre;
+        return pre;
+    };
+    
+    /**
+     * @protected
+     */
+    LINKED_HASH_MAP_CLASS.$retieval = function (item, attr) {
+        var k;
+        if (Object.prototype.toString.call(attr) == '[object Function]') {
+            k = attr(item);
+        } 
+        else if (attr == null) {
+            k = item;
+        } 
+        else {
+            k = item[attr];
+        }
+        return (k === void 0) ? null : k;
+    };   
+
+    /**
+     * @protected
+     */
+    LINKED_HASH_MAP_CLASS.$insert = function (node, preNode, nextNode) {
+        node.pre = preNode;
+        node.next = nextNode;
+        preNode ? (preNode.next = node) : (this._oHead = node);
+        nextNode ? (nextNode.pre = node) : (this._oTail = node);
+        this._nLength ++;
+    };
+    
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    /**
+     * 延迟执行函数的集合
+     *
+     * @type {Array.<Function>}
+     * @private
+     */
+    var linkSet = [];
+    /**
+     * 最终执行的函数集合
+     *
+     * @type {Array.<Function>}
+     * @private
+     */
+    var endSet = [];
+    /**
+     * 最近一次的名空间
+     *
+     * @type {Object}
+     * @private
+     */
+    var lastNameSpace;
+    
+    /**
+     * (1) 创建名空间：如调用namespace("aaa.bbb.ccc")，如果不存在，则建立。
+     * (2) 获得指定名空间：如上，如果存在NS_BASE.aaa.bbb.ccc，则返回。
+     * (3) 获得最近一次声明的名空间：调用namespace()，不传参数，
+     *      则返回最近一次调用namespace（且isRecord参数不为false）得到的结果
+     * 
+     * NS_BASE默认是window (@see setNamespaceBase)。 
+     *
+     * @public
+     * @param {string=} namespacePath 名空间路径，
+     *              以"."分隔，如"aaa.bbb.ccc"，
+     *              如果不传参，则返回最近一次调用结果。
+     * @param {boolean} isRecord 是否记录此次调用结果，缺省则表示true
+     * @return {Object} 名空间对象
+     */
+    XPROJECT.namespace = function (namespacePath, isRecord) {
+        if (arguments.length == 0) {
+            return lastNameSpace;
+        }
+=======
+/**
+ * xutil.ajax
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    工程中Ajax的统一入口。基于基本的ajax封装实现，提供便于工程开发的附加功能。
+ *          功能：
+ *          (1) 全局的的请求失败处理定义接口
+ *          (2) 全局的等待提示定义接口
+ *             （使用方式：请求时传参数showWaiting）
+ *          (3) 请求超时设定及全局的超时处理定义接口
+ *          (4) 提供complete和finalize事件，便于不论请求成功与否的时的处理（如某些清理）
+ *          (5) 返回的一致性保证
+ *              用于在不屏蔽二次点击/重复请求情况下保证只是最新的请求返回被处理。
+ *              用abort方式实现，可abort重复发出的请求。
+ *              没有使用为每个请求挂唯一性tokenId方式的原因是，
+ *              tokenId方式不易处理这种问题：
+ *              如果pending的连接已超过浏览器连接上限，用户看无响应继续点击，
+ *              会造成自激性连接堆积，难以恢复。
+ *              但是abort方式的缺点是，如果重复请求过于频繁（例如由用户点击过快造成），
+ *              容易对后台造成压力。暂时未支持对请求过频繁的限制（TODO）。
+ *              （使用方式：请求时传参数businessKey）
+ *          (6) abort支持的完善
+ *              在多局部刷新的web应用中，在适当时点可以abort掉未完成的请求，
+ *              防止返回处理时因相应的dom已不存在而出错。
+ *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
+ *              参见createSyncWrap方法
+ * @author:  sushuang(sushuang)
+ * @depend:  tangram.ajax, e-json, xutil.ajax
+ */
+
+(function () {
+    
+    var AJAX = xutil.ajax;
+    var exRequest = baidu.ejson.request;
+        
+    /**
+     * 外部接口，可以在工程中定义这些方法的实现或变量的赋值（也均可缺省）
+     */
+    /**
+     * 默认的ajax调用选项，常用于工程的统一配置。
+     * 可以被真正调用ajax时传的options覆盖
+     *
+     * @type {Object}
+     * @public
+     * @see ajax.request
+     */
+    AJAX.DEFAULT_OPTIONS = null;
+    /**
+     * 全局统一的请求失败处理函数
+     * 先调用自定义的失败处理函数，再调用此统一的失败处理函数。
+     * 如果前者返回false，则不会调用后者。
+     *
+     * @type {Function}
+     * @public
+     * @param {number} status ajax返回状态
+     * @param {(Object|string)} obj e-json整体返回的数据
+     * @param {Function} defaultCase 可用此函数替换默认情况的处理函数
+     */
+    AJAX.DEFAULT_FAILURE_HANDLER = null;
+    /**
+     * 全局统一的请求超时处理函数
+     * （无参数返回值）
+     *
+     * @type {Function}
+     * @public
+     */
+    AJAX.DEFAULT_TIMEOUT_HANDLER = null;
+    /**
+     * 全局统一的请求函数
+     *
+     * @type {Function}
+     * @public
+     * @return {string} 参数字符串，如a=5&a=2&b=xxx
+     */
+    AJAX.DEFAULT_PARAM = null;
+    /**
+     * 用于显示全局的等待提示，当第一个需要显示等待的请求发生时会调用
+     *
+     * @type {Function}
+     * @public
+     */
+    AJAX.SHOW_WAITING_HANDLER = null;
+    /**
+     * 用于隐藏全局的等待提示，当最后一个需要显示等待的请求结束时会调用
+     *
+     * @type {Function}
+     * @public
+     */
+    AJAX.HIDE_WAITING_HANDLER = null;
+    /**
+     * 默认是否显示等待提示，默认为false，可在工程中修改此默认定义
+     *
+     * @type {Function}
+     * @public
+     */
+    AJAX.DEFAULT_SHOW_WAITING = false;
+        
+    /**
+     * 记录所有请求未结束的xhr，
+     * 格式：{requestId: {xhr: <xhr>, clear: <clear>}}
+     * 
+     * @type {Object}
+     * @private
+     */
+    var xhrSet = {};
+    /**
+     * 记录指定了businessKey的请求，
+     * 格式：{businessKey: requestId}
+     *
+     * @type {Object}
+     * @private
+     */
+    var businessSet = {};
+    /**
+     * 记录所有需要显示等待的requestId，
+     * 是xhrSet的子集，
+     * 格式：{requestId: 1}
+     *
+     * @type {Object}
+     * @private
+     */
+    var waitingSet = {};
+    /**
+     * waitingSet的大小
+     *
+     * @type {number}
+     * @private
+     */
+    var waitingCount = 0;
+    /**
+     * 唯一性ID
+     *
+     * @type {number}
+     * @private
+     */
+    var uniqueIndex = 1;
+    
+    /**
+     * append默认的参数
+     *
+     * @private
+     * @param {string} data 参数
+     */
+    function appendDefaultParams(data) {
+        var paramArr = [];
+
+        if (hasValue(data) && data !== '') {
+            paramArr.push(data);
+        }
+
+        var defaultParamStr = AJAX.DEFAULT_PARAM ? AJAX.DEFAULT_PARAM() : '';
+        if (hasValue(defaultParamStr) && defaultParamStr !== '') {
+            paramArr.push(defaultParamStr);
+        }
+
+        return paramArr.join('&');
+    }
+    
+    /**
+     * 打印日志
+     *
+     * @private
+     * @param {string} msg 日志信息
+     */
+    function log(msg) {
+        isObject(window.console) 
+            && isFunction(window.console.log) 
+            && window.console.log(msg);
+    }
+    
+    /**
+     * 显示等待处理
+     *
+     * @private
+     * @param {string} requestId 请求ID
+     * @param {boolean} showWaiting 是否显示等待
+     */
+    function handleShowWaiting(requestId, showWaiting) {
+        if (showWaiting) {
+            waitingSet[requestId] = 1;
+            (waitingCount ++) == 0
+                && AJAX.SHOW_WAITING_HANDLER 
+                && AJAX.SHOW_WAITING_HANDLER();
+        }
+    }
+    
+    /**
+     * 隐藏等待处理
+     *
+     * @private
+     * @param {string} requestId 请求ID
+     */
+    function handleHideWaiting(requestId) {
+        if (waitingSet[requestId]) {
+            delete waitingSet[requestId];
+            (-- waitingCount) <= 0 
+                && AJAX.HIDE_WAITING_HANDLER 
+                && AJAX.HIDE_WAITING_HANDLER();
+        }
+    }
+    
+    /**
+     * abort处理
+     *
+     * @private
+     * @param {string} businessKey 业务键
+     * @param {string} requestId 请求ID
+     */
+    function handleBusinessAbort(businessKey, requestId) {
+        var oldRequestId;
+        if (hasValue(businessKey)) {
+            (oldRequestId = businessSet[businessKey]) 
+                && AJAX.abort(oldRequestId, true);
+            businessSet[businessKey] = requestId;
+        }
+    }
+    
+    /**
+     * 业务键清除处理
+     *
+     * @private
+     * @param {string} businessKey 业务键
+     */
+    function handleBusinessClear(businessKey) {
+        if (hasValue(businessKey)) {
+            delete businessSet[businessKey];   
+        }
+    }
+    
+    /**
+     * 发送请求
+     * 
+     * @public
+     * @param {string} url
+     * @param {Objet} options
+     * @param {string} options.data 发送参数字符串，GET时会拼装到URL
+     * @param {string} options.method 表示http method, 'POST'或'GET', 默认'POST'
+     * @param {string} options.businessKey 业务键，提供自动abort功能。
+     *              缺省则不用此功能。
+     *              如果某业务键的请求尚未返回，又发起了同一业务键的请求，
+     *              则前者自动被abort。
+     *              这样保证了请求返回处理的一致性，
+     *              在请求可以重复发起的环境下较有意义
+     *              （例如用户连续点击“下一页”按钮刷新列表，
+     *              同时为用户体验而不会在返回前屏蔽点击时）。
+     * @param {boolean} options.showWaiting 是否需要显示等待，true则计入等待集合，
+     *              在相应时机调用SHOW_WAITING_HANDLER和HIDE_WAITING_HANDLER；
+     *              false则忽略。默认值由DEFAULT_SHOW_WAITING指定。
+     * @param {Function} options.onsuccess 请求成功的回调函数
+     *              param {Object} data e-json解析出的业务数据
+     *              param {Object} obj e-json返回数据整体
+     * @param {Function} options.onfailure 请求失败的回调函数
+     *              param {number} status e-json返回状态
+     *              param {(Object|string)} obj e-json返回数据整体
+     * @param {Function} options.oncomplete 返回时触发的回调函数，
+     *              先于onsuccess或onfailure执行
+     *              param {(Object|string)} obj e-json返回的数据整体 
+     *              return {boolean} 如果返回false，则onsucces和onfailure都不执行
+     * @param {Function} options.onfinalize 返回时触发的回调函数，
+     *              后于onsuccess或onfailure执行
+     *              param {(Object|string)} obj e-json返回的数据整体
+     * @param {Function} options.defaultFailureHandler 
+     *              请求自定的默认的失败处理函数，可缺省
+     *              param {number} status e-json返回状态
+     *              param {(Object|string)} obj e-json返回数据整体
+     * @param {number} options.timeout 请求超时时间，默认是无限大
+     * @param {Function} options.ontimeout 超时时的回调
+     * @param {string} options.syncName 用于请求的同步，参见createSyncWrap方法
+     * @param {Object} options.syncWrap 用于请求的同步，参见createSyncWrap方法
+     * @return {string} options.requestId request的标志，用于abort
+     */
+    AJAX.request = function (url, options) {
+        options = extend(
+            extend(
+                {}, AJAX.DEFAULT_OPTIONS || {}
+            ), 
+            options || {}
+        );
+        var requestId = 'AJAX_' + (++uniqueIndex);
+        var businessKey = options.businessKey;
+        var defaultFailureHandler = 
+                options.defaultFailureHandler || null;
+        var timeout = options.timeout || 0;
+        var ontimeout = options.ontimeout;
+        var onfailure = options.onfailure;
+        var onsuccess = options.onsuccess;
+        var oncomplete = options.oncomplete;
+        var onfinalize = options.onfinalize;
+        var showWaiting = options.showWaiting || AJAX.DEFAULT_SHOW_WAITING;
+        var syncWrap = options.syncWrap;
+        var syncName = options.syncName;
+        var xhr;
+        
+        function clear() {
+            defaultFailureHandler = ontimeout = 
+            onfailure = onsuccess = 
+            onfinalize = oncomplete = xhr = options = null;
+
+            delete xhrSet[requestId];
+            handleBusinessClear(businessKey);
+            handleHideWaiting(requestId);
+        }
+
+        // tangram的ajax提供的屏蔽浏览器缓存
+        options.noCache = true;
+
+        options.method = options.method || 'POST';
+
+        options.data = appendDefaultParams(options.data || '');
+
+        // 构造sucess handler
+        options.onsuccess = function (data, obj) {
+            if (requestId in xhrSet) { // 判断abort
+                try {
+                    if (!oncomplete || oncomplete(obj) !== false) {
+                        onsuccess(data, obj);
+                    }
+                    onfinalize && onfinalize(obj);
+                } 
+                catch (e) {
+                    AJAX.errorMsg = e.message;
+                }
+                finally {
+                    syncWrap && syncWrap.done(syncName);
+                    clear();
+                }
+            }
+        };
+
+        // 构造failure handler
+        options.onfailure = function (status, obj) {
+            var needDef;
+            if (requestId in xhrSet) { // 判断abort
+                try {
+                    if (!oncomplete || oncomplete(obj) !== false) {
+                        needDef = onfailure(status, obj);
+                    }
+                    onfinalize && onfinalize(obj);
+                } 
+                catch (e) {
+                    AJAX.errorMsg = e.message;
+                }
+                finally {
+                    if (needDef !== false) {
+                        if (AJAX.DEFAULT_FAILURE_HANDLER) {
+                            AJAX.DEFAULT_FAILURE_HANDLER(
+                                status, obj, defaultFailureHandler
+                            );
+                        }
+                        else if (defaultFailureHandler) {
+                            defaultFailureHandler(status, obj);
+                        }
+                    }
+                    syncWrap && syncWrap.done(syncName);
+                    clear();
+                }
+            }
+        };
+
+        // 构造timeout handler
+        options.ontimeout = function () {
+            try {
+                if (!oncomplete || oncomplete(obj) !== false) {
+                    ontimeout && ontimeout();
+                }
+                onfinalize && onfinalize(obj);
+            } 
+            catch (e) {
+                AJAX.errorMsg = e.message;
+            }
+            finally {
+                AJAX.DEFAULT_TIMEOUT_HANDLER 
+                    && AJAX.DEFAULT_TIMEOUT_HANDLER();
+                syncWrap && syncWrap.done(syncName);
+                clear();
+            }
+        };
+
+        if (timeout > 0) {
+            options.timeout = timeout;
+            options.ontimeout = timeoutHandler;
+        } 
+        else {
+            delete options.timeout;
+        }
+        
+        handleShowWaiting(requestId, showWaiting);
+        
+        handleBusinessAbort(requestId, businessKey);
+        
+        // 发送请求
+        xhrSet[requestId] = {
+            xhr: exRequest(url, options),
+            clear: clear
+        };
+        
+        return requestId;
+    }
+
+    /**
+     * 发送POST请求
+     * 
+     * @public
+     * @param {string} url
+     * @param {string} data 发送参数字符串，GET时会拼装到URL
+     * @param {Function} onsuccess @see AJAX.request
+     * @param {Function} onfailure @see AJAX.request
+     * @param {Objet} options @see AJAX.request
+     * @return {string} requestId request的标志，用于abort
+     */
+    AJAX.post = function (url, data, onsuccess, onfailure, options) {
+        options = options || {};
+        options.method = 'POST';
+        options.data = data;
+        options.onsuccess = onsuccess;
+        options.onfailure = onfailure;
+        return AJAX.request(url, options);
+    };
+
+    /**
+     * 发送GET请求
+     * 
+     * @public
+     * @param {string} url
+     * @param {string} data 发送参数字符串，GET时会拼装到URL
+     * @param {Function} onsuccess @see AJAX.request
+     * @param {Function} onfailure @see AJAX.request
+     * @param {Objet} options @see AJAX.request
+     * @return {string} requestId request的标志，用于abort
+     */
+    AJAX.get = function (url, data, onsuccess, onfailure, options) {
+        options = options || {};
+        options.method = 'GET';
+        options.data = data;
+        options.onsuccess = onsuccess;
+        options.onfailure = onfailure;
+        return AJAX.request(url, options);        
+    };
+
+    /**
+     * 按requestId终止请求，或终止所有请求
+     * 如果已经中断或结束后还调用此方法，不执行任何操作。
+     * 
+     * @public
+     * @param {string} requestId request的标志，
+     *          如果缺省则abort所有未完成的请求
+     * @param {boolean} silence abort后是否触发回调函数（即onfailure）
+     *          true则不触发，false则触发，缺省为true
+     */
+    AJAX.abort = function (requestId, silence) {
+        var willAbort = [];
+        var i;
+        var wrap;
+        silence = silence || true;
+        
+        if (hasValue(requestId)) {
+            (requestId in xhrSet) && willAbort.push(requestId);
+        } 
+        else {
+            for (i in xhrSet) { willAbort.push(i); }
+        }
+        
+        for (i = 0; requestId = willAbort[i]; i++) {
+            try {
+                wrap = xhrSet[requestId];
+                silence && delete xhrSet[requestId];
+                wrap.xhr.abort();
+                wrap.clear.call(null);
+            } catch (e) {
+                log(
+                    '[ERROR] abort ajax error. requestId=' + 
+                        requestId + ', e=' + e
+                );
+            }
+        }
+    };
+    
+    /**
+     * 按业务键（businessKey）终止请求
+     * 如果已经中断或结束后还调用此方法，不执行任何操作。
+     * 
+     * @public
+     * @param {string} businessKey 业务键
+     * @param {boolean} silence abort后是否触发回调函数（即onfailure）
+     *          true则不触发，false则触发，缺省为true
+     */
+    AJAX.abortBusiness = function (businessKey, silence) {
+        var requestId = businessSet[businessKey];
+        if (hasValue(requestId)) {
+            delete businessSet[businessKey];
+            AJAX.abort(requestId);
+        }
+    };
+
+    /**
+     * 创建一个同步对象，用于多个请求同步返回
+     * 
+     * @public
+     * @usage 假如回调函数callbackX需要在请求a和请求b都返回后才被调用，则这样做：
+     *        (1) 创建个“同步对象”
+     *          var reqWrap = ajax.syncRequest(
+     *              ['a', 'b'], 
+     *              function() { ... this is the callback } 
+     *          );
+     *        (2) 请求时作为参数传入
+     *          // 请求a
+     *          ajax.request(url, { syncName: 'a', syncWrap: reqWrap }); 
+     *          // 请求b
+     *          ajax.request(url, { syncName: 'b', syncWrap: reqWrap });
+     *          这样，reqWrap中定义的回调函数就会在a和b都返回后被执行了。
+     * 
+     * @param {Array} syncNameList 命名集合
+     * @param {Function} callback 回调函数
+     * @return {Object} 同步对象，用作request参数
+     */
+    AJAX.createSyncWrap = function (syncNameList, callback) {
+        return new SyncWrap(syncNameList, callback);
+    };
+
+    /**
+     * 用于多个请求同步的包装
+     *
+     * @constructor
+     * @private
+     * @param {Array} syncNameList 同步名列表
+     * @param {Array} callback 结束回调
+     */
+    function SyncWrap(syncNameList, callback) {
+        var i;
+        this.syncNameMap = {};
+        for (i = 0, syncNameList = syncNameList || []; i < syncNameList.length; i ++) {
+            this.syncNameMap[syncNameList[i]] = 0;
+        }
+        this.callback = callback || new Function();
+    }
+
+    /**
+     * 同步结束
+     *
+     * @public
+     * @param {string} syncName 同步名
+     */
+    SyncWrap.prototype.done = function (syncName) {
+        var name;
+        this.syncNameMap[syncName] = 1;
+        for (name in this.syncNameMap) {
+            if (!this.syncNameMap[name]) { return; }
+        }
+        this.callback.call(null);
+    };
+
+    /**
+     * 扩展
+     *
+     * @private
+     * @param {Object} target 目标对象
+     * @param {Object} source 源对象
+     * @return {Object} 扩展结果
+     */
+    function extend(target, source) {
+        for (var key in source) { target[key] = source[key]; }
+        return target;
+    }
+
+    /**
+     * 是否函数
+     *
+     * @private
+     * @param {*} variable 输入
+     * @return {boolean} 是否函数
+     */
+    function isFunction(variable) {
+        return Object.prototype.toString.call(variable) == '[object Function]';        
+    }
+
+    /**
+     * 是否有值
+     *
+     * @private
+     * @param {*} variable 输入
+     * @return {boolean} 是否有值
+     */
+    function hasValue(variable) {
+        return variable != null;
+    }
+
+    /**
+     * 是否对象
+     *
+     * @private
+     * @param {*} variable 输入
+     * @return {boolean} 是否对象
+     */
+    function isObject(variable) {
+        return variable === Object(variable);
+    }
+
+})();
+
+/**
+ * xutil.collection
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    列表、数组、集合相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.object
+ */
+
+(function () {
+    
+    var COLLECTION = xutil.collection;
+    var OBJECT = xutil.object;
+    
+    /**
+     * target是否在list的field域中存在
+     * 
+     * @public
+     * @param {*} target 被检测的目标
+     * @param {Array} list 被检测的数组
+     * @param {string} field 数组元素的域的名字，
+     *      如果为空则用list节点本身做比较的valueInList
+     * @param {Function} equalsFunc 比较函数，缺省则使用“==”做比较函数
+     *          参数为：
+     *          param {*} target 被检测的目标
+     *          param {*} valueInList list中的项
+     *          return {boolean} 是否相等
+     * @return {boolean} 判断结果
+     */
+    COLLECTION.inList = function (target, list, field, equalsFunc) {
+        if (target == null || !list) {
+            return false;
+        }
+
+        for(var i = 0, l = list.length, v; i < l; i ++) {
+            v = list[i];
+            if (v == null && field) { continue; }
+
+            v = field ? v[field] : v;
+            if (equalsFunc ? equalsFunc(target, v) : (target == v)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    /**
+     * 用类似SQL的方式检索列表
+     * 
+     * @public
+     * @param {*} target 被检测的目标
+     * @param {Array} list 被检测的数组
+     * @param {string} selectField 数组元素的域的名字，用于select
+     * @param {string} whereField 数组元素的域的名字，用于where
+     * @param {*} whereValue 数组元素的相应域的值，用于where
+     * @param {Function} equalsFunc 比较函数，缺省则使用“==”做比较函数
+     *          参数为：
+     *          param {*} target 被检测的目标
+     *          param {8} valueInList list中的项
+     *          return {boolean} 是否相等
+     * @return {Array} 检索结果
+     */
+    COLLECTION.selectFromWhere = function (
+        fromList, selectField, whereField, whereValue, equalsFunc
+    ) {
+        var ret = [];
+
+        if (whereValue == null || !fromList || !whereField || !selectField) {
+            return ret;
+        }
+
+        for(var i = 0, l = fromList.length, v, s; i < l; i ++) {
+            if (!(v = fromList[i])) { continue };
+
+            s = v[whereField];
+            if (equalsFunc ? equalsFunc(whereValue, s) : whereValue == s) {
+                ret.push(v[selectField]);
+            }
+        }
+
+        return ret;
+    };
+    
+    /**
+     * 用类似SQL的方式检索列表，返回单值
+     * 
+     * @public
+     * @param {*} target 被检测的目标
+     * @param {Array} list 被检测的数组
+     * @param {string} selectField 数组元素的域的名字，用于select
+     * @param {string} whereField 数组元素的域的名字，用于where
+     * @param {*} whereValue 数组元素的相应域的值，用于where
+     * @param {Function} equalsFunc 比较函数，缺省则使用“==”做比较函数
+     *          param {*} target 被检测的目标
+     *          param {*} valueInList list中的项
+     *          return {boolean} 是否相等
+     * @return {*} 检索结果，单值
+     */
+    COLLECTION.selectSingleFromWhere = function (
+        fromList, selectField, whereField, whereValue, compareFunc
+    ) {
+        var result = COLLECTION.selectFromWhere(
+                fromList, selectField, whereField, whereValue, compareFunc
+            );
+        return (result && result.length>0) ? result[0] : null;
+    };
+    
+    /**
+     * 排序 (用冒泡实现，是稳定排序)
+     * 
+     * @public
+     * @param {string} field 数组元素的域的名字，如果为空则用list节点本身做比较的valueInList
+     * @param {(string|Function)} compareFunc 比较函数，
+     *          可以传string或Function，compareFunc缺省则相当于传"<" 
+     *          如果为String: 可以传：">"（即使用算术比较得出的降序）, 
+     *                                "<"（即使用算术比较得出的升序）
+     *          如果为Function: 意为：v1是否应排在v2前面，参数为
+     *              param {*} v1 参与比较的第一个值
+     *              param {*} v2 参与比较的第二个值
+     *              return {boolean} 比较结果，true:v1应在v2前面；false:v1不应在v2前面
+     * @param {boolean} willNew 如果为true:原list不动，新创建一个list; 
+     *          如果为false:在原list上排序; 缺省:false
+     * @return {Array} 排序结果
+     */
+    COLLECTION.sortList = function (list, field, compareFunc, willNew) {
+        
+        willNew && (list = OBJECT.clone(list));
+        field = field != null ? field : null;    
+        
+        if (compareFunc == '>') {
+            compareFunc = function (v1, v2) { 
+                var b1 = v1 != null;
+                var b2 = v2 != null;
+                return (b1 && b2) 
+                            ? (v1 >= v2) /*大于等于，保证稳定*/ 
+                            : (b1 || !b2); /*空值算最小，同为空值返回true保证稳定*/
+            }
+        } 
+        else if (compareFunc == '<') {
+            compareFunc = function (v1, v2) { 
+                var b1 = v1 != null;
+                var b2 = v2 != null;
+                return (b1 && b2) 
+                            ? (v1 <= v2) /*小于等于，保证稳定*/ 
+                            : (!b1 || b2); /*空值算最大，同为空值返回true保证稳定*/
+            }
+        }
+        
+        var item1;
+        var item2; 
+        var v1;
+        var v2;
+        var switched = true;
+
+        for (var i = 0, li = list.length - 1; i < li && switched; i ++) {
+            switched = false;
+            
+            for (var j = 0, lj = list.length - i - 1; j < lj; j ++) {
+                item1 = list[j];
+                v1 = item1 != null ? (field ? item1[field] : item1) : null;
+                item2 = list[j + 1];
+                v2 = item2 != null ? (field ? item2[field] : item2) : null;
+                if (!compareFunc(v1, v2)) {
+                    list[j] = item2;
+                    list[j + 1] = item1;
+                    switched = true;
+                }
+            }
+        }
+
+        return list;    
+    };
+    
+    /**
+     * 遍历树
+     * 支持先序遍历、后序遍历、中途停止
+     * 
+     * @public
+     * @usage
+     *      travelTree(root, funciton (node, options) { 
+     *          do something ... 
+     *      }, '_aChildren');
+     * 
+     * @param {Object} travelRoot 遍历的初始
+     * @param {Function} callback 每个节点的回调
+     *          参数为：
+     *          param {Object} node 当前访问的节点
+     *          param {Object} options 一些遍历中的状态
+     *          param {number} options.level 当前层级，0层为根
+     *          param {number} options.index 遍历的总计数，从0开始计
+     *          param {Object} options.parent 当前节点的父亲
+     *          param {Object} options.globalParam 全局用的参数，在遍历的任何环节可以填入
+     *          param {Object} options.parentParam
+     *              先序遍历时，此对象用于在callback中取出父节点传递来的数据
+     *              后序遍历时，此对象用于在callback中填入的要传递给父节点的数据
+     *          param {Object} options.childrenParam 
+     *              先序遍历时，此对象用于在callback中填入的要传递给子节点的数据
+     *              后序遍历时，此对象用于在callback中取出子节点传递来的数据
+     *          return {number} 如果为STOP_ALL_TRAVEL则停止所有遍历，
+     *              如果为STOP_SUB_TREE_TRAVEL则停止遍历当前子树
+     * @param {string} childrenField 子节点列表属性名，缺省为'children'
+     * @param {boolean} postorder true则先序遍历（缺省值），false则后序遍历
+     * @param {Object} globalParam 全局参数
+     */
+    COLLECTION.travelTree = function (
+        travelRoot, callback, childrenField, postorder, globalParam
+    ) {
+        $travelTree(
+            travelRoot, 
+            callback, 
+            childrenField, 
+            postorder, 
+            0, 
+            null, 
+            { index:0 }, 
+            {}, 
+            {}, 
+            globalParam || {}
+        );
+    }
+
+    // 用于停止所有遍历
+    COLLECTION.STOP_ALL_TRAVEL = 1; 
+    // 用于停止遍历当前子树
+    COLLECTION.STOP_SUB_TREE_TRAVEL = 2; 
+    
+    function $travelTree(
+        travelRoot, 
+        callback, 
+        childrenField, 
+        postorder, 
+        level, 
+        parent, 
+        indexRef, 
+        inToChildrenParam, 
+        inToParentParam, 
+        globalParam
+    ) {
+        if (travelRoot == null) {
+            return;
+        }
+            
+        postorder = !!postorder;
+        
+        var conti;
+        var toChildrenParam;
+        var toParentParam;
+
+        if (!postorder) {
+            conti = callback.call(
+                null, 
+                travelRoot, 
+                {
+                    level: level, 
+                    index: indexRef.index, 
+                    parent: parent, 
+                    childrenParam: (toChildrenParam = {}), 
+                    parentParam: inToChildrenParam,
+                    globalParam: globalParam
+                }
+            );
+            indexRef.index ++;
+        }
+        
+        if (conti === COLLECTION.STOP_ALL_TRAVEL) {
+            return conti; 
+        }
+        if (conti === COLLECTION.STOP_SUB_TREE_TRAVEL) { 
+            return; 
+        }
+        
+        var children = travelRoot[childrenField || 'children'] || [];
+        for (var i = 0, len = children.length, node; i < len; i ++) {
+            node = children[i];
+            
+            conti = $travelTree(
+                node, 
+                callback, 
+                childrenField, 
+                postorder, 
+                level + 1, 
+                travelRoot, 
+                indexRef, 
+                toChildrenParam, 
+                (toParentParam = {}), 
+                globalParam
+            );
+                
+            if (conti === COLLECTION.STOP_ALL_TRAVEL) { 
+                return conti; 
+            }
+        }
+        
+        if (postorder && conti !== COLLECTION.STOP_ALL_TRAVEL) { 
+            conti = callback.call(
+                null, 
+                travelRoot, 
+                {
+                    level: level, 
+                    index: indexRef.index, 
+                    parent: parent, 
+                    childrenParam: toParentParam, 
+                    parentParam: inToParentParam,
+                    globalParam: globalParam
+                }
+            );
+            indexRef.index ++;
+        }
+        
+        if (conti === COLLECTION.STOP_ALL_TRAVEL) { 
+            return conti; 
+        }
+    };    
+
+})();
+
+/**
+ * xutil.date
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @change: 增加到秒粒度的日期format，增加方法#isValidFormatPattern。by MENGRAN at 2013-12-06
+ * @file:   时间相关工具函数集合。
+ *          便于工程中统一时间格式，并提供时间相关的数学操作。
+ * @author: sushuang(sushuang)
+ * @depend: xutil.lang, xutil.number
+ */
+
+(function () {
+    
+    var DATE = xutil.date;
+    var LANG = xutil.lang;
+    var NUMBER = xutil.number;
+        
+    var DAY_MILLISECOND = 24*60*60*1000;
+    
+    /**
+     * 默认通用的日期字符串格式为：
+     * 'yyyy-MM-dd hh:mm'或'yyyy-MM-dd'或'yyyy-MM'或'yyyy'，
+     * 如果要修改默认日期格式，修改如下诸属性。
+     *
+     * @type {string}
+     * @public
+     */
+    DATE.DATE_FORMAT = 'yyyy-MM-dd';
+    DATE.MINUTE_FORMAT = 'yyyy-MM-dd hh:mm';
+    DATE.SECONDS_FORMAT = 'yyyy-MM-dd HH:mm:ss';
+
+    /*
+    *时间格式的格式化正则
+    */
+    DATE.TIME_REG = /h{1,2}:m{1,2}:s{1,2}$/i;
+    
+    /**
+     * Add by MENGRAN at 2013-12-6
+     * 判断是否为合法的格式化pattern
+     * 
+     * @public
+     * @param {string} format 格式
+     * @return {boolean} 是否合法
+     */
+    DATE.isValidFormatPattern = function (format) {
+        if (format && 
+            (format === DATE.DATE_FORMAT || format === DATE.MINUTE_FORMAT || format === DATE.SECONDS_FORMAT)) { return true; }
+        return false;
+    };
+
+    /**
+     * 日期对象转换成字符串的简写
+     * 
+     * @public
+     * @param {Date} currDate 日期对象
+     * @param {string} format 格式，缺省为yyyy-MM-dd
+     * @return {string} 日期字符串
+     */
+    DATE.dateToString = function (date, format) {
+        if (!date) { return ''; }
+        format = format || DATE.DATE_FORMAT;
+        return DATE.format(date, format);
+    };
+    
+    /**
+     * 日期对象转换成字符串的简写，到分钟精度
+     * 
+     * @public
+     * @param {Date} date 日期对象
+     * @param {string} format 格式，缺省为yyyy-MM-dd
+     * @return {string} 日期字符串
+     */
+    DATE.dateToStringM = function (date) {
+        return DATE.dateToString(date, DATE.MINUTE_FORMAT);
+    };
+    
+    
+    /**
+     * 字符串转换成日期对象的简写
+     * 
+     * @public
+     * @param {string} dateStr 字符串格式的日期，yyyy-MM-dd 或  yyyy-MM 或 yyyy
+     * @return {Date} 日期对象，如果输入为空则返回null
+     */
+    DATE.stringToDate = function (dateStr) {
+        if (dateStr) {
+            return DATE.parse(dateStr);
+        }
+        return null;
+    };
+    
+    /**
+     * 得到昨天的日期对象
+     * 
+     * @public
+     * @param {Date} date 目标日期对象
+     * @return {Date} 结果
+     */
+    DATE.getYesterday = function (date) {
+        if (!date) { return null; }
+        return DATE.addDay(date, -1, true);
+    };
+    
+    /**
+     * 得到昨天的日期字符串
+     * 
+     * @public
+     * @param {Date} date 目标日期对象
+     * @return {string} 结果
+     */
+    DATE.getYesterdayString = function (date) {
+        if (!date) { return null; }
+        return DATE.dateToString(DATE.getYesterday(date));
+    };
+    
+    /**
+     * 得到周末
+     * 
+     * @public
+     * @param {Date} date 目标日期对象
+     * @param {boolean=} mode 
+     *      true:得到星期六作为周末   false:得到星期日作为周末（默认）
+     * @param {boolean=} remain 为false则新建日期对象（默认）；
+     *                         为true则在输入的日期对象中改；
+     *                         缺省为false
+     */
+    DATE.getWeekend = function (date, mode, remain) {
+        var weekend = remain ? date : new Date(date);
+        var offset = mode 
+                ? (6 - weekend.getDay()) 
+                : (7 - weekend.getDay()) % 7;
+        weekend.setDate(weekend.getDate() + offset);
+        return weekend;
+    }
+    
+    /**
+     * 得到周开始日期
+     * 
+     * @public
+     * @param {Date} date 目标日期对象
+     * @param {boolean=} mode 
+     *      true:得到星期日作为周开始   false:得到星期一作为周开始（默认）
+     * @param {boolean=} remain 为false则新建日期对象（默认）；
+     *                         为true则在输入的日期对象中改；
+     *                         缺省为false
+     */
+    DATE.getWorkday = function (date, mode, remain) {
+        var workday = remain ? date : new Date(date);
+        var d = workday.getDate();
+        d = mode 
+                ? (d - workday.getDay()) 
+                : (d - (6 + workday.getDay()) % 7);
+        workday.setDate(d);
+        return workday;
+    }
+    
+    /**
+     * 获得某天是当前年的第几天
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @return {number} 结果天数
+     */
+    DATE.dateCountFromYearBegin = function (date) {
+        if (!date) { return null; }
+        LANG.isString(date) && (date = DATE.stringToDate(date)); 
+        var startDate = new Date(date.getTime());
+        startDate.setDate(1);
+        startDate.setMonth(0);
+        return DATE.dateMinus(date, startDate) + 1;
+    };
+    
+    /**
+     * 获得某天是当前季度的第几天
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @return {number} 结果天数
+     */
+    DATE.dateCountFromQuarterBegin = function (date) {
+        if (!date) { return null; }
+        LANG.isString(date) && (date = DATE.stringToDate(date)); 
+        return DATE.dateMinus(date, DATE.getQuarterBegin(date)) + 1;
+    };
+    
+    /**
+     * 获得某天是当前月的第几天
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @return {number} 结果天数
+     */
+    DATE.dateCountFromMonthBegin = function (date) {
+        if (!date) { return null; }
+        LANG.isString(date) && (date = DATE.stringToDate(date)); 
+        var startDate = new Date(date.getTime());
+        startDate.setDate(1);
+        return DATE.dateMinus(date, startDate) + 1;
+    };
+    
+    /**
+     * 获得某日期属于哪个季度，1~4
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @return {number} 季度号，1~4
+     */
+    DATE.getQuarter = function (date) {
+        if (!date) { return null; }
+        LANG.isString(date) && (date = DATE.stringToDate(date)); 
+        return Math.floor(date.getMonth() / 3) + 1 ;
+    };
+    
+    /**
+     * 获得该季度的第一天
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @return {Date} 该季度的第一天
+     */
+    DATE.getQuarterBegin = function (date) {
+        if (!date) { return null; }
+        LANG.isString(date) && (date = DATE.stringToDate(date)); 
+        var quarter = DATE.getQuarter(date);
+        var mon = [0, 0, 3, 6, 9];
+        return new Date(date.getFullYear(), mon[quarter], 1);
+    };
+
+    
+    /**
+     * 比较日期相同与否（两者有一者为空就认为是不同）
+     * 
+     * @public
+     * @param {(string|Date)} date1 目标日期对象或日期字符串1
+     * @param {(string|Date)} date2 目标日期对象或日期字符串2
+     * @return {string} 比较结果
+     */
+    DATE.sameDate = function (date1, date2) {
+        if (!date1 || !date2) { return false; }
+        LANG.isString(date1) && (date1 = DATE.stringToDate(date1));
+        LANG.isString(date2) && (date2 = DATE.stringToDate(date2));
+        return date1.getFullYear() == date2.getFullYear() 
+               && date1.getMonth() == date2.getMonth()
+               && date1.getDate() == date2.getDate();
+    };
+    
+    /**
+     * 比较日期大小
+     * 
+     * @public
+     * @param {(string|Date)} date1 目标日期对象或日期字符串1
+     * @param {(string|Date)} date2 目标日期对象或日期字符串2
+     * @return {string} 比较结果，
+     *      -1: date1 < date2;  0: date1 == date2;  1: date1 > date2
+     */
+    DATE.compareDate = function (date1, date2) {
+        var year1;
+        var year2;
+        var month1;
+        var month2;
+        var date1;
+        var date2;
+
+        LANG.isString(date1) && (date1 = DATE.stringToDate(date1));
+        LANG.isString(date2) && (date2 = DATE.stringToDate(date2));
+        if ((year1 = date1.getFullYear()) == (year2 = date2.getFullYear())) {
+            if ((month1 = date1.getMonth()) == (month2 = date2.getMonth())) {
+                if ((date1 = date1.getDate()) == (date2 = date2.getDate())) {
+                    return 0;
+                } 
+                else { return date1 < date2 ? -1 : 1; }
+            } 
+            else { return month1 < month2 ? -1 : 1; }
+        } 
+        else { return year1 < year2 ? -1 : 1; }
+    };
+    
+    /**
+     * 用日做减法：date1 - date2
+     * 如：date1为2012-03-13，date2为2012-03-15，则结果为-2。1.3天算2天。
+     * 
+     * @public
+     * @param {(string|Date)} date1 目标日期对象或日期字符串1
+     * @param {(string|Date)} date2 目标日期对象或日期字符串2
+     * @return {string} 比较结果，
+     *      -1: date1 < date2;  0: date1 == date2;  1: date1 > date2
+     * @return {number} 减法结果天数
+     */
+    DATE.dateMinus = function (date1, date2) {
+        // 格式化成一天最开始
+        date1 = DATE.stringToDate(DATE.dateToString(date1)); 
+        // 格式化成一天最开始
+        date2 = DATE.stringToDate(DATE.dateToString(date2)); 
+        var t = date1.getTime() - date2.getTime();
+        var d = Math.round(t / DAY_MILLISECOND);
+        return d;
+    };
+    
+    /**
+     * 增加天
+     * 
+     * @public
+     * @param {Date} date 目标日期对象
+     * @param {number} num 增加的天数，可为负数
+     * @param {boolean} willNew 为true则新建日期对象；
+     *                          为false则在输入的日期对象中改；
+     *                          缺省为false
+     * @return {Date} 结果
+     */
+    DATE.addDay = function (date, num, willNew) {
+        if (!date) { return null; }
+        num = num || 0;
+        if (willNew) {
+            return new Date(date.getTime() + num * DAY_MILLISECOND);
+        } 
+        else {
+            date.setDate(date.getDate() + num);
+            return date;
+        }
+    };
+    
+    /**
+     * 增加月
+     * 
+     * @public
+     * @param {Date} date 目标日期对象
+     * @param {number} num 增加的月数，可为负数
+     * @param {boolean} willNew 为true则新建日期对象；
+     *                          为false则在输入的日期对象中改；
+     *                          缺省为false
+     * @return {Date} 结果
+     */    
+    DATE.addMonth = function (date, num, willNew) {
+        if (!date) { return null; }
+        num = num || 0;
+        willNew && (date = new Date(date.getTime()));
+        date.setMonth(date.getMonth() + num);
+        return date;
+    };  
+    
+    /**
+     * 得到某日加num个月是几月
+     * 
+     * @public
+     * @param {(string|Date)} date
+     * @param {number} num 任意整数值，可以为负值
+     * @return {Object} 
+     *              {number} year 年
+     *              {number} month 月号：1~12
+     */
+    DATE.nextMonth = function (date, num) {
+        var year = date.getFullYear();
+        var month = date.getMonth();
+        return {
+            year: year + Math.floor((month + num) / 12),
+            month: (month + num + Math.abs(num * 12)) % 12 + 1
+        }
+    };
+    
+    /**
+     * 得到某日加num个季度是几季度
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @param {number} num 任意整数值，可为负值
+     * @return {Object} 
+     *              {number} year 年
+     *              {number} quarter 季度号：1~4
+     */
+    DATE.nextQuarter = function (date, num) {
+        if (!date) { return null; }
+        LANG.isString(date) && (date = DATE.stringToDate(date));
+
+        var quarter = DATE.getQuarter(date);
+        var year = date.getFullYear();
+        return {
+            year: year + Math.floor((quarter - 1 + num) / 4),
+            quarter: (quarter - 1 + num + Math.abs(num * 4)) % 4 + 1
+        };
+    };
+    
+    /**
+     * 返回某日的星期几字符串
+     * 
+     * @public
+     * @param {(string|Date)} date 目标日期
+     * @param {string} weekPrefix 星期几字符串前缀，缺省为'周'
+     * @return {string} 星期几字符串
+     */
+    DATE.getDay = function (date, weekPrefix) {
+        if (!date) { return ''; }
+        LANG.isString(date) && (date = DATE.stringToDate(date));
+        weekPrefix = weekPrefix || '周';
+        var ret;
+        switch (date.getDay()) {
+            case 1: ret = weekPrefix + '一'; break;
+            case 2: ret = weekPrefix + '二'; break;
+            case 3: ret = weekPrefix + '三'; break;
+            case 4: ret = weekPrefix + '四'; break;
+            case 5: ret = weekPrefix + '五'; break;
+            case 6: ret = weekPrefix + '六'; break;
+            case 0: ret = weekPrefix + '日'; break;
+            default: ret = ''; break;
+        }
+        return ret;
+    };
+    
+    /**
+     * 对目标日期对象进行格式化 (@see tangram)
+     * 格式表达式，变量含义：
+     * hh: 带 0 补齐的两位 12 进制时表示
+     * h: 不带 0 补齐的 12 进制时表示
+     * HH: 带 0 补齐的两位 24 进制时表示
+     * H: 不带 0 补齐的 24 进制时表示
+     * mm: 带 0 补齐两位分表示
+     * m: 不带 0 补齐分表示
+     * ss: 带 0 补齐两位秒表示
+     * s: 不带 0 补齐秒表示
+     * yyyy: 带 0 补齐的四位年表示
+     * yy: 带 0 补齐的两位年表示
+     * MM: 带 0 补齐的两位月表示
+     * M: 不带 0 补齐的月表示
+     * dd: 带 0 补齐的两位日表示
+     * d: 不带 0 补齐的日表示
+     * 
+     * @public
+     * @param {Date} source 目标日期对象
+     * @param {string} pattern 日期格式化规则
+     * @return {string} 格式化后的字符串
+     */
+    DATE.format = function (source, pattern) {
+        var pad = NUMBER.pad;
+        if (!LANG.isString(pattern)) {
+            return source.toString();
+        }
+    
+        function replacer(patternPart, result) {
+            pattern = pattern.replace(patternPart, result);
+        }
+        
+        var year    = source.getFullYear();
+        var month   = source.getMonth() + 1;
+        var date2   = source.getDate();
+        var hours   = source.getHours();
+        var minutes = source.getMinutes();
+        var seconds = source.getSeconds();
+    
+        replacer(/yyyy/g, pad(year, 4));
+        replacer(/yy/g, pad(parseInt(year.toString().slice(2), 10), 2));
+        replacer(/MM/g, pad(month, 2));
+        replacer(/M/g, month);
+        replacer(/dd/g, pad(date2, 2));
+        replacer(/d/g, date2);
+    
+        replacer(/HH/g, pad(hours, 2));
+        replacer(/H/g, hours);
+        replacer(/hh/g, pad(hours % 12, 2));
+        replacer(/h/g, hours % 12);
+        replacer(/mm/g, pad(minutes, 2));
+        replacer(/m/g, minutes);
+        replacer(/ss/g, pad(seconds, 2));
+        replacer(/s/g, seconds);
+    
+        return pattern;
+    };
+
+    /**
+    *对目标数字进行格式化成 小时：分钟：秒
+    *@public
+    *@param source 目标数字
+    *
+    **/
+    DATE.formatTime = function(source,pattern){
+        var pad = NUMBER.pad;
+        if (!LANG.isString(pattern)) {
+            return source.toString();
+        }
+
+        var hour = parseInt(source /3600);
+
+        var day = parseInt(hour / 24);
+        hour = parseInt(hour%24);
+        var min = parseInt(source%3600 /60);
+        var sec = Math.round(source % 60);
+        if(day == 0){
+            pattern = 'hh:mm:ss';
+        }
+        function replacer(patternPart, result) {
+            pattern = pattern.replace(patternPart, result);
+        }
+
+        replacer(/d/ig,day);
+        replacer(/hh/ig, hour);
+        replacer(/h/ig, hour);
+        replacer(/mm/ig, pad(min, 2));
+        replacer(/m/ig, min);
+        replacer(/ss/ig, pad(sec, 2));
+        replacer(/s/ig, sec);
+        return pattern;
+    }
+    
+    
+    /**
+     * 将目标字符串转换成日期对象 (@see tangram)
+     * 对于目标字符串，下面这些规则决定了 parse 方法能够成功地解析：
+     * 短日期可以使用“/”或“-”作为日期分隔符，但是必须用月/日/年的格式来表示，例如"7/20/96"。
+     * 以 "July 10 1995" 形式表示的长日期中的年、月、日可以按任何顺序排列，年份值可以用 2 位数字表示也可以用 4 位数字表示。如果使用 2 位数字来表示年份，那么该年份必须大于或等于 70。
+     * 括号中的任何文本都被视为注释。这些括号可以嵌套使用。
+     * 逗号和空格被视为分隔符。允许使用多个分隔符。
+     * 月和日的名称必须具有两个或两个以上的字符。如果两个字符所组成的名称不是独一无二的，那么该名称就被解析成最后一个符合条件的月或日。例如，"Ju" 被解释为七月而不是六月。
+     * 在所提供的日期中，如果所指定的星期几的值与按照该日期中剩余部分所确定的星期几的值不符合，那么该指定值就会被忽略。例如，尽管 1996 年 11 月 9 日实际上是星期五，"Tuesday November 9 1996" 也还是可以被接受并进行解析的。但是结果 date 对象中包含的是 "Friday November 9 1996"。
+     * JScript 处理所有的标准时区，以及全球标准时间 (UTC) 和格林威治标准时间 (GMT)。 
+     * 小时、分钟、和秒钟之间用冒号分隔，尽管不是这三项都需要指明。"10:"、"10:11"、和 "10:11:12" 都是有效的。
+     * 如果使用 24 小时计时的时钟，那么为中午 12 点之后的时间指定 "PM" 是错误的。例如 "23:15 PM" 就是错误的。 
+     * 包含无效日期的字符串是错误的。例如，一个包含有两个年份或两个月份的字符串就是错误的。
+     *             
+     * @public
+     * @param {string} source 目标字符串
+     * @return {Date} 转换后的日期对象
+     */
+    DATE.parse = function (source) {
+        var reg = new RegExp("^\\d+(\\-|\\/)\\d+(\\-|\\/)\\d+\x24");
+        if ('string' == typeof source) {
+            if (reg.test(source) || isNaN(Date.parse(source))) {
+                var d = source.split(/ |T/);
+                var d1 = d.length > 1 
+                        ? d[1].split(/[^\d]/)
+                        : [0, 0, 0];
+                var d0 = d[0].split(/[^\d]/);
+                
+                return new Date(
+                    d0[0],
+                    (d0[1] != null ? (d0[1] - 1) : 0 ), 
+                    (d0[2] != null ? d0[2] : 1), 
+                    (d1[0] != null ? d1[0] : 0), 
+                    (d1[1] != null ? d1[1] : 0), 
+                    (d1[2] != null ? d1[2] : 0)
+                );
+            } 
+            else {
+                return new Date(source);
+            }
+        }
+        
+        return new Date();
+    };
+
+})();
+
+/**
+ * xutil.dom
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DOM相关工具函数
+ * @author:  sushuang(sushuang)
+ */
+
+(function () {
+    
+    var DOM = xutil.dom;
+    var objProtoToString = Object.prototype.toString;
+    var TRIMER_REG = new RegExp(
+            "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
+        );
+    var SPACE_REG = /\s/;
+    var USER_AGENT = navigator.userAgent;
+    var DOCUMENT = document;
+    var REGEXP = RegExp;
+
+    DOM.isStrict = DOCUMENT.compatMode == 'CSS1Compat';
+    DOM.ieVersion = /msie (\d+\.\d)/i.test(USER_AGENT) 
+        ? DOCUMENT.documentMode || (REGEXP.$1 - 0) : undefined;
+    DOM.firefoxVersion = /firefox\/(\d+\.\d)/i.test(USER_AGENT) 
+        ? REGEXP.$1 - 0 : undefined;
+    DOM.operaVersion = /opera\/(\d+\.\d)/i.test(USER_AGENT) 
+        ? REGEXP.$1 - 0 : undefined;
+    DOM.safariVersion = /(\d+\.\d)(\.\d)?\s+safari/i.test(USER_AGENT) 
+        && !/chrome/i.test(USER_AGENT) ? REGEXP.$1 - 0 : undefined;
+    DOM.chromeVersion = /chrome\/(\d+\.\d+)/i.test(USER_AGENT) 
+        ? + REGEXP['\x241'] : undefined;
+    
+    /**
+     * 从文档中获取指定的DOM元素 (@see tangram)
+     * 
+     * @public
+     * @param {(string|HTMLElement)} id 元素的id或DOM元素
+     * @return {(HTMLElement|null)} 获取的元素，查找不到时返回null
+     */
+    DOM.g = function (id) {
+        if (objProtoToString.call(id) == '[object String]') {
+            return document.getElementById(id);
+        } 
+        else if (id && id.nodeName && (id.nodeType == 1 || id.nodeType == 9)) {
+            return id;
+        }
+        return null;
+    };
+    
+    /**
+     * 通过className获取元素 
+     * （不保证返回数组中DOM节点的顺序和文档中DOM节点的顺序一致）
+     * @public
+     * 
+     * @param {string} className 元素的class，只能指定单一的class，
+     *          如果为空字符串或者纯空白的字符串，返回空数组。
+     * @param {(string|HTMLElement)} element 开始搜索的元素，默认是document。
+     * @return {Array} 获取的元素集合，查找不到或className参数错误时返回空数组.
+     */
+    DOM.q = function (className, element) {
+        var result = [];
+
+        if (!className 
+            || !(className = String(className).replace(TRIMER_REG, ''))
+        ) {
+            return result;
+        }
+        
+        if (element == null) {
+            element = document;
+        } 
+        else if (!(element = DOM.g(element))) {
+            return result;
+        }
+        
+        if (element.getElementsByClassName) {
+            return element.getElementsByClassName(className);
+        } 
+        else {
+            var elements = element.all || element.getElementsByTagName("*");
+            for (var i = 0, node, clzz; node = elements[i]; i++) {
+                if ((clzz = node.className) != null) {
+                    var startIndex = clzz.indexOf(className);
+                    var endIndex = startIndex + className.length;
+                    if (startIndex >= 0
+                        && (
+                            clzz.charAt(startIndex - 1) == '' 
+                            || SPACE_REG.test(clzz.charAt(startIndex - 1))
+                        )
+                        && (
+                            clzz.charAt(endIndex) == '' 
+                            || SPACE_REG.test(clzz.charAt(endIndex))
+                        )
+                    ) {
+                        result[result.length] = node;
+                    }
+                }
+            }
+        }
+    
+        return result;
+    };
+
+    /**
+     * 为 Element 对象添加新的样式。
+     * 
+     * @public
+     * @param {HTMLElement} el Element 对象
+     * @param {string} className 样式名，可以是多个，中间使用空白符分隔
+     */
+    DOM.addClass = function (el, className) {
+        // 这里直接添加是为了提高效率，因此对于可能重复添加的属性，请使用标志位判断是否已经存在，
+        // 或者先使用 removeClass 方法删除之前的样式
+        el.className += ' ' + className;
+    };
+
+    /**
+     * 删除 Element 对象中的样式。
+     * 
+     * @public
+     * @param {HTMLElement} el Element 对象
+     * @param {string} className 样式名，可以是多个，中间用空白符分隔
+     */
+    DOM.removeClass = function (el, className) {
+        var oldClasses = el.className.split(/\s+/).sort();
+        var newClasses = className.split(/\s+/).sort();
+        var i = oldClasses.length;
+        var j = newClasses.length;
+
+        for (; i && j; ) {
+            if (oldClasses[i - 1] == newClasses[j - 1]) {
+                oldClasses.splice(--i, 1);
+            }
+            else if (oldClasses[i - 1] < newClasses[j - 1]) {
+                j--;
+            }
+            else {
+                i--;
+            }
+        }
+        el.className = oldClasses.join(' ');
+    };    
+
+    /**
+     * 是否有 样式。
+     * 
+     * @public
+     * @param {HTMLElement} el Element 对象
+     * @param {string} className 样式名，可以是多个（不可重复，多个时，都拥有才返回true），中间用空白符分隔
+     */
+    DOM.hasClass = function (el, className) {
+        var oldClasses = el.className.split(/\s+/).sort();
+        var newClasses = className.split(/\s+/).sort();
+        var i = oldClasses.length;
+        var j = newClasses.length;
+
+        for (; i && j; ) {
+            if (oldClasses[i - 1] == newClasses[j - 1]) {
+                j--;
+            }
+            i--;
+        }
+
+        return j <= 0;
+    };
+
+    /**
+     * 获取 Element 对象的父 Element 对象。
+     * 在 IE 下，Element 对象被 removeChild 方法移除时，parentNode 仍然指向原来的父 Element 对象，
+     * 并且input的parentNode可能为空。
+     * 与 W3C 标准兼容的属性应该是 parentElement。
+     *
+     * @public
+     * @param {HTMLElement} el Element 对象
+     * @return {HTMLElement} 父 Element 对象，如果没有，返回 null
+     */
+    DOM.getParent = DOM.ieVersion 
+        ? function (el) {
+            return el.parentElement;
+        } 
+        : function (el) {
+            return el.parentNode;
+        };
+
+    /**
+     * 获取子节点
+     *
+     * @public
+     * @param {HTMLElement} el Element 对象
+     * @return {Array.<HTMLElement>} 子节点列表
+     */
+    DOM.children = function (el) {
+        if (!el) { return []; }
+
+        for (var result = [], o = el.firstChild; o; o = o.nextSibling) {
+            if (o.nodeType == 1) {
+                result.push(o);
+            }
+        }
+        return result;    
+    };
+
+    /**
+     * 删除
+     *
+     * @public
+     * @param {HTMLElement} el Element 对象
+     */
+    DOM.remove = function (el) {
+        if (el) {
+            var tmpEl = DOM.getParent(el);
+            tmpEl && tmpEl.removeChild(el);
+        }
+    }
+
+})();
+
+
+/**
+ * xutil.file
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    文件相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  none
+ */
+
+(function () {
+    
+    var FILE = xutil.file;
+            
+    /**
+     * 过滤文件名的非法字符
+     * 只考虑了windows和linux
+     * windows文件名非法字符：\/:*?"<>|
+     * linux文件名非法字符：/
+     */
+    FILE.FILE_NAME_FORBIDEN_CHARACTER = {
+        '\\' : '＼',
+        '/' : '／',
+        ':' : '：',
+        '*' : '＊',
+        '?' : '？', 
+        '"' : '＂',
+        '<' : '＜',
+        '>' : '＞',
+        '|' : '｜'
+    };
+    
+    /**
+     * 修正文件名
+     * 只考虑了windows和linux，
+     * 有些字符被禁止做文件名，用类似的字符（如对应的全角字符）替代。
+     * 
+     * @public
+     * @param {string} name 日期对象
+     * @return {string} 修正后的文件名
+     */    
+    FILE.fixFileName = function (name) {
+        if (name == null) {
+            return name;
+        }
+        return name.replace(
+            /./g, 
+            function (w) {
+                return FILE.FILE_NAME_FORBIDEN_CHARACTER[w] || w;
+            }
+        );
+    };
+    
+})();
+
+/**
+ * xutil.fn
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    函数相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.lang
+ */
+
+(function () {
+    
+    var FN = xutil.fn;
+    var LANG = xutil.lang;
+    var slice = Array.prototype.slice;
+    var nativeBind = Function.prototype.bind;
+    
+    /**
+     * 为一个函数绑定一个作用域
+     * 如果可用，使用**ECMAScript 5**的 native `Function.bind`
+     * 
+     * @public
+     * @param {Function|string} func 要绑定的函数，缺省则为函数本身
+     * @param {Object} context 作用域
+     * @param {Any...} 绑定附加的执行参数，可缺省
+     * @rerturn {Funtion} 绑定完得到的函数
+     */
+    FN.bind = function (func, context) {
+        var args;
+        if (nativeBind && func.bind === nativeBind) {
+            return nativeBind.apply(func, slice.call(arguments, 1));
+        }
+        func = LANG.isString(func) ? context[func] : func;
+        args = slice.call(arguments, 2);
+        return function () {
+            return func.apply(
+                context || func, args.concat(slice.call(arguments))
+            );
+        };
+    };
+
+})();
+
+/**
+ * xutil.graphic
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    图形图像相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  none
+ */
+
+(function () {
+    
+    var GRAPHIC = xutil.graphic; 
+
+    /**
+     * 合并外界矩形
+     *
+     * @public
+     * @param {Object...} bound...，可传入多个。
+     *      bound格式：{left:..,top:..,width:..height:..}
+     * @return {Object} 最大外界构成的新bound。如果为null则表示输入全为空。
+     */
+    GRAPHIC.unionBoundBox = function () {
+        var left;
+        var top;
+        var right;
+        var bottom;
+        var width;
+        var height;
+        var bound = null, subBound;
+
+        for(var i = 0, l = arguments.length; i < l; i ++) {
+            if( !( subBound = arguments[i])) {
+                continue;
+            }
+
+            if( !bound) {
+                bound = subBound;
+            } 
+            else {
+                left = subBound.left < bound.left 
+                    ? subBound.left : bound.left;
+                top = subBound.top < bound.top 
+                    ? subBound.top : bound.top;
+                right = subBound.left + subBound.width;
+                width = right > bound.left + bound.width 
+                    ? right - bound.left : bound.width;
+                bottom = subBound.top + subBound.height;
+                height = bottom > bound.top + bound.height 
+                    ? bottom - bound.top : bound.height;
+                bound.left = left;
+                bound.top = top;
+                bound.width = width;
+                bound.height = height;
+            }
+        }
+        return bound;
+    };
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+        
+<<<<<<< HEAD
+        var context = NS_BASE;
+        var pathArr = parseInput(namespacePath).split('.');
+        for (var i = 0 ;i < pathArr.length; i ++) {
+            context = getOrCreateObj(context, parseInput(pathArr[i]));
+        }
+        
+        if (isRecord !== false) {
+            lastNameSpace = context
+        }
+        
+        return context;
+    };
+    
+    /**
+     * 注册一个连接
+     *
+     * @public
+     * @param {Function} func 链接函数
+     */
+    XPROJECT.link = function (func) {
+        if (!isFunction(func)) {
+            throw new Error (
+                'Input of link must be a function but not ' + func
+            );
+        }
+        linkSet.push(func);
+    };
+    
+    /**
+     * 执行所有连接并清空注册
+     *
+     * @public
+     */
+    XPROJECT.doLink = function () {
+        for(var i = 0, o; o = linkSet[i]; i++) {
+            o.call(null);
+        }
+        linkSet = []; 
+    };
+    
+    /**
+     * 注册一个最后执行的函数
+     *
+     * @public
+     * @param {Function} func 链接函数
+     */
+    XPROJECT.end = function (func) {
+        if (!isFunction(func)) {
+            throw new Error (
+                'Input of link must be a function but not ' + func
+            );
+        }
+        endSet.push(func);
+    };
+    
+    /**
+     * 执行所有最后执行的注册并清空注册
+     *
+     * @public
+     */
+    XPROJECT.doEnd = function () {
+        for(var i = 0, o; o = endSet[i]; i++) {
+            o.call(null);
+        }
+        endSet = []; 
+    };
+    
+    /**
+     * 设置名空间查找根基，默认是window
+     *
+     * @public
+     * @param {Object} namespaceBase 名空间根基
+     */
+    XPROJECT.setNamespaceBase = function (namespaceBase) {
+        namespaceBase && (NS_BASE = namespaceBase);
+    };
+=======
+/**
+ * xutil.lang
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    基本工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.lang, xutil.string
+ */
+
+(function () {
+    
+    var LANG = xutil.lang;
+    var STRING = xutil.string;
+    var objProto = Object.prototype;
+    var objProtoToString = objProto.toString;
+    var hasOwnProperty = objProto.hasOwnProperty;
+ 
+    /**
+     * 判断变量是否有值
+     * null或undefined时返回false。
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */
+    LANG.hasValue = function (variable) {
+        // undefined和null返回true，其他都返回false
+        return variable != null;
+    };
+    
+    /**
+     * 判断变量是否有值，且不是空白字符串
+     * null或undefined时返回false。
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */
+    LANG.hasValueNotBlank = function (variable) {
+        return LANG.hasValue(variable)
+           && (!LANG.isString(variable) || STRING.trim(variable) != '');
+    };
+
+    /**
+     * 判断变量是否是空白
+     * 如果variable是string，则判断其是否是空字符串或者只有空白字符的字符串
+     * 如果variable是Array，则判断其是否为空
+     * 如果variable是Object，则判断其是否全没有直接属性（原型上的属性不计）
+     * 
+     * @public
+     * @param {(string|Array|Object)} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isBlank = function (variable) {
+        if (LANG.isString(variable)) { 
+            return trim(variable) == '';
+        } 
+        else if (LANG.isArray(variable)) {
+            return variable.length == 0;
+        } 
+        else if (LANG.isObject(variable)) {
+            for (var k in variable) {
+                if (hasOwnProperty.call(variable, k)) {
+                    return false;   
+                }
+            }
+            return true;
+        } 
+        else {
+            return !!variable;
+        }
+    };
+
+    /**
+     * 判断变量是否为undefined
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isUndefined = function (variable) {
+        return typeof variable == 'undefined';
+    };
+    
+    /**
+     * 判断变量是否为null
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isNull = function (variable) {
+        return variable === null;
+    };
+    
+    /**
+     * 判断变量是否为number
+     * NaN和Finite时也会返回true。
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isNumber = function (variable) {
+        return objProtoToString.call(variable) == '[object Number]';
+    };
+    
+    /**
+     * 判断变量是否为number
+     * NaN和Finite时也会返回false。
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isNormalNumber = function (variable) {
+        return LANG.isNumber(variable) 
+            && !isNaN(variable) && isFinite(variable);
+    };
+
+    /**
+     * 判断变量是否为Finite
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isFinite = function (variable) {
+        return LANG.isNumber(variable) && isFinite(variable);
+    };
+    
+    /**
+     * 判断变量是否为NaN
+     * 不同于js本身的isNaN，undefined情况不会返回true
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isNaN = function (variable) {
+        // NaN是唯一一个对于'==='操作符不自反的
+        return variable !== variable;
+    };
+
+    /**
+     * 判断变量是否为string
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isString = function (variable) {
+        return objProtoToString.call(variable) == '[object String]';
+    };
+    
+    /**
+     * 判断变量是否为boolean
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isBoolean = function (variable) {
+        return variable === true 
+            || variable === false 
+            || objProtoToString.call(variable) == '[object Boolean]';        
+    };
+    
+    /**
+     * 判断是否为Function
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isFunction = function (variable) {
+        return objProtoToString.call(variable) == '[object Function]';
+    };
+    
+    /**
+     * 判断是否为Object
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isObject = function (variable) {
+         return variable === Object(variable);
+    };
+    
+    /**
+     * 判断是否为Array
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isArray = Array.isArray || function (variable) {
+        return objProtoToString.call(variable) == '[object Array]';
+    };
+       
+    /**
+     * 判断是否为Date
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isDate = function (variable) {
+        return objProtoToString.call(variable) == '[object Date]';
+    };  
+    
+    /**
+     * 判断是否为RegExp
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */    
+    LANG.isRegExp = function (variable) {
+        return objProtoToString.call(variable) == '[object RegExp]';
+    };  
+    
+    /**
+     * 判断是否为DOM Element
+     * 
+     * @public
+     * @param {*} variable 输入变量
+     * @return {boolean} 判断结果
+     */
+    LANG.isElement = function (variable) {
+        return !!(variable && variable.nodeType == 1);
+    };
+      
+    /**
+     * 转换为number
+     * 此函数一般用于string类型的数值向number类型数值的转换, 如：'123'转换为123, '44px'转换为44
+     * 遵循parseFloat的法则
+     * 转换失败返回默认值（从而避免转换失败后返回NaN等）。
+     * 
+     * @public
+     * @param {*} input 要转换的东西
+     * @param {*} defaultValue 转换失败时，返回此默认值。如果defaultValue为undefined则返回input本身。
+     * @return {(number|*)} 转换结果。转换成功则为number；转换失败则为defaultValue
+     */
+    LANG.toNumber = function (input, defaultValue) {
+        defaultValue = 
+            typeof defaultValue != 'undefined' ? defaultValue : input;
+        return isFinite(input = parseFloat(input)) ? input : defaultValue;
+    };
+    
+    /**
+     * 用于将string类型的"true"和"false"转成boolean型
+     * 如果输入参数是string类型，输入参数不为"true"时均转成false。
+     * 如果输入参数不是string类型，则按照js本身的强制类型转换转成boolean（从而可以应对不知道input类型的情况）。
+     * 
+     * @public
+     * @param {(string|*)} input 要转换的东西
+     * @return {boolean} 转换结果
+     */
+    LANG.stringToBoolean = function (input) {
+        if (LANG.isString(input)) {
+            return trim(input) == 'true';
+        } 
+        else {
+            return !!input; 
+        }
+    };
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    /**
+     * 得到名空间查找根基，默认是window
+     *
+     * @public
+     * @return {Object} 名空间根基
+     */
+    XPROJECT.getNamespaceBase = function () {
+        return NS_BASE;
+    };
+    
+    /**
+     * Parse输入
+     *
+     * @private
+     * @param {string} input 输入
+     * @return {boolean} parse结果
+     */
+    function parseInput(input) {
+        var o;
+        if ((o = trim(input)) == '') {
+            throw new Error('Error input: ' + str);   
+        } 
+        else {
+            return o;
+        }
+    }
+    
+    /**
+     * 创建及获得路径对象
+     *
+     * @private
+     * @param {Object} context 上下文
+     * @param {string} attrName 属性名
+     * @return {Object} 得到的对象
+     */
+    function getOrCreateObj(context, attrName) {
+        var o = context[attrName];
+        return o != null ? o : (context[attrName] = {});
+    }
+    
+    /**
+     * 是否函数
+     *
+     * @private
+     * @param {*} variable 输入
+     * @return {boolean} 是否函数
+     */
+    function isFunction(variable) {
+        return Object.prototype.toString.call(variable) == '[object Function]';
+    }
+    
+    /**
+     * 字符串trim
+     *
+     * @private
+     * @param {string} 输入
+     * @return {string} 结果
+     */
+    function trim(source) {
+        return source == null ? '' : String(source).replace(TRIMER, '');
+    }
+    
+})();
+=======
+/**
+ * xutil.number
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @change: 修改formatNumber方法，date类数值的format支持。by MENGRAN at 2013-12-06
+ * @file:    数值相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  none
+ */
+
+(function () {
+    
+    var NUMBER = xutil.number;
+    var DATE = xutil.date; // Add by MENGRAN at 2013-12-6
+            
+    /**
+     * 得到序数词(1st, 2nd, 3rd, 4th, ...)的英文后缀
+     * 
+     * @public
+     * @param {number} number 序数的数值
+     * @return {string} 序数词英文后缀
+     */    
+    NUMBER.ordinalSuffix = function (number) {
+        if (number == 1) {
+            return 'st';
+        } 
+        else if (number == 2) {
+            return 'nd';
+        } 
+        else if (number == 3) {
+            return 'rd';
+        } 
+        else {
+            return 'th';
+        }
+    };
+    
+    /**
+     * 数值前部补0
+     * 
+     * @public
+     * @param {(number|string)} source 输入数值, 可以整数或小数
+     * @param {number} length 输出数值长度
+     * @return {string} 输出数值
+     */
+    NUMBER.pad = function (source, length) {
+        var pre = "";
+        var negative = (source < 0);
+        var string = String(Math.abs(source));
+    
+        if (string.length < length) {
+            pre = (new Array(length - string.length + 1)).join('0');
+        }
+    
+        return (negative ?  "-" : "") + pre + string;
+    };
+    
+    /**
+     * 将数值按照指定格式进行格式化
+     * 支持：
+     *      三位一撇，如：'23,444,12.98'
+     *      前后缀，如：'23,444$', '23,444%', '#23,444'
+     *      四舍五入
+     *      四舍六入中凑偶（IEEE 754标准，欧洲金融常用）
+     *      正数加上正号，如：'+23.45%'
+     *      
+     * @public
+     * @example formatNumber(10000/3, "I,III.DD%"); 返回"3,333.33%"
+     * @param {number} num 要格式化的数字
+     * @param {string} formatStr 指定的格式
+     *              I代表整数部分,可以通过逗号的位置来设定逗号分隔的位数 
+     *              D代表小数部分，可以通过D的重复次数指定小数部分的显示位数
+     * @param {string} usePositiveSign 是否正数加上正号
+     * @param {number} cutMode 舍入方式：
+     *                      0或默认:四舍五入；
+     *                      2:IEEE 754标准的五舍六入中凑偶；
+     *                      other：只是纯截取
+     * @param {boolean} percentMultiply 百分数（formatStr满足/[ID]%/）是否要乘以100
+     *                      默认为false
+     * @return {string} 格式化过的字符串
+     */
+    NUMBER.formatNumber = function (
+        num, formatStr, usePositiveSign, cutMode, percentMultiply
+    ) {
+        if (!formatStr) {
+            return num;
+        }
+        // add by majun  2014-3-20 14:27:53
+        // 如果发现要格式化的数字根本就不是number类型的，则直接返回原始值
+        if(isNaN(num)){
+            return num;
+        }
+
+        // Add by MENGRAN at 2013-12-6
+        // 导致number和date两个库循环引用了。我先这么改着。
+        if (DATE.isValidFormatPattern(formatStr)) {
+            return DATE.format(DATE.parse(num), formatStr);
+        }
+
+        if(DATE.TIME_REG.test(formatStr)){
+            return DATE.formatTime(num,formatStr);
+        }
+
+        if (percentMultiply && /[ID]%/.test(formatStr)) {
+            num = num * 100;
+        }
+
+        num = NUMBER.fixNumber(num, formatStr, cutMode); 
+        var str;
+        var numStr = num.toString();
+        var tempAry = numStr.split('.');
+        var intStr = tempAry[0];
+        var decStr = (tempAry.length > 1) ? tempAry[1] : "";
+            
+        str = formatStr.replace(/I+,*I*/g, function () {
+            var matchStr = arguments[0];
+            var commaIndex = matchStr.lastIndexOf(",");
+            var replaceStr;
+            var splitPos;
+            var parts = [];
+                
+            if (commaIndex >= 0 && commaIndex != intStr.length - 1) {
+                splitPos = matchStr.length - 1 - commaIndex;
+                var diff;
+                while (
+                    (diff = intStr.length - splitPos) > 0
+                    && splitPos > 0 /*防止配错引起死循环*/
+                ) {
+                    parts.push(intStr.substr(diff, splitPos));
+                    intStr = intStr.substring(0, diff);
+                }
+                parts.push(intStr);
+                parts.reverse();
+                if (parts[0] == "-") {
+                    parts.shift();
+                    replaceStr = "-" + parts.join(",");
+                } 
+                else {
+                    replaceStr = parts.join(",");
+                }
+            } 
+            else {
+                replaceStr = intStr;
+            }
+            
+            if (usePositiveSign && replaceStr && replaceStr.indexOf('-') < 0) {
+                replaceStr = '+' + replaceStr;
+            }
+            
+            return replaceStr;
+        });
+        
+        str = str.replace(/D+/g, function () {
+            var matchStr = arguments[0]; 
+            var replaceStr = decStr;
+            
+            if (replaceStr.length > matchStr.length) {
+                replaceStr = replaceStr.substr(0, matchStr.length);
+            } 
+            else {
+                replaceStr += (
+                    new Array(matchStr.length - replaceStr.length)
+                ).join('0');
+            }
+            return replaceStr;
+        });
+        // if ( !/[1-9]+/.test(str) ) { // 全零去除加减号，都不是效率高的写法
+            // str.replace(/^(\+|\-)./, '');
+        // } 
+        return str;
+    };
+    
+    /**
+     * 不同方式的舍入
+     * 支持：
+     *      四舍五入
+     *      四舍六入中凑偶（IEEE 754标准，欧洲金融常用）
+     * 
+     * @public
+     * @param {number} cutMode 舍入方式
+     *                      0或默认:四舍五入；
+     *                      2:IEEE 754标准的五舍六入中凑偶
+     */
+    NUMBER.fixNumber = function (num, formatStr, cutMode) {
+        var formatDec = /D+/.exec(formatStr);
+        var formatDecLen = (formatDec && formatDec.length>0) 
+                ? formatDec[0].length : 0;
+        var p;
+            
+        if (!cutMode) { // 四舍五入
+            p = Math.pow(10, formatDecLen);
+            return ( Math.round (num * p ) ) / p ;
+        } 
+        else if (cutMode == 2) { // 五舍六入中凑偶
+            return Number(num).toFixed(formatDecLen);
+        } 
+        else { // 原样
+            return Number(num);
+        }
+    };
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 // Copyright (c) 2009, Baidu Inc. All rights reserved.
 // 
 // Licensed under the BSD License
@@ -312,40 +3701,3139 @@ var xui = {};
  * @name T
  * @version 1.5.2.2
 */
+=======
+/**
+ * xutil.object
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    对象相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  none
+ */
 
+(function () {
+    
+    var OBJECT = xutil.object;
+    var objProtoToString = Object.prototype.toString;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var arraySlice = Array.prototype.slice;
+    
+    /**
+     * getByPath和setByPath的默认context。
+     * 可以在工程中修改。
+     */
+    OBJECT.PATH_DEFAULT_CONTEXT = window;
+
+    /**
+     * 根据对象路径得到数据。
+     * 默认根是window。
+     * 路径中支持特殊字符（只要不和分隔符冲突即可）。
+     * 路径分隔符可以定制，默认是点号和中括号。
+     * 如果未取到目标，返回null。
+     * 注意：此方法不会去trim路径中的空格。
+     * 例如：
+     *      在window中
+     *      已有var obj = { asdf: { zxcv: { qwer: 12 } } };
+     *      可用getByPath('obj.asdf.zxcv.qwer'); 得到数值12。
+     *      已有var obj = { aaa: [123, { fff: 678 }] };（路径中有数组）
+     *      可用getByPath('aaa.2.fff', obj);
+     *      或getByPath('aaa[2].fff', obj);得到数值678。
+     * 
+     * @public
+     * @param {string} path 如xxx.sss.aaa[2][3].SomeObj，
+     *      如果为null或undefined，返回context。
+     * @param {Object=} context 根，缺省是window，
+     *     另外可使用OBJECT.PATH_DEFAULT_CONTEXT配置缺省值
+     * @param {Object=} options 选项
+     * @param {string=} objDelimiter 对象定界符，默认是点号
+     * @param {string=} arrBegin 数组起始标志符，默认是左方括号
+     * @param {string=} arrEnd 数组结束标志符，默认是右方括号
+     * @return {*} 取得的数据，如上例得到SomeObj
+     */
+    OBJECT.getByPath = function (path, context, options) {
+        options = options || {};
+        context = context || OBJECT.PATH_DEFAULT_CONTEXT;
+
+        if (path == null) { return context; }
+
+        var arrBegin = options.arrBegin || '[';
+        var arrEnd = options.arrEnd || ']';
+        var pathArr = path.split(
+                options.objDelimiter != null ? options.objDelimiter : '.'
+            );
+
+        for (var i = 0, j, pai, pajs, paj; i < pathArr.length; i ++) {
+            pai = pathArr[i];
+            pajs = pai.split(arrBegin);
+
+            for (j = 0; j < pajs.length; j ++) {
+                paj = pajs[j];
+                j > 0 && (paj = paj.split(arrEnd)[0]);
+
+                // 如果未取到目标时context就非对象了
+                if (context !== Object(context)) {
+                    return;
+                }
+
+                context = context[paj];
+            }
+        }
+        return context;
+    };
+
+    /**
+     * 根据对象路径设置数据。
+     * 默认根是window。
+     * 如果路径中没有对象/数组，则创建之。
+     * 路径中支持特殊字符（只要不和分隔符冲突即可）。
+     * 路径分隔符可以定制，默认是点号和中括号。
+     * 注意：此方法不会去trim路径中的空格。
+     * 例如：
+     *      可用setByPath('obj.asdf.zxcv', 12); 
+     *      在window中生成对象obj，其内容为{ asdf: { zxcv: 12 } };
+     *      又可用setByPath('asdf.aaa[2].fff', 678, obj);
+     *      或者setByPath('obj.asdf.aaa[2].fff', 678);
+     *      对obj赋值，使obj值最终为：
+     *          { 
+     *              asdf: { 
+     *                  zxcv: 12,
+     *                  aaa: [undefined, { fff: 678 }] 
+     *              } 
+     *          };（路径中有数组）
+     * 
+     * @public
+     * @param {string} path 如xxx.sss.aaa[2][3].SomeObj
+     * @param {*} value 要设置的值
+     * @param {Object=} context 根，缺省是OBJECT.PATH_DEFAULT_CONTEXT
+     *     另外可使用OBJECT.PATH_DEFAULT_CONTEXT配置缺省值
+     * @param {Object=} options 选项
+     * @param {string=} objDelimiter 对象定界符，默认是点号
+     * @param {string=} arrBegin 数组起始标志符，默认是左方括号
+     * @param {string=} arrEnd 数组结束标志符，默认是右方括号
+     * @param {string=} conflict 当路径冲突时的处理.
+     *      路径冲突指路径上已有值（即非undefined或null）但不是对象，
+     *      例如假设当前已经有var obj = { a: 5 };
+     *      又想setByPath('a.c.d', obj, 444)。
+     *      conflict值可为：
+     *          'THROW': 路径冲突时抛出异常（默认）；
+     *          'IGNORE': 路径冲突时不做任何操作直接返回；
+     *          'OVERLAP': 路径冲突时直接覆盖。
+     */
+    OBJECT.setByPath = function (path, value, context, options) {
+        options = options || {};
+        context = context || OBJECT.PATH_DEFAULT_CONTEXT;
+        
+        if (path == null) { return; }
+
+        var arrBegin = options.arrBegin || '[';
+        var arrEnd = options.arrEnd || ']';
+        var conflict = options.conflict || 'THROW';
+        var pathArr = path.split(
+                options.objDelimiter != null ? options.objDelimiter : '.'
+            );
+
+        for (var i = 0, j, pai, pajs, paj, pv; i < pathArr.length; i ++) {
+            pai = pathArr[i];
+            pajs = pai.split(arrBegin);
+
+            for (j = 0; j < pajs.length; j ++) {
+                paj = pajs[j];
+                j > 0 && (paj = paj.split(arrEnd)[0]);
+                pv = context[paj];
+
+                // 最终赋值
+                if (i == pathArr.length - 1 && j == pajs.length - 1) {
+                    context[paj] = value;
+                    return;
+                }
+                else {
+                    // 如果路径上已有值但不是对象
+                    if (pv != null && pv !== Object(pv)) {
+                        if (conflict == 'THROW') {
+                            throw new Error('Path conflict: ' + path);
+                        }
+                        else if (conflict == 'IGNORE') {
+                            return;
+                        }
+                    }
+
+                    context = pv !== Object(pv)
+                        // 如果路径上没有对象则创建
+                        ? (
+                            context[paj] = pajs.length > 1 && j < pajs.length - 1 
+                            ? [] : {}
+                        )
+                        : context[paj];
+                }
+            }
+        }
+    };
+    
+    /**
+     * 兼容性的setter，向一个对象中set数据
+     * 
+     * @public
+     * @param {Object} container 目标对象
+     * @param {string} key 关键字
+     * @param {*} value 数据
+     */
+    OBJECT.set = function (container, key, value) {
+        if (isFunction(container['set'])) {
+            container['set'](key, value);
+        } 
+        else {
+            container[key];
+        }
+    };
+
+    /**
+     * 在某对象中记录key/检查是否有key的方便方法
+     * 
+     * @public
+     * @param {string=} key 如果为空，则fanhuitrue
+     * @param {Object} context 需要enable/disable的对象
+     * @return {boolean} 是否可以enable
+     */
+    OBJECT.objKey = (function () {
+
+        /**
+         * 在目标对象中会占用此成员记录key
+         */
+        var KEY_ATTR_NAME = '\x07__OBJ__KEY__';
+
+        /**
+         * 检查对象中是否有记录的key
+         * 
+         * @public
+         * @param {Object} context 目标对象
+         * @param {string=} key 如果为null或undefined，则返回false
+         * @param {string=} keyName key种类名称，
+         *      如果在对象中使用一种以上的key时，用此区别，否则缺省即可。
+         * @return {boolean} 是否有key
+         */
+        function has(context, key, keyName) {
+            if (key == null) { return false; }
+
+            var hasKey = false;
+            var keyList = getKeyList(context, keyName);
+
+            for (var i = 0; i < keyList.length; i ++) {
+                if (key == keyList[i]) {
+                    hasKey = true;
+                }
+            }
+
+            return hasKey;        
+        }
+
+        /**
+         * 对象中key的数量
+         * 
+         * @public
+         * @param {Object} context 目标对象
+         * @param {string=} keyName key种类名称，
+         *      如果在对象中使用一种以上的key时，用此区别，否则缺省即可。
+         * @return {number} key的数量
+         */
+        function size(context, keyName) {
+            return getKeyList(context, keyName).length;
+        }
+
+        /**
+         * 在对象中记录key
+         * 
+         * @public
+         * @param {Object} context 需要enable/disable的对象
+         * @param {string=} key 如果为null或undefined，则不记录key
+         * @param {string=} keyName key种类名称，
+         *      如果在对象中使用一种以上的key时，用此区别，否则缺省即可。
+         */
+        function add(context, key, keyName) {
+            if (key == null) { return; }
+
+            if (!has(context, key, keyName)) {
+                getKeyList(context, keyName).push(key);
+            }
+        }
+
+        /**
+         * 在对象中删除key
+         * 
+         * @public
+         * @param {Object} context 需要enable/disable的对象
+         * @param {string=} key 如果为null或undefined，则不删除key
+         * @param {string=} keyName key种类名称，
+         *      如果在对象中使用一种以上的key时，用此区别，否则缺省即可。
+         */
+        function remove(context, key, keyName) {
+            if (key == null) { return; }
+
+            var keyList = getKeyList(context, keyName);
+
+            for (var i = 0; i < keyList.length; ) {
+                if (key == keyList[i]) {
+                    keyList.splice(i, 1);
+                }
+                else {
+                    i ++;
+                }
+            }
+        }
+
+        /**
+         * 得到keylist
+         * 
+         * @private
+         * @param {Object} context 目标对象
+         * @param {string=} keyName key种类名称，
+         *      如果在对象中使用一种以上的key时，用此区别，否则缺省即可。
+         * @return {Array} 
+         */
+        function getKeyList(context, keyName) {
+            if (keyName == null) {
+                keyName = '';
+            }
+
+            if (!context[KEY_ATTR_NAME + keyName]) {
+                context[KEY_ATTR_NAME + keyName] = [];
+            }
+
+            return context[KEY_ATTR_NAME + keyName];
+        }
+
+        return {
+            add: add,
+            remove: remove,
+            has: has,
+            size: size,
+            KEY_ATTR_NAME: KEY_ATTR_NAME
+        };
+
+    })();
+
+    /**
+     * 兼容性的getter，从一个对象中get数据
+     * 
+     * @public
+     * @param {Object} container 目标对象
+     * @param {string} key 关键字
+     * @return {*} 数据
+     */
+    OBJECT.get = function (container, key) {
+        if (isFunction(container['get'])) {
+            return container['get'](key);
+        } 
+        else {
+            return container[key];
+        }
+    };
+
+    /**
+     * 是否是空对象
+     * 
+     * @public
+     * @param {Object} o 输入对象
+     * @return {boolean} 是否是空对象
+     */
+    OBJECT.isEmptyObj = function (o) {    
+        if (o !== Object(o)) {
+            return false;
+        }
+        for (var i in o) {
+            return false;
+        }
+        return true;
+    };
+                
+    /**
+     * 属性拷贝（对象浅拷贝）
+     * target中与source中相同的属性会被覆盖。
+     * prototype属性不会被拷贝。
+     * 
+     * @public
+     * @usage extend(target, source1, source2, source3);
+     * @param {(Object|Array)} target
+     * @param {(Object|Array)...} source 可传多个对象，
+     *          从第一个source开始往后逐次extend到target中
+     * @return {(Object|Array)} 目标对象
+     */
+    OBJECT.extend = function (target) {
+        var sourceList = arraySlice.call(arguments, 1);
+        for (var i = 0, source, key; i < sourceList.length; i ++) {
+            if (source = sourceList[i]) {
+                for (key in source) {
+                    if (source.hasOwnProperty(key)) {
+                        target[key] = source[key];
+                    }
+                }
+            }
+        }
+        return target;
+    };
+    
+    /**
+     * 属性赋值（对象浅拷贝）
+     * 与extend的不同点在于，可以指定拷贝的属性，
+     * 但是不能同时进行多个对象的拷贝。
+     * target中与source中相同的属性会被覆盖。
+     * prototype属性不会被拷贝。
+     * 
+     * @public
+     * @param {(Object|Array)} target 目标对象
+     * @param {(Object|Array)} source 源对象
+     * @param {(Array.<string>|Object)} inclusion 包含的属性列表
+     *          如果为{Array.<string>}，则意为要拷贝的属性名列表，
+     *              如['aa', 'bb']表示将source的aa、bb属性
+     *              分别拷贝到target的aa、aa上
+     *          如果为{Object}，则意为属性名映射，
+     *              如{'sAa': 'aa', 'sBb': 'bb'}表示将source的aa、bb属性
+     *              分别拷贝到target的sAa、sBb上
+     *          如果为null或undefined，
+     *              则认为所有source属性都要拷贝到target中
+     * @param {Array.<string>} exclusion 不包含的属性列表，
+     *              如果与inclusion冲突，以exclusion为准.
+     *          如果为{Array.<string>}，则意为要拷贝的属性名列表，
+     *              如['aa', 'bb']表示将source的aa、bb属性分别拷贝到target的aa、aa上
+     *          如果为null或undefined，则忽略此参数
+     * @return {(Object|Array)} 目标对象
+     */
+    OBJECT.assign = function (target, source, inclusion, exclusion) {
+        var i;
+        var len;
+        var inclusionMap = makeClusionMap(inclusion);
+        var exclusionMap = makeClusionMap(exclusion);
+
+        for (var i in source) {
+            if (source.hasOwnProperty(i)) {
+                if (!inclusion) {
+                    if (exclusionMap[i] == null) {
+                        target[i] = source[i];
+                    }
+                }
+                else {
+                    if (inclusionMap[i] != null && exclusionMap[i] == null) {
+                        target[inclusionMap[i]] = source[i];
+                    }
+                }
+            }
+        }
+
+        return target;
+    };       
+    
+    /**
+     * 对象深拷贝
+     * 原型上的属性不会被拷贝。
+     * 非原型上的属性中，
+     * 会进行克隆的属性：
+     *      值属性
+     *      数组
+     *      Date
+     *      字面量对象(literal object @see isPlainObject)
+     * 不会进行克隆只引用拷贝的属性：
+     *      其他类型对象（如DOM对象，RegExp，new somefunc()创建的对象等）
+     * 
+     * @public
+     * @param {(Object|Array)} source 源对象
+     * @param {Object=} options 选项
+     * @param {Array.<string>} options.exclusion 不包含的属性列表
+     * @return {(Object|Array)} 新对象
+     */
+    OBJECT.clone = function (source, options) {
+        options = options || {};
+        var result;
+        var i;
+        var isArr;
+        var exclusionMap = makeClusionMap(options.exclusion);
+
+        if (isPlainObject(source)
+            // 对于数组也使用下面方式，把非数字key的属性也拷贝
+            || (isArr = isArray(source))
+        ) {
+            result = isArr ? [] : {};
+            for (i in source) {
+                if (source.hasOwnProperty(i) && !(i in exclusionMap)) {
+                    result[i] = OBJECT.clone(source[i]);
+                }
+            }
+        } 
+        else if (isDate(source)) {
+            result = new Date(source.getTime());
+        } 
+        else {
+            result = source;
+        }
+        return result;
+    };
+
+    /**
+     * 两个对象融合
+     * 
+     * @public
+     * @param {(Object|Array)} target 目标对象
+     * @param {(Object|Array)} source 源对象
+     * @param {Object} options 参数
+     * @param {boolean} options.overwrite 是否用源对象的属性覆盖目标对象的属性（默认true）
+     * @param {(boolean|string)} options.clone 对于对象属性，
+     *      如果值为true则使用clone（默认），
+     *      如果值为false则直接引用，
+     *      如果值为'WITHOUT_ARRAY'，则克隆数组以外的东西
+     * @param {Array.<string>} options.exclusion 不包含的属性列表
+     * @return {(Object|Array)} 目标对象
+     */
+    OBJECT.merge = function (target, source, options) {
+        options = options || {};
+        var overwrite = options.overwrite;
+        overwrite == null && (overwrite = true);
+        var clone = options.clone;
+        clone == null && (clone = true);
+
+        var exclusionMap = makeClusionMap(options.exclusion);
+
+        if (isPlainObject(target) && isPlainObject(source)) {
+            doMerge(target, source, overwrite, clone, exclusionMap);
+        }
+        return target;
+    };
+
+    function doMerge(target, source, overwrite, clone, exclusionMap) {
+        var s;
+        var t;
+        
+        for (var i in source) {
+            s = source[i];
+            t = target[i];
+
+            if (!(i in exclusionMap) && source.hasOwnProperty(i)) {
+                if (isPlainObject(t) && isPlainObject(s)) {
+                    doMerge(t, s, overwrite, clone, exclusionMap);
+                } 
+                else if (overwrite || !(i in target)) {
+                    target[i] = clone && (
+                            clone != 'WITHOUT_ARRAY' || !isArray(s)
+                        )
+                        ? OBJECT.clone(s) 
+                        : s;
+                }
+            }
+        }
+    }
+
+    /**
+     * 类继承
+     *
+     * @public
+     * @param {Function} subClass 子类构造函数
+     * @param {Function} superClass 父类
+     * @return {Object} 生成的新构造函数的原型
+     */
+    OBJECT.inherits = function (subClass, superClass) {
+        var oldPrototype = subClass.prototype;
+        var clazz = new Function();
+
+        clazz.prototype = superClass.prototype;
+        OBJECT.extend(subClass.prototype = new clazz(), oldPrototype);
+        subClass.prototype.constructor = subClass;
+        subClass.superClass = superClass.prototype;
+
+        return subClass.prototype;
+    };
+
+    /**
+     * 模型继承
+     * 生成的构造函数含有父类的构造函数的自动调用
+     *
+     * @public
+     * @param {Function} superClass 父类，如果无父类则为null
+     * @param {Function} subClassConstructor 子类的标准构造函数，
+     *          如果忽略将直接调用父控件类的构造函数
+     * @return {Function} 新类的构造函数
+     */
+    OBJECT.inheritsObject = function (superClass, subClassConstructor) {
+        var agent = function (options) {
+                return new agent.client(options);
+            }; 
+        var client = agent.client = function (options) {
+                options = options || {};
+                superClass && superClass.client.call(this, options);
+                subClassConstructor && subClassConstructor.call(this, options);
+            };
+            
+        superClass && OBJECT.inherits(agent, superClass);
+        OBJECT.inherits(client, agent);
+        client.agent = agent;
+
+        return agent;
+    };
+
+    /**
+     * 创建单例
+     * 生成的构造函数含有父类的构造函数的自动调用
+     *
+     * @public
+     * @param {Function} superClass 父类，如果无父类则为null
+     * @param {Function} subClassConstructor 子类的标准构造函数，
+     *          如果忽略将直接调用父控件类的构造函数
+     * @return {Function} 新类的构造函数
+     */
+    OBJECT.createSingleton = function (superClass, subClassConstructor) {
+        var instance;
+        var agent = function (options) {
+                return instance || (instance = new agent.client(options));
+            };
+        var client = agent.client = function (options) {
+                options = options || {};
+                superClass && superClass.client.call(this, options);
+                subClassConstructor && subClassConstructor.call(this, options);
+            };
+            
+        superClass && OBJECT.inherits(agent, superClass);
+        OBJECT.inherits(client, agent);
+        client.agent = agent;
+
+        return agent;
+    };
+
+    /**
+     * 试图判断是否是字面量对象 (@see jquery, tangram)
+     * 字面量(literal)对象，简单来讲，
+     * 即由{}、new Object()类似方式创建的对象，
+     * 而DOM对象，函数对象，Date对象，RegExp对象，
+     * 继承/new somefunc()自定义得到的对象都不是字面量对象。
+     * 此方法尽力按通常情况排除通非字面量对象，
+     * 但是不可能完全排除所有的非字面量对象。
+     * 
+     * @public
+     * @param {Object} obj 输入对象
+     * @return {boolean} 是否是字面量对象
+     */
+    var isPlainObject = OBJECT.isPlainObject = function (obj) {
+        
+        // 首先必须是Object（特别地，排除DOM元素）
+        if (!obj || Object.prototype.toString.call(obj) != '[object Object]'
+            // 但是在IE中，DOM元素对上一句话返回true，
+            // 所以使用字面量对象的原型上的isPrototypeOf来判断
+            || !('isPrototypeOf' in obj)) {
+            return false;
+        }
+
+        try {
+            // 试图排除new somefunc()创建出的对象
+            if (// 如果没有constructor肯定是字面量对象
+                obj.constructor
+                // 有constructor但不在原型上时通过
+                && !hasOwnProperty.call(obj, 'constructor') 
+                // 用isPrototypeOf判断constructor是否为Object对象本身
+                && !hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')
+            ) {
+                return false;
+            }
+        } catch ( e ) {
+            // IE8,9时，某些情况下访问某些host objects(如window.location)的constructor时，
+            // 可能抛异常，@see jquery #9897
+            return false;
+        }
+
+        // 有一个继承的属性就不算字面量对象，
+        // 因原型上的属性会在后面遍历，所以直接检查最后一个
+        for (var key in obj) {}
+        return key === undefined || hasOwnProperty.call(obj, key);
+    };
+
+    /**
+     * 是否为数组
+     */
+    function isArray(o) {
+        return objProtoToString.call(o) == '[object Array]';
+    }
+
+    /**
+     * 是否为function
+     */
+    function isFunction(o) {
+        return objProtoToString.call(o) == '[object Function]';
+    }
+
+    /**
+     * 是否为Date
+     */
+    function isDate(o) {
+        return objProtoToString.call(o) == '[object Date]';
+    }
+
+    /**
+     * 做inclusion map, exclusion map
+     */
+    function makeClusionMap (clusion) {
+        var i;
+        var clusionMap = {};
+
+        if (isArray(clusion)) {
+            for (i = 0; i < clusion.length; i ++) {
+                clusionMap[clusion[i]] = clusion[i];
+            }
+        } 
+        else if (clusion === Object(clusion)) { 
+            for (i in clusion) {
+                clusionMap[clusion[i]] = i;
+            }
+        }
+
+        return clusionMap;
+    }
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 /**
  * 修改点：
  * ajax加入 charset=UTF-8
  */
+=======
+/**
+ * xutil.string
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    字符串相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.lang
+ */
 
+(function () {
+    
+    var STRING = xutil.string;
+    var LANG = xutil.lang;
+    var TRIMER = new RegExp(
+            "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
+        );
+    
+    /**
+     * 删除目标字符串两端的空白字符 (@see tangram)
+     * 
+     * @pubilc
+     * @param {string} source 目标字符串
+     * @returns {string} 删除两端空白字符后的字符串
+     */
+    STRING.trim = function (source) {
+        return source == null 
+            ? ""
+            : String(source).replace(TRIMER, "");
+    };
+    
+    /**
+     * HTML编码，包括空格也会被编码
+     * 
+     * @public
+     * @param {string} text 要编码的文本
+     * @param {number} blankLength 每个空格的长度，
+     *      为了显示效果，可调整长度，缺省为1
+     */
+    STRING.encodeHTMLWithBlank = function (text, blankLength) {
+        var blankArr=[];
+        blankLength = blankLength || 1;
+        for(var i = 0; i < blankLength; i++) {
+            blankArr.push('&nbsp;');
+        }
+        return STRING.encodeHTML(text).replace(/ /g, blankArr.join(''));
+    };
+    
+    /**
+     * 对目标字符串进行html编码 (@see tangram)
+     * 编码字符有5个：&<>"'
+     * 
+     * @public
+     * @param {string} source 目标字符串
+     * @returns {string} html编码后的字符串
+     */
+    STRING.encodeHTML = function (source) {
+        return String(source)
+                    .replace(/&/g,'&amp;')
+                    .replace(/</g,'&lt;')
+                    .replace(/>/g,'&gt;')
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#39;");
+    };
+        
+    /**
+     * 对目标字符串进行html解码(@see tangram)
+     * 
+     * @public
+     * @param {string} source 目标字符串
+     * @returns {string} html解码后的字符串
+     */
+    STRING.decodeHTML = function (source) {
+        var str = String(source)
+                    .replace(/&quot;/g,'"')
+                    .replace(/&lt;/g,'<')
+                    .replace(/&gt;/g,'>')
+                    .replace(/&amp;/g, "&");
+        //处理转义的中文和实体字符
+        return str.replace(/&#([\d]+);/g, function (_0, _1){
+            return String.fromCharCode(parseInt(_1, 10));
+        });
+    };
+
+    /**
+     * 解码
+     * 在decodeURIComponent基础上，兼容application/x-www-form-urlencoded中额外定义的
+     * "空格会被encode成加号"这个情况。
+     * 解释：
+     *      encodeURIComponent依据URI规范编码：
+     *          参见：http://en.wikipedia.org/wiki/Application/x-www-form-urlencoded#The_application.2Fx-www-form-urlencoded_type
+     *      form表单提交时是依据较为老的application/x-www-form-urlencoded类型的编码方式：
+     *          参见：http://www.w3.org/TR/REC-html40-971218/interact/forms.html#h-17.13.3.3
+     *          主要区别是：空格被encode成加号
+     *          依照这种方式进行encode/decode的地方是：
+     *              form提交时；
+     *              java.net.URIEncode/java.net.URIDecoder中；
+     *              （报表引擎后台的默认decode也是这样的，所以如果出现加号，会被解码成空格）；
+     *          所以，把这种encode的结果传到di-stub中的情况虽然很少，但也是存在的（比如后台依照这种规范encode，并渲染到页面上）
+     *
+     * @public
+     * @param {string} str 要解码的字符串
+     * @return {string} 解码结果
+     */
+    STRING.decodePercent = function (str) {
+        if (str == null) { return ''; }
+        return decodeURIComponent(str.replace(/\+/g, '%20'));
+    };    
+        
+    /**
+     * 得到可显示的文本的方便函数，便于业务代码中批量使用
+     * 
+     * @public
+     * @param {string} source 原文本
+     * @param {string} defaultText 如果source为空，则使用defaultText，缺省为''。
+     *      例如页面上表格内容为空时，显示'-'
+     * @param {boolean} needEncodeHTML 是否要进行HTML编码，缺省为false
+     * @param {Object} htmlEncoder HTML编码器，缺省为STRING.encodeHTML
+     */
+    STRING.toShowText = function (source, defaultText, needEncodeHTML, htmlEncoder) {
+        defaultText =  LANG.hasValue(defaultText) ? defaultText : '';
+        htmlEncoder = htmlEncoder || STRING.encodeHTML;
+        var text = LANG.hasValueNotBlank(source) ? source : defaultText;
+        needEncodeHTML && (text = htmlEncoder(text));
+        return text;
+    };
+    
+    /**
+     * 参见toShowText
+     *
+     * @public
+     */
+    STRING.htmlText = function (source, defaultText, needEncodeHTML) {
+        if (defaultText == null) {
+            defaultText = '';
+        }
+        if (needEncodeHTML == null) {
+            needEncodeHTML = true
+        }
+        return STRING.toShowText(source, defaultText, needEncodeHTML);
+    }
+
+    /**
+     * 去除html/xml文本中的任何标签
+     * （前提是文本没有被encode过）
+     * 
+     * @public
+     * @param {string} source 输入文本
+     * @return {string} 输出文本
+     */
+    STRING.escapeTag = function (source) {
+        if (!LANG.hasValueNotBlank(source)) {
+            return '';
+        }
+        return String(source).replace(/<.*?>/g,'');
+    };
+    
+    /**
+     * 将目标字符串中可能会影响正则表达式构造的字符串进行转义。(@see tangram)
+     * 给以下字符前加上“\”进行转义：.*+?^=!:${}()|[]/\
+     * 
+     * @public
+     * @param {string} source 目标字符串
+     * @return {string} 转义后的字符串
+     */
+    STRING.escapeReg = function (source) {
+        return String(source)
+                .replace(
+                    new RegExp("([.*+?^=!:\x24{}()|[\\]\/\\\\])", "g"), 
+                    '\\\x241'
+                );
+    };    
+    
+    /**
+     * 求字符串的字节长度，非ASCII字符算两个ASCII字符长
+     * 
+     * @public
+     * @param {string} str 输入文本
+     * @return {number} 字符串字节长度
+     */
+    STRING.textLength = function (str){
+        if (!LANG.hasValue(str)) { return 0; };
+        return str.replace(/[^\x00-\xFF]/g,'**').length;
+    };
+
+    /**
+     * 截取字符串，如果非ASCII字符，
+     * 算两个字节长度（一个ASCII字符长度是一个单位长度）
+     * 
+     * @public
+     * @param {string} str 输入文本
+     * @param {number} start 从第几个字符开始截取
+     * @param {number} length 截取多少个字节长度
+     * @return {string} 截取的字符串
+     */
+    STRING.textSubstr = function (str, start, length) {
+        if (!LANG.hasValue(str)) {
+            return '';
+        }
+        var count=0;
+        for(var i = start, l = str.length; i < l && count < length; i++) {
+            str.charCodeAt(i) > 255 ? (count += 2) : (count++);
+        }
+        count > length && i--;
+        return str.substring(start, i); 
+    };
+    
+    /**
+     * 折行，如果非ASCII字符，算两个单位长度（一个ASCII字符长度是一个单位长度）
+     * 
+     * @public
+     * @param {string} str 输入文本
+     * @param {number} length 每行多少个单位长度
+     * @param {string} lineSeparater 换行符，缺省为\r
+     * @return {string} 折行过的文本
+     */
+    STRING.textWrap = function (str, length, lineSeparater) {
+        lineSeparater = lineSeparater || '\r';
+        if (length < 2)  {
+            throw Error ('illegle length');
+        }
+        if (!LANG.hasValueNotBlank(str)) {
+            return '';
+        }
+        
+        var i = 0;
+        var lineStart=0;
+        var l=str.length;
+        var count=0;
+        var textArr=[];
+        var lineStart;
+
+        while(true) {
+            if (i>=l) {
+                textArr.push(str.substring(lineStart, l+1));
+                break;  
+            }
+            str.charCodeAt(i)>255 ? (count+=2) : (count++);
+            if(count>=length) {
+                (count>length) && (i=i-1);
+                textArr.push(str.substring(lineStart, i+1));
+                lineStart = i+1;
+                count = 0;
+            }
+            i++;
+        }
+        return textArr.join(lineSeparater);     
+    };
+ 
+    /**
+     * 按照模板对目标字符串进行格式化 (@see tangram)
+     *
+     * @public
+     * @usage 
+     *      template('asdf#{0}fdsa#{1}8888', 'PA1', 'PA2') 
+     *      返回asdfPA1fdsaPA28888。
+     *      template('asdf#{name}fdsa#{area}8888, { name: 'PA1', area: 'PA2' }) 
+     *      返回asdfPA1fdsaPA28888。   
+     * @param {string} source 目标字符串
+     * @param {(Object|...string)} options 提供相应数据的对象
+     * @return {string} 格式化后的字符串
+     */
+    STRING.template = function (source, options) {
+        source = String(source);
+        var data = Array.prototype.slice.call(arguments, 1);
+        var toString = Object.prototype.toString;
+
+        if(data.length) {
+            data = data.length == 1 ? 
+                (options !== null && 
+                    (/\[object Array\]|\[object Object\]/.test(
+                        toString.call(options)
+                    )) 
+                        ? options : data
+                ) : data;
+
+            return source.replace(
+                /#\{(.+?)\}/g, 
+                function (match, key) {
+                    var replacer = data[key];
+                    if('[object Function]' == toString.call(replacer)) {
+                        replacer = replacer(key);
+                    }
+                    return ('undefined' == typeof replacer ? '' : replacer);
+                }
+            );
+
+        }
+        return source;
+    };
+
+    /**
+     * 是否以XX为结束
+     * @public 
+     * 
+     * @param {string} str
+     * @param {string} end
+     * @return {boolean} 是或否
+     */
+    STRING.endWith = function (str, end) {
+        if (str && end) {
+            return str.lastIndexOf(end) 
+                === str.length - end.length;
+        }
+        return false;
+    }; 
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 /**
  * 声明baidu包
  * @author: allstar, erik, meizz, berg
  */
 var T,
     baidu = T = baidu || {version: "1.5.2.2"}; 
+=======
+/**
+ * xutil.uid
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    唯一性ID相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  none
+ */
 
+(function () {
+    
+    var UID = xutil.uid;
+    var INCREASED_UID_BASE_PUBLIC = 1;
+    var INCREASED_UID_BASE_PRIVATE = {};
+    
+    /**
+     * 获取不重复的随机串（自增，在单浏览器实例，无worker情况下保证唯一）
+     * @public
+     * 
+     * @param {Object} options
+     * @param {string} options.key UID的所属。
+     *          缺省则为公共UID；传key则为私有UID。
+     *          同一key对应的UID不会重复，不同的key对应的UID可以重复。
+     * @return {string} 生成的UID
+     */
+    UID.getIncreasedUID = function (key) {
+        if (key != null) {
+            !INCREASED_UID_BASE_PRIVATE[key] 
+                && (INCREASED_UID_BASE_PRIVATE[key] = 1);
+            return INCREASED_UID_BASE_PRIVATE[key] ++;
+        } 
+        else {
+            return INCREASED_UID_BASE_PUBLIC ++ ;
+        }
+    };
+    
+    /**
+     * 也可以在应用中重载此定义
+     */
+    UID.getUID = UID.getIncreasedUID;
+    
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 //提出guid，防止在与老版本Tangram混用时
 //在下一行错误的修改window[undefined]
 baidu.guid = "$BAIDU$";
+=======
+/**
+ * xutil.url
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    时间相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.lang
+ */
 
+(function () {
+    
+    var URL = xutil.url;
+    var LANG = xutil.lang;
+    var objProtoToString = Object.prototype.toString;
+    var arrayProtoSlice = Array.prototype.slice;
+
+    /**
+     * 包装js原生的decodeURIComponent，
+     * 对于undefined和null均返回空字符串
+     * 
+     * @public
+     * @param {string} input 输入文本
+     * @return {string} 输出文本
+     */
+    URL.decodeURIComponent = function (input) { 
+        return LANG.hasValueNotBlank(input) 
+            ? decodeURIComponent(input) : input;
+    };
+    
+    /**
+     * 向URL增加参数
+     * 
+     * @public
+     * @param {string} url 输入url
+     * @param {string} paramStr 参数字符串
+     * @param {number} urlType url类型，1:普通URL（默认）; 2:erURL 
+     * @return {string} 结果url
+     */
+    URL.appendParam = function (url, paramStr, urlType) {
+        urlType = urlType || 1;
+
+        if (url.indexOf('?') < 0) {
+            url += (urlType == 2 ? '~' : '?') + paramStr;
+        } 
+        else {
+            url += '&' + paramStr;
+        }
+
+        return url;
+    };
+
+    /**
+     * 替换url中的参数。如果没有此参数，则添加此参数。
+     * 
+     * @public
+     * @param {string} 输入url
+     * @param {string} paramName 参数名
+     * @param {string} newValue 新参数值，如果为空则给此paramName赋空字串
+     * @param {number} urlType url类型，1:普通URL（默认）; 2:erURL 
+     * @return {string} 结果url
+     */
+    URL.replaceIntoParam = function (url, paramName, newValue, urlType) {
+        var retUrl = url;
+        
+        if (!retUrl || !LANG.hasValueNotBlank(paramName)) { 
+            return retUrl; 
+        }
+        newValue = newValue != null ? newValue : '';
+
+        var regexp = new RegExp('([&~?])' + paramName + '=[^&]*');
+        var paramStr = paramName + '=' + newValue;
+        if (regexp.test(retUrl)) { // 替换
+            // js不支持反向预查
+            retUrl = retUrl.replace(regexp, '$1' + paramStr); 
+        } 
+        else { // 添加
+            retUrl = URL.appendParam(retUrl, paramStr, urlType);
+        }
+        return retUrl;
+    };
+
+    /**
+     * 一个将请求参数转换为对象工具函数
+     * 
+     * @public
+     * @usage url.parseParam('asdf=123&qwer=654365&t=43&t=45&t=67'); 
+     *          一个将请求参数转换为对象工具函数
+     *          其中如上例，返回对象{asdf:123, qwer:654365, t: [43, 45, 67]}
+     * @param {string} paramStr 请求参数字符串
+     * @param {Object} options 
+     * @param {Object} options.dontParseBoolean 不将"true"，"false"转换为true，false
+     *          默认是转换的
+     * @return {Object} 请求参数封装对象，如上例
+     */
+    URL.parseParam = function (paramStr, options) {
+        var paramMap = {};
+        options = options || {};
+
+        if (paramStr == null) {
+            return paramMap;
+        }
+
+        var paramArr = paramStr.split('&');
+        for (var i = 0, len = paramArr.length, o; i < len; i++) {
+            o = paramArr[i] != null ? paramArr[i] : '';
+            o = o.split('=');
+            var key = o[0];
+            var value = o[1];
+
+            if (!options.dontParseBoolean) {
+                value == 'true' && (value = true);
+                value == 'false' && (value = false);
+            }
+            
+            if (key == null) { continue; }
+
+            if (paramMap.hasOwnProperty(key)) {
+                if (objProtoToString.call(paramMap[key]) == '[object Array]') {
+                    paramMap[key].push(value);
+                } 
+                else {
+                    paramMap[key] = [paramMap[key], value];   
+                }
+            } 
+            else {
+                paramMap[key] = value;   
+            }
+        }
+        return paramMap;
+    };
+
+    /**
+     * 请求参数变为string
+     * null和undefined会被转为空字符串
+     * 可支持urlencoding
+     * 
+     * @public
+     * @usage url.stringifyParam({asdf:123, qwer:654365, t: [43, 45, 67]})
+     *          一个将请求参数对象转换为数组的工具函数
+     *          其中如上例，返回['asdf=123', 'qwer=654365', 't=43', 't=45', 't=67'] 
+     *          可自己用join('&')变为请求参数字符串'asdf=123&qwer=654365&t=43&t=45&t=67'
+     *
+     * @param {Object} paramObj 请求参数封装
+     *      key为参数名，
+     *      value为参数值，{string}或者{Array.<string>}类型   
+     * @param {boolean} useEncoding 是否使用urlencoding，默认false
+     * @return {Array.<string>} 请求参数数组
+     */
+    URL.stringifyParam = function (paramObj, useEncoding) {
+        var paramArr = [];
+        var textParam = URL.textParam;
+
+        function pushParam(name, value) {
+            paramArr.push(
+                textParam(name, !useEncoding) 
+                + '=' 
+                + textParam(value, !useEncoding)
+            );
+        }    
+
+        var name;
+        var value;
+        var i;
+        for (name in (paramObj || {})) {
+            value = paramObj[name];
+            if (Object.prototype.toString.call(value) == '[object Array]') {
+                for (i = 0; i < value.length; i ++) {
+                    pushParam(name, value[i]);
+                }
+            }
+            else {
+                pushParam(name, value);
+            }
+        }
+        return paramArr;
+    };
+
+    /**
+     * 格式化文本请求参数的方便函数，统一做提交前最常需要做的事：
+     * (1) 判空防止请求参数中出现null/undefined字样，
+     * (2) encodeURIComponent（默认进行，可配置）
+     *
+     * @public
+     * @param {string} str 参数值
+     * @param {boolean} dontEncoding 默认false
+     * @param {string} defaultValue 数据为空时默认值，缺省为''
+     * @return {string} 用于传输的参数值
+     */
+    URL.textParam = function (str, dontEncoding, defaultValue) {
+        typeof defaultValue == 'undefined' && (defaultValue = '');
+        str = str == null ? defaultValue : str;
+        return dontEncoding ? str : encodeURIComponent(str);
+    };
+
+    /**
+     * 格式化数值请求参数的方便函数，统一做提交前最常需要做的事：
+     * 防止请求参数中出现null/undefined字样，如果为空可指定默认值
+     *
+     * @public
+     * @param {(string|number)} value 参数值
+     * @param {string} defaultValue 数据为空时的默认值，缺省为''
+     * @return {string} 用于传输的参数值
+     */
+    URL.numberParam = function (value, defaultValue) {
+        typeof defaultValue == 'undefined' && (defaultValue = '');
+        return (value == null || value === '') ? defaultValue : value;
+    };
+
+    /**
+     * 格式化数值请求参数的方便函数，统一做提交前最常需要做的事：
+     * 直接构造array请求参数，如 aaa=1&aaa=233&aaa=443 ...
+     * 防止请求参数中出现null/undefined字样，如果为空可指定默认值
+     * 
+     * @public
+     * @param {array} arr 要构成arr的参数，结构可以为两种
+     *              (1) ['asdf', 'zxcv', 'qwer']
+     *                  不需要传入attrName。
+     *              (2) [{ t: 'asdf' }, { t: 'zxcv' }]
+     *                  需要传入attrName为t。
+     * @param {string} paramName 参数名
+     *                  如上例，假如传入值'aaa'，
+     *                  则返回值为aaa=asdf&aaa=zxcv&aaa=qwer
+     * @param {string=} attrName 为arr指定每项的属性名，解释如上
+     * @param {Function=} paramFunc 即每个参数的处理函数,
+     *                  缺省则为xutil.url.textParam
+     * @param {...*} paramFunc_args 即paramFunc的补充参数
+     * @return {Array} 参数字符串数组，如['aa=1', 'aa=33', 'aa=543']
+     *              可直接使用join('&')形成用于传输的参数aa=1&aa=33&aa=543
+     */
+    URL.wrapArrayParam = function (arr, paramName, attrName, paramFunc) {
+        if (!arr || !arr.length) {
+            return [];
+        }
+        
+        paramFunc = paramFunc || URL.textParam;
+        var args = arrayProtoSlice.call(arguments, 4);
+
+        var paramArr = [];
+        for (var i = 0, item; i < arr.length; i ++) {
+            item = arr[i];
+            if (item === Object(item)) { // 如果item为Object
+                item = item[attrName];
+            }
+            item = paramFunc.apply(null, [item].concat(args));
+            paramArr.push(paramName + '=' + item);
+        }
+
+        return paramArr;
+    };
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 //Tangram可能被放在闭包中
 //一些页面级别唯一的属性，需要挂载在window[baidu.guid]上
 baidu.$$ = window[baidu.guid] = window[baidu.guid] || {global:{}};
+=======
+/**
+ * xutil.validator
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    输入验证相关工具函数
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.lang
+ */
 
+(function () {
+    
+    var VALIDATOR = xutil.validator = {};
+
+    var REGEXP_CASH = /^\d+(\.\d{1,2})?$/;
+    var REGEXP_CASH_CAN_NAGE = /^(\+|-)?\d+(\.\d{1,2})?$/;
+    var REGEXP_EMAIL = /^[_\w-]+(\.[_\w-]+)*@([\w-])+(\.[\w-]+)*((\.[\w]{2,})|(\.[\w]{2,}\.[\w]{2,}))$/;
+    var REGEXP_URL = /^[^.。，]+(\.[^.，。]+)+$/;
+    var REGEXP_MOBILE = /^1\d{10}$/;
+    var REGEXP_ZIP_CODE = /^\d{6}$/;
+    
+    /**
+     * 是否金额
+     * 
+     * @pubilc
+     * @param {string} value 目标字符串
+     * @param {boolean} canNagetive 是否允许负值，缺省为false
+     * @returns {boolean} 验证结果
+     */
+    VALIDATOR.isCash = function (value, canNagetive) {
+        return canNagetive 
+            ? REGEXP_CASH_CAN_NAGE.test(value) : REGEXP_CASH.test(value);
+    };   
+
+    /**
+     * 是否金额
+     * 
+     * @pubilc
+     * @param {string} value 目标字符串
+     * @returns {boolean} 验证结果
+     */
+    VALIDATOR.isURL = function (value) {
+        return REGEXP_URL.test(value); 
+    };
+
+    /**
+     * 是否移动电话
+     * 
+     * @pubilc
+     * @param {string} value 目标字符串
+     * @returns {boolean} 验证结果
+     */
+    VALIDATOR.isMobile = function (value) {
+        return REGEXP_MOBILE.test(value);
+    };    
+
+    /**
+     * 是否电子邮箱
+     * 
+     * @pubilc
+     * @param {string} value 目标字符串
+     * @returns {boolean} 验证结果
+     */
+    VALIDATOR.isEMAIL = function (value) {
+        return REGEXP_EMAIL.test(value);
+    };
+    
+    /**
+     * 是否邮政编码
+     * 
+     * @pubilc
+     * @param {string} value 目标字符串
+     * @returns {boolean} 验证结果
+     */
+    VALIDATOR.isZipCode = function (value) {
+        return REGEXP_ZIP_CODE.test(value);
+    };
+    
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 /**
  * 对XMLHttpRequest请求的封装
  * @namespace baidu.ajax
  */
 baidu.ajax = baidu.ajax || {};
+=======
+/**
+ * ecui.XObject
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    视图和模型的基类
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.object
+ * @version: 1.0.1
+ */
 
+(function () {
+
+    //----------------------------------
+    // 引用
+    //----------------------------------
+    
+    var xobject = xutil.object;
+    var inheritsObject = xobject.inheritsObject;
+    var objProtoToString = Object.prototype.toString;
+    var arrayProtoSlice = Array.prototype.slice;
+    
+    //----------------------------------
+    // 类型定义
+    //----------------------------------
+    
+    /**
+     * 视图和模型的基类
+     *
+     * @class
+     */
+    var XOBJECT = xui.XObject = 
+            inheritsObject(null, xobjectConstructor);
+    var XOBJECT_CLASS = XOBJECT.prototype;
+    
+    /**
+     * 构造函数
+     *
+     * @public
+     * @constructor
+     * @param {Object} options 参数     
+     */
+    function xobjectConstructor(options) {
+        /**
+         * 事件监听器集合
+         * key: eventName
+         * value: {Array.<Object>} 监听器列表
+         *
+         * @type {Object} 
+         * @private
+         */
+        this._oEventHandlerMap = {};
+
+        /**
+         * 是否禁用（不可交互）
+         *
+         * @type {boolean} 
+         * @private
+         */
+        this._bDisabled = false;
+    }
+
+    //----------------------------------
+    // 基本方法
+    //----------------------------------
+
+    /**
+     * 默认的初始化函数
+     *
+     * @public
+     */
+    XOBJECT_CLASS.init = function () {};
+    
+    /**
+     * 默认的析构函数
+     * 如果有设businessKey，则终止未完成的请求
+     *
+     * @public
+     */
+    XOBJECT_CLASS.dispose = function () {
+        this._oEventHandlerMap = {};
+    };
+
+    /**
+     * 是否禁用（不可交互）
+     *
+     * @public
+     * @return {boolean} 是否禁用
+     */
+    XOBJECT_CLASS.isDisabled = function () {
+        return !!this._bDisabled;
+    };
+    
+    /**
+     * 设置禁用（不可交互）
+     *
+     * @public
+     * @return {boolean} 是否执行了禁用
+     */
+    XOBJECT_CLASS.disable = function () {
+        if (!this._bDisabled) {
+            this._bDisabled = true;
+            return true;
+        }
+        return false;
+    };
+    
+    /**
+     * 设置启用（可交互）
+     *
+     * @public
+     * @return {boolean} 是否执行了启用
+     */
+    XOBJECT_CLASS.enable = function () {
+        if (this._bDisabled) {
+            this._bDisabled = false;
+            return true;
+        }
+        return false;
+    };
+    
+    //------------------------------------------
+    // 事件/通知/Observer相关方法
+    //------------------------------------------
+    
+    /**
+     * 注册事件监听器
+     * 重复注册无效
+     *
+     * @public
+     * @param {(string|Object|Array)} eventName 
+     *                  类型是string时表示事件名，
+     *                  类型是Object或Array时，含义见下方用法举例
+     * @param {Function} handler 监听器
+     * @param {Object=} context 即handler调用时赋给的this，
+     *                  缺省则this为XDatasource对象本身
+     * @param {...*} args handler调用时绑定的前几个参数
+     * @usage
+     *      [用法举例一] 
+     *          myModel.attach('sync.result', this.eventHandler, this);
+     *      [用法举例二] （同时绑定很多事件）
+     *          var bind = xutil.fn.bind;
+     *          myModel.attach(
+     *              {    
+     *                  'sync.parse': bind(this.handler1, this, arg1, arg2),
+     *                  'sync.preprocess': bind(this.handler2, this),
+     *                  'sync.result.INIT': bind(this.handler3, this),
+     *                  'sync.result.DATA': [
+     *                      bind(this.handler4, this),
+     *                      bind(this.handler5, this, arg3),
+     *                      bind(this.handler6, this)
+     *                  ]
+     *              }
+     *      [用法举例三] （同时绑定很多事件）
+     *          myModel.attach(
+     *              ['sync.parse', this.handler1, this, arg1, arg2],
+     *              ['sync.preprocess', this.handler2, this],
+     *              ['sync.result.INIT', this.handler3, this],
+     *              ['sync.result.DATA', this.handler4, this],
+     *              ['sync.result.DATA', this.handler5, this, arg3],
+     *              ['sync.result.DATA', this.handler6, this]
+     *          );
+     */
+    XOBJECT_CLASS.attach = function (eventName, handler, context, args) {
+        parseArgs.call(this, attach, arrayProtoSlice.call(arguments));
+    };
+
+    /**
+     * 事件注册
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {Object} handlerWrap 事件监听器封装
+     */
+    function attach(handlerWrap) {
+        handlerWrap.once = false;
+        doAttach.call(this, handlerWrap);
+    }
+
+    /**
+     * 注册事件监听器，执行一次即被注销
+     * 重复注册无效
+     *
+     * @public
+     * @param {(string|Object|Array)} eventName 
+     *                  类型是string时表示事件名，
+     *                  类型是Object或Array时，含义见attach方法的用法举例
+     * @param {Function} handler 监听器
+     * @param {Object=} context 即handler中的this，
+     *                  缺省则this为XDatasource对象本身
+     * @param {...*} args handler执行时的前几个参数
+     * @usage 用法举例同attach方法
+     */
+    XOBJECT_CLASS.attachOnce = function (eventName, handler, context, args) {
+        parseArgs.call(this, attachOnce, arrayProtoSlice.call(arguments));
+    };
+
+    /**
+     * 事件注册，执行一次即被注销
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {Object} handlerWrap 事件监听器封装
+     */
+    function attachOnce(handlerWrap) {
+        handlerWrap.once = true;
+        doAttach.call(this, handlerWrap);
+    }
+    
+    /**
+     * 注册事件监听器
+     * 重复注册无效
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {Object} handlerWrap 事件监听器封装
+     */
+    function doAttach(handlerWrap) {
+        var handlerList = this._oEventHandlerMap[handlerWrap.eventName];
+        if (!handlerList) {
+            handlerList = this._oEventHandlerMap[handlerWrap.eventName] = [];
+        }
+        if (getHandlerWrapIndex.call(this, handlerWrap) < 0) {
+            handlerList.push(handlerWrap);
+        }
+    }
+
+    /**
+     * 注销事件监听器
+     * 如果传了context参数，则根据handler和context来寻找已经注册的监听器，
+     * 两者同时批评才会命中并注销。
+     * （这样做目的是：
+     *      当handler是挂在prototype上的类成员方法时，可用传context来区别，
+     *      防止监听器注销影响到同类的其他实例
+     *  ）
+     * 如果context缺省，则只根据handler寻找已经注册了的监听器。
+     *
+     * @public
+     * @param {(string|Object|Array)} eventName
+     *                  类型是string时表示事件名，
+     *                  类型是Object或Array时，含义见下方用法举例
+     * @param {Function} handler 监听器
+     * @param {Object=} context 即注册时handler中的this，
+     *                  缺省则this为XDatasource对象本身
+     * @usage
+     *      [用法举例一] 
+     *          myModel.detach('sync.result', this.eventHandler);
+     *      [用法举例二] （同时注销绑定很多事件）
+     *          myModel.detach(
+     *              {    
+     *                  'sync.parse': handler1,
+     *                  'sync.preprocess': handler2,
+     *                  'sync.result.DATA': [
+     *                      handler5,
+     *                      handler6
+     *                  ]
+     *              }
+     *      [用法举例三] （同时注销绑定很多事件）
+     *          myModel.detach(
+     *              ['sync.parse', this.handler1],
+     *              ['sync.result.INIT', this.handler3],
+     *              ['sync.result.DATA', this.handler4],
+     *              ['sync.result.DATA', this.handler5],
+     *              ['sync.result.DATA', this.handler6]
+     *          );
+     */
+    XOBJECT_CLASS.detach = function (eventName, handler, context) {
+        parseArgs.call(this, doDetach, arrayProtoSlice.call(arguments));        
+    };
+
+    /**
+     * 注销注册事件监听器
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {Object} handlerWrap 事件监听器封装
+     */
+    function doDetach(handlerWrap) {
+        var index = getHandlerWrapIndex.call(this, handlerWrap);
+        if (index >= 0) {
+            this._oEventHandlerMap[handlerWrap.eventName].splice(index, 1);
+        }
+    }    
+    
+    /**
+     * 注销某事件的所有监听器
+     *
+     * @public
+     * @param {string} eventName 事件名
+     */
+    XOBJECT_CLASS.detachAll = function (eventName) {
+        delete this._oEventHandlerMap[eventName];
+    };
+    
+    /**
+     * 触发事件
+     *
+     * @public
+     * @param {string} eventName 事件名
+     * @param {Array} paramList 参数，可缺省
+     * @return {boolean} 结果，
+     *      有一个事件处理器返回false则为false，否则为true
+     */
+    XOBJECT_CLASS.notify = function (eventName, paramList) {
+        var result = true;
+        var onceList = [];
+        var handlerList = this._oEventHandlerMap[eventName] || [];
+
+        var i;
+        var o;
+        var handlerWrap;
+        for (i = 0; handlerWrap = handlerList[i]; i++) {
+            o = handlerWrap.handler.apply(
+                handlerWrap.context, 
+                (handlerWrap.args || []).concat(paramList || [])
+            );
+            (o === false) && (result = false);
+
+            if (handlerWrap.once) {
+                onceList.push(handlerWrap);
+            }
+        }
+        for (i = 0; handlerWrap = onceList[i]; i++ ) {
+            this.detach(eventName, handlerWrap.handler, handlerWrap.context);
+        }
+        return result;
+    };
+
+    /**
+     * 构造handlerWrap
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {string} eventName 事件名
+     * @param {Function} handler 监听器
+     * @param {Object} context 即handler中的this，
+     *                  缺省则this为XDatasource对象本身
+     * @param {...*} args handler执行时的前几个参数
+     * @return {Object} wrap
+     */
+    function makeWrap(eventName, handler, context, args) {
+        args = arrayProtoSlice.call(arguments, 3);
+        args.length == 0 && (args = null);
+
+        return {
+            eventName: eventName,
+            handler: handler,
+            context: context || this,
+            args: args
+        };
+    }
+    
+    /**
+     * 处理函数参数
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {Function} func 要执行的方法
+     * @param {Array} args 输入的函数参数
+     */
+    function parseArgs(func, args) {
+        var firstArg = args[0];
+
+        if (objProtoToString.call(firstArg) == '[object String]') {
+            func.call(this, makeWrap.apply(this, args));
+        }
+
+        else if (objProtoToString.call(firstArg) == '[object Array]') {
+            for (var i = 0; i < args.length; i ++) {
+                func.call(this, makeWrap.apply(this, args[i]));
+            }
+        }
+
+        else if (firstArg === Object(firstArg)) {
+            var hand;
+            for (var eventName in firstArg) {
+                hand = firstArg[eventName];
+
+                if (objProtoToString.call(hand) == '[object Array]') {
+                    for (var i = 0; i < hand.length; i ++) {
+                        func.call(
+                            this,
+                            makeWrap.call(this, eventName, hand[i])
+                        );
+                    }
+                }
+                else {
+                    func.call(this, makeWrap.call(this, eventName, hand));
+                }
+            }
+        }
+    }
+    
+    /**
+     * 获得index
+     *
+     * @private
+     * @this {xui.XObject} XObject实例自身
+     * @param {Object} handlerWrap 事件监听器封装
+     */
+    function getHandlerWrapIndex(handlerWrap) {
+        var handlerList = this._oEventHandlerMap[handlerWrap.eventName];
+        if (handlerList) {
+            for (var i = 0, wrap; wrap = handlerList[i]; i++ ) {
+                if (wrap.handler === handlerWrap.handler
+                    && wrap.context === handlerWrap.context
+                ) {
+                    return i;   
+                }
+            }
+        }
+        return -1;
+    };
+    
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 /**
  * 对方法的操作，解决内存泄露问题
  * @namespace baidu.fn
  */
 baidu.fn = baidu.fn || {};
+=======
+/**
+ * xui.XDatasource
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:   数据模型基类
+ *
+ *          使用模型（Model）和视图（View）分离的程序结构时，
+ *          此类可作为模型的基类被继承及扩展，定义相应属性
+ *          （@see OPTIONS_NAME），
+ *          其各派生类提供前/后台的业务数据获取和管理。
+ *          XDatasource推荐一定的代码结构规范，见如下@usage。
+ *
+ *          基础功能：
+ *              (1) 向后台发送数据（用Ajax）
+ *              (2) 获得数据：
+ *                      主动注入数据
+ *                          （出现在数据从其他代码中取得的情况，
+ *                          如数据模型的依赖）
+ *                      从前台取数据
+ *                          （例如为了节省链接和加快速度，
+ *                          JSON数据放在页面HTML中一块返回前端，
+ *                          或者从本地存储中得到等）
+ *                      从后台取数据
+ *                          （用Ajax）
+ *                  取数据顺序是：
+ *                      首先看是否已有主动注入的"businessData"；
+ *                      否则如果"local"定义了则从"local"中取；
+ *                      否则如果"url"定义了则发Ajax请求从后台取。
+ *              (3) Oberver模式的更新通知，及自定义事件
+ *              (4) 多数据源的管理（参见datasourceId）
+ *              (5) 推荐的请求生命期结构
+ *                  （参数准备、返回值解析、结果响应、最终清理等）
+ *              (6) 析构时，abort所有未完成的请求，
+ *                  防止请求回来后视图、模型已经不存在导致js错误、
+ *                  全局视图未清理等问题
+ *
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil
+ * @version: 1.0.1
+ */
 
+/**
+ *                             -----------------
+ *                             |   使用说明    |
+ *                             -----------------
+ * ____________________________________________________________________________
+ * @usage 使用XDatasource
+ *        [举例] 
+ *          ___________________________________________________________________
+ *          (1) 定义一个新的XDatasource（如下MyDatasource），用继承的方式:
+ * 
+ *              如果有数据获取的参数或代码逻辑要写在MyDatasource里面
+ *              （如URL，返回解过解析等逻辑），
+ *              则在MyDatasource中，定义OPTIONS_NAME中指定的各参数
+ *              （不需要定义则缺省即可）。
+ *              其中各参数可以定义成string或者Function
+ * 
+ *              // 定义MyDatasource类
+ *              var MyDatasource = function() {}; 
+ *              inherits(MyDatasource, XDatasource);
+ *              
+ *              // 定义url
+ *              MyDatasource.prototype.url = '/order/go.action'; 
+ *
+ *              // 定义param的构造
+ *              MyDatasource.prototype.param = function(options) {
+ *                  var paramArr = [];
+ *                  paramArr.push('name=' + options.args.name);
+ *                  paramArr.push('year=' + options.args.year);
+ *                  paramArr.push('id=' + this._nId);
+ *                  return paramArr.join('&');
+ *              }
+ *
+ *              // 定义返回数据的解析
+ *              MyDatasource.prototype.parse = function(data, obj, options) {
+ *                  // do something ...
+ *                  return data;
+ *              }
+ * 
+ *          ___________________________________________________________________
+ *          (2) 使用定义好的MyDatasource
+ *              
+ *              如果有数据获取的参数或代码逻辑是写在MyDatasource外面
+ *              （如sync后改变视图的回调），
+ *              则用事件的方式注册到MyDatasource里,
+ *
+ *              例如：
+ *              MyDatasource myDatasource = new MyDatasource();
+ *              绑定事件：
+ *              myDatasource.attach(
+ *                  'sync.result', 
+ *                  function(data, obj, options) {
+ *                      // do something ..., 比如视图改变 
+ *                  }
+ *              );
+ *              myDatasource.attach(
+ *                  'sync.error', 
+ *                  function(status, obj, options) {
+ *                      // do something ..., 比如页面提示 
+ *                  }
+ *              );
+ *              myDatasource.attach(
+ *                  'sync.timeout', 
+ *                  function(options) { 
+ *                      // do something ..., 比如页面提示 
+ *                  }
+ *              );
+ *
+ *              往往我们需要给事件处理函数一个scope，
+ *              比如可以使用第三方库提供的bind方法。
+ *              也可以直接在attach方法中输入scope。
+ *
+ *              当需要绑定许多事件，可以使用代码更短小的方式绑定事件。
+ *              （参见xui.XObject的attach方法）
+ *
+ *              例如：
+ *              （下例中，this是要赋给事件处理函数的scope）
+ *              var bind = xutil.fn.bind;
+ *              myDatasource.attach(
+ *                  {
+ *                      'sync.preprocess.TABLE_DATA': bind(this.disable, this),
+ *                      'sync.result.TABLE_DATA': bind(this.$handleListLoaded, this),
+ *                      'sync.finalize.TABLE_DATA': [  
+ *                          // 一个事件多个处理函数的情况
+ *                          bind(this.enable, this),
+ *                          bind(this.$resetDeleteBtnView, this)
+ *                      ],
+ *                      'sync.result.DELETE': bind(this.$handleDeleteSuccess, this)
+ *                  }
+ *              ); 
+ *
+ *              又例如，还可以这样写：
+ *              （数组第一个元素是事件名，第二个是事件处理函数，第三个是函数的scope）
+ *              myDatasource.attach(
+ *                  ['sync.preprocess.TABLE_DATA', this.disable, this],
+ *                  ['sync.result.TABLE_DATA', this.$handleListLoaded, this],
+ *                  ['sync.finalize.TABLE_DATA', this.enable, this],
+ *                  ['sync.finalize.TABLE_DATA', this.$resetDeleteBtnView, this],
+ *                  ['sync.result.DELETE': this.$handleDeleteSuccess, this]
+ *              );
+ *              
+ *              需要发送数据或者获取数据时调用myDatasource.sync()，
+ *              即可触发相应事件。
+ * 
+ *              如果要传入外部参数，则在options.args中传入，
+ *              例如上例的param和parse定义，sync时直接传入参数：
+ *
+ *              myDatasource.sync( 
+ *                  { 
+ *                      args: { name: 'ss', year: 2012 } 
+ *                  } 
+ *              ); 
+ *
+ *              这样param和parse函数中即可得到参数'ss', 2012。
+ * 
+ *              注意，如果sync时指定了datasourceId，比如
+ *              myDatasource.sync( { datasourceId:'ds1' } );
+ *              则先触发sync.result.ds1事件，再触发sync.result事件。
+ *              error、timeout等事件也是此规则。
+ * 
+ *          ___________________________________________________________________
+ *          (3) 如果调用sync时数据是从本地取得，
+ *              比如页面初始化时把JSON数据写在了页面的某个dom节点中，
+ *              则设置"local"参数，
+ * 
+ *              例如：
+ *              MyDatasource.prototype.local = function() {
+ *                   var data;
+ *                   try {
+ *                      JSON.parse(
+ *                          decodeHTML(
+ *                              document.getElementById('DATA').innerHTML
+ *                          )
+ *                      );
+ *                      return this.wrapEJson(data);
+ *                   } catch (e) {
+ *                      return this.wrapEJson(null, 99999, 'business error');
+ *                   }
+ *              };
+ *
+ *              从而sync时会调用此local函数取得数据，
+ *              如果success则会走parse和result过程。 (@see OPTIONS_NAME.local)
+ *          
+ *          ___________________________________________________________________
+ *          (4) 如果调用sync时数据已经OK不需要解析处理等，
+ *              则直接对businessData进行设置。
+ * 
+ *              例如：
+ *              myDatasource.businessData = someData;
+ *              从而sync时直接取someData了，走result过程了。
+ *              (@see OPTIONS_NAME.businessData)
+ * 
+ *          ___________________________________________________________________
+ *          (5) 如果一个XDatasource中要包含多个数据源，
+ *              可以把url、result等属性(@see OPTIONS_NAME)定义成XDatasource.Set，
+ *              在sync时使用datasourceId指定当前sync时使用哪个数据源。
+ *
+ *              例如：
+ *              MyDatasource.prototype.url = new xui.XDatasource.Set();
+ *              MyDatasource.prototype.url['ORDER'] = 'order.action';
+ *              MyDatasource.prototype.url['ADD'] = 'add.action';
+ *
+ *              // 这样初始化也可以
+ *              MyDatasource.prototype.result = new xui.XDatasource.Set(
+ *                  {
+ *                      'ORDER': function() { ... }
+ *                      'ADD': function() { ... }
+ *                  }
+ *              );
+ *
+ *              MyDatasource.prototype.param = function() { // func_all... };
+ *              MyDatasource.prototype.param['ORDER'] = 
+ *                  function() { // func_order... };
+ *
+ *              则：myDatasource.sync( { datasourceId: 'ORDER' } ); 
+ *              或者简写为：
+ *                  myDatasource.sync('ORDER'); 
+ *              表示取order.action，并走相应的result（func_order）。
+ *
+ *              另外，上例没有找到相应的param['ORDER']，
+ *              但param本身定义成了函数，则走本身（func_all）。
+ * 
+ * ____________________________________________________________________________
+ * @usage 绑定多个XDatasource
+ *              如果多个XDatasource共用一个请求，可绑定在一起处理，
+ *
+ *              例如：
+ *              CombinedXDatasource c = new CombinedXDatasource();
+ *              c.addSyncCombine(datasource1);
+ *              c.addSyncCombine(datasource2, 'DATASOURCE_LIST');
+ *
+ *              从而：
+ *              使用c.sync()时，datasource1也会被触发parse事件
+ *              以及sync.result/sync.error/sycn.timeout事件
+ *              使用c.sync( { datasourceId: 'DATASOURCE_LIST' } )时，
+ *              datasource1、datasource2都会被触发parse事件
+ *              以及sync.result/sync.error/sycn.timeout事件
+ * 
+ * ____________________________________________________________________________
+ * @usage 工程中重写/扩展XDatasource的实现类
+ *              （一般在工程中用于指定静态的url，也可在需要时用于重写方法）
+ *              直接调用
+ *              XDatasource.extend(
+ *                  MyXDatasource, 
+ *                  { url: ..., method: ... }
+ *              );
+ *              进行扩展。
+ */
 
+(function () {
+    
+    //--------------------------
+    // 引用
+    //--------------------------
+
+    var XOBJECT = xui.XObject;
+    var xajax = xutil.ajax;
+    var xlang = xutil.lang;
+    var xobject = xutil.object;
+    var utilUrl = xutil.url;
+    var utilString = xutil.string;
+    var inheritsObject = xobject.inheritsObject;
+    var extend = xobject.extend;
+    var clone = xobject.clone;
+    var isFunction = xlang.isFunction;
+    var isArray = xlang.isArray;
+    var isString = xlang.isString;
+    var isObject = xlang.isObject;
+    var hasValue = xlang.hasValue;
+    var sliceArray = Array.prototype.slice;
+    
+    //--------------------------
+    // 类型定义
+    //--------------------------
+
+    /**
+     * Model基类
+     * 
+     * @class
+     * @extends xui.XObject
+     */
+    var XDATASOURCE = xui.XDatasource = 
+            inheritsObject(XOBJECT, xdatasourceConstructor);
+    var XDATASOURCE_CLASS = XDATASOURCE.prototype;
+
+    /**
+     * 构造函数
+     *
+     * @public
+     * @constructor
+     * @param {Object} options
+     */
+    function xdatasourceConstructor(options) {
+        /**
+         * 事件处理器集合
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oEventHandlerMap = {};
+        /**
+         * 绑定集合，key是datasourceId
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oSyncCombineSet = {};
+        /**
+         * 无datasourceId时默认的绑定集合
+         *
+         * @type {Array.<xui.XDatasource>}
+         * @private
+         */
+        this._aSyncCombineSetDefault = [];
+        /**
+         * 当前未完成的request集合，key为requestId
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oRequestSet = {};
+        /**
+         * sync过程中的当前datasourceId
+         *
+         * @type {string}
+         * @private
+         */
+        this._sCurrentDatasourceId;
+    }
+
+    /**
+     * 一个hash map。表示每个datasourceId对应的配置。
+     * 所以使用时须满足的格式：
+     * key为datasourceId，
+     * value为datasourceId对应的参数/属性。
+     * 
+     * @class
+     * @constructor
+     * @param {Object=} set 如果为null，则初始化空Set
+     */
+    var SET = XDATASOURCE.Set = function (set) {
+        set && extend(this, set);
+    };
+    
+    //---------------------------
+    // 属性
+    //---------------------------
+
+    /**
+     * 默认的错误状态值，
+     * 用于从success转为error时
+     *
+     * @type {number} 
+     * @protected
+     */
+    XDATASOURCE_CLASS.DEFAULT_ERROR_STATUS = 999999999999;
+
+    /**
+     * XDatasource中可在子类中定义或继承的属性
+     * 这些属性不可误指定为其他用
+     *
+     * @protected
+     */
+    XDATASOURCE_CLASS.OPTIONS_NAME = [
+        /**
+         * 调用sync时最初始的预处理，较少使用。
+         * 可能使用在：调用sync的地方和注册preprocess的地方不在同一类中的情况
+         *
+         * @type {(Function|xui.XDatasource.Set)} 
+         *          如果为Function：
+         *              @param {Object} options 调用sync时传入的配置
+         * @protected
+         */
+        'preprocess',
+
+        /**
+         * 主动注入的业务数据（主要意义是标志业务数据是否已经OK）,
+         * 如果此属性有值表示数据已经OK，sync时不会再试图获取数据。
+         *
+         * @type {(Function|Any|xui.XDatasource.Set)} 
+         *          如果为Function：
+         *              @param {Object} options 调用sync时传入的配置
+         *              @return {Any} businessData  
+         * @protected
+         */
+        'businessData', 
+        
+        /**
+         * 从本地取得数据
+         * 例如可以数据挂在HTML中返回：
+         * <div style="display:none" id="xxx"> ...some data... </div>
+         * 
+         * @type {(Function|Object|xui.XDatasource.Set)}
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {Object} e-json规范的返回值，
+         *                  可用wrapEJson方法包装得到
+         *          如果为Object，则是e-json对象
+         * @protected
+         */
+        'local',
+        
+        /**
+         * 请求后台的url
+         *
+         * @type {(Function|string|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {string} url  
+         * @protected
+         */
+        'url', 
+        
+        /**
+         * 请求的HTTP方法（'POST'或'GET'），默认是POST
+         *
+         * @type {(Function|string|xui.XDatasource.Set)}
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {string} 方法
+         * @protected
+         */
+        'method', 
+        
+        /**
+         * 用于阻止请求并发，同一businessKey的请求不能并发 (@see xajax)
+         *
+         * @type {(Function|string|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {string} 方法
+         * @protected
+         */
+        'businessKey', 
+        
+        /**
+         * 得到请求的参数字符串
+         *
+         * @type {(Function|string|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {string} 请求参数字符串   
+         * @protected
+         */
+        'param',
+        
+        /**
+         * 处理请求成功的结果数据
+         * 
+         * @type {(Function|Any|xui.XDatasource.Set)}
+         *          如果为Function, 参数为：
+         *             param {(Object|string)} data 获取到的业务数据
+         *             param {(Object|string)} ejsonObj 后台返回全结果，一般不使用
+         *             param {Object} options 调用sync时传入的配置
+         *             return {Any} data 结果数据
+         * @protected
+         */
+        'parse',
+        
+        /**
+         * 获得数据结果
+         *
+         * @type {(Function|xui.XDatasource.Set)}
+         *          如果为Function, 参数为：
+         *             param {(Object|string)} data parse过的业务数据
+         *             param {(Object|string)} ejsonObj 后台返回全结果，一般不使用
+         *             param {Object} options 调用sync时传入的配置
+         * @protected
+         */
+        'result',
+        
+        /**
+         * 处理请求失败的结果
+         *
+         * @type {(Function|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {(Object|string)} status 后台返回错误状态
+         *             param {(Object|string)} ejsonObj 后台返回全结果，一般不使用
+         *             param {Object} options 调用sync时传入的配置
+         * @protected
+         */
+        'error',
+        
+        /**
+         * 处理请求超时的结果
+         * 
+         * @type {(Function|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         * @protected
+         */
+        'timeout',
+
+        /**
+         * 请求返回时总归会触发的回调，先于result或error触发
+         *
+         * @type {(Function|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         * @protected
+         */
+        'complete',
+        
+        /**
+         * 请求返回时总归会触发的回调，常用于最后的清理
+         *
+         * @type {(Function|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         * @protected
+         */
+        'finalize',
+        
+        /**
+         * 定义请求超时的时间(ms)，缺省则不会请求超时
+         *
+         * @type {(Function|number|xui.XDatasource.Set)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {number} timout的毫秒数
+         * @protected
+         */
+        'timeoutTime',
+        
+        /**
+         * 如果一个XDatasource中包含多个数据源，
+         * sync时用此指定当前请求使用那套url、parse、result等
+         * 
+         * @type {(Function|string|number)} 
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {string} datasourceId
+         * @protected
+         */
+        'datasourceId',
+
+        /**
+         * 调用ajax时额外的输入参数
+         *
+         * @type {(Function|Object|xui.XDatasource.Set)}
+         *          如果为Function, 参数为：
+         *             param {Object} options 调用sync时传入的配置
+         *             return {Object} ajax参数
+         * @protected
+         */
+        'ajaxOptions'
+    ];
+    
+    //-------------------------------------------------------------
+    // 方法                                        
+    //-------------------------------------------------------------
+
+    /**
+     * 功能：
+     * (1) 发送数据到后台。
+     * (2) 获取数据，可能从前台直接获取，也可能通过Ajax请求后台获取。
+     *
+     * @public
+     * @param {(Object|string)} options 参数
+     *                  参数 @see OPTIONS_NAME sync时指定的参数，
+     *                  用于重载xdatasource本身的配置
+     *                  如果是string，则表示datasourceId
+     *                  如果是Object，则属性如下：
+     * @param {Object} options.datasourceId 指定数据源id
+     * @param {Object} options.args 用户定义的参数
+     * @return {string} requestId 如果发生后台请求，返回请求Id，一般不使用
+     */
+    XDATASOURCE_CLASS.sync = function (options) {
+        if (isString(options)) {
+            options = { datasourceId: options, args: {} };
+        } 
+        else {
+            options = options || {};
+            options.args = options.args || {};
+        }
+
+        var datasourceId = getDatasourceId.call(this, options);
+        this._sCurrentDatasourceId = datasourceId;
+
+        // 预处理
+        handleSyncPreprocess.call(this, datasourceId, options);
+
+        var data;
+        var ejsonObj;
+        var url;
+        var requestId;
+
+        // 已经被注入数据
+        if (hasValue(
+                data = handleAttr.call(
+                    this, datasourceId, 'businessData', options
+                )
+            )
+        ) { 
+            handleSyncHasData.call(this, datasourceId, options, data);
+        }
+
+        // 从本地获取数据
+        else if (
+            hasValue(
+                ejsonObj = handleAttr.call(
+                    this, datasourceId, 'local', options
+                )
+            )
+        ) { 
+            handleSyncLocal.call(this, datasourceId, options, ejsonObj);
+        }    
+
+        // 从后台获取数据 
+        else if (
+            hasValue(
+                url = handleAttr.call(this, datasourceId, 'url', options)
+            )
+        ){ 
+            requestId = handleSyncRemote.call(
+                this, datasourceId, options, url
+            );
+        }
+
+        delete this._sCurrentDatasourceId;
+
+        return requestId;
+    };
+    
+    /**
+     * 默认的析构函数
+     * 如果有设businessKey，则终止未完成的请求
+     *
+     * @public
+     */
+    XDATASOURCE_CLASS.dispose = function () {
+        this.abortAll();
+        this._oSyncCombineSet = null;
+        this._aSyncCombineSetDefault = null;
+        XDATASOURCE.superClass.dispose.call(this);
+    };
+    
+    /**
+     * 默认的parse函数
+     *
+     * @protected
+     * @param {*} data ejsonObject的data域
+     * @param {Object} ejsonObj e-json对象本身
+     */
+    XDATASOURCE_CLASS.parse = function (data, ejsonObj) { 
+        return data; 
+    };
+    
+    /**
+     * 默认的datasourceId函数
+     *
+     * @protected
+     * @param {Object} options 调用sync时传入的配置
+     * @return {string} datasourceId 数据源Id
+     */
+    XDATASOURCE_CLASS.datasourceId = function (options) { 
+        return void 0; 
+    };
+    
+    /**
+     * 主动设值，用于前端已有数据的情况
+     * 不传参数则清空
+     *
+     * @public
+     * @param {*} businessData 业务数据
+     * @param {string} datsourceId 可指定datasourceId
+     */
+    XDATASOURCE_CLASS.setBusinessData = function (businessData, datasourceId) {
+        this.businessData = businessData || null;
+        notifyEvent.call(
+            this, datasourceId, 'set.businessdata', {}, [businessData]
+        );
+    };
+    
+    /**
+     * 得到当前的datasourceId，只在sync过程中可获得值，
+     * 等同于在sync的回调中使用options.datasourceId
+     *
+     * @public
+     * @return {string} 当前的datasourceId
+     */
+    XDATASOURCE_CLASS.getCurrentDatasourceId = function () {
+        return this._sCurrentDatasourceId;
+    };
+    
+    /**
+     * 终止此Model管理的所有请求
+     *
+     * @public
+     */
+    XDATASOURCE_CLASS.abortAll = function () {
+        var requestIdSet = clone(this._oRequestSet);
+        for (var requestId in requestIdSet) {
+            this.abort(requestId);
+        }
+        this.notify('abortAll', [requestIdSet]);
+    };
+    
+    /**
+     * 终止此Model管理的某请求
+     *
+     * @public
+     * @param {string} requestId 请求Id，即sync方法调用的返回值
+     */
+    XDATASOURCE_CLASS.abort = function (requestId) {
+        xajax.abort(requestId, true);
+        delete this._oRequestSet[requestId];
+    };
+    
+    /**
+     * 包装成ejson对象
+     *
+     * @public
+     * @param {*} data 业务数据
+     * @param {number} status 返回状态，
+     *              0为正常返回，非0为各种错误返回。缺省则为0。
+     * @param {string} statusInfo 附加信息，可缺省
+     * @return {Object} e-json对象
+     */
+    XDATASOURCE_CLASS.wrapEJson = function (data, status, statusInfo) {
+        return { data: data, status: status || 0, statusInfo: statusInfo };
+    };
+    
+    /**
+     * 停止success流程，走向error流程。
+     * 在parse或result中调用有效。
+     * 一般用于parse或result中解析后台返回数据，
+     * 发现数据错误，需要转而走向error流程的情况。
+     *
+     * @protected
+     * @param {number=} status 错误状态码，如果不传则取DEFAULT_ERROR_STATUS
+     * @param {string=} statusInfo 错误信息，可缺省
+     */
+    XDATASOURCE_CLASS.$goError = function (status, statusInfo) {
+        this._bGoError = true;
+        this._nErrorStatus = status == null ? DEFAULT_ERROR_STATUS : status;
+        if (statusInfo != null) {
+            this._sErrorStatusInfo = statusInfo; 
+        }
+    };
+
+    /**
+     * 预处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     */
+    function handleSyncPreprocess(datasourceId, options) {
+        handleAttr.call(this, datasourceId, 'preprocess', options);
+        notifyEvent.call(this, datasourceId, 'sync.preprocess', options);
+    }
+
+    /**
+     * 已有数据处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {*} data 业务数据
+     */
+    function handleSyncHasData(datasourceId, options, data) {
+        handleAttr.call(
+            this, datasourceId, 'result', options, 
+            [data, this.wrapEJson(data)]
+        );
+        notifyEvent.call(
+            this, datasourceId, 'sync.result', options, 
+            [data, this.wrapEJson(data)]
+        );
+    }
+
+    /**
+     * 本地数据处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {(Object|string)} ejsonObj e-json对象
+     */
+    function handleSyncLocal(datasourceId, options, ejsonObj) {
+        handleCallback.call(
+            this, datasourceId, handleComplete, options, ejsonObj
+        );
+
+        if (!ejsonObj.status) { 
+            // status为0则表示正常返回 (@see e-json)
+            handleCallback.call(
+                this, datasourceId, handleSuccess, options, ejsonObj.data, ejsonObj
+            );
+        }
+        else {
+            handleCallback.call(
+                this, datasourceId, handleFailure, options, ejsonObj.status, ejsonObj
+            );
+        }
+
+        handleCallback.call(
+            this, datasourceId, handleFinalize, options, ejsonObj
+        );
+    }
+
+    /**
+     * 远程请求处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {string} url 请求url
+     * @return {string} requestId 请求ID
+     */
+    function handleSyncRemote(datasourceId, options, url) {
+        var opt = {};
+        var me = this;
+        var paramStr;
+        var paramObj;
+
+        // 准备ajax参数
+        opt.method = 
+            handleAttr.call(me, datasourceId, 'method', options) 
+            || 'POST';
+
+        opt.businessKey = 
+            handleAttr.call(me, datasourceId, 'businessKey', options);
+
+        opt.data =
+            hasValue(
+                paramStr = handleAttr.call(me, datasourceId, 'param', options)
+            )
+            ? paramStr : '';
+        paramObj = utilUrl.parseParam(handleAttr.call(me, datasourceId, 'param', options));
+
+        // TODO:
+        opt.timeout = 
+            handleAttr.call(me, datasourceId, 'timeoutTime', options) 
+            || undefined;
+
+        opt.onsuccess = function (data, ejsonObj) {
+            handleCallback.call(
+                me, datasourceId, handleSuccess, options, data, ejsonObj
+            );
+        };
+
+        opt.onfailure = function (status, ejsonObj) {
+            handleCallback.call(
+                me, datasourceId, handleFailure, options, status, ejsonObj
+            );
+        };
+
+        opt.oncomplete = function (ejsonObj) {
+            handleCallback.call(
+                me, datasourceId, handleComplete, options, ejsonObj
+            );
+            // 清除requestId
+            delete me._oRequestSet[requestId];
+        };
+
+        opt.onfinalize = function (ejsonObj) {
+            handleCallback.call(
+                me, datasourceId, handleFinalize, options, ejsonObj
+            );
+        };
+
+        opt.ontimeout = function () {
+            handleCallback.call(
+                me, datasourceId, handleTimeout, options
+            );
+        };
+
+        opt = extend(
+            opt, 
+            handleAttr.call(me, datasourceId, 'ajaxOptions', options) || {}
+        );
+        
+        this._sBusinessKey = opt.businessKey;
+
+        //FIXME:这里需要把不需要往后端传的参数给干掉
+        url = utilString.template(url, paramObj);
+        // 发送ajax请求
+        var requestId = xajax.request(url, opt);
+        this._oRequestSet[requestId] = 1;
+
+        return requestId;
+    }
+
+    /**
+     * 回调处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Function} callback 回调
+     * @param {Object} options 参数
+     */    
+    function handleCallback(datasourceId, callback, options) {
+        var args= sliceArray.call(arguments, 3, arguments.length);
+
+        callback.apply(this, [datasourceId, options].concat(args));
+
+        var i;
+        var o;
+        var list;
+
+        // sync combines
+        if (hasValue(datasourceId)) {
+            list = this._oSyncCombineSet[datasourceId] || [];
+            for (i = 0; o = list[i]; i++) {
+                callback.apply(o, [datasourceId, {}].concat(args));
+            }
+        }
+
+        list = this._aSyncCombineSetDefault || [];
+        for (i = 0; o = list[i]; i++) {
+            callback.apply(o, [datasourceId, {}].concat(args));
+        }
+    }
+    
+    /**
+     * 回调处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {*} data 业务数据
+     * @param {(Object|string)} ejsonObj e-json对象
+     */    
+    function handleSuccess(datasourceId, options, data, ejsonObj) {
+        this._bGoError = false;
+
+        function goFailure() {
+            if (this._sErrorStatusInfo != null) {
+                ejsonObj.statusInfo = this._sErrorStatusInfo;
+            }
+            handleCallback.call(
+                this, 
+                datasourceId, 
+                handleFailure, 
+                options, 
+                this._nErrorStatus, 
+                ejsonObj
+            );
+            this._bGoError = false;
+            this._nErrorStatus = null;
+            this._sErrorStatusInfo = null;
+        }
+        
+        var data = handleAttr.call(
+            this, datasourceId, 'parse', options, [data, ejsonObj]
+        );
+        if (this._bGoError) {
+            goFailure.call(this);
+            return;
+        }
+
+        handleAttr.call(
+            this, datasourceId, 'result', options, [data, ejsonObj]
+        );
+        if (this._bGoError) {
+            goFailure.call(this);
+            return;
+        }
+
+        notifyEvent.call(
+            this, datasourceId, 'sync.result', options, [data, ejsonObj]
+        );
+    }
+    
+    /**
+     * 失败处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {number} status 返回状态
+     * @param {(Object|string)} ejsonObj e-json对象
+     */    
+    function handleFailure(datasourceId, options, status, ejsonObj) {
+        handleAttr.call(
+            this, datasourceId, 'error', options, [status, ejsonObj]
+        );
+        notifyEvent.call(
+            this, datasourceId, 'sync.error', options, [status, ejsonObj]
+        );        
+    }
+
+    /**
+     * 请求完结处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {(Object|string)} ejsonObj e-json对象
+     */    
+    function handleComplete(datasourceId, options, ejsonObj) {
+        handleAttr.call(
+            this, datasourceId, 'complete', options, [ejsonObj]
+        );
+        notifyEvent.call(
+            this, datasourceId, 'sync.complete', options, [ejsonObj]
+        );        
+    }
+    
+    /**
+     * 请求最终处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     * @param {(Object|string)} ejsonObj e-json对象
+     */    
+    function handleFinalize(datasourceId, options, ejsonObj) {
+        handleAttr.call(
+            this, datasourceId, 'finalize', options, [ejsonObj]
+        );
+        notifyEvent.call(
+            this, datasourceId, 'sync.finalize', options, [ejsonObj]
+        );        
+    }
+    
+    /**
+     * 请求超时处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {Object} options 参数
+     */    
+    function handleTimeout(datasourceId, options) {
+        handleAttr.call(this, datasourceId, 'timeout', options);
+        notifyEvent.call(this, datasourceId, 'sync.timeout', options);
+    }
+    
+    /**
+     * 属性处理
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {string} name 属性名
+     * @param {Object} options 参数
+     * @param {Array} args 调用参数
+     */    
+    function handleAttr(datasourceId, name, options, args) {
+        options = options || {};
+        args = args || [];
+        args.push(options);
+        
+        var o;
+        var datasourceId;
+
+        // 优先使用options中的定义
+        if (typeof options[name] != 'undefined') {
+            o = options[name];
+        } 
+        else {
+            // 次优先使用不分datasourceId的通用定义
+            o = this[name];
+            // 再次使用每个datasourceId的各自定义
+            if (hasValue(datasourceId) 
+                && isObject(o) 
+                && hasValue(o[datasourceId])
+            ) {
+                o = o[datasourceId];
+            }
+        }
+
+        if (o instanceof SET) { o = null; }
+
+        return isFunction(o) ? o.apply(this, args) : o;
+    }
+    
+    /**
+     * 触发事件
+     *
+     * @private
+     * @param {string} datasourceId 数据源id
+     * @param {string} eventName 事件名
+     * @param {Object} options 参数
+     * @param {Array} args 调用参数
+     */    
+    function notifyEvent(datasourceId, eventName, options, args) {
+        options = options || {};
+        args = args || [];
+        args.push(options);
+        if (hasValue(datasourceId)) {
+            this.notify(eventName + '.' + datasourceId, args);
+        }
+        this.notify(eventName, args);        
+    }
+
+    /**
+     * 获得数据源id
+     *
+     * @private
+     * @param {Object} options 参数
+     * @return {string} 数据源id
+     */    
+    function getDatasourceId (options) {
+        options = options || {};
+        var datasourceId = hasValue(options.datasourceId) 
+            ? options.datasourceId : this.datasourceId;
+        return isFunction(datasourceId) 
+            ? datasourceId.call(this, options) : datasourceId;
+    }
+    
+    //-------------------------------------------------------------
+    // [多XDatasource组合/绑定]                                               
+    //-------------------------------------------------------------
+    
+    /**
+     * 为了公用sync，绑定多个XDatasource
+     * 这个功能用于多个XDatasource共享一个请求的情况。
+     * sync及各种事件，会分发给被绑定的XDatasource，
+     * 由他们分别处理（如做请求返回值解析，取的自己需要的部分）
+     *
+     * @public
+     * @param {xui.XDatasource} xdatasource 要绑定的XDatasource
+     * @param {string} datasourceId 绑定到此datasourceId上，
+     *          缺省则绑定到所有datasourceId上
+     */
+    XDATASOURCE_CLASS.addSyncCombine = function (xdatasource, datasourceId) {
+        if (!(xdatasource instanceof XDATASOURCE)) { 
+            return;
+        }
+
+        var o;
+        if (hasValue(datasourceId)) {
+            if (!(o = this._oSyncCombineSet[datasourceId])) {
+                o = this._oSyncCombineSet[datasourceId] = [];
+            }
+            o.push(xdatasource);
+        } 
+        else {
+            this._aSyncCombineSetDefault.push(xdatasource);
+        }
+    };
+    
+    /**
+     * 取消绑定XDatasource
+     * 这个功能用于多个XDatasource共享一个请求的情况。
+     * sync及各种事件，会分发给被绑定的XDatasource，
+     * 由他们分别处理（如做请求返回值解析，取的自己需要的部分）
+     *
+     * @public
+     * @param {xui.XDatasource} xdatasource 要取消绑定的XDatasource
+     * @param {string} datasourceId 与addSyncCombine的定义须一致
+     */
+    XDATASOURCE_CLASS.removeSyncCombine = function (xdatasource, datasourceId) {
+        if (!(xdatasource instanceof XDATASOURCE)) { return; }
+
+        var o = hasValue(datasourceId) 
+                    ? (this._oSyncCombineSet[datasourceId] || []) 
+                    : (this._aSyncCombineSetDefault || []);
+
+        for (var j = 0; j < o.length;) {
+            (xdatasource === o[j]) ? o.splice(j, 1) : j++;
+        }
+    };
+    
+    //-------------------------------------------------------------
+    // XDatasource扩展
+    //-------------------------------------------------------------
+    
+    /**
+     * 扩展
+     * （禁止对XDatasource类本身使用extend）
+     *
+     * @public
+     * @static
+     * @param {Object} clz XDatasource子类本身
+     * @param {Object} options 扩展的内容 (@see OPTIONS_NAME)
+     */
+    XDATASOURCE.extend = function (clz, options) {
+        if (clz instanceof XDATASOURCE && clz !== XDATASOURCE) {
+            extend(clz.prototype, options);
+        }
+    };
+    
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+=======
+/**
+ * xui.XView
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    视图基类
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil
+ * @usage:   
+ *          (1) 须实现xui.XView.domReady函数
+ *          (2) 页面中使用：
+ *              <script type="text/javascript">
+ *                  xui.XView.start("aaa.bbb.ccc.SomePageView");
+ *              </script>
+ *              则启动了SomePageView类
+ */
+
+(function () {
+    
+    var XOBJECT = xui.XObject;
+    var getByPath = xutil.object.getByPath;
+    var inheritsObject = xutil.object.inheritsObject;
+    
+    /**
+     * 视图基类
+     *
+     * @class
+     */
+    var XVIEW = xui.XView = inheritsObject(
+        XOBJECT, 
+        function (options) {
+            this._el = options.el;
+        }
+    );
+    var XVIEW_CLASS = XVIEW.prototype;
+
+    /** 
+     * 得到主DOM元素
+     *
+     * @public
+     */
+    XVIEW_CLASS.getEl = function() {
+        return this._el;
+    };
+
+    /** 
+     * 设置主DOM元素
+     *
+     * @public
+     */
+    XVIEW_CLASS.setEl = function(el) {
+        this._el = el;
+    };
+
+    /** 
+     * 析构
+     *
+     * @public
+     */
+    XVIEW_CLASS.dispose = function() {
+        this._el = null;
+    };
+
+    /**
+     * 页面开始
+     * 
+     * @public
+     * @static
+     * @param {string} viewPath 页面对象的路径
+     * @param {Object} options 参数 
+     * @return {ecui.ui.Control} 创建的页面对象
+     */    
+    XVIEW.start = function (viewPath, options) {
+        var viewClass;
+        
+        XVIEW.$domReady(
+            function () {
+                // 前中后三级控制 - 前
+                XVIEW.$preStart && XVIEW.$preStart(viewPath, options);
+
+                // 前中后三级控制 - 中
+                // 控制端的页面初始化的控制器 "di.console.frame.ui.MainPage"
+                // spa中的初始化也用到此逻辑
+                viewPath && (viewClass = getByPath(viewPath));
+                viewClass && (new viewClass(options)).init();
+
+                // 前中后三级控制 - 后
+                // 系统预制结束，具体的业务数据开始加载并生成dom并绑定事件
+                XVIEW.$postStart && XVIEW.$postStart(viewPath, options);
+            }
+        );
+    };
+
+    /**
+     * 初始前的预处理
+     * 
+     * @private
+     * @abstract
+     * @static
+     * @param {string} viewPath 页面对象的路径
+     * @param {Object} options 参数 
+     */
+    XVIEW.$preStart = function (viewPath, options) {};
+
+    /**
+     * 初始后的处理
+     * 
+     * @private
+     * @abstract
+     * @static
+     * @param {string} viewPath 页面对象的路径
+     * @param {Object} options 参数 
+     */
+    XVIEW.$postStart = function (viewPath, options) {};
+
+    /**
+     * DOM READY函数，由工程自己定义
+     * 
+     * @private
+     * @abstract
+     * @static
+     * @param {Function} callback
+     */
+    XVIEW.$domReady = null;
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 /**
  * 这是一个空函数，用于需要排除函数作用域链干扰的情况.
  * @author rocy
@@ -7339,6 +13827,46 @@ var di = $namespace('di');
 $getNamespaceBase().xui = xui;
 $getNamespaceBase().xutil = xutil;
 
+=======
+/**
+ * project declaration
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    项目起始文件，全局声明
+ * @author:  sushuang(sushuang)
+ * @depend:  xui.XProject
+ */
+
+// 如果打包时使用(function() { ... })()包裹住所有代码，
+// 则以下声明的变量在闭包中；
+// 否则以下声明的变量暴露到全局。
+ 
+// DI名空间基础
+xui.XProject.setNamespaceBase(
+    window.__$DI__NS$__ = window.__$DI__NS$__ || {}
+);
+
+// 声明名空间用方法
+var $namespace = xui.XProject.namespace;
+
+// 注册依赖连接用方法
+var $link = xui.XProject.link;
+
+// 注册延迟初始化用方法
+var $end = xui.XProject.end;
+
+// 得到名空间根基
+var $getNamespaceBase = xui.XProject.getNamespaceBase;
+
+// DI根名空间
+var di = $namespace('di');
+
+// FIXME
+// 暂时用这种方法注册进去
+$getNamespaceBase().xui = xui;
+$getNamespaceBase().xutil = xutil;
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 xutil.object.PATH_DEFAULT_CONTEXT = $getNamespaceBase();
 var ecui;
 (function () {
@@ -20681,12 +27209,427 @@ Combox - 定义可输入下拉框行为的基本操作。
         dom = core.dom,
         ui = core.ui,
 
+<<<<<<< HEAD
         inheritsControl = core.inherits,
         createDom = dom.create,
         moveElements = dom.moveElements,
+=======
+/**
+ * ecui.ui.Container
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * desc:    组件容器
+ *          提供子组件的创建及管理
+ * author:  sushuang(sushuang)
+ * depend:  ecui
+ */
 
+(function () {
+    var core = ecui,
+        array = core.array,
+        dom = core.dom,
+        ui = core.ui,
+        util = core.util,
+        string = core.string,
+
+        $fastCreate = core.$fastCreate,
+        inheritsControl = core.inherits,
+        triggerEvent = core.triggerEvent,
+        disposeControl = core.dispose,
+        blank = util.blank,
+
+        createDom = dom.create,
+        getStyle = dom.getStyle,
+        extend = util.extend,
+
+        UI_CONTROL = ui.Control,
+        UI_CONTROL_CLASS = UI_CONTROL.prototype;
+
+    var UI_CONTAINER = ui.Container = 
+        inheritsControl(
+            UI_CONTROL,
+            'ui-container',
+            function (el, options) {
+                var o = createDom(),
+                    type = this.getTypes()[0];
+                // TODO
+            }
+        ),
+        UI_CONTAINER_CLASS = UI_CONTAINER.prototype;    
+     
+    UI_CONTAINER_CLASS.setSize = blank; // 禁用setSize 
+    
+    /**
+     * 创建子控件的简便方法
+     * @public
+     * 
+     * @param {string|ecui.ui.Control|Function} type 子控件的类型
+     *          如果type为Function，则调用此函数创建子控件，参数为：
+     *          @param {HTMLElement} 子控件绑定的DOM元素
+     *          @return {ecui.ui.Control} 子控件实例
+     * @return {ecui.ui.Control} 创建好的子控件
+     */
+    UI_CONTAINER_CLASS.createSubControl = function (type, domCreater) {
+        var o = createDom();
+        
+        if (type && type instanceof UI_CONTROL) {
+            
+        }
+        // TODO
+    };
+    
+    /**
+     * 删除子控件的简便方法
+     * @public
+     * 
+     * @param {ecui.ui.Control} control 子控件实例
+     */
+    UI_CONTAINER_CLASS.removeSubControl = function (control) {
+        // TODO
+    };
+
+    /**
+     * 创建子控件的绑定DOM元素
+     * 供继承使用，默认为在父控件的getBody()中appendChild
+     * @protected
+     * 
+     * @return {HTMLElement} 创建好的DOM元素
+     */
+    UI_CONTAINER_CLASS.createSubDom = function () {
+        var o = createDom();
+        this.getBody().appendChild(o);
+        return o;
+    };
+    
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
         UI_BUTTON = ui.Button;
+=======
+/**
+ * ecui.ui.TabContainer
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * desc:    TAB页容器基类
+ * author:  sushuang(sushuang)
+ * depend:  ecui
+ */
 
+(function() {
+
+    var array = ecui.array;
+    var dom = ecui.dom;
+    var ui = ecui.ui;
+    var util = ecui.util;
+    var string = ecui.string;
+    var MAX = Math.max;
+
+    var indexOf = array.indexOf;
+    var $fastCreate = ecui.$fastCreate;
+    var inheritsControl = ecui.inherits;
+    var triggerEvent = ecui.triggerEvent;
+    var disposeControl = ecui.dispose;
+    var moveElements = dom.moveElements;
+    var removeDom = dom.remove;
+    var encodeHTML = string.encodeHTML;
+    // 引了外部包
+    var template = xutil.string.template;
+    var textLength = xutil.string.textLength;
+    var textSubstr = xutil.string.textSubstr;
+    var blank = util.blank;
+    var q = xutil.dom.q;
+
+    var createDom = dom.create;
+    var getStyle = dom.getStyle;
+    var extend = util.extend;
+
+    var UI_CONTROL = ui.Control;
+    var UI_TAB = ui.Tab;
+    var UI_TAB_CLASS = UI_TAB.prototype;
+    var UI_ITEMS = ui.Items;
+    var UI_BUTTON = ui.Button;
+
+    /**
+     * tab控件
+     * 
+     * @class
+     * @param {Object} options 初始化参数
+     */
+    var UI_TAB_CONTAINER = ui.TabContainer = inheritsControl(UI_TAB);
+    var UI_TAB_CONTAINER_CLASS = UI_TAB_CONTAINER.prototype;
+        
+    var UI_TAB_ITEM_EXT_CLASS = (UI_TAB_CONTAINER_CLASS.Item = inheritsControl(
+            UI_TAB_CLASS.Item, 
+            null, 
+            null,
+            function(el, options) {
+                var type = this.getType();
+
+                el.innerHTML = template(TPL_ITEM, {   
+                    currClass: this._sClass, 
+                    content: el.innerHTML, 
+                    close: options.canClose ? TPL_CLOSE_BTN : ''
+                });
+                    
+                this._oMemo = options.memo;
+                if (options.canClose) {
+                    this._uCloseBtn = $fastCreate(
+                        this.CloseBtn, 
+                        q('q-close-btn', el)[0], 
+                        this, 
+                        { primary:'ui-tab-close-btn' }
+                    );
+                }
+            }
+        )).prototype;
+        
+    var UI_TAB_CLOSE_BTN_CLASS = (UI_TAB_ITEM_EXT_CLASS.CloseBtn = 
+            inheritsControl(UI_BUTTON)).prototype;
+
+    var UI_TAB_BUTTON_CLASS = (
+            UI_TAB_CONTAINER_CLASS.Button = inheritsControl(
+                UI_TAB_CLASS.Button,
+                null,
+                function(el, options) {
+                    var type = this.getType();
+                    el.appendChild(createDom(type + '-icon'));
+                }
+            )
+        ).prototype;
+    
+    /*模板*/
+    var TPL_ITEM = [
+            '<div class="#{currClass}-ledge"></div>',
+            '<div class="#{currClass}-lledge"></div>',
+            '<div class="#{currClass}-inner">',
+                '<span class="#{currClass}-text">#{content}</span>',
+                '#{close}',
+            '</div>',
+            '<div class="#{currClass}-lledge"></div>',
+            '<div class="#{currClass}-ledge"></div>'
+        ].join('');
+    var TPL_CLOSE_BTN = [
+            '<span class="ui-tab-close-btn q-close-btn">',
+                '<span class="ui-tab-close-btn-icon"></span>',
+            '</span>'
+        ].join('');
+                    
+    /**
+     * @override
+     */
+    UI_TAB_CONTAINER_CLASS.$dispose = function() {
+        UI_TAB_CONTAINER.superClass.$dispose.call(this);
+    };        
+        
+    /**
+     * @override
+     */
+    UI_TAB_CONTAINER_CLASS.$alterItems = function() {
+        this.cache(true, true);
+        UI_TAB_CONTAINER.superClass.$alterItems.call(this);
+    };
+
+    /**
+     * 增加 tab
+     * @public 
+     * 
+     * @param {ecui.ui.Control|Function} tabContent tab页内控件，
+     *          或者用于创建页内控件的回调函数
+     *          如果为回调函数，则函数参数为：
+     *              {HTMLElement} tabEl item的container元素
+     *              {ecui.ui.Tab} tabCtrl 父控件
+     *              {ecui.ui.Item} tabItem项
+     *          返回值为：
+     *              {ecui.ui.Control} 页内对象
+     * @param {Object} options 参数
+     * @param {number} options.index 位置，可缺省
+     * @param {string} options.title 页面标题，可缺省
+     * @param {boolean} options.canClose 是否可以关闭，默认不可关闭
+     * @param {HTMLElement=} options.tabEl 指定的tab el，可缺省
+     * @param {HTMLElement=} options.contentEl 指定的content el，可缺省
+     * @param {Any} options.memo 附加参数
+     * @return {Object}
+     *          {ecui.ui.Item} tabItem 子选项控件
+     *          {(ecui.ui.Control|HTMLElement)} tabContent 子选项容器
+     */    
+    UI_TAB_CONTAINER_CLASS.addTab = function(tabContent, options) {
+        options = options || {};
+        options.canClose = options.canClose || false; 
+
+        var el = options.tabEl;
+        if (!el) {
+            el = createDom();
+            this.getBody().appendChild(el);
+        }
+        if (el.tagName != 'LABEL') {
+            el.innerHTML = '<label>' + options.title + '</label>';
+        }
+        
+        var tabItem = this.add(el, options.index, options);
+
+        if (options.contentEl) {
+            tabItem.setContainer(options.contentEl);
+        }
+        
+        if (Object.prototype.toString.call(tabContent) 
+                == '[object Function]'
+        ) {
+            tabContent = tabContent(
+                tabItem.getContainer(),
+                this,
+                tabItem,
+                options
+            );
+        }
+
+        // tabContent && tabContent.$setParent(this);
+
+        return { tabItem: tabItem, tabContent: tabContent };
+    };
+        
+    /**
+     * 选择tab
+     * @public
+     * 
+     * @param {ecui.ui.Item} tabItem 被选中的项的控件
+     */
+    UI_TAB_CONTAINER_CLASS.selectTab = function(tabItem) {
+        this.setSelected(tabItem);
+    };
+    
+    /**
+     * 关闭tab
+     * @public
+     * 
+     * @param {string} tabId tab的标志
+     */
+    UI_TAB_CONTAINER_CLASS.$closeTab = function(item) {
+        this.remove(item);
+    };
+    
+    //----------------------------------------
+    // UI_TAB_ITEM_EXT
+    //----------------------------------------
+    
+    /**
+     * 得到附加信息
+     * @public
+     * 
+     * @return {Any} 附加信息
+     */
+    UI_TAB_ITEM_EXT_CLASS.getMemo = function() {
+        return this._oMemo;
+    };
+
+    /**
+     * 更新标题，并支持过长截断
+     * @public
+     * 
+     * @param {string} title 标题
+     */
+    UI_TAB_ITEM_EXT_CLASS.setTitle = function(title) {
+        var titleEl = q(this._sClass + '-text', this.getOuter())[0];
+        var parent = this.getParent();
+
+        if (titleEl) {
+            var fullTitle = encodeHTML(title);
+            var shortTitle;
+            if (textLength(title) > 36) {
+                shortTitle = encodeHTML(textSubstr(title, 0, 36) + '...');
+            } 
+            else {
+                shortTitle = fullTitle;
+            }
+            titleEl.innerHTML = '<label title="' + fullTitle + '">' 
+                + shortTitle + '</label>';   
+
+            parent.$alterItems();
+            // 增加标题后调整位置
+            // TODO
+            // 这段逻辑晦涩复杂，效果差强人意，后续重构
+            var style = parent.getBody().style;
+            var left = parseInt(style.left);
+            var itemIndex = indexOf(parent.getItems(), this);
+            var itemLeft = parent._aPosition[itemIndex] 
+                - (parent._uPrev.isShow() ? 0 : parent._uPrev.getWidth());
+
+            if (left + parent.getBodyWidth() + itemLeft - this.getWidth() < 0) {
+                style.left = 
+                    MAX(
+                        parent._aPosition[itemIndex], 
+                        parent.getBodyWidth() - parent.$$titleWidth 
+                            - parent._uNext.getWidth()
+                    ) 
+                    + 'px';
+            }
+        }
+    };
+
+    /**
+     * 设置选项卡对应的容器元素。
+     * （重载，不将容器元素添加到parent的eMain中。
+     *
+     * @public
+     * @override
+     * @param {HTMLElement} el 选项卡对应的容器元素
+     */
+    UI_TAB_ITEM_EXT_CLASS.setContainer = function (el) {
+        var parent = this.getParent();
+
+        if (this._eContainer) {
+            removeDom(this._eContainer);
+        }
+        if (this._eContainer = el) {
+            if ((this._sContainer = el.style.display) == 'none') {
+                this._sContainer = '';
+            }
+
+            if (parent) {
+                // 如果当前节点被选中需要显示容器元素，否则隐藏
+                el.style.display = parent._cSelected == this 
+                    ? this._sContainer : 'none';
+            }
+        }
+    };
+        
+    /**
+     * @override
+     */
+    UI_TAB_ITEM_EXT_CLASS.$click = function(event) {
+        // 更改当前tab
+        var par = this.getParent();
+        var selected = par.getSelected();
+
+        if (triggerEvent(par, 'beforechange', null, [this, selected]) !== false) {
+            UI_TAB_CONTAINER_CLASS.Item.superClass.$click.apply(this, arguments);
+            triggerEvent(par, 'afterchange', null, [this, selected]);
+        }        
+    };
+
+    //----------------------------------------
+    // UI_TAB_CLOSE_BTN
+    //----------------------------------------
+            
+    /**
+     * @override
+     */
+    UI_TAB_CLOSE_BTN_CLASS.$click = function(event) {
+        // 关闭tab
+        var item = this.getParent();
+        var tabContainer = item.getParent();
+        if (triggerEvent(tabContainer, 'tabclose', null, [item]) !== false) {
+            tabContainer.$closeTab(item);
+            tabContainer.$alterItems();
+        }
+        event.stopPropagation();
+    };
+    
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
     var UI_PL_BUTTON = ui.PlButton = 
         inheritsControl(
             UI_BUTTON,
@@ -22076,6 +29019,932 @@ Combox - 定义可输入下拉框行为的基本操作。
 
 })();
 
+=======
+/**
+ * ecui.ui.IstCalendar
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    IST风格的日历
+ *          （支持单日历时间段选择，周月季选择）
+ * @author:  sushuang(sushuang) 
+ *          (
+ *              从Pulse版本的ecui中拷贝而来
+ *              (pl-calendar.js by cxl(chenxinle))，
+ *              并稍做修改
+ *          )
+ * @depend:  ecui
+ */
+
+(function() {
+
+    var core = ecui;
+    var array = core.array;
+    var dom = core.dom;
+    var ui = core.ui;
+    var string = core.string;
+    var util = core.util;
+
+    var DATE = Date;
+    var REGEXP = RegExp;
+    var DOCUMENT = document;
+
+    var children = dom.children;
+    var createDom = dom.create;
+    var getParent = dom.getParent;
+    var getPosition = dom.getPosition;
+    var moveElements = dom.moveElements;
+    var setText = dom.setText;
+    var addClass = dom.addClass;
+    var formatDate = string.formatDate;
+    var getByteLength = string.getByteLength;
+    var encodeHTML = string.encodeHTML;
+    var sliceByte = string.sliceByte;
+    var indexOf = array.indexOf;
+    var getView = util.getView;
+    var blank = util.blank;
+
+    var $fastCreate = core.$fastCreate;
+    var inheritsControl = core.inherits;
+    var triggerEvent = core.triggerEvent;
+    var setFocused = core.setFocused;
+
+    var UI_CONTROL = ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+    var UI_INPUT_CONTROL = ui.InputControl;
+    var UI_INPUT_CONTROL_CLASS = UI_INPUT_CONTROL.prototype;
+    var UI_PANEL = ui.Panel;
+    var UI_PANEL_CLASS = UI_PANEL.prototype;
+    var UI_CALENDAR_CLASS = ui.Calendar.prototype;
+    var UI_CALENDAR_LAYER_CLASS = UI_CALENDAR_CLASS.Layer.prototype;
+    var UI_CALENDAR_LAYER_SELECT_CLASS = UI_CALENDAR_LAYER_CLASS.Select.prototype;
+    var UI_BUTTON = ui.Button;
+    var UI_MONTH_VIEW_CLASS = ui.MonthView.prototype;
+
+    //-------------------------------------------------
+    // 类型声明
+    //-------------------------------------------------
+
+    /**
+     * 日历控件类
+     *
+     * @class
+     * @param {Object} options 初始化选项
+     * @param {string} options.start 范围开始点
+     * @param {end} options.end 范围结束点
+     * @param {string} optoins.date 初始时间，格式：2012-12-12
+     * @param {string} options.dateEnd 如果是RANGE模式，表示最后时间，格式：2012-12-12
+     * @param {number} optoins.now 当前时间戳（用于传来系统时间）
+     * @param {string} options.mode 模式，
+     *      可选值为：'DAY'(默认), 'WEEK', 'RANGE'
+     * @param {string} options.viewMode 显示模式，
+     *      可选值为：'POP'(默认), 'FIX' 
+     * @param {boolean} options.shiftBtnDisabled 是否禁用前后移动button，默认false
+     */
+    var UI_IST_CALENDAR = ui.IstCalendar =
+        inheritsControl(
+            UI_INPUT_CONTROL,
+            'ui-calendar',
+            function(el, options) {
+                options.hidden = true;
+            },
+            function(el, options) {
+                var o = createDom();
+                var child;
+                var date;
+                var type = this.getTypes()[0];
+
+                this._sMode = options.mode || 'DAY';
+                if (this._sMode == 'WEEK' || this._sMode == 'RANGE') {
+                    addClass(el, type + '-range-mode');
+                }
+
+                this._sViewMode = options.viewMode || 'POP';
+                if (this._sViewMode == 'FIX') {
+                    addClass(el, type + '-fix-view');
+                }
+
+                o.innerHTML = [
+                    '<span class="'+ type +'-btn-prv '+ type +'-btn"></span>',
+                    '<span class="'+ type +'-text"></span>',
+                    '<span class="'+ type +'-btn-nxt '+ type +'-btn"></span>',
+                    '<span class="'+ type +'-btn-cal '+ type +'-btn"></span>',
+                    '<div class="'+ type +'-layer" style="position:absolute;display:none"></div>'
+                ].join('');
+
+                child = children(o);
+
+                this._oDate = PARSE_INPUT_DATE(options.date);
+                if (this._sMode == 'RANGE') {
+                    this._oDateEnd = PARSE_INPUT_DATE(options.dateEnd);
+                }
+
+                this._oRange = UI_CALENDAR_PARSE_RANGE(
+                    options.start, 
+                    options.end,
+                    options.now
+                );
+
+                this._eText = child[1];
+                
+                // 后退一天按钮
+                if (options.shiftBtnDisabled) {
+                    child[0].style.display = 'none';
+                }
+                this._uBtnPrv = $fastCreate(
+                    this.Button, 
+                    child[0], 
+                    this, 
+                    { command: 'prv', icon: true }
+                );
+
+                // 前进一天按钮
+                if (options.shiftBtnDisabled) {
+                    child[2].style.display = 'none';
+                }
+                this._uBtnNxt = $fastCreate(
+                    this.Button, 
+                    child[2], 
+                    this, 
+                    { command: 'nxt', icon: true }
+                );
+
+                // 小日历按钮
+                if (this._sViewMode == 'FIX') {
+                    // FIX模式下不显示
+                    child[3].style.display = 'none'; 
+                }
+                this._uBtnCal = $fastCreate(
+                    this.Button, 
+                    child[3], 
+                    this, 
+                    { command: 'cal', icon: true }
+                );
+
+                if (this._sViewMode == 'POP') {
+                    DOCUMENT.body.appendChild(child[4]);
+                }
+
+                this._uLayer = $fastCreate(
+                    this.Layer, 
+                    child[4], 
+                    this, 
+                    {
+                        date: this._oDate, 
+                        range: this._oRange,
+                        mode: this._sMode
+                    }
+                );
+
+                moveElements(o, el, true);
+
+                if (this._sViewMode == 'FIX') {
+                    this.$showLayer();
+                }
+            }
+        );
+
+    var UI_IST_CALENDAR_CLASS = UI_IST_CALENDAR.prototype;
+
+    var UI_IST_CALENDAR_BUTTON_CLASS = (
+            UI_IST_CALENDAR_CLASS.Button = inheritsControl(
+                UI_BUTTON, 
+                null, 
+                function(el, options){
+                    var o = createDom();
+                    var type = this.getType();
+                
+                    moveElements(el, o, true);
+                    el.innerHTML = '<span class="'+ type +'-inner"></span>';
+                    moveElements(o, el.firstChild, true);
+
+                    if (options.icon) {
+                        o = createDom(type + '-icon', '',  'span');
+                        el.appendChild(o);
+                    }
+
+                    this._sCommand = options.command;
+                }
+            )
+        ).prototype;
+
+    var UI_IST_CALENDAR_LAYER_CLASS = (
+            UI_IST_CALENDAR_CLASS.Layer = 
+                inheritsControl(UI_CALENDAR_CLASS.Layer)
+        ).prototype;
+
+    var UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS = (
+            UI_IST_CALENDAR_LAYER_CLASS.MonthView = 
+                inheritsControl(
+                    UI_CALENDAR_CLASS.Layer.prototype.MonthView,
+                    null,
+                    function(el, options) {
+                        this._sMode = options.mode;
+                        this._oCellSelSet = {};
+                        this._oCellHoverSet = {};
+                    }
+                )
+        ).prototype;
+
+    var UI_IST_CALENDAR_LAYER_MONTH_VIEW_CELL_CLASS = (
+            UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.Cell = inheritsControl(
+                UI_CALENDAR_CLASS.Layer.prototype.MonthView.prototype.Cell
+            )
+        ).prototype;
+
+    var UI_IST_CALENDAR_LAYER_SELECT_OPTIONS_CLASS = (
+            UI_CALENDAR_LAYER_SELECT_CLASS.Options = inheritsControl(
+                UI_CALENDAR_LAYER_SELECT_CLASS.Options, 
+                null, 
+                null, 
+                function(el, options) { 
+                    addClass(el, 'ui-calendar-select-options'); 
+                }
+            )
+        ).prototype;
+
+    //-------------------------------------------------
+    // 常量
+    //-------------------------------------------------
+
+    var UI_IST_CALENDAR_STR_PATTERN = 'yyyy-MM-dd';
+    var UI_IST_CALENDAR_STR_PATTERN_SHOW = 'yyyy-MM-dd';
+
+    var TIME_TYPE_WEEK = 1;
+    var TIME_TYPE_MONTH = 2;
+    var TIME_TYPE_QUARTER = 3;
+    var DAY_MILLISECOND = 24*60*60*1000;
+    var DATE_ZERO = new Date(0);
+
+    //-------------------------------------------------
+    // 工具方法
+    //-------------------------------------------------
+        
+    function UI_CALENDAR_PARSE_RANGE(begin, end, now) {
+        now = now != null ? new Date(now) : new Date();
+        var res = {};
+        var o = [now.getFullYear(), now.getMonth(), now.getDate()];
+        var t;
+        var p = {y:0, M:1, d:2};
+
+        if (/^([-+]?)(\d+)([yMd])$/.test(begin)) {
+            t = o.slice();
+            if (!REGEXP.$1 || REGEXP.$1 == '+') {
+                t[p[REGEXP.$3]] += parseInt(REGEXP.$2, 10);
+            }
+            else {
+                t[p[REGEXP.$3]] -= parseInt(REGEXP.$2, 10);
+            }
+            res.begin = new Date(t[0], t[1], t[2]);
+        }
+        else if (
+            Object.prototype.toString.call(begin) in {
+                '[object String]': 1, '[object Date]': 1
+            }
+        ) {
+            res.begin = new Date(begin);
+        }
+
+        if (/^([-+]?)(\d+)([yMd])$/.test(end)) {
+            t = o.slice();
+            if (!REGEXP.$1 || REGEXP.$1 == '+') {
+                t[p[REGEXP.$3]] += parseInt(REGEXP.$2, 10);
+            }
+            else {
+                t[p[REGEXP.$3]] -= parseInt(REGEXP.$2, 10);
+            }
+            res.end = new Date(t[0], t[1], t[2]);
+        }
+        else if (
+            Object.prototype.toString.call(end) in {
+                '[object String]': 1, '[object Date]': 1
+            }
+        ) {
+            res.end = new Date(end);
+        }
+
+        return res ? res : {};
+    }
+    
+    function UI_CALENDAR_WEEK_INFO(date) {
+        var weekDay = date.getDay();
+        var pre = -((weekDay + 6) % 7), next = (7 - weekDay) % 7;
+        return {
+            monday: new Date(date.getTime() + pre * DAY_MILLISECOND), 
+            sunday: new Date(date.getTime() + next * DAY_MILLISECOND)
+        };
+    }
+
+    function COMPARE_DATE(year1, month1, date1, year2, month2, date2) {
+        if (year1 == year2) {
+            if (month1 == month2) {
+                if (date1 == date2) {
+                    return 0;
+                }
+                else {
+                    return date1 > date2 ? 1 : -1;
+                }
+            }
+            else {
+                return month1 > month2 ? 1 : -1;
+            }
+        }
+        else {
+            return year1 > year2 ? 1 : -1;
+        }
+    }
+
+    function COMPARE_DATE_OBJ(date1, date2) {
+        return COMPARE_DATE(
+            date1.getFullYear(), date1.getMonth(), date1.getDate(),
+            date2.getFullYear(), date2.getMonth(), date2.getDate()
+        );        
+    }
+
+    function PARSE_INPUT_DATE(input) {
+        var ret;
+        if (input === false) {
+            ret = null
+        }
+        else if (Object.prototype.toString.call(input) == '[object Date]') {
+            ret = input;
+        }
+        else if (Object.prototype.toString.call(input) == '[object String]') {
+            ret = input.split('-');
+            ret = new Date(
+                ret[0], 
+                parseInt(ret[1], 10) - 1, 
+                ret[2]
+            );
+        }
+        return ret;
+    }
+
+    //----------------------------------------------
+    // UI_IST_CALENDAR_BUTTON_CLASS 的方法
+    //----------------------------------------------
+
+    UI_IST_CALENDAR_BUTTON_CLASS.$click = function(event) {
+        var par = this.getParent();
+        switch(this._sCommand) {
+            case 'prv':
+                par.go(-1, -1);
+                break;
+            case 'nxt':
+                par.go(1, 1);
+                break;
+            case 'cal':
+                par.$showLayer();
+                break;
+        }
+        event.exit();
+    };
+
+    //----------------------------------------------
+    // UI_IST_CALENDAR_CLASS 的方法
+    //----------------------------------------------
+
+    UI_IST_CALENDAR_CLASS.$setSize = new Function();
+
+    UI_IST_CALENDAR_CLASS.$showLayer = function() {
+        var layer = this._uLayer;
+        var pos = getPosition(this.getOuter());
+        var posTop = pos.top + this.getHeight();
+
+        if (!layer.isShow()) {
+
+            layer.setDate(this.getDate());
+            layer.show();
+            setFocused(layer);
+
+            if (this._sViewMode == 'POP') {
+                var height = layer.getHeight();
+                layer.setPosition(
+                    pos.left,
+                    posTop + height <= getView().bottom 
+                        ? posTop : pos.top - height
+                );
+            }
+        }
+    }
+
+    UI_IST_CALENDAR_CLASS.getMode = function() {
+        return this._sMode;
+    }    
+
+    UI_IST_CALENDAR_CLASS.$flush = function() {
+        var curDate = this._oDate;
+        var range = this._oRange;
+
+        if (range.begin && range.begin.getTime() == curDate.getTime()) {
+            this._uBtnPrv.disable();
+        }
+        else {
+            this._uBtnPrv.enable();
+        }
+        
+        if (range.end && range.end.getTime() == curDate.getTime()) {
+            this._uBtnNxt.disable();
+        }
+        else {
+            this._uBtnNxt.enable();
+        }
+    }
+
+    UI_IST_CALENDAR_CLASS.$click = function(event) {
+        UI_INPUT_CONTROL_CLASS.$click.call(this);
+        if (event.target == this._eText) {
+            this.$showLayer();
+        }
+    };
+
+    UI_IST_CALENDAR_CLASS.$activate = function (event) {
+        var layer = this._uLayer;
+        var con;
+        var pos = getPosition(this.getOuter());
+        var posTop = pos.top + this.getHeight();
+
+        UI_INPUT_CONTROL_CLASS.$activate.call(this, event);
+        if (!layer.isShow()) {
+            layer.setDate(this.getDate(), this.getDateEnd(), null, true);
+            layer.show();
+            con = layer.getHeight();
+            layer.setPosition(
+                pos.left,
+                posTop + con <= getView().bottom ? posTop : pos.top - con
+            );
+            setFocused(layer);
+        }
+    };
+
+    UI_IST_CALENDAR_CLASS.go = function(offset, offsetEnd) {
+        var newDate = new Date(
+                this._oDate.getFullYear(), 
+                this._oDate.getMonth(), 
+                this._oDate.getDate() + offset
+            );
+
+        var newDateEnd;
+        if (this._sMode == 'RANGE') {
+            newDateEnd = new Date(
+                this._oDateEnd.getFullYear(), 
+                this._oDateEnd.getMonth(), 
+                this._oDateEnd.getDate() + offsetEnd
+            );
+        }
+
+        this.setDate(newDate, newDateEnd, null, true);
+        triggerEvent(this, 'change', null, [newDate, newDateEnd]);
+    };
+
+    UI_IST_CALENDAR_CLASS.getDate = function() {
+        return this._oDate;
+    };
+    
+    UI_IST_CALENDAR_CLASS.getDateEnd = function() {
+        return this._oDateEnd;
+    };
+    
+    UI_IST_CALENDAR_CLASS.getWeekInfo = function() {
+        return UI_CALENDAR_WEEK_INFO(this._oDate);
+    };
+
+    UI_IST_CALENDAR_CLASS.setDate = function(
+        date, dateEnd, remainLayer, remainRangeSelStatus
+    ) {
+        var layer = this._uLayer;
+        var range = this._oRange;
+        var ntxt; 
+        var weekInfo;
+
+        if ((range.begin && range.begin.getTime() > date.getTime()) 
+            || (range.end && range.end.getTime() < date.getTime())
+        ) {
+            return;
+        }
+
+        if (this._sViewMode == 'POP' && this._uLayer.isShow() && !remainLayer) {
+            this._uLayer.hide();
+        }
+        
+        if (date != null) {
+            // 周模式
+            if (this._sMode == 'WEEK') {
+                weekInfo = UI_CALENDAR_WEEK_INFO(date);
+                ntxt = formatDate(
+                        maxDate(weekInfo.monday, range.begin), 
+                        UI_IST_CALENDAR_STR_PATTERN_SHOW
+                    )
+                    + ' 至 ' 
+                    + formatDate(
+                        minDate(weekInfo.sunday, range.end), 
+                        UI_IST_CALENDAR_STR_PATTERN_SHOW
+                    );
+            } 
+            // 范围模式
+            else if (this._sMode == 'RANGE') {
+                if (!remainRangeSelStatus || !this._sRangeSelStatus) {
+                    this._sRangeSelStatus = 'END';
+                }
+                ntxt = formatDate(date, UI_IST_CALENDAR_STR_PATTERN_SHOW);
+                if (dateEnd) {
+                    ntxt += ' 至 ' + formatDate(dateEnd, UI_IST_CALENDAR_STR_PATTERN_SHOW);
+                }
+                else {
+                    if (this._sViewMode == 'POP') {
+                        // 为了小日历按钮对齐而做的fake
+                        ntxt += [
+                            '<span class="', this.getType(), '-fake-text">',
+                            ' 至 ' + formatDate(DATE_ZERO, UI_IST_CALENDAR_STR_PATTERN_SHOW),
+                            '</span>',
+                        ].join('');
+                    }
+                }
+            }
+            // 天模式
+            else {
+                ntxt = formatDate(date, UI_IST_CALENDAR_STR_PATTERN_SHOW);
+            }
+        } else {
+            ntxt = '';
+        }
+
+        this._eText.innerHTML = ntxt;
+        this.setValue(ntxt.replace(/\//g, '-'));
+
+        this._oDate = date;
+        if (this._sMode == 'RANGE') {
+            this._oDateEnd = dateEnd;
+        }
+
+        if (this._sViewMode == 'FIX') {
+            this._uLayer.setDate(date);
+        }
+
+        this.$flush();
+    };
+
+    UI_IST_CALENDAR_CLASS.init = function() {
+        UI_INPUT_CONTROL_CLASS.init.call(this);
+        this._uLayer.init();
+        this.setDate(this.getDate(), this.getDateEnd());
+    };
+
+    UI_IST_CALENDAR_CLASS.$cache = function(style, cacheSize) {
+        UI_INPUT_CONTROL_CLASS.$cache.call(this, style, cacheSize);
+        this._uLayer.cache(true, true);
+    };
+
+    UI_IST_CALENDAR_CLASS.setRange = function(begin, end) {
+        var cal = this._uLayer._uMonthView;
+        cal.setRange(begin, end, true);
+    };
+
+    function minDate(date1, date2) {
+        if (!date2) { return date1; }
+        if (!date1) { return date2; }
+        return date1.getTime() > date2.getTime() ? date2 : date1;
+    }
+
+    function maxDate(date1, date2) {
+        if (!date2) { return date1; }
+        if (!date1) { return date2; }
+        return date1.getTime() > date2.getTime() ? date1 : date2;        
+    }
+    
+    //--------------------------------------------------------------
+    // UI_IST_CALENDAR_LAYER_CLASS 的方法
+    //--------------------------------------------------------------
+
+    UI_IST_CALENDAR_LAYER_CLASS.ondateclick = function(event, date) {
+        var par = this.getParent();
+
+        // 非RANGE模式
+        if (this._sMode != 'RANGE' 
+            && (!par.getDate() 
+                || par.getDate().getTime() != date.getTime()
+            )
+        ) {
+            par.setDate(date, null, null, true);
+            /**
+             * @event
+             * @param {Date} selected date
+             */
+            triggerEvent(par, 'change', null, [date])
+        }
+
+        // RANGE模式
+        else if (this._sMode == 'RANGE') {
+            this._oDateSel = null;
+            if (par._sRangeSelStatus == 'BEGIN') {
+                par._sRangeSelStatus = 'END';
+                var start = par.getDate();
+                var end = date;
+                if (start && end && COMPARE_DATE_OBJ(start, end) > 0) {
+                    var tmp = end;
+                    end = start;
+                    start = tmp;
+                }
+                par.setDate(start, end, false, true);
+
+                /**
+                 * @event
+                 * @param {string} ragneSelStatus 取值为'BEGIN'或'END'
+                 * @param {Date} begin date
+                 * @param {Date} end date
+                 */
+                triggerEvent(
+                    par,
+                    'change',
+                    null,
+                    [par.getDate(), date]
+                )
+            }
+            else {
+                par._sRangeSelStatus = 'BEGIN';
+                // 设值后不隐藏layer
+                par.setDate(date, null, true, true);
+            }
+
+        }
+
+        // 其他
+        else {
+            this.hide();
+        }
+    };    
+
+    UI_IST_CALENDAR_LAYER_CLASS.hide = function() {
+        if (this.getParent()._sViewMode == 'FIX') {
+            return;
+        }
+
+        if (this.isShow()) {
+            var calCon = this.getParent();
+            calCon && triggerEvent(calCon, 'layerhide');
+        }
+        UI_IST_CALENDAR_CLASS.Layer.superClass.hide.apply(this, arguments);
+    };
+
+    //--------------------------------------------------------------
+    // UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS 的方法
+    //--------------------------------------------------------------
+
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.$setSelected = function(cell) {
+
+        function removeStyle(c) { c.alterClass('-selected'); }
+        function addStyle(c) { c.alterClass('+selected'); }
+        var me = this;
+
+        if (this._uCellSel) {
+            // select一星期
+            if (this._sMode == 'WEEK') {
+                this.$travelWeek(this._uCellSel, removeStyle);
+            }
+            // select一天
+            else if (this._sMode == 'DAY') {
+                removeStyle(this._uCellSel);
+            }
+        }
+
+        if (cell) {
+            // select一星期
+            if (this._sMode == 'WEEK') {
+                this.$travelWeek(cell, addStyle);
+            }
+            // select一天
+            else if (this._sMode == 'DAY') {
+                addStyle(cell);
+            }
+            this._uCellSel = cell;
+        }
+
+        // select一个范围
+        if (this._sMode == 'RANGE') {
+            var calCon = this.getParent() 
+                    ? this.getParent().getParent() : null;
+
+            // 范围选完一半时
+            if (calCon && calCon._sRangeSelStatus == 'BEGIN') {
+                for (var i in this._oCellSelSet) {
+                    removeStyle(this._oCellSelSet[i]);
+                    delete this._oCellSelSet[i];
+                }
+                var cellWrap = this.$getCellByDate(calCon.getDate());
+                if (cellWrap) {
+                    this._oCellSelSet[cellWrap.index] = cellWrap.cell;
+                    addStyle(cellWrap.cell);
+                }
+            }
+            // 范围选完时
+            else if (calCon && calCon._sRangeSelStatus == 'END') {
+                this.$travelMonth(
+                    function(c, i, isThisMonth) {
+
+                        var isInRange;
+                        if (isThisMonth) {
+                            isInRange = me.$isCellInRange(
+                                c, calCon.getDate(), calCon.getDateEnd()
+                            );
+                        }
+
+                        if (isThisMonth 
+                            && isInRange 
+                            && !(i in me._oCellSelSet)
+                        ) {
+                            me._oCellSelSet[i] = c;
+                            addStyle(c);
+                        }
+                        else if (
+                            (!isInRange || !isThisMonth) 
+                            && (i in me._oCellSelSet)
+                        ) {
+                            delete me._oCellSelSet[i];
+                            removeStyle(c);
+                        }
+                    }
+                );
+            }
+            // 其他情况
+            else {
+                for (var i in this._oCellSelSet) {
+                    delete this._oCellSelSet[i];
+                    removeStyle(this._oCellSelSet[i]);
+                }
+            }
+        }
+    };
+    
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.$setHovered = function(
+        cell, hovered
+    ) {
+        function addStyle(c) { c.alterClass('+hover'); }
+        function removeStyle(c) { c.alterClass('-hover'); }
+        var cellIndex = indexOf(this._aCells, cell);
+        var me = this;
+
+        if (cell) {
+            // hover一星期
+            if (this._sMode == 'WEEK') {
+                this.$travelWeek(cell, (hovered ? addStyle : removeStyle));
+            }
+
+            // hover一天
+            else if (this._sMode == 'DAY') {
+                hovered ? addStyle(cell) : removeStyle(cell);
+            }
+
+            // hover一个范围
+            else if (this._sMode == 'RANGE') {
+                var calCon = this.getParent().getParent();
+                var start = calCon.getDate();
+                var end = new Date(this._nYear, this._nMonth, cell._nDay);
+                if (start && end && COMPARE_DATE_OBJ(start, end) > 0) {
+                    var tmp = end;
+                    end = start;
+                    start = tmp;
+                }
+
+                // 范围选完一半时
+                if (calCon._sRangeSelStatus == 'BEGIN') {
+                    this.$travelMonth(
+                        function(c, i, isThisMonth) {
+                            var isInRange;
+                            if (isThisMonth) {
+                                isInRange = me.$isCellInRange(c, start, end);
+                            }
+                            if (hovered
+                                && isThisMonth 
+                                && isInRange 
+                                && !(i in me._oCellHoverSet)
+                            ) {
+                                me._oCellHoverSet[i] = c;
+                                addStyle(c);
+                            }
+                            else if (
+                                (!hovered || !isThisMonth || !isInRange)
+                                && (i in me._oCellHoverSet)
+                            ) {
+                                delete me._oCellHoverSet[i];
+                                removeStyle(c);
+                            }
+                        }
+                    );
+                }
+                // 其他情况
+                else {
+                    this.$travelMonth(
+                        function(c, i, isThisMonth) {
+                            if ((!hovered || !isThisMonth)
+                                && (i in me._oCellHoverSet)
+                            ) {
+                                delete me._oCellHoverSet[i];
+                                removeStyle(c);
+                            }
+                        }
+                    );
+                    if (hovered) {
+                        this._oCellHoverSet[cellIndex] = cell;
+                        addStyle(cell);
+                    }
+                }
+            }
+
+        }
+    };
+    
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.$travelWeek = function(
+        cell, callback
+    ) {
+        if (cell) {
+            var currDate = new DATE(this._nYear, this._nMonth, cell._nDay);
+            var index = indexOf(this._aCells, cell);
+            index -= ((currDate.getDay() + 6) % 7);
+            for (var i = 0; i < 7; i++) {
+                callback.call(this, this._aCells[index + i]);    
+            } 
+        }  
+    };
+
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.$travelMonth = function(callback) {
+        var lastDateOfThisMonth = 
+                new Date(this._nYear, this._nMonth + 1, 0).getDate();
+        for (var i = 7, cell, isThisMonth; cell = this._aCells[i]; i ++) {
+            isThisMonth = cell._nDay > 0 && cell._nDay <= lastDateOfThisMonth;
+            callback(cell, i, isThisMonth);
+        }
+    };
+
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.$getCellByDate = function(date) {
+        if (!date 
+            || this._nYear != date.getFullYear() 
+            || this._nMonth != date.getMonth()
+        ) {
+            return null;
+        }
+        var day = date.getDate();
+        for (var i = 0, cell; cell = this._aCells[i]; i ++) {
+            if (cell._nDay == day) { 
+                return {cell: cell, index: i};
+            }
+        }
+    };
+
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CLASS.$isCellInRange = function(
+        cell, beginDate, endDate
+    ) {
+        if (!cell || !beginDate || !endDate) {
+            return false;
+        }
+
+        var beginY = beginDate && beginDate.getFullYear();
+        var beginM = beginDate && beginDate.getMonth();
+        var beginD = beginDate && beginDate.getDate();
+        var endY = endDate && endDate.getFullYear(); 
+        var endM = endDate && endDate.getMonth();
+        var endD = endDate && endDate.getDate();
+
+        if ((   
+                COMPARE_DATE(
+                    beginY, beginM, beginD,
+                    this._nYear, this._nMonth, cell._nDay
+                ) <= 0
+            )
+            && (
+                COMPARE_DATE(
+                    this._nYear, this._nMonth, cell._nDay,
+                    endY, endM, endD
+                ) <= 0
+            )
+        ) {
+            return true;
+        }
+
+        return false; 
+    };
+    
+    //--------------------------------------------------------------
+    // UI_IST_CALENDAR_LAYER_MONTH_VIEW_CELL_CLASS 的方法
+    //--------------------------------------------------------------
+
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CELL_CLASS.$mouseover = function() {
+        var parent = this.getParent();
+        var index = indexOf(parent._aCells, this);
+        // 非本月的cell已经被disabled，不会触发mouseover事件
+        (index >= 7) && parent.$setHovered(this, true);  
+    };
+    
+    UI_IST_CALENDAR_LAYER_MONTH_VIEW_CELL_CLASS.$mouseout = function() {
+        var parent = this.getParent();
+        var index = indexOf(parent._aCells, this);
+        // 非本月的cell已经被disabled，不会触发mouseout事件
+        (index >= 7) && parent.$setHovered(this, false);   
+    };
+
+    UI_CALENDAR_LAYER_SELECT_CLASS.$mousewheel = blank;
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * data tree
@@ -25811,6 +33680,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
 
 })();
 
+<<<<<<< HEAD
 /**
  * ecui.ui.XCalendar
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -26604,6 +34474,801 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
 
 })();
 
+=======
+/**
+ * ecui.ui.XCalendar
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    富日历，
+ *           支持日、周、月、季不同粒度时间选择，
+ *           支持单选、多选、范围选
+ * @author:  sushuang(sushuang)
+ * @depend:  ecui
+ */
+
+/**
+ * 配置方式举例：（全不配置也可，就取默认的）
+ * {
+ *     "forbidEmpty": false,
+ *     "disableCancelBtn": false,
+ *
+ *     // 下文中日周月季所对应的"D"、"W"、"M"、"Q"为内建常量，
+ *     // 不能变为其他表示（如不可写为"Day"、"Week"）
+ *     "timeTypeList": [
+ *         // 此为日周月季的切换下拉框的内容和文字配置
+ *         // 例如，如果只要显示“日”和“月”，那么不配置“周”和“季”即可
+ *         { "value": "D", "text": "日" },
+ *         { "value": "W", "text": "周" },
+ *         { "value": "M", "text": "月" },
+ *         { "value": "Q", "text": "季" }
+ *     ],
+ *
+ *     "timeTypeOpt": {
+ *         // 此为日周月季每个所对应的配置
+ *         // 例如，如果只要显示“日”和“月”，那么不配置“周”和“季”即可
+ *         "D": {
+ *             "date": ["-31D", "-1D"],
+ *             "range": {
+ *                  start: "2011-01-01",
+ *                  end: "-1D",
+ *                  offsetBase: new Date()
+ *             },
+ *             // selModelList表示所需要的时间点选模式
+ *             // 可取枚举值（value字段）为"SINGLE"（单选），"RANGE"（首尾范围选择），"MULTIPLE"（离散多选）
+ *             "selModeList": [
+ *                 { "text": "单选", "value": "SINGLE", "prompt": "单项选择" }
+ *             ],
+ *             // selModeList表示默认的时间点选模式
+ *             "selMode": "SINGLE"
+ *         },
+ *
+ *         "W": {
+ *             "date": ["-31D", "-1D"],
+ *             "range": {
+ *                  start: "2011-01-01",
+ *                  end: "-1D",
+ *                  offsetBase: new Date()
+ *             },
+ *             "selModeList": [
+ *                 { "text": "单选", "value": "SINGLE", "prompt": "单项选择" },
+ *                 { "text": "范围多选", "value": "RANGE", "prompt": "范围选择，点击一下选择开始值，再点击一下选择结束值" }
+ *             ],
+ *             "selMode": "RANGE"
+ *         },
+ *
+ *         "M": {
+ *             "date": ["-31D", "-1D"],
+ *             "range": {
+ *                  start: "2011-01-01",
+ *                  end: "-1D",
+ *                  offsetBase: new Date()
+ *             },
+ *             "selModeList": [
+ *                 { "text": "单选", "value": "SINGLE", "prompt": "单项选择" },
+ *                 { "text": "范围多选", "value": "RANGE", "prompt": "范围选择，点击一下选择开始值，再点击一下选择结束值" },
+ *                 { "text": "散选", "value": "MULTIPLE", "prompt": "多项选择" }
+ *             ],
+ *             "selMode": "MULTIPLE"
+ *         },
+ *
+ *         "Q": {
+ *             "date": ["-31D", "-1D"],
+ *             "range": {
+ *                  start: "2011-01-01",
+ *                  end: "-1D",
+ *                  offsetBase: new Date()
+ *             },
+ *             "selModeList": [
+ *                 { "text": "单选", "value": "SINGLE", "prompt": "单项选择" }
+ *             ],
+ *             "selMode": "SINGLE"
+ *         }
+ *     }
+ */
+
+(function() {
+
+    var core = ecui;
+    var array = core.array;
+    var dom = core.dom;
+    var ui = core.ui;
+    var string = core.string;
+    var util = core.util;
+    var cutil = ui.XCalendarUtil;
+
+    var DATE = Date;
+    var REGEXP = RegExp;
+    var DOCUMENT = document;
+    var objProtoToString = Object.prototype.toString;
+    var REGEXP = RegExp;
+
+    var children = dom.children;
+    var createDom = dom.create;
+    var getParent = dom.getParent;
+    var getPosition = dom.getPosition;
+    var moveElements = dom.moveElements;
+    var setText = dom.setText;
+    var addClass = dom.addClass;
+    var formatDate = string.formatDate;
+    var getByteLength = string.getByteLength;
+    var encodeHTML = string.encodeHTML;
+    var sliceByte = string.sliceByte;
+    var indexOf = array.indexOf;
+    var getView = util.getView;
+    var blank = util.blank;
+    var extend = util.extend;
+    var getWeekInfo = cutil.getWeekInfo;
+    var getQuarter = cutil.getQuarter;
+    var minDate = cutil.minDate;
+    var maxDate = cutil.maxDate;
+    var arrProtoSlice = Array.prototype.slice;
+
+    var $fastCreate = core.$fastCreate;
+    var inheritsControl = core.inherits;
+    var triggerEvent = core.triggerEvent;
+    var setFocused = core.setFocused;
+
+    var UI_CONTROL = ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+    var UI_INPUT_CONTROL = ui.InputControl;
+    var UI_INPUT_CONTROL_CLASS = UI_INPUT_CONTROL.prototype;
+    var UI_SELECT = ui.Select;
+    var UI_BUTTON = ui.Button;
+    var UI_LAYER = ui.XCalendarLayer;
+
+    //-------------------------------------------------
+    // 类型声明
+    //-------------------------------------------------
+
+    /**
+     * 日历控件类
+     *
+     * @class
+     * @param {Object} options 初始化选项，除去下面列出的参数，其余参见setDatasource
+     * @param {string=} options.headText 最前面的显示文字，默认为：'时间粒度：'
+     * @param {string=} options.rangeLinkStr 范围选择模式下，显示出的当前选中时间的连接符，默认为' 至 '
+     * @param {string=} options.weekLinkStr 时间类型为周时，显示出的周首尾的连接符，默认为' ~ '
+     * @param {string=} options.blankText 当前无选中时显示的文本，默认为'请选择时间' 
+     */
+    var UI_X_CALENDAR = ui.XCalendar =
+        inheritsControl(
+            UI_INPUT_CONTROL,
+            'ui-x-calendar',
+            function(el, options) {
+                options.hidden = true;
+            },
+            function(el, options) {
+                var type = this.getTypes()[0];
+                var i;
+                var item;
+                var selected;
+                var html = [];
+                var domIndex = 0;
+                var domIndexTimeType;
+                var domIndexInfo;
+                var domIndexLayer;
+                var shiftBtnDisabled = this._bShiftBtnDisabled = options.shiftBtnDisabled;
+
+                this._oTextOptions = {
+                    blankText: options.blankText,
+                    rangeLinkStr: options.rangeLinkStr,
+                    weekLinkStr: options.weekLinkStr
+                };
+
+                // 提示字符
+                var headText = options.headText;
+                if (headText == null) {
+                    headText = '时间粒度：'
+                    html.push('<span class="' + type + '-head-text">' + encodeHTML(headText) + '</span>');
+                    domIndex ++;
+                }
+
+                // 时间类度选择下拉框
+                html.push('<select class="'+ type +'-slt-timetype'+ UI_SELECT.TYPES +'">');
+                html.push('</select>');
+                domIndexTimeType = domIndex ++;
+
+                // 当前选择信息与切换
+                html.push(
+                    '<span class="' + type + '-btn-prv ' + type + '-btn"></span>',
+                    '<span class="' + type + '-text"></span>',
+                    '<span class="' + type + '-btn-cancel ' + type + '-btn"></span>',
+                    '<span class="' + type + '-btn-cal ' + type + '-btn"></span>',
+                    '<span class="' + type + '-btn-nxt ' + type + '-btn"></span>'
+                );
+                domIndexInfo = domIndex;
+                domIndex += 5;
+
+                // 日历layer
+                domIndexLayer = domIndex;
+                var tList = ['D', 'W', 'M', 'Q'];
+                for (i = 0; item = tList[i]; i ++) {
+                    html.push('<div class="'+ type +'-layer" style="position:absolute;display:none"></div>');
+                    domIndex ++;
+                }
+
+                // 以下开始创建子控件实例
+                var o = createDom();
+                o.innerHTML = html.join('');
+                var child = children(o);
+                var node;
+
+                // 时间类型选择
+                if (domIndexTimeType != null) {
+                    this._uTimeTypeSlt = $fastCreate(
+                        this.Select, child[domIndexTimeType], this
+                    );
+                }
+
+                // 显示当前选择文本
+                this._eText = child[domIndexInfo + 1];
+                
+                // prev一天按钮
+                node = child[domIndexInfo];
+                if (shiftBtnDisabled) {
+                    node.style.display = 'none';
+                }
+                this._uBtnPrv = $fastCreate(
+                    this.Button, node, this, { command: 'prv', icon: true }
+                );
+
+                // 取消选择按钮
+                node = child[domIndexInfo + 2];
+                this._uBtnCancel = $fastCreate(
+                    this.Button, node, this, { command: 'cancel', icon: true }
+                );
+
+                // 小日历按钮
+                node = child[domIndexInfo + 3];
+                this._uBtnCal = $fastCreate(
+                    this.Button, node, this, { command: 'cal', icon: true }
+                );
+
+                // next一天按钮
+                node = child[domIndexInfo + 4];
+                if (shiftBtnDisabled) {
+                    node.style.display = 'none';
+                }
+                this._uBtnNxt = $fastCreate(
+                    this.Button, node, this, { command: 'nxt', icon: true }
+                );
+
+                // layers
+                var layers = this._oLayers = {};
+                i = 0;
+                for (i = 0; item = tList[i]; i ++) {
+                    node = child[domIndexLayer + i];
+                    DOCUMENT.body.appendChild(node);
+                    // 延后创建
+                    layers[item] = node;
+                }
+
+                moveElements(o, el, true);
+
+                // 初始化数据
+                this.setDatasource(options);
+            }
+        );
+
+    var UI_X_CALENDAR_CLASS = UI_X_CALENDAR.prototype;
+
+    var UI_X_CALENDAR_BUTTON_CLASS = (
+            UI_X_CALENDAR_CLASS.Button = inheritsControl(
+                UI_BUTTON, 
+                null, 
+                function(el, options){
+                    var o = createDom();
+                    var type = this.getType();
+                
+                    moveElements(el, o, true);
+                    el.innerHTML = '<span class="'+ type +'-inner"></span>';
+                    moveElements(o, el.firstChild, true);
+
+                    if (options.icon) {
+                        o = createDom(type + '-icon', '',  'span');
+                        el.appendChild(o);
+                    }
+
+                    this._sCommand = options.command;
+                }
+            )
+        ).prototype;
+
+    var UI_X_CALENDAR_SELECT_CLASS = (
+            UI_X_CALENDAR_CLASS.Select = inheritsControl(UI_SELECT, null)
+        ).prototype;
+
+    UI_X_CALENDAR_SELECT_CLASS.Options = inheritsControl(
+        UI_X_CALENDAR_SELECT_CLASS.Options, 
+        null, 
+        null, 
+        function(el, options) {
+            addClass(el, 'ui-x-calendar-select-options');
+        }
+    );
+
+    var UI_X_CALENDAR_LAYER_CLASS = (
+            UI_X_CALENDAR_CLASS.Layer = inheritsControl(UI_LAYER)
+        ).prototype;
+
+    var UI_X_CALENDAR_MODEL = UI_X_CALENDAR_LAYER_CLASS.Model;
+    var UI_X_CALENDAR_MODEL_CLASS = UI_X_CALENDAR_MODEL.prototype;
+
+    //-------------------------------------------------
+    // 常量
+    //-------------------------------------------------
+
+    var PATTERN_SHOW_DATE = 'yyyy-MM-dd';
+    var PATTERN_SHOW_MONTH = 'yyyy-MM';
+    var DATE_ZERO = new Date(0);
+
+    //----------------------------------------------
+    // UI_X_CALENDAR_CLASS 的方法
+    //----------------------------------------------
+
+    /**
+     * 设置数据
+     *
+     * @param {Object} datasource 初始化选项
+     * @param {string} datasource.preText
+     * @param {string=} datasource.timeType 初始的时间类度，可为'D'（日）, 'W'（周）, 'M'（月）, 'Q'（季），缺省则取'D'
+     * @param {Array=} datasource.timeTypeList 时间粒度选择列表，如果为[]则没有时间粒度选择，如果为null则全部开启
+     *      每项结构例如：{ text: '文字文字', value: 'D' }，其中value与timeTypeOpt的key相对应。
+     * @param {Object=} datasource.timeTypeOpt 按时间粒度的日历定义，此参数结构可为：
+     *      {
+     *          D: { ... 日历定义 },
+     *          W: { ... 日历定义 },
+     *          M: { ... 日历定义 },
+     *          Q: { ... 日历定义 }   
+     *      }
+     *      其中，"日历定义"的参数内容参见x-calendar-layer.js
+     * @param {boolean} datasource.disableCancelBtn
+     * @param {boolean} datasource.disablePreviousBtn
+     * @param {boolean} datasource.disableNextBtn
+     * @param {boolean=} datasource.forbidEmpty 禁止时间为空，如果为空，则设置为默认date。默认notEmpty为false
+     */    
+    UI_X_CALENDAR_CLASS.setDatasource = function (datasource, silent, renderOpt) {
+        datasource = datasource || {};
+
+        var timeTypeOpt = datasource.timeTypeOpt || {
+            "D": {
+                "selMode": "SINGLE",
+                "date": [
+                    "-31D",
+                    "-1D"
+                ],
+                "range": [
+                    "2011-01-01",
+                    "-1D"
+                ],
+                "selModeList": [
+                    {
+                        "text": "单选",
+                        "value": "SINGLE",
+                        "prompt": "单项选择"
+                    }
+                ]
+            }
+        };
+        var timeTypeList = this._aTimeTypeList = datasource.timeTypeList.length > 0
+            ? datasource.timeTypeList
+            : [
+                { text: '日', value: 'D'},
+                { text: '周', value: 'W'},
+                { text: '月', value: 'M'},
+                { text: '季', value: 'Q'}
+            ];
+        var models = this._oModels = this._oModels || {};
+        var timeType = this._sTimeType = datasource.timeType 
+            || (timeTypeList.length ? timeTypeList[0].value : void 0);
+
+        if (datasource.disableCancelBtn) {
+            this._uBtnCancel.hide();
+        }
+        if (datasource.disablePreviousBtn) {
+            this._uBtnPrv.hide();
+        }
+        if (datasource.disableNextBtn) {
+            this._uBtnNxt.hide();
+        }
+
+        // 创建或重置layer的model
+        for (var i = 0, t, opt, dft; t = timeTypeList[i]; i ++) {
+            t = t.value;
+            opt = 
+                timeTypeOpt[t] = 
+                extend({ timeType: t }, timeTypeOpt[t]);
+
+            // 设默认值
+            dft = UI_X_CALENDAR_MODEL_CLASS.DEFAULT;
+            if (!opt.selMode) {
+                opt.selMode = dft.selMode;
+            }
+            if (!opt.timeType) {
+                opt.timeType = dft.timeType;
+            }
+            if (!opt.selModeList) {
+                opt.selModeList = dft.selModeList;
+            }
+            if (!opt.defaultDate) {
+                opt.defaultDate = opt.date;
+            }
+            opt.forbidEmpty = datasource.forbidEmpty || false;
+
+            !models[t]
+                ? (models[t] = new UI_X_CALENDAR_MODEL(opt))
+                : models[t].setDatasource(opt);
+        }
+
+        !silent && this.render(renderOpt);
+    };
+
+    /** 
+     * 渲染
+     *
+     * @public
+     * @param {Object} opt
+     * @param {Date} viewDate 决定面板显示的日期
+     * @param {boolean} remainSlt 是不时重新绘制日期选择下拉框
+     * @param {boolean} remainLayer 是不是保留layer显示
+     */  
+    UI_X_CALENDAR_CLASS.render = function (opt) {
+        opt = opt || {};
+
+        var timeType = this._sTimeType;
+
+        if (!timeType) { return;}
+
+        var models = this._oModels;
+        var timeTypeList = this._aTimeTypeList;
+        var layers = this._oLayers;
+
+        !opt.remainSlt && this.$resetTimeTypeSlt();
+
+        for (var i = 0, t, layer, isNew; t = timeTypeList[i]; i ++) {
+            t = t.value;
+            isNew = false;
+
+            // 创建并初始化layer
+            if (!(layers[t] instanceof UI_CONTROL)) {
+                layers[t] = $fastCreate(
+                    this.Layer, layers[t], this, { model: models[t] }
+                );
+                layers[t].init();
+                isNew = true;
+            }
+
+            layer = layers[t];
+
+            if (t == timeType) {
+                if (layer._bLayerShow && !opt.remainLayer) {
+                    layer.hide();
+                }
+            }
+            else {
+                layers[t].hide();
+            }
+        }
+
+        this.$flushThis();
+    };    
+
+    UI_X_CALENDAR_CLASS.$setSize = new Function();
+
+    UI_X_CALENDAR_CLASS.$resetTimeTypeSlt = function () {
+        var timeTypeList = this._aTimeTypeList;
+        var slt = this._uTimeTypeSlt;
+        if (!slt) { return; }
+
+        // 清除
+        slt.setValue(null);
+        while(slt.remove(0)) {}
+
+        // 添加
+        for (var i = 0, t, item; t = timeTypeList[i]; i ++) {
+            slt.add(String(t.text), null, { value: t.value });
+        }
+
+        slt.setValue(this._sTimeType);
+    };
+
+    UI_X_CALENDAR_CLASS.$showLayer = function() {
+        var layer = this.getCurrLayer();
+        var anchor = this._bShiftBtnDisabled 
+            ? this._eText : this._uBtnPrv.getOuter();
+        var pos = getPosition(anchor);
+        var posTop = pos.top + this.getHeight();
+
+        if (!layer._bLayerShow) {
+            layer.render({ remainSlt: true, remainSelMode: true });
+            layer.show();
+            setFocused(layer);
+
+            var height = layer.getHeight();
+            layer.setPosition(
+                pos.left,
+                posTop + height <= getView().bottom 
+                    ? posTop : pos.top - height
+            );
+        }
+    }
+
+    UI_X_CALENDAR_CLASS.$clear = function() {
+        var model = this.getModel();
+        this.getModel().setDatasource({ date: [] });
+        this.$flushThis();
+    }
+
+    UI_X_CALENDAR_CLASS.$flushThis = function() {
+        var curDate = this._oDate;
+        var model = this.getModel();
+
+        var txt = this.$getShowText();
+        this._eText.innerHTML = txt.shortHTML;
+        txt.fullText && this._eText.setAttribute('title', txt.fullText);
+        this._uBtnPrv[model.testEdge(-1) ? 'enable' : 'disable']();
+        this._uBtnNxt[model.testEdge(1) ? 'enable' : 'disable']();
+    }
+
+    UI_X_CALENDAR_CLASS.$getSingleText = function (date) {
+        options = this._oTextOptions || {};
+        var model = this.getModel();
+        var timeType = this._sTimeType;
+
+        if (!date) { return ''; }
+
+        if (timeType == 'D') {
+            return formatDate(date, PATTERN_SHOW_DATE);
+        }
+        else if (timeType == 'W') {
+            var weekInfo = getWeekInfo(date);
+            var range = model.getRange();
+            // 只有week时有range问题，因为week是用日显示的，
+            // 当range在半周时会表现出来
+            return formatDate(
+                    range.start
+                        ? maxDate('D', weekInfo.workday, range.start)
+                        : weekInfo.workday,
+                    PATTERN_SHOW_DATE
+                )
+                + (options.weekLinkStr || ' ~ ')
+                + formatDate(
+                    range.end
+                        ? minDate('D', weekInfo.weekend, range.end)
+                        : weekInfo.weekend, 
+                    PATTERN_SHOW_DATE
+                );
+        }
+        else if (timeType == 'M') {
+            return formatDate(date, PATTERN_SHOW_MONTH);
+        }
+        else if (timeType == 'Q') {
+            return date.getFullYear() + '-Q' + getQuarter(date);
+        }
+    };
+
+    UI_X_CALENDAR_CLASS.$getShowText = function () {
+        options = this._oTextOptions || {};
+        var type = this.getType();
+        var model = this.getModel();
+        var aDate = model.getDate();
+        var timeType = this._sTimeType;
+        var selMode = model.getSelMode();
+        var shortText;
+        var fullText;
+        var rangeLinkStr = options.rangeLinkStr || ' 至 ';
+        var tmp;
+
+        if (!aDate[0]) {
+            shortHTML = [
+                '<span class="', type, '-blank', '">',
+                    encodeHTML(options.blankText || '请选择时间'),
+                '</span>'
+            ].join('');
+            return { shortHTML: shortHTML, fullText: '' };
+        }
+
+        if (selMode == 'SINGLE') {
+            fullText = shortText = this.$getSingleText(aDate[0], options);
+        }
+        else if (selMode == 'RANGE') {
+            if (timeType == 'W') {
+                shortText = this.$getSingleText(aDate[0], options);
+                tmp = this.$getSingleText(aDate[1], options);
+                fullText = '[' + shortText + ']'
+                    + rangeLinkStr + (tmp ? '[' + tmp + ']' : '');
+                shortText += ', ...';
+            }
+            else {
+                shortText = fullText = this.$getSingleText(aDate[0], options) 
+                    + rangeLinkStr
+                    + this.$getSingleText(aDate[1], options);
+            }
+        }
+        else if (selMode == 'MULTIPLE') {
+            shortText = this.$getSingleText(aDate[0], options) + ', ...';
+            fullText = [];
+            for (var i = 0; i < aDate.length; i ++) {
+                fullText.push(this.$getSingleText(aDate[i], options));
+            }
+
+            fullText = '[' + fullText.join('], [') + ']';
+        }
+
+        return { shortHTML: encodeHTML(shortText), fullText: fullText };
+    };    
+
+    UI_X_CALENDAR_CLASS.$click = function(event) {
+        UI_INPUT_CONTROL_CLASS.$click.call(this);
+        if (event.target == this._eText) {
+            this.$showLayer();
+        }
+    };
+
+    UI_X_CALENDAR_CLASS.$activate = function (event) {
+        UI_INPUT_CONTROL_CLASS.$activate.call(this, event);
+        this.$showLayer();
+    };
+
+    UI_X_CALENDAR_CLASS.$goStep = function(step) {
+        this.getModel().goStep(step);
+        this.getCurrLayer().render({ remainSlt: true, remainSelMode: true });
+        this.$flushThis();
+    };
+
+    UI_X_CALENDAR_CLASS.getModel = function() {
+        return this.getCurrLayer().getModel();
+    };
+    
+    UI_X_CALENDAR_CLASS.getCurrLayer = function() {
+        return this._oLayers[this._sTimeType];
+    };
+    
+    UI_X_CALENDAR_CLASS.getDate = function() {
+        return this.getModel().getDate();
+    };
+
+    UI_X_CALENDAR_CLASS.getValue = UI_X_CALENDAR_CLASS.getDate;
+
+    UI_X_CALENDAR_CLASS.getTimeType = function() {
+        return this.getModel().getTimeType();
+    };
+
+    UI_X_CALENDAR_CLASS.getSelMode = function() {
+        return this.getModel().getSelMode();
+    };
+
+    UI_X_CALENDAR_CLASS.init = function() {
+        UI_INPUT_CONTROL_CLASS.init.call(this);
+        this._uBtnCal.init();
+        this._uBtnCancel.init();
+        this._uBtnNxt.init();
+        this._uBtnPrv.init();
+        this._uTimeTypeSlt.init();
+    };
+
+    //----------------------------------------------
+    // UI_X_CALENDAR_BUTTON_CLASS 的方法
+    //----------------------------------------------
+
+    UI_X_CALENDAR_BUTTON_CLASS.$click = function (event) {
+        var par = this.getParent();
+        var changed;
+        switch(this._sCommand) {
+            case 'prv':
+                par.$goStep(-1);
+                changed = true;
+                break;
+            case 'nxt':
+                par.$goStep(1);
+                changed = true;
+                break;
+            case 'cal':
+                par.$showLayer();
+                break;
+            case 'cancel': 
+                par.$clear();
+                changed = true;
+                break;
+        }
+        // TODO:找宿爽确认修改是否合理
+        if (this._sCommand !== 'cal') {
+            /**
+             * @event
+             */
+            triggerEvent(
+                par, 'change', null, [par.getModel().getDate().slice()]
+            );
+        }
+//        /**
+//         * @event
+//         */
+//        triggerEvent(
+//            par, 'change', null, [par.getModel().getDate().slice()]
+//        );
+
+        event.exit();
+    };
+
+    //----------------------------------------------
+    // UI_X_CALENDAR_SELECT_CLASS 的方法
+    //----------------------------------------------
+
+    UI_X_CALENDAR_SELECT_CLASS.onchange = function () {
+        var par = this.getParent();
+        par._sTimeType = this.getValue();
+        par.$flushThis();
+
+        /**
+         * @event
+         */
+        triggerEvent(
+            par, 'change', null, [par.getModel().getDate().slice()]
+        );
+    };
+
+    //--------------------------------------------------------------
+    // UI_X_CALENDAR_LAYER_CLASS 的方法
+    //--------------------------------------------------------------
+
+    UI_X_CALENDAR_LAYER_CLASS.$blur = function () {
+        this.hide();
+    };
+    
+    UI_X_CALENDAR_LAYER_CLASS.onchange = function() {
+        var par = this.getParent();
+        par.$flushThis();
+        this._bLayerChanged = true;
+    };    
+
+    UI_X_CALENDAR_LAYER_CLASS.ondateclick = function() {
+        var model = this.getModel();
+        var selMode = model.getSelMode();
+        var aDate = model.getDate();
+
+        if (selMode == 'SINGLE') {
+            this.hide();
+        }
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.show = function() {
+        this._bLayerShow = true;
+        this._bLayerChanged = false;
+        UI_X_CALENDAR_CLASS.Layer.superClass.show.apply(this, arguments);
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.hide = function() {
+        if (this._bLayerShow) {
+
+            var par = this.getParent();
+            var model = this.getModel();
+            var selMode = model.getSelMode();
+            var aDate = model.getDate();
+
+            // 对于范围选择时只选了一半就关掉日历面板的情况，直接补全
+            if (selMode == 'RANGE' && aDate[0] && !aDate[1]) {
+                aDate[1] = new Date(aDate[0].getTime());
+                par.$flushThis();
+            }
+
+            par && triggerEvent(par, 'layerhide');
+
+            if (this._bLayerChanged) {
+                triggerEvent(
+                    par, 'change', null, [this.getModel().getDate().slice()]
+                );
+                this._bLayerChanged = false;
+            }
+        }
+
+        this._bLayerShow = false;
+
+        UI_X_CALENDAR_CLASS.Layer.superClass.hide.apply(this, arguments);
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * ecui.ui.HButton
@@ -30505,7 +39170,11 @@ change:     切换了分页
  * path:    count-input.js
  * desc:    带计数的文本输入框(input与textarea)
  * author:  cxl(chenxinle)
+<<<<<<< HEAD
  *          modified by sushuang(sushuang)
+=======
+ *          modified by sushuang(sushuang) 
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * date:    2012/03/12
  */
 (function () {
@@ -32901,6 +41570,7 @@ _uOptions     - 下拉选择框
     };
 
 }) ();
+<<<<<<< HEAD
 /**
  * xui-ui
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -32914,6 +41584,21 @@ _uOptions     - 下拉选择框
  * @namespace
  */
 xui.ui = {};
+=======
+/**
+ * xui-ui
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    简单的ui
+ *           这些ui是项目中不成体系的ui、简单的ui的集合
+ * @author:  sushuang(sushuang)
+ */
+
+/**
+ * @namespace
+ */
+xui.ui = {};
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 (function(_global){
 
@@ -39644,7 +48329,11 @@ define(
 /**
  * zrender
  *
+<<<<<<< HEAD
  * @author Kener (@Kener-林峰, linzhifeng) ,
+=======
+ * @author Kener (@Kener-林峰, linzhifeng) , 
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  *         strwind (@劲风FEI, yaofeifei)
  *
  * shape类：矩形
@@ -68590,6 +77279,7 @@ _global['zrender'] = zrender;
 
 })();
 
+<<<<<<< HEAD
 /**
  * configuration of xutil.ajax
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -68750,7 +77440,170 @@ $namespace('di.config');
     XAJAX.HIDE_WAITING_HANDLER = AJAX.hideWaiting;
     XAJAX.DEFAULT_OPTIONS = DEFAULT_OPTIONS;    
 
+=======
+/**
+ * configuration of xutil.ajax
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    data insight 全局(包括console和product)的ajax的配置
+ *          （常量和默认失败处理等）
+ *          （如不服此配置，可重载）
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil.ajax, di.config.lang
+ */
+
+$namespace('di.config');
+
+(function() {
+    
+    //--------------------------------
+    // 引用
+    //--------------------------------
+
+    var XAJAX = xutil.ajax;
+    var isFunction = xutil.lang.isFunction;
+    var LANG;
+    var DIALOG;
+    
+    $link(function () {
+        LANG = di.config.Lang;
+        DIALOG = di.helper.Dialog;
+    });
+
+    //--------------------------------
+    // 类型声明
+    //--------------------------------
+
+    var AJAX = $namespace().Ajax = function() {};
+
+    /**
+     * 业务错误信息
+     */
+    AJAX.ERROR_RTPL_ID = 10011; // reportTemplateId 不存在
+    AJAX.ERROR_SESSION_TIMEOUT = 10001; // session 过期
+    AJAX.ERROR_PARAM = 20001; // olap查询参数错误，由应用程序自己处理
+
+    /**
+     * 默认选项
+     */
+    var DEFAULT_OPTIONS = {
+        showWaiting: true // 默认在ajax请求时显示waiting
+    };
+
+    /**
+     * 默认的ajax失败处理
+     * 
+     * @public
+     * @param {number} status ajax返回状态
+     * @param {Object|string} ejsonObj e-json整体返回的数据
+     * @param {Function} defaultCase 可用此函数替换默认情况的处理函数
+     */
+    AJAX.handleDefaultFailure = function(status, ejsonObj, defaultCase) {
+        switch (status) {
+            case 100: // 未登陆
+            case 201: 
+            case 301: // 重定向的情况
+            case 302: // 重定向的情况
+            case 99999: // 其实302时返回的是这个 ...
+                DIALOG.alert(LANG.SAD_FACE + LANG.RE_LOGIN, null, true);
+                break;
+            case 333: //没有权限
+                DIALOG.alert(LANG.SAD_FACE + LANG.NO_AUTH_SYSTEM);
+                break;
+            case 20003: // 缺少某个维度节点
+                var dimName = ejsonObj.data.dimName;
+                var dimCapture = ejsonObj.data.dimCapture;
+                var missedMember = ejsonObj.data.missedMember;
+                DIALOG.alert(LANG.SAD_FACE + "缺少维度节点 "+dimCapture+"("+dimName+"): "+missedMember);
+                break;
+            case 20004: // 镜像缺少某个参数
+                var statusInfo = ejsonObj.statusInfo;
+                DIALOG.alert(LANG.SAD_FACE + statusInfo);
+                break;
+            case 1: // 返回html错误页面的情况
+            case 403: // 403错误
+            case 404: // 404错误
+            case 405: // 405错误
+            case 500: // 500错误
+                DIALOG.alert(LANG.SAD_FACE + LANG.ERROR);
+                break;
+            default:
+                if (isFunction(defaultCase)) {
+                    defaultCase(status, ejsonObj);
+                } 
+                else {
+                    DIALOG.alert(LANG.SAD_FACE + LANG.ERROR);
+                }
+        }
+    }
+
+    /**
+     * 刷新整站
+     *
+     * @protected
+     */
+    // AJAX.reload = function() {
+    //     try {
+    //         window.top.location.reload();
+    //     } 
+    //     catch (e) {
+    //         window.location.reload();
+    //     }
+    // }
+
+    /**
+     * 默认的timeout处理
+     *
+     * @public
+     */
+    AJAX.handleDefaultTimeout = function() {
+        DIALOG.hidePrompt();
+    }
+    
+    /**
+     * 默认的请求参数
+     *
+     * @public
+     * @return {string} 参数字符串，如a=5&a=2&b=xxx
+     */
+    AJAX.getDefaultParam = function() {
+        var date = new Date(), paramArr = [];
+        paramArr.push('_cltime=' + date.getTime()); // 供后台log当前时间
+        paramArr.push('_cltimezone=' + date.getTimezoneOffset()); // 供后台log当前时区
+        return paramArr.join('&');
+    }
+    
+    /**
+     * 用于显示全局的等待提示，当第一个需要显示等待的请求发生时会调用
+     *
+     * @public
+     */
+    AJAX.showWaiting = function() {
+        DIALOG.waitingPrompt(LANG.AJAX_WAITING);
+    }
+    
+    /**
+     * 用于隐藏全局的等待提示，当最后一个需要显示等待的请求结束时会调用
+     *
+     * @public
+     */
+    AJAX.hideWaiting = function() {
+        DIALOG.hidePrompt();
+    }
+        
+    /**
+     * 挂载配置
+     */
+    XAJAX.DEFAULT_FAILURE_HANDLER = AJAX.handleDefaultFailure;
+    XAJAX.DEFAULT_ONTIMEOUT = AJAX.handleDefaultTimeout;
+    XAJAX.DEFAULT_PARAM =AJAX.getDefaultParam;
+    XAJAX.SHOW_WAITING_HANDLER = AJAX.showWaiting;
+    XAJAX.HIDE_WAITING_HANDLER = AJAX.hideWaiting;
+    XAJAX.DEFAULT_OPTIONS = DEFAULT_OPTIONS;    
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.config.Dict
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -68880,7 +77733,139 @@ $namespace('di.config');
      */
     DICT.REPORT_JSON = 'report_json';
 
+=======
+/**
+ * di.config.Dict
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    data insight 全局(包括console和product)的ajax的配置
+ * @author:  sushuang(sushuang), lizhantong(lztlovely@126.com)
+ */
+
+$namespace('di.config');
+
+(function() {
+
+    /**
+     * DICT初始化，此方法会在生成的repo-dict.js中自动被调用
+     */
+    var DICT = $namespace().Dict = function () {
+        if (!initialized) {
+            this.reset();
+            initialized = true;
+        }
+        return DICT;
+    };
+
+    /**
+     * DICT恢复默认状态
+     */
+    DICT.reset = function () {
+        // 初始化类引用
+        DICT.CLZ = {};
+        for (var i = 0, clzDef; clzDef = DICT.CLZ_DEFS[i]; i ++) {
+            if (clzDef.clzKey in DICT.CLZ) {
+                throw new Error("dupicate clzKey: " + clzDef.clzKey);
+            }
+            DICT.CLZ[clzDef.clzKey] = clzDef;
+        }
+    }
+
+    var initialized = false;
+
+    DICT.DOM_FLAG_BEGIN = '<!-- DI_BEGIN^_^DONT_MODIFY_ME -->';
+    DICT.DOM_FLAG_END = '<!-- DI_END^_^DONT_MODIFY_ME -->';
+    DICT.RTPL_VIRTUAL = 'RTPL_VIRTUAL';
+    DICT.RTPL_VIRTUAL_ID = 'RTPL_VIRTUAL_ID';
+
+    /**
+     * 目前支持的图的类型枚举
+     */
+    DICT.GRAPH_DEFS = [
+        { name: 'line', text: '折线', yAxisNameSet: ['left', 'right'] },
+        { name: 'bar', text: '柱', yAxisNameSet: ['left', 'right'] },
+        { name: 'pie', text: '饼', yAxisNameSet: [] },
+        { name: 'beaker', text: '烧杯', yAxisNameSet: []}
+    ];
+    DICT.getGraphByType = function (type) {
+        for (var i = 0, o; o = DICT.GRAPH_DEFS[i]; i ++) {
+            if (o.name == type) { return o; }
+        }
+    }
+
+    /**
+     * 同后台的 “reportTemplateType”
+     */
+    DICT.REPORT_TYPE = {
+        RTPL_OLAP_TABLE: 1,
+        RTPL_OLAP_CHART: 1,
+        RTPL_PLANE_TABLE: 1,
+        RTPL_VIRTUAL: 1
+    };
+
+    /**
+     * 标记且功能性css，在console会起标记作用, 定义在di.css中
+     */
+    DICT.FLAG_CSS = [
+        'di-o_o-body',
+        'di-o_o-block',
+        'di-o_o-line',
+        'di-o_o-item',
+        'di-o_o-space-l1'
+    ];
+
+    /**
+     * DI 用户定义的前缀
+     */
+    DICT.PARAM_PREFIX = 'DI_P_';
+
+    /**
+     * 视图模版部署相对路径
+     */
+    DICT.VTPL_ROOT = 'asset-d';
+
+    /**
+     * 视图模版部署相对路径
+     */
+    DICT.MOLD_PATH = 'asset-d/-com-/mold';
+
+    /**
+     * 默认的遮罩透明度
+     */
+    DICT.DEFAULT_MASK_OPACITY = 0.5;
+
+    /**
+     * di snippet中的attr
+     */
+    DICT.DI_ATTR = 'data-o_o-di';
+
+    /**
+     * 自动化测试用的id属性
+     */
+    DICT.TEST_ATTR = 'data-o_o-di-test';
+
+    /**
+     * 指标维度元数据视图状态
+     */
+    DICT.META_STATUS = {
+        DISABLED: 0,
+        NORMAL: 1,
+        SELECTED: 2
+    };
+
+    /**
+     * 报表根路径
+     */
+    DICT.REPORTS = 'reports';
+
+    /**
+     * 报表描述文件路径
+     */
+    DICT.REPORT_JSON = 'report_json';
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.config.Lang
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -69079,7 +78064,208 @@ $namespace('di.config');
         '</div>'   
     ].join(''), Array(4).join('&nbsp;'));
 
+=======
+/**
+ * di.config.Lang
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    data insight 全局(包括console和product)的话术定义
+ * @author:  xxx(xxx)
+ */
+
+$namespace('di.config');
+
+(function() {
+    
+    //--------------------------------
+    // 类型声明
+    //--------------------------------
+
+    var LANG = $namespace().Lang = {};
+    var template = xutil.string.template;
+
+    /**
+     * ajax请求失败
+     */
+    LANG.AJAX_FAILURE = function (status) {
+        return status + ' SERVER ERROR';
+    };
+
+    LANG.AJAX_TIMEOUT = '请求超时，请稍后重试';
+    LANG.AJAX_WAITING = '加载中...';
+    
+    LANG.SMILE_FACE = '&nbsp;<div class="global-smile-face"></div>&nbsp;&nbsp;&nbsp;';
+    LANG.SAD_FACE = '&nbsp;<div class="global-sad-face"></div>&nbsp;&nbsp;&nbsp;';
+    
+    LANG.OTHER_EDITING = function (otherEditing) {
+        var stl = ' style="color: blue; font-weight: bold;" ';
+        var tpl = [
+            '<p>【注意】</p>',
+            '<p>在#{0}页中，本报表已被编辑但未保存。</p>',
+            '<p>如果确定保存，则会以<span ', stl, '>本编辑页</span>为准进行保存，放弃其他编辑页中做出的改动。确定保存吗？</p>'
+        ];
+        return template(
+            tpl.join(''),
+            ' "<span ' + stl + '>' + otherEditing.join('</span>", "<span ' + stl + '>') + '</span>" '
+        );
+    };
+    LANG.SOME_ERROR = '抱歉，出现错误。';
+    LANG.NEED_CREATE = '请先保存再执行此操作';
+    LANG.OPT_SUCCESS = '操作成功';
+    LANG.NO_SEL = '请选择';
+    LANG.NO_DATA = '缺失数据';
+    LANG.NO_AUTH = '抱歉，您没有查看当前页面的权限';
+    LANG.NO_AUTH_OPERATION = '抱歉，您没有权限进行此操作';
+    LANG.NO_AUTH_SYSTEM = '抱歉，您没有系统权限';
+    LANG.ERROR = '系统异常';
+    LANG.DATA_ERROR = '数据异常';
+    LANG.ERROR_RTPL_ID = 'reportTemplateId错误或者不存在';
+    LANG.RE_LOGIN = '请重新登陆';
+    LANG.EMPTY_TEXT = '未查询到相关信息';
+    LANG.QUERY_ERROR_TEXT = '查询数据出错，请检查';
+    LANG.SAVE_FAIL = '抱歉，保存失败，请重试';
+    LANG.SAVE_SUCCESS = '保存成功';
+    LANG.PARAM_ERROR = '抱歉，参数校验失败';
+    LANG.FATAL_DATA_ERROR = '抱歉，服务器异常，操作无法继续';
+    
+    LANG.INPUT_MANDATORY = '必填';
+    LANG.INVALID_FORMAT = '格式错误';
+    LANG.NUMBER_OVERFLOW = '数据过大';
+    LANG.NUMBER_UNDERFLOW = '数据过小';
+    LANG.TEXT_OVERFLOW = '输入文字过多';
+    LANG.DOWNLOAD_FAIL = '下载失败';
+    LANG.OFFLINE_DOWNLOAD_FAIL = '离线下载请求失败';
+    LANG.DELETE_SUCCESS = '删除成功';
+
+    LANG.GET_DIM_TREE_ERROR = '抱歉，维度数据获取失败，请重试';
+    LANG.NEED_DS_ALL_LINKED = '请确保所有组件都有选择对应的数据集（没有则创建），再进行下一步';
+
+    LANG.CONFIRM_ADD_SHARE = '您真的要添加分享吗？';
+    LANG.CONFIRM_REMOVE_SHARE = '您真的要取消分享吗？';
+    LANG.CONFIRM_DELETE = '您真的要删除吗？';
+
+    LANG.DIM_MANDATORY = '请确认每种维度都有勾选，再点击查询';
+
+    LANG.DESC_OVERFLOW = '解释说明文字过多';
+    LANG.DESC_MANDATORY = '解释说明必填';
+    LANG.PLAN_OVERFLOW = '跟进计划文字过多';
+    LANG.PLAN_MANDATORY = '跟进计划必填';
+    LANG.REASON_ADD_ERROR = '原因添加失败，请重试';
+
+    LANG.DRILL_DIM_DATA_ERROR = '[维度数据校验失败]';
+
+    LANG.WAITING_HTML = '<span class="waiting-icon"></span>&nbsp;<span class="waiting-text">加载中...</span>';
+
+    //----------------------------------------------
+    // 很丑陋地临时这么写：界面上显示的特殊的解释说明
+    //----------------------------------------------
+
+    LANG.TIME_DESC = [
+        '<div style="border: 1px solid #BBB; padding: 10px;margin-top: 10px; border-radius: 5px;">',
+            '<div style="font-weight: bold">&nbsp;&nbsp;时间表达式举例：</div>',
+            '<br />',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;昨天：["-1D"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;六天前到当天：["-6D", "0D"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;本月初到当天：["0MB", "0D"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;本周末到2013-09-20：["0WE", "2013-09-20"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;上季初到明年末：["-1QB", "+1YE"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;后天到下月的后天：["+2D", null, "+1M"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;昨天所在的月的月初到昨天：[null, "-1D", "0MB"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;（注：字母用大小写都可以）</div>',
+            '<br />',
+            '<br />',
+            '<div style="font-weight: bold">&nbsp;&nbsp;时间表达式说明：</div>',
+            '<br />',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;时间表达式是一个 一元组 或者 二元组 或者 三元组</div>',
+            '<div style="color: blue;">&nbsp;&nbsp;&nbsp;&nbsp;如：["0YB"] 或 ["2012-12-12", "5Q"] 或 ["-5ME", null, "6D"]</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;数组第一个元素表示开始时间，</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;绝对值（如2012-12-12）</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;或相对于基准时间的偏移（如-5d）</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;数组第二个元素表示结束时间，格式同上。（可缺省）</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;数组第三个元素表示时间区间，相对于start或end的偏移（如-4d）（可缺省）</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果已经定义了start和end，则range忽略。</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果start或end只有一个被定义，则range是相对于它的偏移。</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如果只有start被定义，则只取start。</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;例如start是+1ME，range是+5WB，</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;表示一个时间范围：从下月的最后一天开始，到下月最后一天往后5周的周一为止。</div>',
+            '<br />',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;三元组中每个元素的写法：</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;第一种情况是：</div>',
+            '<div style="color: blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用YMDWQ（年月日周季）分别表示时间粒度（大小写都可以），</div>',
+            '<div style="color: blue;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;用B/E表示首尾，如果没有B/E标志则不考虑首尾</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;例如：</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;假如系统时间为2012-05-09</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+4D"表示系统时间往后4天，即2012-05-13 </div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"-2M"表示往前2个月（的当天），即2012-03-13</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"2Q"表示往后2个季度（的当天），即2012-11-13</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"1W"表示往后1周（的当天），即2012-05-20</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"1WB"表示往后1周的开头（周一），即2012-05-14</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"-1WE"表示往前一周的结束（周日），即2012-05-06</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"0WE"表示本周的结束（周日），即2012-05-13</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;月、季、年同理</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;第二种情况是：直接指定日期，如yyyy-MM-dd，</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;则返回此指定日期</div>',
+            '<div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可以用相对时间或绝对时间；</div>',
+            '<br />',
+        '</div>'   
+    ].join(''); 
+
+    LANG.X_CALENDAR_DESC = template([
+        '<div style="border: 1px solid #BBB; padding: 10px;margin-top: 10px; border-radius: 5px;">',
+            '<div style="font-weight: bold">&nbsp;&nbsp;设置初始化参数格式举例：</div>',
+            '<br />',
+            '<div>#{0}{</div>',
+            '<div>#{0}#{0}"forbidEmpty": false,</div>',
+            '<div>#{0}#{0}"disableCancelBtn": false,</div>',
+            '<div>#{0}#{0}"timeTypeList": [</div>',
+            '<div>#{0}#{0}#{0}{ "value": "D", "text": "日" },</div>',
+            '<div>#{0}#{0}#{0}{ "value": "W", "text": "周" },</div>',
+            '<div>#{0}#{0}#{0}{ "value": "M", "text": "月" },</div>',
+            '<div>#{0}#{0}#{0}{ "value": "Q", "text": "季" }</div>',
+            '<div>#{0}#{0}],</div>',
+            '<div>#{0}#{0}"timeTypeOpt": {</div>',
+            '<div>#{0}#{0}#{0}"D": {</div>',
+            '<div>#{0}#{0}#{0}#{0}"selMode": "SINGLE",</div>',
+            '<div>#{0}#{0}#{0}#{0}"date": ["-31D", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"range": ["2011-01-01", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"selModeList": [</div>',
+            '<div>#{0}#{0}#{0}#{0}#{0}{ "text": "单选", "value": "SINGLE", "prompt": "单项选择" }</div>',
+            '<div>#{0}#{0}#{0}#{0}]</div>',
+            '<div>#{0}#{0}#{0}},</div>',
+            '<div>#{0}#{0}#{0}"W": {</div>',
+            '<div>#{0}#{0}#{0}#{0}"selMode": "RANGE",</div>',
+            '<div>#{0}#{0}#{0}#{0}"date": ["-31D", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"range": ["2011-01-01", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"selModeList": [</div>',
+            '<div>#{0}#{0}#{0}#{0}#{0}{ "text": "单选", "value": "SINGLE", "prompt": "单项选择" },</div>',
+            '<div>#{0}#{0}#{0}#{0}#{0}{ "text": "范围多选", "value": "RANGE", "prompt": "范围选择，点击一下选择开始值，再点击一下选择结束值" }</div>',
+            '<div>#{0}#{0}#{0}#{0}]</div>',
+            '<div>#{0}#{0}#{0}},</div>',
+            '<div>#{0}#{0}#{0}"M": {</div>',
+            '<div>#{0}#{0}#{0}#{0}"selMode": "MULTIPLE",</div>',
+            '<div>#{0}#{0}#{0}#{0}"date": ["-31D", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"range": ["2011-01-01", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"selModeList": [</div>',
+            '<div>#{0}#{0}#{0}#{0}#{0}{ "text": "单选", "value": "SINGLE", "prompt": "单项选择" },</div>',
+            '<div>#{0}#{0}#{0}#{0}#{0}{ "text": "范围多选", "value": "RANGE", "prompt": "范围选择，点击一下选择开始值，再点击一下选择结束值" }</div>',
+            '<div>#{0}#{0}#{0}#{0}]</div>',
+            '<div>#{0}#{0}#{0}},</div>',
+            '<div>#{0}#{0}#{0}"Q": {</div>',
+            '<div>#{0}#{0}#{0}#{0}"selMode": "SINGLE",</div>',
+            '<div>#{0}#{0}#{0}#{0}"date": ["-31D", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"range": ["2011-01-01", "-1D"],</div>',
+            '<div>#{0}#{0}#{0}#{0}"selModeList": [</div>',
+            '<div>#{0}#{0}#{0}#{0}#{0}{ "text": "单选", "value": "SINGLE", "prompt": "单项选择" }</div>',
+            '<div>#{0}#{0}#{0}#{0}]</div>',
+            '<div>#{0}#{0}#{0}}</div>',
+            '<div>#{0}#{0}}</div>',
+            '<div>#{0}}</div>',
+        '</div>'   
+    ].join(''), Array(4).join('&nbsp;'));
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * repo dict
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -69594,7 +78780,524 @@ $namespace('di.config');
         return false;
     };
 
+=======
+/**
+ * repo dict
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    描述构件的引用。构建程序（buidlfront会根据此文件生成repo.js）
+ * @author:  sushuang(sushuang)
+ */
+
+(function() {
+
+    var DICT = $namespace('di.config').Dict;
+    var extend = xutil.object.extend;
+    var isArray = xutil.lang.isArray;
+
+    var repoDict =
+
+        //==[DI=BEGIN]==[NIGEB=ID]=========
+        // 此注释不可改动，标记了解析段落的开始
+        //=================================
+
+        {
+            /**
+             * 默认的clzKey
+             */
+            "DEFAULT_CLZ_KEY": {
+                "SNIPPET": "GENERAL_SNIPPET",
+                "VCONTAINER": "GENERAL_VCONTAINER",
+                "VPART": "GENERAL_VPART",
+                "COMPONENT": "GENERAL_COMPONENT"
+            },
+
+            /**
+             * 构件件类
+             * 说明：
+             * (1") 如果定义了adapterMethod"，则从di.shared.adapter."GeneralAdapterMethod"中获取方法拷贝到目标实例中
+             * (2) ""如果定义了adapterPath"，则将该adapter中方法全拷贝至目标实例中。能够覆盖adapterMethod"定义。
+             */
+            "CLZ_DEFS": [
+
+                //-------------------------------
+                // SNIPPET
+                //-------------------------------
+
+                {
+                    "clzKey": "GENERAL_SNIPPET",
+                    "clzPath": "di.shared.ui.GeneralSnippet",
+                    "clzType": "SNIPPET"
+                },
+
+                //-------------------------------
+                // VPART
+                //-------------------------------
+
+                {
+                    "clzKey": "GENERAL_VPART",
+                    "clzPath": "di.shared.ui.GeneralVPart",
+                    "clzType": "VPART"
+                },
+
+                //-------------------------------
+                // COMPONENT
+                //-------------------------------
+
+                {
+                    "clzKey": "GENERAL_COMPONENT",
+                    "clzPath": "di.shared.ui.InteractEntity",
+                    "clzType": "COMPONENT"
+                },
+                {
+                    "clzKey": "DI_TABLE",
+                    "clzPath": "di.shared.ui.DITable",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_OLAP_TABLE"]
+                },
+                {
+                    "clzKey" : "DI_REPORTSAVE",
+                    "clzPath" : "di.shared.ui.DIReportSave",
+                    "clzType" : "COMPONENT"
+                },
+                {
+                    "clzKey": "DI_RTPLCLONE",
+                    "clzPath": "di.shared.ui.DIRtplClone",
+                    "clzType": "COMPONENT"
+                },
+                {
+                    "clzKey": "DI_PLANE_TABLE",
+                    "clzPath": "di.shared.ui.DIPlaneTable",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_PLANE_TABLE"]
+                },
+                {
+                    "clzKey": "DI_CHART",
+                    "clzPath": "di.shared.ui.DIChart",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_OLAP_CHART"]
+                },
+                {
+                    "clzKey": "DI_ECHART",
+                    "clzPath": "di.shared.ui.DIEChart",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_OLAP_CHART"]
+                },
+                {
+                    "clzKey": "DI_LITEOLAP_CHART",
+                    "clzPath": "di.shared.ui.DILiteOlapChart",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_OLAP_TABLE"]
+                },
+                {
+                    "clzKey": "DI_FORM",
+                    // FIX ME Jack 去repo-config.json 中查找"di.shared.ui.DIForm"，内含集中配置信息
+                    "clzPath": "di.shared.ui.DIForm",
+                    "clzType": "COMPONENT",
+                    "vuiRefCandidate": {
+                        "input": [
+                            "HIDDEN_INPUT", 
+                            "DAY_POP_CALENDAR", 
+                            "RANGE_POP_CALENDAR", 
+                            "CALENDAR_PLUS", 
+                            "X_CALENDAR", 
+                            "ECUI_SELECT", 
+                            "ECUI_MULTI_SELECT", 
+                            "ECUI_INPUT_TREE", 
+                            "ECUI_SUGGEST", 
+                            "ECUI_INPUT",
+                            "MULTI_CHECKBOX",
+                            "SIMPLE_RADIO"
+                        ],
+                        "confirm": [
+                            "BUTTON",
+                            "H_BUTTON"
+                        ]
+                    }
+                },
+                {
+                    "clzKey": "OLAP_META_CONFIG",
+                    "clzPath": "di.shared.ui.OlapMetaConfig",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_OLAP_TABLE", "RTPL_OLAP_CHART"]
+                },
+                {
+                    "clzKey": "LITEOLAP_META_CONFIG",
+                    "clzPath": "di.shared.ui.LiteOlapMetaConfig",
+                    "clzType": "COMPONENT",
+                    "reportTemplateTypeCandidate": ["RTPL_OLAP_TABLE", "RTPL_OLAP_CHART"]
+                },
+
+                //-------------------------------
+                // VCONTAINER
+                //-------------------------------
+
+                {
+                    "clzKey": "GENERAL_VCONTAINER",
+                    "clzPath": "di.shared.ui.GeneralVContainer",
+                    "clzType": "VCONTAINER"
+                },
+                {
+                    "clzKey": "DI_TAB",
+                    "clzPath": "di.shared.ui.DITab",
+                    "clzType": "VCONTAINER"
+                },
+                {
+                    "clzKey": "FOLD_PANEL",
+                    "clzPath": "di.shared.ui.FoldPanel",
+                    "clzType": "VCONTAINER"
+                },
+
+                //-------------------------------
+                // VUI
+                //-------------------------------
+
+                {
+                    "clzKey": "HIDDEN_INPUT",
+                    "clzPath": "di.shared.vui.HiddenInput",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "clzType": "VUI",
+                    "rtplParamHandler": [
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4SimpleTextImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4SuggestTextImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TreeImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4HttpTreeImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4ComboBoxImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TimeImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4ComboBoxTransferImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4HiddenPosImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TimeFromOutsideImpl"
+                    ],
+                    "caption": "隐藏的输入"
+                },
+                {
+                    "clzKey": "H_CHART",
+                    "clzPath": "xui.ui.HChart",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "adapterPath": "di.shared.adapter.HChartVUIAdapter",
+                    "clzType": "VUI",
+                    "caption": "组合图"
+                },
+                {
+                    "clzKey": "E_CHART",
+                    "clzPath": "xui.ui.EChart",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "adapterPath": "di.shared.adapter.EChartVUIAdapter",
+                    "clzType": "VUI",
+                    "caption": "组合图"
+                },
+                {
+                    "clzKey": "OLAP_META_DRAGGER",
+                    "clzPath": "di.shared.vui.OlapMetaDragger",
+                    "clzType": "VUI",
+                    "adapterPath": "di.shared.adapter.MetaConfigVUIAdapter",
+                    "caption": "OLAP维度拖拽选择器"
+                },
+                {
+                    "clzKey": "TEXT_LABEL",
+                    "clzPath": "di.shared.vui.TextLabel",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "caption": "简单文本标签"
+                },
+                {
+                    "clzKey": "OLAP_META_IND_SELECT",
+                    "clzPath": "di.shared.vui.OlapMetaSelect",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "adapterPath": "di.shared.adapter.MetaConfigVUIAdapter",
+                    "dataOpt": {
+                        "ctrlClz": "ecui.ui.Select",
+                        "optionSize": 15
+                    },
+                    "caption": "OLAP指标单选下拉框"
+                },
+                {
+                    "clzKey": "OLAP_META_IND_MULTI_SELECT",
+                    "clzPath": "di.shared.vui.OlapMetaSelect",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "adapterPath": "di.shared.adapter.MetaConfigVUIAdapter",
+                    "dataOpt": {
+                        "ctrlClz": "ecui.ui.MultiSelect",
+                        "optionSize": 15
+                    },
+                    "caption": "OLAP指标多选下拉框"
+                },
+                {
+                    "clzKey": "DAY_POP_CALENDAR",
+                    "clzPath": "ecui.ui.IstCalendar",
+                    "clzType": "VUI",
+                    "adapterMethod": { "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.IstCalendarVUIAdapter",
+                    "dataOpt": {
+                        "mode": "DAY",
+                        "viewMode": "POP"
+                    },
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TimeImpl",
+                    "caption": "简单弹出式日历（单日选择）"
+                },
+                {
+                    "clzKey": "RANGE_POP_CALENDAR",
+                    "clzPath": "ecui.ui.IstCalendar",
+                    "clzType": "VUI",
+                    "adapterMethod": { "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.IstCalendarVUIAdapter",
+                    "dataOpt": {
+                        "mode": "RANGE",
+                        "viewMode": "POP"
+                    },
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TimeImpl",
+                    "caption": "简单弹出式日历（范围选择）"
+                },
+                {
+                    "clzKey": "CALENDAR_PLUS",
+                    "clzPath": "ecui.ui.CalendarPlus",
+                    "clzType": "VUI",
+                    "adapterMethod": { "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.CalendarPlusVUIAdapter",
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TimeImpl",
+                    "editorDisable": true,
+                    "caption": "混合日历（季月周切换）"
+                },
+                {
+                    "clzKey": "X_CALENDAR",
+                    "clzPath": "ecui.ui.XCalendar",
+                    "clzType": "VUI",
+                    "adapterMethod": { "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.XCalendarVUIAdapter",
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TimeImpl",
+                    "caption": "混合日历（季月周切换＋单选范围选切换）"
+                },
+                {
+                    "clzKey": "OLAP_TABLE",
+                    "clzPath": "ecui.ui.OlapTable",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "dataOpt": { "defaultCCellAlign": "right" },
+                    "caption": "多维表（透视表/交叉表）"
+                },
+                {
+                    "clzKey": "BEAKER_CHART",
+                    "clzPath": "ecui.ui.BeakerChart",
+                    "clzType": "VUI",
+                    "adapterPath": "di.shared.adapter.BeakerChartVUIAdapter",
+                    "caption": "烧杯图"
+                },
+                {
+                    "clzKey": "BREADCRUMB",
+                    "clzPath": "ecui.ui.Breadcrumb",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "caption": "面包屑"
+                },
+                {
+                    "clzKey": "BUTTON",
+                    "clzPath": "ecui.ui.Button",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "caption": "简单按钮"
+                },
+                {
+                    "clzKey": "H_BUTTON",
+                    "clzPath": "ecui.ui.HButton",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "caption": "带图标按钮"
+                },
+        		{
+                    "clzKey" : "SAVE_BUTTON",
+                    "clzPath" : "di.shared.vui.SaveButton",
+                    "clzType" : "VUI",
+                    "adapterMethod" : {
+                        "create" : "xuiCreate",
+                        "dispose" : "xuiDispose"
+                    }
+                },
+                {
+                    "clzKey" : "TAB_BUTTON",
+                    "clzPath" : "di.shared.vui.TabButton",
+                    "clzType" : "VUI",
+                    "adapterMethod" : {
+                        "create" : "xuiCreate",
+                        "dispose" : "xuiDispose"
+                    }
+                },
+                {
+                    "clzKey": "OFFLINE_DOWNLOAD",
+                    "clzPath": "di.shared.vui.OfflineDownload",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "dataOpt": {
+                        "headText": "请输入邮箱（多个邮箱使用逗号分隔）：",
+                        "confirmText": "确定",
+                        "cancelText": "取消",
+                        "text": "离线下载1"
+                    },
+                    "caption": "离线下载按钮"
+                },
+                {
+                    "clzKey": "SWITCH_BUTTON",
+                    "clzPath": "ecui.ui.SwitchButton",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "caption": "开关按钮"
+                },
+                {
+                    "clzKey": "ECUI_SELECT",
+                    "clzPath": "ecui.ui.Select",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.EcuiSelectVUIAdapter",
+                    "dataOpt": {
+                        "optionSize": 15
+                    },
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4ComboBoxImpl",
+                    "caption": "单选下拉框"
+                },
+                {
+                    "clzKey": "ECUI_MULTI_SELECT",
+                    "clzPath": "ecui.ui.MultiSelect",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.EcuiSelectVUIAdapter",
+                    "dataOpt": {
+                        "optionSize": 15
+                    },
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4ComboBoxImpl",
+                    "caption": "多选下拉框"
+                },
+                {
+                    "clzKey": "ECUI_INPUT_TREE",
+                    "clzPath": "ecui.ui.InputTree",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.EcuiInputTreeVUIAdapter",
+                    "rtplParamHandler": [
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4TreeImpl",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4HttpTreeImpl"
+                    ],
+                    "caption": "树结构选择下拉框"
+                },
+                {
+                    "clzKey": "ECUI_SUGGEST",
+                    "clzPath": "ecui.ui.Suggest",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.EcuiSuggestVUIAdapter",
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4SuggestTextImpl",
+                    "caption": "带提示的输入框"
+                },
+                {
+                    "clzKey": "ECUI_INPUT",
+                    "clzPath": "ecui.ui.Input",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "rtplParamHandler": "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4SimpleTextImpl",
+                    "caption": "简单输入框"
+                },
+                {
+                    "clzKey": "MULTI_CHECKBOX",
+                    "clzPath": "di.shared.vui.MultiCheckbox",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "clzType": "VUI",
+                    "rtplParamHandler": [
+                        "复选框（平铺）",
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4ComboBoxImpl"
+                    ],
+                    "caption": "复选框（平铺）"
+                },
+                {
+                    "clzKey": "SIMPLE_RADIO",
+                    "clzPath": "di.shared.vui.SimpleRadio",
+                    "adapterMethod": { "create": "xuiCreate", "dispose": "xuiDispose" },
+                    "clzType": "VUI",
+                    "rtplParamHandler": [
+                        "com.baidu.rigel.datainsight.engine.service.impl.DIParamHandler4ComboBoxImpl"
+                    ],
+                    "caption": "单选框（平铺）"
+                },
+                {
+                    "clzKey": "ECUI_SLOW_PLANE_TABLE",
+                    "clzPath": "ecui.ui.CustomTable",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.EcuiCustomTableVUIAdapter",
+                    "caption": "平面表"
+                },
+                {
+                    "clzKey": "ECUI_PAGER",
+                    "clzPath": "ecui.ui.ExtPager",
+                    "clzType": "VUI",
+                    "adapterMethod": { "create": "ecuiCreate", "dispose": "ecuiDispose" },
+                    "adapterPath": "di.shared.adapter.EcuiPagerVUIAdapter",
+                    "caption": "分页控件"
+                }
+            ]
+
+        }
+
+        //==[DI=END]==[DNE=ID]=============
+        // 此注释不可改动，标记了解析段落的结束
+        //=================================
+
+    ;
+    extend(DICT, repoDict);
+
+    /**
+     * 类引用处理
+     */
+    DICT.CLZ = {};
+    for (var i = 0, clzDef; clzDef = DICT.CLZ_DEFS[i]; i ++) {
+        if (clzDef.clzKey in DICT.CLZ) {
+            throw new Error('dupicate clzKey: ' + clzDef.clzKey);
+        }
+        DICT.CLZ[clzDef.clzKey] = clzDef;
+        
+        // 规范化
+        var handlers = clzDef.rtplParamHandler = clzDef.rtplParamHandler || [];
+        if (!isArray(handlers)) {
+            clzDef.rtplParamHandler = [handlers];
+        }
+    }
+
+    /**
+     * @public
+     */
+    DICT.findClzDef = function (clzKey, clzType) {
+        for (var i = 0, def; def = DICT.CLZ_DEFS[i]; i ++) {
+            if (def.clzKey == clzKey && def.clzType == clzType) {
+                return def;
+            }
+        }
+    };
+
+    /**
+     * @public
+     */
+    DICT.hasReportTemplateType = function (clzKey, reportTemplateType) {
+        var cmpt = DICT.findClzDef(clzKey, 'COMPONENT');
+        if (!cmpt) {
+            return false;
+        }
+
+        // reportTemplateType全适用的情况
+        if (!cmpt.reportTemplateTypeCandidate) {
+            return true;
+        }
+
+        for (var i = 0, type; type = cmpt.reportTemplateTypeCandidate[i]; i ++) {
+            if (reportTemplateType == type) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.config.URL
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -69836,7 +79539,251 @@ $namespace('di.config');
     URL_SET.RTPL_SAVE_UPDATE='/image/updateImage.action';
     URL_SET.RTPL_SAVE_GETIMAGES='/image/getUserImages.action';
     URL_SET.RTPL_SAVE_DELETE='/image/deleteImage.action';
+=======
+/**
+ * di.config.URL
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    data insight 全局(包括console和product)的URL定义
+ * @author:  sushuang(sushuang)
+ */
+$namespace('di.config');
+
+(function() {
+    
+    //--------------------------------
+    // 引用
+    //--------------------------------
+
+    var xextend = xui.XDatasource.extend;
+
+    //--------------------------------
+    // 类型声明
+    //--------------------------------
+
+    /**
+     * 因为URL要作为权限验证，所以在使用时再加WEB_ROOT
+     * web根目录, 页面初始时从后台传来，暂存在_TMP_WEB_ROOT_中
+     *
+     * @usage 
+     *      假设有定义：kt.config.URL.SOME_TABLE_QUERY = '/some/table.action';
+     *      用这样语句获得请求url： kt.config.URL('SOME_TABLE_QUERY'); 
+     * @param {string} urlAttr url常量名
+     * @return {string} 请求使用的url
+     */
+    var URL = $namespace().URL = function(urlConst) {
+        var url = URL_SET[urlConst];
+        if (!url) {
+            throw new Error('empty url!');
+        }
+        return URL.getWebRoot() + url;
+    };
+
+    URL.fn = function (urlConst) {
+        return xutil.fn.bind(URL, null, urlConst);
+    };
+
+    var URL_SET = {};
+    var webRoot;
+
+    /**
+     * 得到运行时的web base
+     * 
+     * @public
+     * @return {string} 运行时的web base
+     */
+    URL.getWebRoot = function() {
+        return webRoot || $getNamespaceBase().WEB_ROOT || '';
+    };
+
+    URL.setWebRoot = function(root) {
+        webRoot = root;
+    };
+
+    /**
+     * 增加URL
+     * 
+     * @public
+     * @param {string} 新增的URL
+     */
+    URL.addURL = function(name, url) {
+        // 检查重复
+        if (URL_SET[name]) {
+            throw new Error('Duplicate URL! name=' + name + ' url=' + url);
+        }
+
+        // 新增
+        URL_SET[name] = url;
+    };
+
+    URL.changeURL = function(name, url) {
+        URL_SET[name] = url;
+    };
+
+    //--------------------------------
+    // 公用URL
+    //--------------------------------  
+
+    // 打开报表编辑
+    URL_SET.OLAP_REPORT_INIT = '/reportTemplate/initReportTemplate.action';
+    URL_SET.CONSOLE_SAVE_TPL = '/manage/virtualTemplate/saveVirtualTemplate.action';
+    URL_SET.CONSOLE_GET_COND = '/manage/virtualTemplate/getSelectableConditions.action';
+    URL_SET.CONSOLE_EXIST_COND = '/manage/virtualTemplate/getSelectedConditions.action';    
+    URL_SET.CONSOLE_VTPL_LIST = '/manage/virtualTemplate/getVirtualTemplateInfo.action';
+//    URL_SET.CONSOLE_MOLD_LIST = '/manage/moldTemplate/getMoldTemplates.action';
+    URL_SET.CONSOLE_DS_LIST = '/manage/virtualTemplate/getReportTemplates.action';
+    URL_SET.CONSOLE_TO_PRE = '/manage/publish/publishToPre.action';
+    URL_SET.CONSOLE_TO_RELEASE = '/manage/publish/publishToRelease.action';
+    URL_SET.OLAP_SAVE = '/reportTemplate/save.action';
+
+
+    // PlaneTable
+    URL_SET.PLANE_TABLE_INIT = '/reportTemplate/planeTable/init.action';
+    URL_SET.PLANE_TABLE_SQL_SAVE = '/reportTemplate/planeTable/create.action';
+    URL_SET.PLANE_TABLE_COL_DATA = '/reportTemplate/planeTable/doMapColumns.action';
+    URL_SET.PLANE_TABLE_COL_SAVE = '/reportTemplate/planeTable/saveColumns.action';
+    URL_SET.PLANE_TABLE_COND_DATA = '/reportTemplate/planeTable/doMapConds.action';
+    URL_SET.PLANE_TABLE_COND_SAVE = '/reportTemplate/planeTable/saveConds.action';
+    URL_SET.PLANE_TABLE_PREVIEW_DATA = '/reportTemplate/planeTable/doMapPreview.action';
+    // 预览
+    // @param reportId
+    // @param AAAfromURL=12345&BBBfromURL=67899&showColumns=AAAfromURL&showColumns=BBBfromURL& ...
+    // @return {  }
+    // URL_SET.PLANE_TABLE_DATA = '/reportTemplate/planeTable/preview.action';
+
+    // 得到cube tree
+    URL_SET.CUBE_META = '/meta/getCubeTree.action';
+    // 得到plane table的数据源列表
+    URL_SET.DATASOURCE_META = '/reportTemplate/planeTable/getDs.action';
+
+    // 获取维度树
+    URL_SET.DIM_TREE_TABLE = '/reportTemplate/table/getDimTree.action';
+    URL_SET.DIM_TREE_CHART = '/reportTemplate/chart/getDimTree.action';
+
+//    URL_SET.DIM_MULTISELECT_TABLE = '/reportTemplate/table/getDimMultiSelect.action';
+//    URL_SET.DIM_MULTISELECT_CHART = '/reportTemplate/chart/getDimMultiSelect.action';
+
+    URL_SET.DIM_MULTISELECT_TABLE = '/reports/runtime/extend_area/#{componentId}/dims/#{dimSelectName}/members';
+    URL_SET.DIM_MULTISELECT_CHART = '/reportTemplate/chart/getDimMultiSelect.action';
+    
+//    URL_SET.DIM_SELECT_SAVE_TABLE = '/reportTemplate/table/updateDimNodes.action';
+//    URL_SET.DIM_SELECT_SAVE_CHART = '/reportTemplate/chart/updateDimNodes.action';
+
+    URL_SET.DIM_SELECT_SAVE_TABLE = '/reports/runtime/extend_area/#{componentId}/dims/#{dimSelectName}/members/1';
+    URL_SET.DIM_SELECT_SAVE_CHART = '/reportTemplate/chart/updateDimNodes.action';
+
+    // 指标维度元数据
+    URL_SET.MEASURE_DES = '/reportTemplate/table/getMeasureDescription.action';
+
+    //URL_SET.META_CONDITION_IND_DIM_TABLE = '/reportTemplate/table/getMetaData.action';
+    // 加载拖拽区域数据
+    URL_SET.META_CONDITION_IND_DIM_TABLE = '/reports/#{reportId}/runtime/extend_area/#{componentId}/config';
+    // 获取图形上面的下拉框的内容
+    //URL_SET.LITEOLAP_INDS_META_DATA = '/reportTemplate/liteolap/getCurrentAnalysisInds.action';
+    URL_SET.LITEOLAP_INDS_META_DATA = '/reports/#{reportId}/runtime/extend_area/#{componentId}/ind_for_chart';
+    URL_SET.META_CONDITION_IND_DIM_CHART = '/reportTemplate/chart/getMetaData.action';
+    //URL_SET.META_CONDITION_SELECT_TABLE = '/reportTemplate/table/dragAndDrop.action';
+    // 拖拽完毕后提交的请求
+    URL_SET.META_CONDITION_SELECT_TABLE = '/reports/#{reportId}/runtime/extend_area/#{componentId}/item';
+    URL_SET.META_CONDITION_SELECT_CHART = '/reportTemplate/chart/dragAndDrop.action';
+    URL_SET.META_CONDITION_LIST_SELECT_CHART = '/reportTemplate/chart/selectInd.action'; // 这是个为list形式的元数据提交而写的临时接口
+    URL_SET.META_CONDITION_LIST_SELECT_TABLE = '/reportTemplate/table/selectInd.action'; // 这是个为list形式的元数据提交而写的临时接口
+    URL_SET.META_CONDITION_COL_CONFIG_GET = '/reportTemplate/table/COLCONFIGGET.action'; // 这是个为list形式的元数据提交而写的临时接口
+    URL_SET.META_CONDITION_COL_CONFIG_SUBMIT = '/reportTemplate/table/COLCONFIGGET.action'; // 这是个为list形式的元数据提交而写的临时接口
+    URL_SET.META_CONDITION_CANDIDATE_INIT = '/reportTemplate/configure/getTemplateMeta.action ';
+    URL_SET.META_CONDITION_CANDIDATE_SUBMIT = '/repoyozrtTemplate/configure/setTemplateMeta.action ';
+    URL_SET.META_CONDITION_ADD_SERIES_GROUP = '/reportTemplate/chart/addSeriesUnit.action';
+    URL_SET.META_CONDITION_REMOVE_SERIES_GROUP = '/reportTemplate/chart/removeSeriesUnit.action';
+    // 图设置
+    URL_SET.CONSOLE_CHART_CONFIG_INIT = '/reportTemplate/chart/getChartSettings.action';
+    URL_SET.CONSOLE_CHART_CONFIG_SUBMIT = '/reportTemplate/chart/updateChartSettings.action';
+
+    // 表单
+//    URL_SET.FORM_DATA = '/reportTemplate/initParams.action';
+//    URL_SET.FORM_ASYNC_DATA = '/reportTemplate/interactParam.action';
+    URL_SET.FORM_DATA = '/reports/#{reportId}/init_params';
+    URL_SET.FORM_UPDATE_CONTEXT = '/reports/#{reportId}/runtime/context';
+
+    // PIVOIT表（透视表）
+//    URL_SET.OLAP_TABLE_DATA = '/reportTemplate/table/transform.action';
+//    URL_SET.OLAP_TABLE_DRILL = '/reportTemplate/table/drill.action';
+//    URL_SET.OLAP_TABLE_LINK_DRILL = '/reportTemplate/table/drillByLink.action';
+//    URL_SET.OLAP_TABLE_SORT = '/reportTemplate/table/sort.action';
+//    URL_SET.OLAP_TABLE_CHECK = '/reportTemplate/table/checkRow.action';
+//    URL_SET.OLAP_TABLE_SELECT = '/reportTemplate/table/selectRow.action';
+//    URL_SET.OLAP_TABLE_DOWNLOAD = '/reportTemplate/table/download.action';
+//    URL_SET.OLAP_TABLE_OFFLINE_DOWNLOAD = '/reportTemplate/table/downloadOffLine.action';
+//    URL_SET.OLAP_TABLE_LINK_BRIDGE = '/reportTemplate/table/linkBridge.action';
+    URL_SET.OLAP_TABLE_DATA = '/reports/#{reportId}/runtime/extend_area/#{componentId}';
+    URL_SET.OLAP_TABLE_DRILL =  '/reports/#{reportId}/runtime/extend_area/#{componentId}/drill/#{action}';
+    URL_SET.OLAP_TABLE_LINK_DRILL = '/reports/#{reportId}/runtime/extend_area/#{componentId}/drill';
+    URL_SET.OLAP_TABLE_SELECT = '/reports/#{reportId}/runtime/extend_area/#{componentId}/selected_row';
+
+
+    // PLANE表（平面表）
+    URL_SET.PLANE_TABLE_DATA = '/reportTemplate/planeTable/transform.action';
+    URL_SET.PLANE_TABLE_CHECK = '/reportTemplate/planeTable/checkRow.action';
+    URL_SET.PLANE_TABLE_SELECT = '/reportTemplate/planeTable/selectRow.action';
+    URL_SET.PLANE_TABLE_DOWNLOAD = '/reportTemplate/planeTable/download.action';
+    URL_SET.PLANE_TABLE_DOWNLOADEXCEL = '/reportTemplate/planeTable/downloadExcel.action';
+    URL_SET.PLANE_TABLE_OFFLINE_DOWNLOAD = '/reportTemplate/planeTable/downloadOffLine.action';
+    URL_SET.PLANE_TABLE_LINK_BRIDGE = '/reportTemplate/planeTable/linkBridge.action';
+
+    // 图
+//    URL_SET.OLAP_CHART_DATA = '/reportTemplate/chart/transform.action';
+//    // 根据liteOlap的表格数据和相应条件生成图形数据
+//    URL_SET.LITEOLAP_CHART_DATA = '/reportTemplate/liteolap/generateAnalysisChart.action';
+//    URL_SET.OLAP_CHART_X_DATA = '/reportTemplate/chart/reDraw.action';
+//    URL_SET.OLAP_CHART_S_DATA = '/reportTemplate/chart/reDrawSeries.action'; // 传入维度参数
+//    URL_SET.OLAP_CHART_S_ADD_DATA = '/reportTemplate/chart/addChartSeries.action'; // 传入维度参数，增加趋势线
+//    URL_SET.OLAP_CHART_S_REMOVE_DATA = '/reportTemplate/chart/removeChartSeries.action'; // 传入维度参数，删除趋势线
+//    URL_SET.OLAP_CHART_BASE_CONFIG_INIT = '/reportTemplate/chart/config.action';
+//    URL_SET.OLAP_CHART_BASE_CONFIG_SUBMIT = '/reportTemplate/chart/config.action';
+//    URL_SET.OLAP_CHART_DOWNLOAD = '/reportTemplate/chart/download.action';
+//    URL_SET.OLAP_CHART_OFFLINE_DOWNLOAD = '/reportTemplate/chart/downloadOffLine.action';
+
+    // 图-最新路径
+    URL_SET.OLAP_CHART_DATA = '/reports/#{reportId}/runtime/extend_area/#{componentId}';
+    URL_SET.LITEOLAP_CHART_DATA = '/reports/#{reportId}/runtime/extend_area/#{componentId}';
+
+    // 报表预览
+    URL_SET.REPORT_PREVIEW = '/reportTemplate/complex/generateReport.action';
+    // URL_SET.REPORT_PREVIEW = '/asset-d/ditry/dev/try-standard.html';
+
+    // 表头属性
+    URL_SET.ROWHEAD_CONFIG_INIT = '/reportTemplate/table/rowHeadConfig/getDrillTypeConfig.action';
+    URL_SET.ROWHEAD_CONFIG_SUBMIT = '/reportTemplate/table/rowHeadConfig/setRowHeadDrillTypes.action';
+
+    // 行（轴）维度展示属性
+    URL_SET.DIMSHOW_CONFIG_INIT = '/reportTemplate/table/rowHeadConfig/getDimShowConfig.action';
+    URL_SET.DIMSHOW_CONFIG_SUBMIT = '/reportTemplate/table/rowHeadConfig/setDimShowConfig.action';
+
+	//从模板中根据KEY获取数据
+    URL_SET.GET_TEMPLATE_INFO = '/reportTemplate/configure/getTemplateInfo.action';
+
+    //设置模板的数据格式
+    URL_SET.DATA_FORMAT_SET = '/reportTemplate/data/setDataFormat.action';
+
+    //提交设置报表的RMkey
+    URL_SET.REPORT_ROWMERGE_KEY_SUBMIT = '/reportTemplate/updateProperties.action';
+    //首页的报表查询url
+    URL_SET.REPORT_QUERY = '/myview/queryReportList.action';
+    //mold模板查询url
+    URL_SET.MOLD_QUERY = '/manage/moldTemplate/getMoldTemplates.action';
+    //mold模板查询url
+    URL_SET.PAHNTOMJS_INFO = '/myview/getPhantomJsInfo.action';
+    //报表模板镜像操作url
+    URL_SET.RTPL_CLONE_SAVE = '/image/delAndAddImage.action';
+    URL_SET.RTPL_CLONE_GETDEFAULTIMAGENAME = '/image/getDefaultImageName.action';
+    URL_SET.RTPL_CLONE_CLEAR = '/image/deleteImage.action';
+    //报表保存镜像操作url
+    URL_SET.RTPL_SAVE_ADD='/image/addImage.action';
+    URL_SET.RTPL_SAVE_UPDATE='/image/updateImage.action';
+    URL_SET.RTPL_SAVE_GETIMAGES='/image/getUserImages.action';
+    URL_SET.RTPL_SAVE_DELETE='/image/deleteImage.action';
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.helper.Dialog
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -70218,7 +80165,391 @@ $namespace('di.helper');
         DIALOG.alert(LANG.ERROR);
     };
 
+=======
+/**
+ * di.helper.Dialog
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    全局的提示信息 
+ *           (代码拷贝自 rigel.layer。但是tip是“小窍门”的意思，而不是“提示”的意思，所以改成prompt)
+ * @author:  sushuang(sushuang)
+ * @depends: ecui
+ */
+
+$namespace('di.helper');
+
+(function() {
+    
+    //--------------------------------
+    // 引用
+    //--------------------------------
+
+    // FIXME 
+    // 后续去除此ecui引用
+    var ui = ecui;
+    var encodeHTML = xutil.string.encodeHTML;
+    var LANG;
+    var UTIL;
+    var DICT;
+    var DI_FACTORY;
+
+    $link(function() {
+        LANG = di.config.Lang;
+        DICT = di.config.Dict;
+        UTIL = di.helper.Util;
+        DI_FACTORY = di.shared.model.DIFactory;
+    });
+
+    //--------------------------------
+    // 类型声明
+    //--------------------------------
+
+    var DIALOG = $namespace().Dialog = {};
+    
+    var ePrompt = null;
+    var bPromptMask = false;
+    var promptTimer = null;
+    //  是否需要调整弹出窗口位置（当嵌套两层iframe时，可以根据父窗口滚动条修正弹出位置）
+    var bAdjustDialogPosition = false;
+    bAdjustDialogPosition = true; //  TODO 临时重置，上线可删除
+
+    DIALOG.prompt = function () {
+        prompt.apply(this, arguments);
+    };
+    DIALOG.waitingPrompt = function () {
+        waitingPrompt.apply(this, arguments);
+    };
+    DIALOG.hidePrompt = function () {
+        hidePrompt.apply(this, arguments);
+    };
+
+    /**
+     * 设置prompt定义
+     *
+     * @public
+     * @param {Object} def 定义
+     * @param {string} def.anchor 值可为：
+     *      'I'：internal，在报表引擎内部定位，如果是iframe加载报表引擎，这样则定位不理想），默认
+     *      'E'：external，在报表引擎外定位（报表引擎所在的iframe的window上）
+     * @param {string} diAgent 是否为stub
+     */
+    DIALOG.setPromptDef = function(def, diAgent) {
+        if (diAgent == 'STUB' && def && def.anchor == 'E') {
+            // 临时写法，后续规整
+            // FIXME
+            prompt = getRemoteDelegation('prompt');
+            hidePrompt = getRemoteDelegation('hideprompt');
+            waitingPrompt = getRemoteDelegation('waitingprompt');
+        }
+    };
+
+    /**
+     * 设置prompt定义
+     *
+     * @public
+     */
+    function getRemoteDelegation(eventName) {
+        return function() {
+            var eventChannel = DI_FACTORY().getEventChannel();
+            if (eventChannel) {
+                eventChannel.triggerEvent(eventName, arguments);
+            }
+        };
+    };
+
+    /**
+     * 设置 弹窗定位策略（内部定位则不考虑父窗口滚动条位置；外部定位则参考父窗口滚动条位置）。
+     * 方法的变量名只是为了与setPromptDef方法保持一致，其实我并不喜欢。。。（吐槽 by xlst）
+     * 
+     * @public
+     * @param {Object} def 定义
+     * @param {string='I'} def.anchor 值可为：
+     *      'I'：internal，在报表引擎内部定位，如果是iframe加载报表引擎，这样则定位不理想），默认
+     *      'E'：external，在报表引擎外定位（报表引擎所在的iframe的window上）
+     * @param {string} diAgent 是否为stub
+     */
+    DIALOG.setAdjustDialogPosition = function(def, diAgent) {
+        if (diAgent == 'STUB') {
+            
+            //  设置bAdjustDialogPosition的状态。在showDialog中会根据这个状态执行弹窗策略
+            if (def && def.anchor == 'E') {
+                bAdjustDialogPosition = true;
+            }
+            else if (def && def.anchor == 'I') {
+                bAdjustDialogPosition = false;
+            }
+        }
+    };
+
+    /**
+     * 信息提示，支持自动消失
+     *
+     * @public
+     * @param {string} text 信息
+     * @param {boolean} mask 是否使用遮罩
+     * @param {number} timeout 消失时间
+     */
+    function prompt(text, mask, timeout) {
+        var win;
+        try {
+            // win = window.top;
+            win = window;
+            // TODO
+            // 在iframe中，根据定位到top中间，或者dom加到top上。
+        } 
+        catch (e) {
+        }
+        
+        var x = UTIL.getScrollLeft(win) + UTIL.getViewWidth(win) / 2;
+        var y = 5;
+
+        if(!ePrompt) {
+            ePrompt = document.createElement('div');
+            ePrompt.style.cssText = 'display:none;position:fixed;*position:absolute';
+            ePrompt.className = 'global-prompt';
+            document.body.appendChild(ePrompt);
+        }
+
+        clearPromptTimer();
+
+        if(ePrompt.style.display == '') {
+            return false;
+        }
+
+        ePrompt.innerHTML = text;
+        ePrompt.style.display = '';
+        ePrompt.style.left = x - ePrompt.offsetWidth / 2 + 'px';
+        ePrompt.style.top = y + 'px';
+        if(mask) {
+            ui.mask(0);
+            bPromptMask = true;
+        }
+
+        if (timeout) {
+            promptTimer = setTimeout(
+                function () {
+                    DIALOG.hidePrompt();
+                }, 
+                timeout
+            );
+        }
+        return true;        
+    };
+
+    /**
+     * 等待提示
+     *
+     * @public
+     * @param {string} text 信息
+     * @param {boolean} mask 是否使用遮罩
+     * @param {number} timeout 消失时间
+     */
+    function waitingPrompt(text) {
+        if (text == null) {
+            text = LANG.AJAX_WAITING;
+        }
+        text = [
+            '<div class="global-prompt-waiting"></div>',
+            '<div class="global-prompt-waiting-text">', text, '</div>'
+        ].join('');
+        DIALOG.prompt(text);
+    }
+    
+    /**
+     * 隐藏信息提示
+     *
+     * @public
+     * @param {string} messag 信息
+     * @param {boolean} 是否使用遮罩
+     * @param {number} timeout 消失时间
+     */
+    function hidePrompt() {
+        clearPromptTimer();
+        ePrompt.style.display = 'none';
+        if(bPromptMask) {
+            bPromptMask = false;
+            ui.mask();
+        }
+    };
+        
+    function clearPromptTimer() {
+        if (promptTimer) {
+            clearTimeout(promptTimer);
+            promptTimer = null;
+        }
+    }
+
+    /**
+     * 显示提示窗口
+     *
+     * @public
+     * @param {string} text 提示信息
+     * @param {string} title 标题
+     * @param {Array.<Object>} buttons 按钮，其中每一项结构为
+     *      {string} text 按钮文字
+     *      {string} className cssClassName
+     *      {Function} action 按下按钮的回调
+     * @param {number=} mask 使用mask的透明值，如果不传此参数则不使用
+     */
+    DIALOG.showDialog = function(text, title, buttons, mask) {
+        ui.$messagebox(text, title, buttons, mask);
+        
+        //  如果通过 setAdjustDialogPosition 方法重置了弹窗定位策略，则对 ui-messagebox 元素进行重新定位
+        if (bAdjustDialogPosition) {
+            var dialogElement = xutil.dom.q('ui-messagebox')[0];
+            
+            if (dialogElement) {
+                DIALOG.adjustDialogPosition(dialogElement);
+            }
+        }
+    };
+    
+    /**
+     * 在页面上重新调整窗口的位置（将综合参考父窗口的滚动条高度）
+     *
+     * @public
+     * @param {HTMLElement} dialogElement 弹窗元素（用于定位的最外层html元素）
+     */
+    DIALOG.adjustDialogPosition = function (dialogElement) {
+        //  先try-catch，避免破坏代码结构
+        try {
+            //  如果此句不抛异常，说明该window有父窗口，且不会跨越
+            window.frameElement.getBoundingClientRect();
+        }
+        catch (e) {
+            //  抛异常可能是 没有父窗口、跨越、浏览器兼容。
+            return;
+        }
+        
+        /*
+         * 完整公式为：
+         * dialogElement.style.top =
+         *     window.parent.scrollY
+         *     - (window.frameElement.getBoundingClientRect().top + window.parent.scrollY)
+         *     + (window.parent.innerHeight-dialogElement.offsetHeight) / 2
+         * 解释：
+         * ①window.parent.scrollY 为窗口滚动高度；
+         * ②window.frameElement.getBoundingClientRect().top + window.parent.scrollY
+         *  这一段是计算 iframe前面所有元素所占的高度（将这个计算放在本方法中，可以降低调用di-stub时的复杂度，方便用户）；
+         * ③(window.parent.innerHeight-dialogElement.offsetHeight) / 2
+         *  这一段是计算 弹出窗在可视范围内居中时 的top值。
+         * 
+         * 完整公式用中文表述，即为：弹窗的最终top值，就是 页面(iframe)实际卷轴高度值，加上 弹窗 距离可视范围顶部 的值
+         */
+        var win = window;
+        //  实际滚动高度（扣除了 父窗口中iframe前面所有元素所占的高度）
+        var actualScrollHeight = -win.frameElement.getBoundingClientRect().top;
+        //  可视范围（即 弹窗居中时的相对范围）的高度
+        var viewportHeight = UTIL.getViewHeight(win.parent);
+        //  弹窗元素本身的高度
+        var dialogElementHeight = dialogElement.offsetHeight;
+        
+        //  弹窗在可视范围内的相对top值（可能为负数）
+        var viewportTop = (viewportHeight - dialogElementHeight) / 2;
+        //  计算后的top值（使用Math.max保证 弹窗的最小定位top是滚动高度。当可视范围容纳不下整个大弹窗时，弹窗标题优先紧靠顶部）
+        var styleTop = actualScrollHeight + Math.max(viewportTop, 0);
+        
+        //  当 可视范围容纳不下整个大弹窗，且父级页面滚动高度为0时，则可能会出现 弹窗顶部部分内容被截断 的情况。
+        //      因此，需要保证 styleTop 不小于0，才能避免上述情况发生。
+        dialogElement.style.top = Math.max(styleTop, 0) + 'px';
+    };
+
+    /**
+     * 只含确定键的提示窗口
+     *
+     * @public
+     * @param {String} text 提示信息
+     * @param {Function} onconfirm 确定按钮的处理函数
+     * @param {boolean} noBtn 是否不显示btn（不显示则禁止了一切页面的继续操作）
+     */
+    DIALOG.alert = function(text, onconfirm, noBtn) {
+        DIALOG.showDialog(
+            text, 
+            '提示', 
+            noBtn
+                ? []
+                : [
+                    { 
+                        text: '确定', 
+                        className: 'ui-button-g', 
+                        action: onconfirm 
+                    }
+                ], 
+            DICT.DEFAULT_MASK_OPACITY
+        );
+    };
+
+    /**
+     * 含确定和取消键的窗口
+     *
+     * @public
+     * @param {String} text 提示信息
+     * @param {Function} ok 确定按钮的处理函数
+     * @param {Function} cancel 取消按钮的处理函数
+     */
+    DIALOG.confirm = function(text, onconfirm, oncancel) {
+        DIALOG.showDialog(
+            text, 
+            '确认', 
+            [
+                { 
+                    text: '确定', 
+                    className: 'ui-button-g', 
+                    action: onconfirm 
+                },
+                { 
+                    text: '取消', 
+                    action: oncancel 
+                }
+            ], 
+            DICT.DEFAULT_MASK_OPACITY
+        );
+    };
+    
+    /**
+     * 自定义键的窗口
+     *
+     * @public
+     * @param {string} title 标题
+     * @param {string} message 提示信息
+     * @param {Array.<Object>} buttons 按钮，每项为：
+     *          {string} text 按钮文字
+     *          {string} className 样式文字
+     *          {Function} action 点击的回调函数
+     */
+    DIALOG.dialog = function(title, message, buttons) {
+        var html;
+        buttons = buttons || [];
+        
+        html.push(
+            '<div class="ui-messagebox-icon"></div>', 
+            '<div class="ui-messagebox-content">',
+                '<div class="ui-messagebox-text">', 
+                    encodeHTML(message), 
+                '</div>',
+            '</div>'
+        );
+
+        DIALOG.showDialog(
+            html.join(''), 
+            title, 
+            buttons, 
+            DICT.DEFAULT_MASK_OPACITY
+        );     
+    };
+
+    /**
+     * 错误alert
+     *
+     * @public
+     */
+    DIALOG.errorAlert = function() {
+        DIALOG.alert(LANG.ERROR);
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.helper.Formatter
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -70440,7 +80771,231 @@ $namespace('di.helper');
         return '<a ' + targetBlank + ' href="' + href + '">' + text + '</a>';
     }
 
+=======
+/**
+ * di.helper.Formatter
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    格式化集合
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil
+ */
+
+$namespace('di.helper');
+ 
+(function() {
+    
+    //--------------------------------
+    // 引用
+    //--------------------------------
+
+    var xlang = xutil.lang;
+    var isFunction = xlang.isFunction;
+    var isArray = xlang.isArray;
+    var isString = xlang.isString;
+    var hasValue = xlang.hasValue;
+    var hasValueNotBlank = xlang.hasValueNotBlank;
+    var encodeHTML = xutil.string.encodeHTML;
+    var textLength = xutil.string.textLength;
+    var textSubstr = xutil.string.textSubstr;
+    var formatNumber = xutil.number.formatNumber;
+    var arraySlice = Array.prototype.slice;
+    var DICT;
+
+    $link(function() {
+        DICT = di.config.Dict;
+    });
+    
+    /**
+     * 约定，所有formatter第一个参数是data
+     * 取得formatter使用这种方式：
+     * kt.helper.Formatter('SOME_FORMATTER')
+     * kt.helper.Formatter('SOME_FORMATTER', true, 'asdf', ...)
+     * （从第二参数起是绑定给formatter的参数）
+     * formatter的this指针，即每项的对象。
+     *
+     * @param {string} formatterName 格式化名
+     * @param {Any...} 调用formatter时的从第二个开始的参数
+     * @return {Function} formatter
+     */
+    var FORMATTER = $namespace().Formatter = function(formatterName) {
+        var args = arraySlice.call(arguments, 1);
+        return function(data) {
+            var argsInput = arraySlice.call(arguments, 1);
+            return FORMATTER[formatterName].apply(
+                this, 
+                [data].concat(args, argsInput)
+            );
+        }
+    };
+
+    /**
+     * 统一的比率格式
+     */
+    FORMATTER.DEFAULT_RATE_FORMAT = 'I,III.DD%';
+
+    /**
+     * 得到用于ecui表格的formatter
+     * 取得formatter使用这种方式：
+     * tableFormatter('SOME_FORMATTER')
+     * tableFormatter('SOME_FORMATTER', true, 'asdf', ...)
+     * （从第二参数起是绑定给formatter的参数）
+     * 
+     * @param {(string|Object)} field 数据源项的要格式化的属性名
+     *              如果为Obejct，则各域为
+     *              {string} data 数据属性名
+     *              {string} link 链接属性名
+     * @param {string} formatterName 格式化名
+     * @param {Any...} 调用formatter时的从第二个开始的参数
+     * @return {Function} formatter
+     */
+    FORMATTER.tableFormatter = function(field, formatterName) {
+        var args = arraySlice.call(arguments, 2);
+        var dataField; 
+        var linkField;
+
+        if (isString(field)) {
+            dataField = field;
+        } 
+        else {
+            dataField = field.data;
+            linkField = field.link;
+        }   
+
+        return function(item) {
+            var text = FORMATTER[formatterName].apply(
+                item, 
+                [item[dataField]].concat(args)
+            );
+            return prepareLink(item, text, linkField);
+        };
+    }
+
+    /**
+     * 表格中普通文本格式化，默认encodeHTML
+     * 
+     * @public
+     * @param {Any} data 值
+     * @param {string} needEncodeHTML 默认为true
+     * @return {string} 显示值
+     */
+    FORMATTER.SIMPLE_TEXT = function(data, needEncodeHTML) {    
+        needEncodeHTML = hasValue(needEncodeHTML) ? needEncodeHTML : true;
+        data = hasValueNotBlank(data) ? data : '-';
+        data = needEncodeHTML ? encodeHTML(data) : data;
+        return data;
+    }
+    
+    /**
+     * 截断字符，用HTML的title属性显示全部字符
+     * 
+     * @public
+     * @param {Any} data 值
+     * @param {number} length 显示字节长度
+     * @param {string} needEncodeHTML 默认为true
+     * @param {string} color 当截断时，显示颜色，缺省则原色
+     * @param {string} classNames 补充的classNames
+     * @return {string} 显示值
+     */
+    FORMATTER.CUT_TEXT = function(
+        data, length, needEncodeHTML, color, classNames
+    ) {
+        var shortText = '', isCut, colorStyle = '',
+        needEncodeHTML = hasValue(needEncodeHTML) ? needEncodeHTML : true;
+        data = hasValueNotBlank(data) ? data : '-';
+
+        if (textLength(data) > length) {
+            shortText = textSubstr(data, 0, length - 2) + '..';
+            isCut = true;
+        } 
+        else {
+            shortText = data;
+            isCut = false;
+        }
+
+        shortText = needEncodeHTML ? encodeHTML(shortText) : shortText;
+        if (isCut && hasValue(color)) {
+            colorStyle = 'color:' + color + '';
+        }
+        data = needEncodeHTML ? encodeHTML(data) : data;
+        return '<span class="' + classNames + '" style="' + colorStyle + '" title="' + data + '" >' + shortText + '&nbsp;</span>'; 
+    }
+
+    /**
+     * 表格中比率的格式化
+     * 
+     * @public
+     * @param {Any} data 值
+     * @param {string} format 数据格式，缺省则为'I,III.DD%'
+     * @return {string} 显示值
+     */
+    FORMATTER.SIMPLE_RATE = function(data, format) {
+        var text, flagClass;
+        if (!hasValueNotBlank(data)) {
+            return '-';
+        }
+        format = format || FORMATTER.DEFAULT_RATE_FORMAT;
+        text = formatNumber(data, format);
+        return text;
+    }
+
+    /**
+     * 表格中普通数据格式化
+     * 
+     * @public
+     * @param {Any} data 值
+     * @param {string} format 数据格式，缺省不格式化
+     * @return {string} 显示值
+     */
+    FORMATTER.SIMPLE_NUMBER = function(data, format) {
+        data = hasValueNotBlank(data) 
+            ? (!format ? data : formatNumber(data, format)) 
+            : '-';
+        return data;
+    }
+
+    /**
+     * 表格中带颜色的数据格式化（默认正数红，负数绿）
+     * 
+     * @public
+     * @param {Any} data 值
+     * @param {string} format 数据格式，缺省不格式化
+     * @param {string} positiveColor 非负数的颜色，默认'red'
+     * @param {string} nagetiveColor 负数的颜色，默认'green'
+     * @return {string} 显示值
+     */
+    FORMATTER.COLORED_NUMBER = function(
+        data, format, positiveColor, nagetiveColor
+    ) {    
+        var style, text = '-';
+        positiveColor = positiveColor || 'red';
+        nagetiveColor = nagetiveColor || 'green';
+        if (hasValueNotBlank(data)) {
+            style = 'style="color:' + (data < 0 ? nagetiveColor : positiveColor) + '" ';
+            text = '<span ' + style + '>' + (!format ? data : formatNumber(data, format)) + '</span>';
+        }
+        return text;
+    }
+
+
+    /**
+     * @private
+     */
+    function prepareLink (item, text, linkField, dontTargetBlank) {
+        var href;
+        if (hasValueNotBlank(linkField)) {
+            href = item[linkField];
+        }
+        if (!hasValueNotBlank(href) || !hasValueNotBlank(text)) { 
+            return text;
+        }
+        var targetBlank = dontTargetBlank ? '' : ' target="_blank" ';
+        return '<a ' + targetBlank + ' href="' + href + '">' + text + '</a>';
+    }
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.helper.SnippetParser
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -70708,7 +81263,277 @@ $namespace('di.helper');
         return el.all || el.getElementsByTagName('*');
     }
 
+=======
+/**
+ * di.helper.SnippetParser
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    提供html片段的解析
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil
+ */
+
+$namespace('di.helper');
+ 
+(function () {
+    
+    //--------------------------------
+    // 引用
+    //--------------------------------
+
+    var setByPath = xutil.object.setByPath;
+    var getByPath = xutil.object.getByPath;
+    var getParent = xutil.dom.getParent;
+    var merge = xutil.object.merge;
+    var DICT;
+    var DIALOG;
+
+    $link(function () {
+        DICT = di.config.Dict;
+        DIALOG = di.helper.Dialog;
+    });
+
+    /**
+     * html片段解析器
+     *
+     * @usage
+     *      单例，
+     *      这样得到实例：var unitFactory = di.helper.SnippetParser();
+     */
+    $namespace().SnippetParser = function () {
+        return instance = instance || {
+            parseProdSnippet: parseProdSnippet,
+            setupEventChannel: setupEventChannel
+        };
+    };
+
+    var instance;
+
+    var DEFAULT_DOM_ATTR_NAME = 'data-o_o-di';
+    var STUB_EVENT_CHANNEL_ANCHOR = 'BODY';
+    var STUB_EVENT_CHANNEL_OUTWARD = 'data-d-outward-d-atad';
+    var STUB_EVENT_CHANNEL_INWARD = 'data-d-inward-d-atad';
+    var ID_DELIMITER = '.';
+
+    function setupEventChannel(el, prodDef, diFactory) {
+        var els = getAllEls(el);
+        var domAttrName = prodDef.domAttrName || DEFAULT_DOM_ATTR_NAME;
+
+        // 便利dom节点
+        for (var i = 0, eo, attr; eo = els[i]; i ++) {
+            // 事件通道
+            attr = eo.getAttribute(domAttrName);
+            if (attr == STUB_EVENT_CHANNEL_ANCHOR) {
+                return createStubEventChannel(eo, diFactory);
+            }
+        }                
+    }
+
+    /**
+     * 解析生产环境的snippet
+     * 
+     * @public
+     * @param {HTMLElement} el html片段的根节点
+     * @param {Object} depict 定义描述
+     * @param {Object} prodDef 生成环境定义
+     * @param {Object} diFactory 工厂
+     */
+    function parseProdSnippet(el, depict, prodDef, diFactory) {    
+        prodDef = prodDef || {};
+        var domAttrName = prodDef.domAttrName || DEFAULT_DOM_ATTR_NAME;
+
+        var els = getAllEls(el);
+        var def;
+        var attr;
+        var ins;
+        var clz;
+        var clzType;
+        var clzKey;
+        var i;
+        var j;
+        var eo;
+
+        // 做entityDef集合
+        var entityDefs = depict.entityDefs || [];
+        var entityDefMap = {};
+        for (i = 0; i < entityDefs.length; i ++) {
+            def = entityDefs[i];
+            entityDefMap[def.id] = def;
+        }
+
+        // 遍历dom节点
+        for (i = 0; eo = els[i]; i ++) {
+            // 事件通道
+            attr = eo.getAttribute(domAttrName);
+            if (attr == STUB_EVENT_CHANNEL_ANCHOR) {
+                // createStubEventChannel(eo, diFactory);
+                continue;
+            }
+
+            // 处理实例声明的节点
+            if (attr) {
+                def = entityDefMap[attr];
+                // TODO remove this
+                if (!def) {
+                    console.log();
+                }
+                checkId(def.id);
+                
+                // 注册进diFactory
+                def.el = eo;
+                diFactory.addEntity(def, 'DEF');
+            }
+        }
+
+        // 根据id，为component寻找到逻辑隶属snippet，
+        // 添加reportTemplateId的引用
+        // 根据包含关系，为component寻找视图隶属snippet。
+        diFactory.forEachEntity(
+            ['COMPONENT'], 
+            function (def, ins, id) {
+                // 设置逻辑隶属snippet
+                var idArr = def.id.split(ID_DELIMITER);
+                var snptDef = diFactory.getEntity(idArr[0], 'DEF');
+                if (!snptDef) {
+                    throw new Error(def.id + ' 未定义隶属的snippet');
+                }
+                setByPath('belong.snippet', snptDef.id, def);
+
+                // 向外循环，设置视图隶属snippet
+                var el = def.el;
+                var parentDef;
+                var besnpt = getByPath('layout.parentSnippet', def);
+                if (!besnpt) {
+                    setByPath('layout.parentSnippet', besnpt = [], def);
+                }
+                while ((el = getParent(el)) && el != document) {
+                    parentDef = diFactory.getEntity(
+                        el.getAttribute(domAttrName), 
+                        'DEF'
+                    );
+
+                    if (parentDef && parentDef.clzType == 'SNIPPET') {
+                        besnpt.push(parentDef.id);
+                    }
+                }
+            }
+        );
+
+        // 根据dom包含关系，为vpart添加其内部实体的引用
+        // FIXME
+        // 如果后面要vpart中能嵌套snippet，则不能如下简单处理，须考虑层级。
+        diFactory.forEachEntity(
+            ['VPART'],
+            function(def, ins, id) {
+                var subEls = getAllEls(def.el);
+                var index = { COMPONENT: 0, VUI: 0 };
+                var refName = { COMPONENT: 'componentRef', VUI: 'vuiRef' };
+
+                for (var i = 0, eo, subDef, clzType; eo = subEls[i]; i ++) {
+                    subDef = diFactory.getEntity(
+                        eo.getAttribute(domAttrName), 
+                        'DEF'
+                    );
+
+                    if (!subDef) { continue; }
+
+                    refName[clzType = subDef.clzType] && setByPath(
+                        refName[clzType] + '.inner[' + (index[clzType] ++) + ']',
+                        subDef.id, 
+                        def
+                    );
+                }
+            }
+        );
+
+        // 记录根snippet
+        diFactory.rootSnippet(depict.rootSnippet); 
+    }
+
+    /**
+     * 生成对外事件通道
+     * 
+     * @private
+     */
+    function createStubEventChannel(el, diFactory) {  
+
+        // outward (报表发事件，di-stub收事件)
+        var triggerEvent = function(eventName, args) {
+            var handler = el[STUB_EVENT_CHANNEL_OUTWARD];
+            if (handler) {
+                try {
+                    handler(eventName, args);
+                }
+                catch (e) {
+                    // TODO
+                }
+            }
+        };
+        
+        // inward (di-stub发事件，报表收事件)
+        el[STUB_EVENT_CHANNEL_INWARD] = function(eventName, args) {
+            var hList = listenerMap[eventName];
+            if (hList) {
+                for (var i = 0; i < hList.length; i ++) {
+                    try {
+                        hList[i] && hList[i].apply(null, args || []);
+                    }
+                    catch (e) {
+                        // TODO
+                    }
+                }
+            }
+        };
+
+        var listenerMap = {};
+
+        var addEventListener = function(eventName, listener) {
+            var hList = listenerMap[eventName];
+            if (!hList) {
+                hList = listenerMap[eventName] = [];
+            }
+            hList.push(listener);          
+        }
+
+        var eventChannel;
+        diFactory.setEventChannel(
+            eventChannel = {
+                anchorEl: el,
+                triggerEvent: triggerEvent,
+                addEventListener: addEventListener
+            }
+        );
+
+        return eventChannel;
+    }
+
+    /**
+     * 检查id，非法则抛出异常
+     * 目前只允许使用 1-9a-zA-Z、中划线、下划线
+     *
+     * @private
+     * @param {string} id
+     */
+    function checkId(id) {
+        if (!/[1-9a-zA-Z\-_\.]/.test(id)) {
+            throw new Error('id is illegal: ' + id);
+        }
+    }
+
+    /**
+     * 得到所有子el
+     * 
+     * @private
+     * @param {HTMLElement} el 根el
+     * @return {Array} 所有子el
+     */
+    function getAllEls(el) {
+        return el.all || el.getElementsByTagName('*');
+    }
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.helper.Util
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -71860,7 +82685,1161 @@ $namespace('di.helper');
     };
 
 
+=======
+/**
+ * di.helper.Util
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    业务辅助函数集
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil, tangram.ajax, tangram.json
+ */
+
+$namespace('di.helper');
+ 
+(function () {
+    
+    //----------------------------------------
+    // 引用
+    //----------------------------------------
+
+    var xlang = xutil.lang;
+    var isFunction = xlang.isFunction;
+    var isArray = xlang.isArray;
+    var isString = xlang.isString;
+    var stringToDate = xutil.date.stringToDate;
+    var hasValue = xlang.hasValue;
+    var hasValueNotBlank = xlang.hasValueNotBlank;
+    var decodePercent = xutil.string.decodePercent;
+    var sortList = xutil.collection.sortList;
+    var dateToString = xutil.date.dateToString;
+    var getWorkday = xutil.date.getWorkday;
+    var getWeekend = xutil.date.getWeekend;
+    var getQuarter = xutil.date.getQuarter;
+    var getQuarterBegin = xutil.date.getQuarterBegin;
+    var g = xutil.dom.g;
+    var isDate = xutil.lang.isDate;
+    var arraySlice = [].slice;
+    var $fastCreate = ecui.$fastCreate;
+    var stringify = baidu.json.stringify;
+    var getByPath = xutil.object.getByPath;
+    var DOCUMENT = document;
+    var ECUI_CONTROL;
+    var DIALOG;
+    var LANG;
+    var REGEXP = RegExp;
+
+    $link(function () {
+        ECUI_CONTROL = getByPath('ecui.ui.Control');
+        DIALOG = di.helper.Dialog;
+        LANG = di.config.Lang;
+    });
+        
+    //----------------------------------------
+    // 类型声明
+    //----------------------------------------
+
+    var UTIL = $namespace().Util = {};
+
+    var DAY_MILLISEC = 1000 * 60 * 60 * 24; 
+    
+    //----------------------------------------
+    // 方法
+    //----------------------------------------
+
+    /**
+     * 就是通常用的assert
+     * 
+     * @public
+     * @param {boolean} cond 条件真假
+     * @param {string} msg 如果cond为false时的信息
+     */
+    UTIL.assert = function (cond, msg) {
+        if (!cond) {
+            throw new Error(msg || 'Assert fail!');
+        }
+    };
+
+    /**
+     * 在控件中初始化自己的主元素，如需使用则放在preprocess最前调用。
+     * 用于这种情况：外部逻辑只构造了一个空元素（使控件定位），然后$fastCreate控件，控件自己管理自己的所有行为。
+     * 
+     * @public
+     * @param {ecui.ui.Control} control 控件
+     * @param {HTMLElement} el 控件的主元素
+     * @param {Object} options 控件的初始化参数
+     */
+    UTIL.preInit = function (control, el, options) {
+        options.primary = control.getType();
+        el.className = control.getTypes().join(' ') + el.className;
+    };
+    
+    /**
+     * 初始化一个ecui控件
+     * 用于这种情况：外部逻辑只构造了一个空元素（使控件定位）。
+     * 
+     * @public
+     * @param {constructor} contorlClass ecui的类
+     * @param {HTMLElement} el 控件的主元素
+     * @param {ecui.ui.Control} parentControl 父控件
+     * @param {Object} options 控件的初始化参数
+     * @return {ecui.ui.Control} 创建好的控件
+     */
+    UTIL.ecuiCreate = function (controlClass, el, parentControl, options) {
+        var type = controlClass.types[0];
+        options = options || {};
+        !options.primary && (options.primary = type);
+        el.className = [
+            controlClass.TYPES,
+            options.primary,
+            el.className
+        ].join(' ');
+        return $fastCreate(controlClass, el, parentControl, options);
+    };
+
+    /**
+     * 析构名为"_u***"的成员ecui控件
+     * 
+     * @public
+     * @param {Object} container 
+     */
+    UTIL.disposeInnerControl = function (container) {
+        for (var attr in container) {
+            /_u\w+/.test(attr) 
+                && container[attr]
+                && UTIL.ecuiDispose(container[attr]);
+        }
+    };
+
+    /**
+     * 检查dimSel是否全勾选
+     *
+     * @public
+     * @param {string} dimSelStr 
+     * @return {boolean} 是否valid
+     */
+    UTIL.validDimSel = function (dimSelStr) {
+        var i, o, oo, arr;
+        if (!hasValueNotBlank(dimSelStr)) { return false; }
+
+        arr = dimSelStr.split('|');
+        for (i = 0; i < arr.length; i ++) {
+            if (!hasValueNotBlank(o = arr[i])) {
+                return false;
+            }
+            oo = o.split(':');
+            if (!hasValueNotBlank(oo[0]) || !hasValueNotBlank(oo[1])) {
+                return false;
+            }
+        }  
+        return true;
+    };
+
+    /**
+     * 将dimSel中未选择的项补为选择维度树根节点
+     *
+     * @public
+     * @param {string} dimSelStr 维度选择字符串
+     * @param {Object} dimDatasourceMap 维度散列O
+     *                  key: dimId, 
+     *                  value: { datasource: dimDatasource }
+     * @return {string} 补全过的dimSelStr
+     */
+    UTIL.completeDimSel = function (dimSelStr, dimDatasourceMap) {
+        if (!hasValueNotBlank(dimSelStr)) { return false; }
+
+        var dimSelObj = UTIL.parseDimSel(dimSelStr);
+        var rootNode;
+        for (var dimId in dimSelObj) {
+            rootNode = dimDatasourceMap[dimId].datasource.rootNode;
+            if (rootNode 
+                && (!dimSelObj[dimId] || dimSelObj[dimId].length == 0)
+            ) {
+                dimSelObj[dimId] = [rootNode.dimNodeId];
+            }
+        }
+        return UTIL.stringifyDimSel(dimSelObj);
+    };    
+
+    /**
+     * 把字符串格式的dimSel解析成对象
+     *
+     * @public
+     * @param {string} dimSelStr 
+     * @return {Object} dimSel对象
+     *          格式：{<dimId>: [<dimNodeId>, <dimNodeId>, ...], ...}
+     */
+    UTIL.parseDimSel = function (dimSelStr) {
+        var i, o, oo, ooo, arr, ret = {};
+        if (!hasValueNotBlank(dimSelStr)) { return null; }
+        arr = dimSelStr.split('|');
+        for (i = 0; i < arr.length; i ++) {
+            if (!hasValueNotBlank(o = arr[i])) { continue; }
+            oo = o.split(':');
+            if (!hasValueNotBlank(oo[0])) { continue; }
+            ret[oo[0]] = hasValueNotBlank(oo[1]) ? oo[1].split(',') : [];
+        }
+        return ret;
+    };
+
+    /**
+     * 把对象格式的dimSel解析成字符串格式
+     *
+     * @public
+     * @param {Object} dimSelObj
+     *          格式：{<dimId>: [<dimNodeId>, <dimNodeId>, ...], ...}
+     * @return {string} dimSel字符串
+     */
+    UTIL.stringifyDimSel = function (dimSelObj) {
+        var dimId, arr = [];
+        if (!dimSelObj) {
+            return '';
+        }
+        for (dimId in dimSelObj) {
+            arr.push(dimId + ':' + (dimSelObj[dimId] || []).join(','));
+        }
+        return arr.join('|');
+    };
+
+    /**
+     * 得到el的属性里的json
+     * 出错时会抛出异常
+     * 
+     * @private
+     * @param {HTMLElement} el dom节点
+     * @param {string} attrName 属性名
+     * @return {Object} 属性信息
+     */
+    UTIL.getDomAttrJSON = function (el, attrName) {
+        var attr = el.getAttribute(attrName);
+        if (attr) {
+            return (new Function('return (' + attr + ');'))();
+        }
+    };
+
+    /**
+     * 判断dimSel是否相同
+     *
+     * @public
+     * @param {string} dimSelStr1 要比较的dimSel1
+     * @param {string} dimSelStr2 要比较的dimSel2
+     * @param {Object} dimIdMap dimId集合，在其key指定的dimId上比较
+     * @return {boolean} 比较结果 
+     */
+    UTIL.sameDimSel = function (dimSelStr1, dimSelStr2, dimIdMap) {
+        var dimId, list1, list2, 
+            dimSelObj1 = UTIL.parseDimSel(dimSelStr1), 
+            dimSelObj2 = UTIL.parseDimSel(dimSelStr2);
+
+        for (dimId in dimIdMap) {
+            sortList((list1 = dimSelObj1[dimId]), null, '<', false);
+            sortList((list2 = dimSelObj2[dimId]), null, '<', false);
+            if (list1.join(',') !== list2.join(',')) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * 判断某个dim的选择是否相同（都为空算相同）
+     *
+     * @public
+     * @param {Array{string}} dimNodeIdArr1 要比较的dim1
+     * @param {Array{string}} dimNodeIdArr2 要比较的dim2
+     * @return {boolean} 比较结果 
+     */
+    UTIL.sameDimNodeIdArr = function (dimNodeIdArr1, dimNodeIdArr2) {
+        dimNodeIdArr1 = dimNodeIdArr1 || [];
+        dimNodeIdArr2 = dimNodeIdArr2 || [];
+
+        if (dimNodeIdArr1.length != dimNodeIdArr2.length) {
+            return false;
+        }
+
+        sortList(dimNodeIdArr1, null, '<', false);
+        sortList(dimNodeIdArr2, null, '<', false);
+
+        for (var i = 0; i < dimNodeIdArr1.length; i ++) {
+            if (dimNodeIdArr1[i] != dimNodeIdArr2[i]) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    /**
+     * 渲染空表格
+     * 
+     * @public
+     * @param {ecui.ui.LiteTable} tableCon table控件
+     * @param {string} text 解释文字，可缺省
+     */
+    UTIL.emptyTable = function (tableCon, text) {
+        var oldText, html = '';
+
+        if (hasValue(text)) {
+            oldText = tableCon.getEmptyText();
+            tableCon.setEmptyText(text);
+        }
+
+        tableCon.setData([]);
+
+        if (hasValue(oldText)) {
+            tableCon.setEmptyText(oldText);
+        }
+    };
+
+    /**
+     * 渲染表格的等待状态
+     * 
+     * @public
+     * @param {ecui.ui.LiteTable} tableCon table控件
+     */
+    UTIL.waitingTable = function (tableCon) {
+        UTIL.emptyTable(tableCon, LANG.WAITING_HTML);
+    };    
+
+    /**
+     * 得到wrap格式的当前选择
+     *
+     * @public
+     * @param {Object} wrap，格式为：
+     *          {Array.<Object>} list
+     *              {string} text
+     *              {*} value
+     *          {*} selected
+     */
+    UTIL.getWrapSelected = function (wrap) {
+        for (var i = 0; o = wrap.list[i]; i ++) {
+            if (o.value == wrap.selected) {
+                return o;
+            }
+        }
+    };
+
+    /**
+     * 打印异常
+     *
+     * @public
+     * @param {Error} e 异常对象
+     */
+    UTIL.logError = function (e) {
+        try {
+            if (console && console.log) {
+                console.log(e);
+                (e.message != null) && console.log(e.message);
+                (e.stack != null) && console.log(e.stack);
+            }
+        } 
+        catch (e) {
+        }
+    };
+
+    /**
+     * 解析成DI约定的字符串时间格式
+     *
+     * @public
+     * @param {Date|number} date 目标时间或者时间戳
+     * @param {string} config.granularity 时间粒度，'D', 'W', 'M', 'Q', 'Y'
+     * @param {Object} options 参数
+     * @param {boolean} options.firstWeekDay 为true则周数据时格式化成周一，默认false
+     */
+    UTIL.formatTime = function (date, granularity, options) {
+        if (!date) { return; }
+        if (!isDate(date)) { date = new Date(date); }
+        options = options || {};
+
+        switch (granularity) {
+            case 'D': 
+                return dateToString(date, 'yyyy-MM-dd');
+            case 'W':
+                return options.firstWeekDay 
+                    // 取周一
+                    ? dateToString(getWorkday(date), 'yyyy-MM-dd')
+                    // 保留原来日期
+                    : dateToString(date, 'yyyy-MM-dd')
+            case 'M':
+                return dateToString(date, 'yyyy-MM');
+            case 'Q':
+                return date.getFullYear() + '-Q' + getQuarter(date);
+            case 'Y':
+                return String(date.getFullYear());
+            default: 
+                return '';
+        }
+    };
+
+    /**
+     * 由DI约定的字符串时间格式得到Date对象
+     *
+     * @public
+     * @param {Date|string} date 目标时间
+     */
+    UTIL.parseTime = function (dateStr) {
+        if (!dateStr) { return null; }
+        if (isDate(dateStr)) { return dateStr; }
+
+        if (dateStr.indexOf('-Q') >= 0) {
+            var par = [0, 0, 3, 6, 9];
+            dateStr = dateStr.split('-Q');
+            return new Date(
+                parseInt(dateStr[0], 10), 
+                par[parseInt(dateStr[1], 10)], 
+                1
+            );
+        }
+        else {
+            return stringToDate(dateStr);
+        }
+    };    
+
+    /**
+     * 解析标准化的时间定义。
+     * 标准化的时间定义由timeUtil数组组成，或者是单纯的一个timeUnit。
+     *（timeUtil定义由parseTimeUtitDef方法规定
+     * 例如: 
+     *      时间定义可以是一个timeUnit: ['+1D', '+5W'] 或 [null, '-1D', '-3MB']
+     *      也可以是timeUnit组成的数组: [['+1D', '+5W'], ['+5W', '+10Q'], ...]
+     *
+     * @param {(Array.<Array.<string>>|Array.<string>)} def 时间定义
+     * @param {(Array.<string>|Array.<Date>)} ref 基准时间
+     * @return {Array.<Object>} timeUnitList 结果时间单元数组，
+     *      其中每个数组元素的格式见parseTimeUnitDef的返回。
+     */
+    UTIL.parseTimeDef = function (def, ref) {
+        var dArr = [];
+        var retArr = [];
+        if (isArray(def) && def.length) {
+            var def0 = def[0];
+            if (isArray(def0)) {
+                dArr = def;
+            }
+            else {
+                dArr = [def];
+            }
+            for (var i = 0, unit; i < dArr.length; i ++) {
+                if (isArray(unit = dArr[i])) {
+                    retArr.push(UTIL.parseTimeUnitDef(unit, ref));
+                }
+                else {
+                    UTIL.assert('TimeDef illegal: ' + def);
+                }
+            }
+        }
+
+        return retArr;
+    };
+
+    /**
+     * 解析标准化的时间单元定义
+     * 时间单元用于描述一个时间或者一段时间
+     * 举例：
+     *      从昨天的月初到昨天：[null, "-1D", "0MB"]
+     * 
+     * @param {Array.<string>} def 时间单元定义，其中：
+     *      数组第一个元素表示def.start，即开始时间，
+     *                      绝对值（如2012-12-12）
+     *                      或相对于基准时间的偏移（如-5d）
+     *      数组第二个元素表示def.end 结束时间，格式同上。（可缺省）
+     *      数组第三个元素表示def.range 区间，相对于start或end的偏移（如-4d）（可缺省）
+     *                  如果已经定义了start和end，则range忽略。
+     *                  如果start或end只有一个被定义，则range是相对于它的偏移。
+     *                  如果只有start被定义，则只取start。
+     *                  例如start是+1ME，range是+5WB，
+     *                  表示一个时间范围：从下月的最后一天开始，到下月最后一天往后5周的周一为止。
+     * @param {(Array.<string>|Array.<Date>)} ref 基准时间
+     *      格式同上，但数组中每个项都是绝对时间
+     * @return {Object} timeUnit 结果时间单元
+     * @return {Date} timeUnit.start 开始时间
+     * @return {Date} timeUnit.end 结束时间
+     */
+    UTIL.parseTimeUnitDef = function (def, ref) {
+        if (!def || !def.length) {
+            return null;
+        }
+
+        var ret = {};
+        var start = def[0];
+        var end = def[1];
+        var interval = def[2];
+
+        ret.start = UTIL.parseTimeOffset(ref[0], start);
+        ret.end = UTIL.parseTimeOffset(ref[1], end);
+
+        // range情况处理
+        if ((!start || !end) && interval) {
+            var from;
+            var to;
+            if (start) {
+                from = 'start';
+                to = 'end';
+            }
+            else {
+                from = 'end';
+                to = 'start';
+            }
+            ret[to] = UTIL.parseTimeOffset(ret[from], interval);
+        }
+        else if (!end && !interval) {
+            ret.end = ret.start;
+        }
+
+        return ret;
+    };
+
+    /**
+     * 解析时间的偏移表达式
+     *
+     * @public
+     * @param {(Date|string)} baseDate 基准时间，
+     *      如果为 {string} 则格式为yyyy-MM-dd
+     * @param {string} offset 偏移量，
+     *      第一种情况是：
+     *          用YMDWQ（年月日周季）分别表示时间粒度，
+     *          用B/E表示首尾，如果没有B/E标志则不考虑首尾
+     *          例如：
+     *              假如baseDate为2012-05-09
+     *              '+4D'表示baseDate往后4天，即2012-05-13 
+     *              '-2M'表示往前2个月（的当天），即2012-03-13
+     *              '2Q'表示往后2个季度（的当天），即2012-11-13
+     *              '1W'表示往后1周（的当天），即2012-05-20
+     *              '1WB'表示往后1周的开头（周一），即2012-05-14
+     *              '-1WE'表示往前一周的结束（周日），即2012-05-06
+     *              '0WE'表示本周的结束（周日），即2012-05-13
+     *              月、季、年同理
+     *      第二种情况是：直接指定日期，如yyyy-MM-dd，
+     *          则返回此指定日期
+     *      第三种情况是：空，则返回空
+     * @return {Date} 解析结果
+     */
+    UTIL.parseTimeOffset = function (baseDate, offset) {
+        if (offset == null) { return null; }
+        if (!baseDate) { return baseDate; }
+        
+        if (isString(baseDate)) {
+            baseDate = UTIL.parseTime(baseDate);
+        }
+        offset = offset.toUpperCase();
+        
+        var t = [
+            baseDate.getFullYear(), 
+            baseDate.getMonth(), 
+            baseDate.getDate()
+        ];
+        var p = { Y: 0, M: 1, D: 2 };
+
+        if (/^([-+]?)(\d+)([YMDWQ])([BE]?)$/.test(offset)) {
+            var notMinus = !REGEXP.$1 || REGEXP.$1 == '+';
+            var off = parseInt(REGEXP.$2);
+            var timeType = REGEXP.$3;
+            var beginEnd = REGEXP.$4;
+
+            if ('YMD'.indexOf(timeType) >= 0) {
+                t[p[timeType]] += notMinus ? (+ off) : (- off);
+            }
+            else if (timeType == 'W') {
+                off = off * 7;
+                t[p['D']] += notMinus ? (+ off) : (- off);
+            }
+            else if (timeType == 'Q') {
+                off = off * 3;
+                t[p['M']] += notMinus ? (+ off) : (- off);
+            }
+            var ret = new Date(t[0], t[1], t[2]);
+
+            if (beginEnd) {
+                if (timeType == 'Y') {
+                    beginEnd == 'B'
+                        ? (
+                            ret.setMonth(0),
+                            ret.setDate(1)
+                        )
+                        : (
+                            ret.setFullYear(ret.getFullYear() + 1),
+                            ret.setMonth(0),
+                            ret.setDate(1),
+                            ret.setTime(ret.getTime() - DAY_MILLISEC)
+                        );
+                }
+                else if (timeType == 'M') {
+                    beginEnd == 'B'
+                        ? ret.setDate(1)
+                        : (
+                            ret.setMonth(ret.getMonth() + 1),
+                            ret.setDate(1),
+                            ret.setTime(ret.getTime() - DAY_MILLISEC)
+                        );
+                }
+                else if (timeType == 'W') {
+                    ret = (beginEnd == 'B' ? getWorkday : getWeekend)(ret);
+                }
+                else if (timeType == 'Q') {
+                    (beginEnd == 'B') 
+                        ? (ret = getQuarterBegin(ret))
+                        : (
+                            ret.setMonth(ret.getMonth() + 3),
+                            ret = getQuarterBegin(ret),
+                            ret.setTime(ret.getTime() - DAY_MILLISEC)
+                        );
+                }
+            }
+
+            return ret;
+        }
+        else {
+            return UTIL.parseTime(offset);
+        }
+    };
+
+    /**
+     * 季度格式解析，格式形如：2012-Q1
+     *
+     * @param {string} dateStr 季度字符串
+     * @return {Date} 季度第一天日期
+     */
+    UTIL.parseQuarter = function (dateStr) {
+        var par = [0, 0, 3, 6, 9];
+        dateStr = dateStr.split('-Q'); 
+        return new Date(
+            parseInt(dateStr[0], 10), 
+            par[parseInt(dateStr[1], 10)], 
+            1
+        );
+    };
+
+    /**
+     * json stringify
+     *
+     * @param {Object} obj 对象
+     * @return {string} json 字符串
+     */
+    UTIL.jsonStringify = function (obj) {
+        return obj ? stringify(obj) : '';
+    };
+    
+    /**
+     * ecui 发事件
+     * 没有ecui时则直接返回
+     *
+     * @param {ecui.ui.Control} control ECUI 控件
+     * @param {string} name 事件名称
+     * @param {Object} event 事件对象
+     * @param {Array} args 事件参数
+     */
+    UTIL.ecuiTriggerEvent = function (control, name, event, args) {
+        if (!ecui) { return; }
+        return ecui.triggerEvent(control, name, event, args);
+    };  
+
+    /**
+     * ecui 添加监听器
+     * 没有ecui时则直接返回
+     *
+     * @param {ecui.ui.Control} control ECUI 控件
+     * @param {string} name 事件名称
+     * @param {Function} caller 监听函数
+     * @param {boolean=} once 是否只执行一次就注销
+     */
+    UTIL.ecuiAddEventListener = function (control, name, caller, once) {
+        if (!ecui) { return; }
+
+        var newCaller = once 
+            ? function () {
+                // 运行一次后就注销自己
+                ecui.removeEventListener(control, name, arguments.callee);
+                // 执行原来caller
+                return caller.apply(this, arguments);
+            }
+            : caller;
+
+        return ecui.addEventListener(control, name, newCaller);
+    };    
+
+    /**
+     * ecui 析构控件
+     * 没有ecui时则直接返回
+     *
+     * @param {ecui.ui.Control|HTMLElement} control 
+     *      需要释放的控件对象或包含控件的 Element 对象
+     */
+    UTIL.ecuiDispose = function (control) {
+        ecui && ecui.dispose(control);
+    };
+
+    /**
+     * 是否是ecui控件
+     *
+     * @param {Object} obj 对象
+     * @return {boolean} 是否是ecui控件
+     */
+    UTIL.isEcuiControl = function (obj) {
+        return !!(ECUI_CONTROL && obj instanceof ECUI_CONTROL);
+    };
+
+    /**
+     * 使用GET方式下载
+     * 如果请求参数过长（如在ie下长于2000），则不应使用此方法，否则会url被截断，并且可能发不出请求（ie）
+     * @see UTILdownload
+     */
+    UTIL.downloadByGet = function (url, onfailure, showDialog) {
+        onfailure = onfailure || new Function();
+
+        var failureHandler = showDialog 
+            ? function () {
+                DIALOG.alert(LANG.SAD_FACE + LANG.DOWNLOAD_FAIL, onfailure);
+            }
+            : onfailure;
+
+        var elDownload = g(downloadIfrId);
+        if (!elDownload) {
+            elDownload = DOCUMENT.createElement('iframe');
+            elDownload.id = downloadIfrId;
+            elDownload.style.display = 'none';
+            DOCUMENT.body.appendChild(elDownload);
+        }
+
+        elDownload.onload = function () {
+            var doc = elDownload.contentWindow.document;
+            
+            if (doc.readyState == 'complete' || doc.readyState == 'loaded') {
+                failureHandler();
+            }
+
+            elDownload.onload = null;
+        };
+
+        // 开始下载
+        elDownload.src = url;
+    };
+
+    /**
+     * 使用POST方式下载
+     * @see UTIL.download
+     */
+    UTIL.downloadByPost = function (url, onfailure, showDialog) {
+        onfailure = onfailure || new Function();
+
+        var failureHandler = showDialog 
+            ? function () {
+                DIALOG.alert(LANG.SAD_FACE + LANG.DOWNLOAD_FAIL, onfailure);
+            }
+            : onfailure;
+
+        var elIfr = g(downloadIfrId);
+        if (!elIfr) {
+            elIfr = DOCUMENT.createElement('iframe');
+            elIfr.id = downloadIfrId;
+            //elIfr.name = downloadIfrName;
+            elIfr.style.display = 'none';
+            DOCUMENT.body.appendChild(elIfr);
+            elIfr.contentWindow.name = downloadIfrName;
+        }
+
+        var elForm = g(downloadFormId);
+        if (!elForm) {
+            elForm = DOCUMENT.createElement('form');
+            elForm.id = downloadFormId;
+            elForm.method = 'POST';
+            elForm.target = downloadIfrName;
+            elForm.style.display = 'none';
+            DOCUMENT.body.appendChild(elForm);
+        }
+        else {
+            elForm.innerHTML = '';
+        }
+
+        // 组织请求参数
+        var urla = url.split('?');
+        var urlParams = urla[1];
+
+        // Dirty solution by MENGRAN at 2013-12-31
+        var rbk = "?_rbk=";
+        if (urlParams) {
+            urlParams = urlParams.split('&');
+
+            for (var i = 0, pa, ipt; i < urlParams.length; i ++) {
+                if (!urlParams[i]) { continue; }
+
+                pa = urlParams[i].split('=');
+                if (pa[0]) {
+                    ipt = document.createElement('INPUT');
+                    ipt.type = 'hidden';
+                    ipt.value = decodePercent(pa[1]);
+                    ipt.name = decodePercent(pa[0]);
+                    elForm.appendChild(ipt);
+                    if (pa[0] === "_rbk") {
+                        rbk = rbk + pa[1];
+                    }
+                }
+            }
+        }
+        elForm.action = urla[0] + rbk;
+
+        // 开始下载
+        elForm.submit();
+    };
+
+    /**
+     * 下载
+     * 只支持下载失败的判断。
+     * （在iframe的onload中使用readyState判断，如果下载成功则不会走onload）
+     * 默认情况失败则弹窗提示。
+     *
+     * @public
+     * @param {Object} url 链接和参数
+     * @param {Function} onfailure 失败的回调
+     * @param {boolean} showDialog 显示对话框提示。默认不显示。
+     */
+    UTIL.download = UTIL.downloadByPost;
+
+    /**
+     * 新开窗口
+     *
+     * @public
+     * @param {string} url 目标url
+     */
+    UTIL.targetBlank = function (url) {
+        var doc = document;
+        var body = doc.body;
+        var el = doc.createElement('a');
+        el.style.display = 'none';
+        el.href = url || '#';
+        el.target = '_blank';
+        body.appendChild(el);
+        el.click();
+        body.removeChild(el);
+    };
+
+    // 原生的
+    UTIL.foreachDo = function (list, method, args) {
+        $foreachDo.call(this, false, list, method, arraySlice.call(arguments, 2));
+    };
+    
+    UTIL.foreachDoOri = function (list, method, args) {
+        $foreachDo.call(this, true, list, method, arraySlice.call(arguments, 2));
+    };
+
+    /**
+     * 对每个对象，执行方法
+     *
+     * @public
+     * @param {Array} list 要执行方法的对象列表
+     * @param {(string|Function)} method 要执行的方法名或者方法本身
+     * @param {boolean=} origin true则强制使用原生的方法，就算有$di也不使用di方法
+     *      没有通过diFactory创建的控件需要这么做。默认为false
+     * @param {Array} args参数
+     */
+    function $foreachDo(origin, list, method, args) {
+        for (var i = 0, o; i < list.length; i ++) {
+            if (o = list[i]) {
+                if (isFunction(method)) {
+                    method(o);
+                }
+                else {
+                    // origin true则强制使用原生的方法，就算有$di也不使用di方法
+                    // 没有通过diFactory创建的控件需要这么做。默认为false
+                    (!origin && o.$di) 
+                        ? o.$di(method, 'apply', o, args)
+                        : o[method].apply(o, args);
+                }
+            }
+        }
+    };
+
+    var downloadIfrId = String(
+        'download-iframe-' + Math.round(Math.random() * 10000000)
+    );
+    var downloadIfrName = downloadIfrId + 'NAME';
+    var downloadFormId = String(
+        'download-form-' + Math.round(Math.random() * 10000000)
+    );
+
+    function naming (attrName, prefix) {
+        return prefix + attrName.charAt(0).toUpperCase() + attrName.slice(1);
+    }
+    
+    function attrNaming (attrName, o) {
+        var prefix = '';
+        if (UTIL.isEcuiControl(o)) {
+            prefix = '_u';
+        } else if (isArray(o)) {
+            prefix = '_a';
+        } else if (isFunction(o)) {
+            prefix = '_f';
+        } else {
+            prefix = '_m';
+        }
+        return naming(attrName, prefix);
+    }
+
+    //-------------------------------------------------------
+    // 逻辑表达式
+    //-------------------------------------------------------
+
+    /**
+     * 计算json配置的逻辑表达式
+     * 
+     * @public
+     * @param {Object} jsonLogicExp 表达式
+     *      支持与（and）、或（or）非（not）逻辑。
+     *      原子语句的判断由使用提供（atomCal）
+     *      原子语句必须是对象形式定义
+     *      格式例如：（array的第一个元素是操作符，后面是操作数）
+     *      [
+     *          'and',
+     *           [ 
+     *               'or',
+     *               { someCustomerRule: 'asdf', someValue: 1234 },
+     *               { someCustomerRule: 'asdf', someValue: 1234 },
+     *               { someCustomerRule: 'asdf', someValue: 1234 }
+     *           ],
+     *           { someCustomerRule: 'zcvcxz', someValue: 32432 }
+     *      ]
+     *
+     * @param {Function} atomCalFunc 原子语句的计算的回调函数
+     *      参数为{Object}格式的原子语句
+     *      返回值为{boolean}表示判断结果
+     * @return {boolean} 计算结果
+     */
+    UTIL.evalJsonLogic = function (jsonLogicExp, atomCalFunc) {
+        if (!jsonLogicExp || !atomCalFunc) {
+            jsonLogicExpError(jsonLogicExp);
+        }
+
+        var operator;
+        var i;
+        var ret;
+
+        // 是逻辑表达式
+        if (isArray(jsonLogicExp)) {
+
+            jsonLogicExp.length < 2 && jsonLogicExpError(jsonLogicExp);
+
+            operator = jsonLogicExp[0];
+            if (operator == 'and') {
+                ret = true;
+                for (i = 1; i < jsonLogicExp.length; i ++) {
+                    ret = ret && UTIL.evalJsonLogic(
+                        jsonLogicExp[i], atomCalFunc
+                    );
+                }
+                return ret;
+            }
+            else if (operator == 'or') {
+                ret = false;
+                for (i = 1; i < jsonLogicExp.length; i ++) {
+                    ret = ret || UTIL.evalJsonLogic(
+                        jsonLogicExp[i], atomCalFunc
+                    );
+                }
+                return ret;
+            }
+            else if (operator == 'not') {
+                return !UTIL.evalJsonLogic(
+                    jsonLogicExp[i], atomCalFunc
+                );
+            }
+            else {
+                jsonLogicExpError(jsonLogicExp);
+            }
+        }
+        // 是原子语句
+        else {
+            return atomCalFunc(jsonLogicExp);
+        }
+    };
+
+    function jsonLogicExpError(jsonLogicExp, msg) {
+        throw new Error(
+            'Illegle json logic express, ' + (msg || '') 
+            + '. ' + stringify(jsonLogicExp)
+        );
+    }
+
+    //-------------------------------------------------------
+    // dom相关 (modified based on tangram and ecui)
+    //-------------------------------------------------------
+
+    /**
+     * 获取横向滚动量
+     * 
+     * @public
+     * @param {Window} win 指定window
+     * @return {number} 横向滚动量
+     */
+    UTIL.getScrollLeft = function (win) {
+        win = win || window;
+        var d = win.document;
+        return win.pageXOffset || d.documentElement.scrollLeft || d.body.scrollLeft;
+    };
+
+    /**
+     * 获取纵向滚动量
+     *
+     * @public
+     * @param {Window} win 指定window
+     * @return {number} 纵向滚动量
+     */
+    UTIL.getScrollTop = function (win) {
+        win = win || window;
+        var d = win.document;
+        return win.pageYOffset || d.documentElement.scrollTop || d.body.scrollTop;
+    };
+
+    /**
+     * 获取页面视觉区域宽度
+     *             
+     * @public
+     * @param {Window} win 指定window
+     * @return {number} 页面视觉区域宽度
+     */
+    UTIL.getViewWidth = function (win) {
+        win = win || window;
+        var doc = win.document;
+        var client = doc.compatMode == 'BackCompat' ? doc.body : doc.documentElement;
+
+        return client.clientWidth;
+    };
+
+    /**
+     * 获取页面视觉区域高度
+     * 
+     * @public
+     * @param {Window} win 指定window
+     * @return {number} 页面视觉区域高度
+     */
+    UTIL.getViewHeight = function (win) {
+        win = win || window;
+        var doc = win.document;
+        var client = doc.compatMode == 'BackCompat' ? doc.body : doc.documentElement;
+
+        return client.clientHeight;
+    };
+
+    /**
+     * 获取页面宽度
+     *
+     * @public
+     * @param {Window} win 指定window
+     * @return {number} 页面宽度
+     */
+    UTIL.getWidth = function (win) {
+        win = win || window;
+        var doc = win.document;
+        var body = doc.body;
+        var html = doc.documentElement;
+        var client = doc.compatMode == 'BackCompat' ? body : doc.documentElement;
+
+        return Math.max(html.scrollWidth, body.scrollWidth, client.clientWidth);
+    };
+
+    /**
+     * 获取页面高度
+     *             
+     * @public
+     * @param {Window} win 指定window
+     * @return {number} 页面高度
+     */
+    UTIL.getHeight = function (win) {
+        win = win || window;
+        var doc = win.document;
+        var body = doc.body;
+        var html = doc.documentElement;
+        var client = doc.compatMode == 'BackCompat' ? body : doc.documentElement;
+
+        return Math.max(html.scrollHeight, body.scrollHeight, client.clientHeight);
+    };
+
+    /**
+     * 解开文件名
+     *
+     * @public
+     */
+    UTIL.parseFileName = function (name) {
+        if (!name) {
+            return {};
+        }
+
+        var dotIndex = name.lastIndexOf('.');
+        var fileName;
+        var extName;
+
+        if (dotIndex >= 0) {
+            fileName = name.slice(0, dotIndex);
+            extName = name.slice(dotIndex + 1);
+        }
+        else {
+            fileName = name;
+        }
+
+        return { fileName: fileName, extName: extName, fullName: name };
+    };
+
+    //-------------------------------------------------
+    // Deprecated
+    //-------------------------------------------------
+
+    /**
+     * 注入ui和model的方便方法
+     * 
+     * @public 
+     * @deprecated
+     * @usage 例如：util.ref(container, 'abc', o); 
+     *        则首先会去container中寻找方法setAbc调用，
+     *        如果没有则直接对属性进行赋值：
+     *              前缀映射举例：
+     *                  {ecui.ui.Control} => _uAbc
+     *                  {Array} => _aAbc
+     *                  {Function} => _fAbc
+     *                  {others} => _mAbc
+     * @param {Object} container 目标容器
+     * @param {string} attrName 属性名
+     * @param {ecui.ui.Contorl|SomeModel|Array|Function} o 被设置内容
+     * @return {ecui.ui.Contorl|SomeModel|Array|Function} o 被设置内容
+     */
+    UTIL.ref = function (container, attrName, o) {
+        var f;
+        if (isFunction(f = container[naming(attrName, 'set')])) {
+            f.call(container, o);
+        } else if (hasValue(f = attrNaming(attrName, o))){
+            container[f] = o;
+        }
+        return o;
+    };
+    
+    /**
+     * 从对象中得到model的方便方法
+     * 
+     * @deprecated
+     * @public 
+     * @usage 例如：util.getModel(container, 'abc'); 
+     *        则首先会去container中寻找方法getAbc调用，
+     *        如果没有则直接从属性container._mAbc中取
+     * @param {Object} container 目标容器
+     * @param {string} attrName 属性名
+     * @return {SomeModel} o 模型对象
+     */
+    UTIL.getModel = function (container, attrName) {
+        var f;
+        if (isFunction(f = container[naming(attrName, 'get')])) {
+            return f.call(container);
+        } else {
+            return container[naming(attrName, '_m')];
+        }
+    };
+
+    /**
+     * 从字符串的"true" "false"转换成true/false
+     */
+    UTIL.strToBoolean = function (str) {
+        return str == 'true';
+    };
+
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.helper.ArgHandlerFactory
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -72151,7 +84130,300 @@ $namespace('di.shared.arg');
         }
     };
 
+=======
+/**
+ * di.helper.ArgHandlerFactory
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    默认的参数解析方法集合
+ * @author:  sushuang(sushuang)
+ * @depend:  xutil
+ */
+
+$namespace('di.shared.arg');
+ 
+(function () {
+    
+    //--------------------------------
+    // 引用
+    //--------------------------------
+
+    var isObject = xutil.lang.isObject;
+    var extend = xutil.object.extend;
+    var getByPath = xutil.object.getByPath;
+    var setByPath = xutil.object.setByPath;
+    var isArray = xutil.lang.isArray;
+    var formatTime = di.helper.Util.formatTime;
+    var parseTimeUnitDef = di.helper.Util.parseTimeUnitDef;
+    var assign = xutil.object.assign;
+    var merge = xutil.object.merge;
+    var DI_FACTORY;
+
+    $link(function () {
+        DI_FACTORY = di.shared.model.DIFactory;
+    });
+
+    /**
+     * 默认的参数解析方法集合
+     * 约定：所有parser的
+     *      this：是参数所属的函数被调用时的scope。
+     *      输入：
+     *          {Array} tarArgs 要处理的参数数组。
+     *          {*...} 其余参数。
+     *
+     * 注意GeneralArgHandler如果要更改原参数对象的内容，需要新建副本，
+     * 以免影响其他事件处理器的响应。
+     *
+     * 得到argHandler的方法：
+     *      var argHandler = di.helper.ArgHandlerFactory(
+     *          [somObj1, 'handlerName1', 'asdf', 'zxcv', ...],
+     *          [null, 'handlerName2', 'zxz', 1242, ...]
+     *      );
+     * 则得到了一个argHandler，其中会顺序调用handlerName1, handlerName2
+     * handlerName1调用时，'asdf', 'zxcv', ... 会作为后面的参数自动传入，
+     * handlerName2同理。
+     *
+     * @param {Array...} descs 
+     *          每个Array：
+     *              第一个元素是转换函数调用时的scope（可缺省），
+     *              第二个元素是转换函数名，
+     *              以后的元素是转换函数调用时，tarArgs后面的参数。
+     * @return {Function} 参数转换函数
+     */
+    $namespace().ArgHandlerFactory = function (descs) {
+        // 目前全由内部提供，后续支持可扩展
+        if (arguments.length < 1) {
+            return null;
+        }
+
+        var funcs = [];
+
+        // 这其中会进行check，如果非法则返回空
+        for (var i = 0, desc; i < arguments.length; i ++) {
+            desc = arguments[i];
+            funcs.push(
+                [
+                    desc[0], 
+                    NS[desc[1]], 
+                    desc.slice(2)
+                ]
+            );
+            if (!funcs[funcs.length - 1][1]) {
+                return null;
+            }
+        }
+
+        return function (tarArgs) {
+            // 链式调用各个argHandler
+            for (var i = 0, func; func = funcs[i]; i ++) {
+                func[1].apply(
+                    func[0], 
+                    [tarArgs].concat(func[2])
+                );
+            }
+            return tarArgs;
+        }
+    }
+
+    var NS = {};
+
+    /**
+     * 清除参数内容
+     * 
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {number=} index 参数index，如果缺省则全部清除
+     */
+    NS.clear = function (tarArgs, index) {
+        if (index != null) {
+            tarArgs[index] = void 0;
+        }
+        else {
+            for (var i = 0; i < tarArgs.length; i ++) {
+                tarArgs[i] = void 0;
+            }
+        }
+    };
+
+    /**
+     * 对第一个参数，根据源属性路径取得值，根据目标属性路径放到结果对象中。
+     * 属性路径例如'aaa.bbb[3][4].ccc.ddd'
+     * 
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {string} srcPath 源属性路径，如果为null，则取数组元素本身
+     * @param {string} tarPath 目标属性路径，如果为null，则放到数组元素本身上
+     * @param {number} index 对第哪个参数进行操作，默认为0
+     * @param {Object=} options 参见xutil.object.setByPath的options
+     */
+    NS.attr = function (tarArgs, srcPath, tarPath, index, options) {
+        index = String(index || 0);
+        var value = tarArgs[index];
+        setByPath(
+            !tarPath ? index : (index + '.' + tarPath),
+            isObject(value) ? getByPath(srcPath, value, options) : value,
+            tarArgs,
+            options
+        );
+    };
+
+    /**
+     * 对第一个参数，按arrPath得到数组，对每一个元素，按arcPath和tarPath进行转换
+     * 属性路径例如'aaa.bbb[3][4].ccc.ddd'
+     * 
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {string} arrPath 数组目标，如果为null，则取tarArgs[0]本身
+     * @param {string} srcPath 源属性路径，如果为null，则取数组元素本身
+     * @param {string} tarPath 目标属性路径，如果为null，则放到数组元素本身上
+     * @param {Object=} options 参见xutil.object.setByPath的options
+     */
+    NS.attrArr = function (tarArgs, arrPath, srcPath, tarPath, options) {
+        var value = tarArgs[0];
+        var arr = isObject(value)
+            ? (
+                arrPath 
+                    ? getByPath(arrPath, value, options) 
+                    : value
+            )
+            : null;
+
+        if (isArray(arr)) {
+            for (var i = 0, itemA; i < arr.length; i ++) {
+                NS.attr(arr, srcPath, tarPath, i, options);
+            }
+        }
+    };
+
+    /**
+     * 设置数据（用于配置时）
+     * 
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {*} data 数据
+     * @param {number} index 向第哪个参数，默认为0
+     */
+    NS.setData = function (tarArgs, data, index) {
+        tarArgs[index || 0] = data;
+    };
+
+    /**
+     * merge数据（用于配置时）
+     * 
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {*} data 数据
+     * @param {number} index 向第哪个参数，默认为0
+     */
+    NS.mergeData = function (tarArgs, data, index) {
+        merge(tarArgs[index || 0], data);
+    };
+
+    /**
+     * 从diIdList给定的id对应的di实例中用getValue取值，
+     * 覆盖到tarArgs第一个参数中。
+     *
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {string} di实例的id
+     * @param {string} srcPath 源属性路径
+     * @param {string} tarPath 目标属性路径
+     * @param {Object=} options 参见xutil.object.setByPath的options
+     */
+    NS.getValue = function (tarArgs, diId, srcPath, tarPath, options) {
+        var ins = DI_FACTORY().getEntity(diId, 'INS');
+        var o = [];
+        if (ins && ins.$di) {
+            var value = ins.$di('getValue');
+            setByPath(
+                !tarPath ? '0' : ('0.' + tarPath), 
+                isObject(value) ? getByPath(srcPath, value, options) : value,
+                o,
+                options
+            );
+            
+            if (isObject(o[0])) {
+                extend(tarArgs[0] || (tarArgs[0] = {}), o[0]);
+            }
+            else {
+                tarArgs[0] = o[0];
+            }
+        }
+    };
+
+    /**
+     * 设置来源reportTemplateId
+     * 覆盖到tarArgs第一个参数中。
+     *
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {string} di实例的id
+     */
+    NS.sourceTemplateId = function (tarArgs, diId) {
+        var ins = DI_FACTORY().getEntity(diId, 'INS');
+        if (ins && ins.$di) {
+            if (!isObject(tarArgs[0])) {
+                tarArgs[0] = {};
+            }
+            tarArgs[0].sourceTemplateId = ins.$di('getReportTemplateId');
+        }
+    };
+
+    /**
+     * 装载dimTagList
+     * 这个东西是用于图表组件之间的联动的。
+     * 用dimTagList这个属性来传递图/表当前点击的行信息
+     *
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {string} di实例的id
+     */
+    NS.dimTagsList = function (tarArgs, diId) {
+        var ins = DI_FACTORY().getEntity(diId, 'INS');
+        if (ins && ins.$di) {
+            if (!isObject(tarArgs[0])) {
+                tarArgs[0] = {};
+            }
+            tarArgs[0].dimTagsList = ins.$di('getDimTagsList');
+        }
+    };
+
+    /**
+     * 修正时间
+     * 应用场景例如：可以在这里配置固定时间，隐含时间等界面输入无法不表达出的时间参数
+     *
+     * @public
+     * @this {Object} tarArgs所属函数被调用时的scope
+     * @param {Array} tarArgs
+     * @param {string} attrName 参数属性名
+     * @param {Object.<Array.<string>>} timeUnitDefMap 按此参数修正时间。 
+     *      格式例如：{ D: ['-1Y', '0D'], W: ['-1Y', '0D'], M: ['-24M', '0D'], Q: ['-2Y', '0D'] }
+     */
+    NS.patchTime = function (tarArgs, attrName, timeUnitDefMap) {
+        var arg = tarArgs[0];
+        if (isObject(arg) && isObject(arg = arg[attrName])) {
+            var gran = arg.granularity || 'D';
+            arg = parseTimeUnitDef(
+                timeUnitDefMap[gran], 
+                [arg.start, arg.end, arg.range]
+            );
+            arg.start = formatTime(arg.start, gran);
+            arg.end = formatTime(arg.end, gran);
+            extend(tarArgs[0][attrName], arg);
+        }
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 /**
  * di.shared.vui.HiddenInput
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -72226,6 +84498,82 @@ $namespace('di.shared.vui');
         return (this._oData || {}).value;
     };
 
+=======
+/**
+ * di.shared.vui.HiddenInput
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    隐藏的输入，用于传递报表引擎外部传来的参数
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.vui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var inheritsObject = xutil.object.inheritsObject;
+    var extend = xutil.object.extend;
+    var encodeHTML = xutil.string.encodeHTML;
+    var XOBJECT = xui.XObject;
+
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 隐藏的输入，用于传递报表引擎外部传来的参数
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {HTMLElement} options.el 容器元素
+     */
+    var HIDDEN_INPUT = $namespace().HiddenInput = 
+            inheritsObject(XOBJECT, constructor);
+    var HIDDEN_INPUT_CLASS = HIDDEN_INPUT.prototype;
+    
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        (this._eMain = options.el).style.display = 'none';
+    };
+    
+    /**
+     * 设置数据
+     *
+     * @public
+     * @param {Object} data 数据
+     * @param {(Object|Array}} data.datasource 数据集
+     * @param {*} data.value 当前数据
+     */
+    HIDDEN_INPUT_CLASS.setData = function (data) {
+        this._oData = data;
+    };
+
+    /**
+     * 得到当前值
+     *
+     * @public
+     * @return {*} 当前数据
+     */
+    HIDDEN_INPUT_CLASS.getValue = function () {
+        return (this._oData || {}).value;
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
 /**
  * di.shared.vui.MultiCheckbox
@@ -72371,6 +84719,7 @@ $namespace('di.shared.vui');
         el.innerHTML = html.join('');
     }
 })();
+<<<<<<< HEAD
 /**
  * di.shared.vui.OfflineDownload
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -72539,7 +84888,187 @@ $namespace('di.shared.vui');
         }
     };       
     
+=======
+/**
+ * di.shared.vui.OfflineDownload
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    离线下载按钮和对话框
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.vui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var extend = xutil.object.extend;
+    var encodeHTML = xutil.string.encodeHTML;
+    var ecuiCreate = di.helper.Util.ecuiCreate;
+    var isObject = xutil.lang.isObject;
+    var isArray = xutil.lang.isArray;
+    var template = xutil.string.template;
+    var domChildren = xutil.dom.children;
+    var domRemove = xutil.dom.remove;
+    var getByPath = xutil.object.getByPath;
+    var DICT = di.config.Dict;
+    var XOBJECT = xui.XObject;
+    var UI_BUTTON;
+    var UI_FORM;
+
+    $link(function () {
+        UI_BUTTON = getByPath('ecui.ui.HButton');
+        UI_FORM = getByPath('ecui.ui.Form');
+    });
+    
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 离线下载按钮和对话框
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {string} options.skin 皮肤（的css类）
+     * @param {string} options.text 按钮上的文字，默认为'离线下载'
+     * @param {string} options.confirmText 确定按钮上的文字，默认为'确定'
+     * @param {string} options.cancelText 取消按钮上的文字，默认为'取消'
+     * @param {string} options.headText 提示文字，默认为'请输入邮箱'
+     * @param {string} options.inputInfo 输入信息
+     */
+    var OFFLINE_DOWNLOAD = $namespace().OfflineDownload = 
+            inheritsObject(XOBJECT, constructor);
+    var OFFLINE_DOWNLOAD_CLASS = OFFLINE_DOWNLOAD.prototype;
+    
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        var el = this._eMain = options.el;
+        addClass(el, 'offline-download');
+
+        var eel;
+        var html;
+
+        eel = document.createElement('div');
+        el.appendChild(eel);
+        this._uBtn = ecuiCreate(
+            UI_BUTTON, 
+            eel, 
+            null,
+            {
+                text: options.text || '离线下载',
+                skin: options.skin
+            }
+        );
+
+        // 输入离线下载信息（如邮箱）的对话框
+        if (!this._uDialog) {
+            eel = document.createElement('div');
+            html = [
+                '<label>离线下载</label>',
+                '<span class="offline-download-head">' + (options.headText || '请输入邮箱') + '</span>',
+                '<input type="input" class="offline-download-input"/>',
+                '<div></div>',
+                '<div></div>'
+            ];
+            eel.innerHTML = html.join('');
+            html = domChildren(eel);
+            this._eInput = html[2];
+            this._uDialog = ecuiCreate(UI_FORM, eel, null, { hide: true });
+            this._uConfirmBtn = ecuiCreate(
+                UI_BUTTON, 
+                html[3],
+                null,
+                {
+                    text: options.confirmText || '确定',
+                    skin: options.skin
+                }
+            );
+            this._uCancelBtn = ecuiCreate(
+                UI_BUTTON, 
+                html[4],
+                null,
+                {
+                    text: options.cancelText || '取消',
+                    skin: options.skin
+                }
+            );
+
+            document.body.appendChild(eel);
+        }
+    };
+
+    OFFLINE_DOWNLOAD_CLASS.init = function () {
+        var me = this;
+
+        this._uBtn.onclick = function () {
+            me.$clear();
+            me._uDialog.center();
+            me._uDialog.showModal(DICT.DEFAULT_MASK_OPACITY);
+        };
+
+        this._uConfirmBtn.onclick = function () {
+            me.notify('confirm', [me._eInput.value]);
+            me._uDialog.hide();
+        };
+
+        this._uCancelBtn.onclick = function () {
+            me._uDialog.hide();
+        }
+
+        this._uDialog.init();
+        this._uBtn.init();
+        this._uConfirmBtn.init();
+        this._uCancelBtn.init();
+    };   
+
+    OFFLINE_DOWNLOAD_CLASS.$clear = function () {
+        this._eInput.value = '';
+    };
+
+    OFFLINE_DOWNLOAD_CLASS.getValue = function () {
+        return { email: this._eInput.value };
+    };
+
+    OFFLINE_DOWNLOAD_CLASS.dispose = function () {
+        if (this._uDialog) {
+            var el = this._uDialog.getOuter();
+            this._uDialog.dispose();
+            this._uBtn.dispose();
+            this._uConfirmBtn.dispose();
+            this._uCancelBtn.dispose();
+            domRemove(el);
+        }
+    };       
+    
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
+/**
+ * di.shared.model.DimSelectModel  
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    维度选择model
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+=======
 /**
  * di.shared.model.DimSelectModel  
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -72719,6 +85248,2164 @@ $namespace('di.shared.model');
     };
 
 })();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+$namespace('di.shared.model');
+=======
+/**
+ * ist.opanaly.fcanaly.ui.MultiDimSelectPanel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    维度选择面板
+ * @author:  sushuang(sushuang)
+ * @depend:  xui
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //-----------------------------------
+    // 引用
+    //-----------------------------------
+    
+    var URL = di.config.URL;
+    var DIALOG = di.helper.Dialog;
+    var UTIL = di.helper.Util;
+    var DICT = di.config.Dict;
+    var LANG = di.config.Lang;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var template = xutil.string.template;
+    var q = xutil.dom.q;
+    var addClass = xutil.dom.addClass;
+    var createSingleton = xutil.object.createSingleton;
+    var hasValueNotBlank = xutil.lang.hasValueNotBlank;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var textLength = xutil.string.textLength;
+    var textSubstr = xutil.string.textSubstr;
+    var stringToDate = xutil.date.stringToDate;
+    var trim = xutil.string.trim;
+    var bind = xutil.fn.bind;
+    var XVIEW = xui.XView;
+    var UI_FORM = ecui.ui.Form;
+    var UI_BUTTON = ecui.ui.Button;
+    var UI_IND_TREE = ecui.ui.IndTree;
+    var alert = di.helper.Dialog.alert;
+    var DIM_SELECT_MODEL;
+
+    $link(function() {
+        MULTIDIM_SELECT_MODEL = di.shared.model.MultiDimSelectModel;
+    });
+
+    //-----------------------------------
+    // 类型声明
+    //-----------------------------------
+
+    /**
+     * 维度树选择浮层
+     * 单例，直接使用MULTIDIM_SELECT_PANEL()可得到实例
+     * 
+     * @class
+     * @extends xui.XView
+     */
+    var MULTIDIM_SELECT_PANEL = 
+        $namespace().MultiDimSelectPanel = createSingleton(
+            XVIEW,
+            MultiDimSelectPanelConstructor
+        );
+    var MULTIDIM_SELECT_PANEL_CLASS = MULTIDIM_SELECT_PANEL.prototype;
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @param {Object} options 参数
+     */
+    function MultiDimSelectPanelConstructor(options) {
+        createModel.call(this, options);
+        createView.call(this, options);
+        this.init();
+    }
+    // 注意：needLimit属性需要ajax取到后台数据之后才会做真正的业务判断
+    // 故只能在handleTreeSuccess方法执行之后再使用。
+    var needLimit = false ;
+    var dimLimitedSize = 30; 
+    var otherLimitedSize = 300;
+    
+    //-----------------------------------
+    // 模板
+    //-----------------------------------
+
+    var TPL_MAIN = [
+            '<div class="q-di-form">',
+                '<label>维度选择</label>',
+                '<div class="q-di-dimlimited"></div>',
+                '<div class="q-di-level"></div>',
+                '<div class="di-dim-mutliselect-tree">',
+                    '<div class="q-di-mutlidim"></div>',
+                '</div>',
+                '<div>',
+                    '<div class="di-dim-select-btn">',
+                        '<div class="ui-button-g ui-button q-di-submit">确定</div>',
+                        '<div class="ui-button q-di-cancel">取消</div>',
+                    '</div>',
+                '<div>',
+            '</div>'
+        ].join('');
+
+    //-----------------------------------
+    // 方法
+    //-----------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @private
+     */
+    function createModel() {
+        this._mDimSelectModel = new MULTIDIM_SELECT_MODEL();
+    };
+
+    /**
+     * 创建控件
+     *
+     * @private
+     */
+    function createView() {
+        // 创建主dom
+        var el = this._eMain = document.createElement('div');
+        addClass(el, 'di-dim-mutliselect-panel');
+
+        document.body.appendChild(el);
+        el.innerHTML = TPL_MAIN;
+
+        // 创建控件
+        this._uForm = ecuiCreate(
+            UI_FORM,
+            q('q-di-form', el)[0],
+            null,
+            { hide: true }
+        );
+
+
+        this._uSubmitBtn = ecuiCreate(
+            UI_BUTTON,
+            q('q-di-submit', el)[0]
+        );
+        this._uCancelBtn = ecuiCreate(
+            UI_BUTTON,
+            q('q-di-cancel', el)[0]
+        );
+    };
+
+    /**
+     * @override
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.init = function() {
+        var me = this;
+
+        // 事件绑定
+        this._mDimSelectModel.attach(
+            ['sync.preprocess.MULTISELECT', this.disable, this],
+            ['sync.result.MULTISELECT', this.$handleTreeSuccess, this],
+            ['sync.error.MULTISELECT', this.$handleTreeError, this],
+            ['sync.complete.MULTISELECT', this.enable, this]
+        );
+        this._mDimSelectModel.attach(
+            ['sync.preprocess.SAVE', this.disable, this],
+            ['sync.result.SAVE', this.$handleSubmitSuccess, this],
+            ['sync.error.SAVE', this.$handleSubmitError, this],
+            ['sync.complete.SAVE', this.enable, this]
+        );
+        this._uSubmitBtn.onclick = bind(this.$submitHandler, this);
+        this._uCancelBtn.onclick = bind(this.$cancelHandler, this);
+
+        // Init
+        this._uForm.init();
+        this._uSubmitBtn.init();
+        this._uCancelBtn.init();
+
+        // this._uForm.$resize();
+
+        this.$resetInput();
+    };
+    
+    /**
+     * @override
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.dispose = function() {
+    	MULTIDIM_SELECT_PANEL.superClass.dispose.call(this);
+    };
+
+    /**
+     * 打开面板
+     *
+     * @public
+     * @param {string} mode 可取值：
+     *                       'VIEW': 查看
+     *                       'EDIT': 修改
+     * @param {Object} options 参数
+     * @param {string=} options.uniqName
+     * @param {string} options.selLineName
+     * @param {Function} options.commonParamGetter
+     * @param {string} options.reportType 值为RTPL_OLAP_TABLE或者RTPL_OLAP_CHART
+     * @param {string=} options.dimMode 模式，
+     *      可选值为'NORMAL'（默认）, 'TIME'（时间维度面板）
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.open = function(mode, options) {
+        this._sMode = mode;
+        this._oOptions = options;
+        this.$resetInput();
+
+        // 每次取消的时候，将生成的dom元素清空，避免下次不刷新页面的时候打开有脏数据影响
+        var levelDom = q('q-di-level', this._eMain)[0];
+            levelDom.innerHTML='';
+        var mutliDimDom = q('q-di-mutlidim', this._eMain)[0];
+            mutliDimDom.innerHTML='';
+
+        // 每次打开时从后台获取维度树和当前所选
+        this._mDimSelectModel.sync(
+            { 
+                datasourceId: 'MULTISELECT', 
+                args: this._oOptions
+            }
+        );
+    };
+
+    /**
+     * 重置
+     * 
+     * @public
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$resetInput = function() {
+        // 清空以及恢复状态
+        // 如果后续只有此一行代码则移除此方法直接调用clear prompt
+        this.$clearPrompt();
+    };
+
+    /**
+     * 清除prompt
+     *
+     * @protected
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$clearPrompt = function() {
+        // TODO
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @override
+     * @public
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.enable = function(enable) {
+        if (this._bDisabled && this._sMode == 'EDIT') {
+            this._uSubmitBtn.enable();
+            this._uCancelBtn.enable();
+        }
+        MULTIDIM_SELECT_PANEL.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @override
+     * @public
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.disable = function(enable) {
+        if (!this._bDisabled) {
+            this._uSubmitBtn.disable();
+            this._uCancelBtn.disable();
+        }
+        MULTIDIM_SELECT_PANEL.superClass.disable.call(this);
+    };    
+
+    /**
+     * 提交事件处理
+     *
+     * @protected
+     * @event
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$submitHandler = function() {
+        var levelDom = q('di-level-radio', this._eMain);
+        var mutliDimDom = q('di-mutlidim-checkbox', this._eMain);
+        var selectedLevel;
+        var selectedDims = [];
+        for(var i = 0; i < levelDom.length ; i++){
+           if(levelDom[i].checked == true){
+                selectedLevel = levelDom[i].value;
+           }
+        }
+        for(var j = 0; j < mutliDimDom.length ; j++){
+           if(mutliDimDom[j].checked == true){
+                selectedDims.push(mutliDimDom[j].value);
+           }
+        }
+
+        if(selectedDims.length == 0){
+            alert('请至少选中一项维度值');
+            return ;
+        }
+        //如果维值需要限制，并且选中的节点个数超过了上限，则limitedOverstepFlag置为true
+        var limitedOverstepFlag = false;
+        if(needLimit && selectedDims[0].indexOf('all$') == 0 && selectedDims.length > dimLimitedSize+1){
+            limitedOverstepFlag = true;
+        }else if(needLimit && selectedDims[0].indexOf('all$') < 0 && selectedDims.length > dimLimitedSize){
+            limitedOverstepFlag = true;
+        }
+        //如果维值没有明显的限制，那么会有一个默认限制个数，如果超过这个默认限制，otherOverstepFlag置为true
+        var otherOverstepFlag = false;
+        if(selectedDims[0].indexOf('all$') == 0 && selectedDims.length > otherLimitedSize+1){
+            otherOverstepFlag = true;
+        }else if(selectedDims[0].indexOf('all$') < 0 && selectedDims.length > otherLimitedSize){
+            otherOverstepFlag = true;
+        }
+
+        // 先判断维度是否是明确定义为需要限制个数的，然后再判断选中的个数是否多于默认的最大限额
+        if(limitedOverstepFlag){
+            alert('该限制维度不能选中多于'+dimLimitedSize+'项！');
+            return ;
+        }else if(otherOverstepFlag){
+            alert('该维度不能选中多于'+otherLimitedSize+'项！');
+            return ;
+        }
+
+        this._mDimSelectModel.sync(
+            { 
+                datasourceId: 'SAVE',
+                args: extend(
+                    {
+                        selectedLevel: selectedLevel,
+                        selectedDims: selectedDims
+                    },
+                    this._oOptions
+                )
+            }
+        );
+    };
+
+    /**
+     * 取消事件处理
+     *
+     * @protected
+     * @event
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$cancelHandler = function() {
+        this._uForm.hide();
+    };
+
+    /**
+     * 原因添加成功结果处理
+     *
+     * @protected
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$handleTreeSuccess = function() {
+        try {
+           var model = this._mDimSelectModel;
+           // 先将提示清空
+           var dimLimitedDiv = q('q-di-dimlimited', this._eMain)[0];
+           dimLimitedDiv.innerHTML = '';
+           this._uForm.showModal(DICT.DEFAULT_MASK_OPACITY);
+           var levelDom = q('q-di-level', this._eMain)[0];
+           
+           // 创建查找提示信息dom，对应的在diui-dim-select.css中添加了样式
+           var oFindMsg = document.createElement("div");
+           oFindMsg.innerHTML = '如需查找，请按&nbsp;<span>Ctrl+f</span>';
+           oFindMsg.className = 'di-dim-level-find-msg';
+           levelDom.appendChild(oFindMsg);
+           
+           var multiData = model.getMultiSelectData();
+           var selectedLevel ;
+            for (var i = 0 ; i < multiData.length ; i++) {
+                // 这里只对有需要的限制个数的维度进行限制
+                
+                    if(multiData[i].needLimit && i == 0){
+                        dimLimitedDiv.innerHTML = '维值不要选中多于'+dimLimitedSize+'项';
+                        needLimit = true ;
+                    }else if(!multiData[i].needLimit && i == 0){
+                        needLimit = false ;
+                    }
+                var levelRadio = document.createElement("INPUT");  
+                    levelRadio.type = "radio";  
+                    levelRadio.name = "level";  
+                    levelRadio.value = multiData[i].name; 
+                    addClass(levelRadio, 'di-level-radio');
+                var levelEl = document.createElement("span");
+                    levelEl.innerHTML = " " + multiData[i].caption+" ";
+                    levelDom.appendChild(levelRadio);
+                    levelDom.appendChild(levelEl);
+                    if(multiData[i].selected == true ){
+                        selectedLevel = multiData[i];
+                        levelRadio.checked = "checked";
+                    }
+                  //要想给每个元素添加事件，需要用bind方式
+                levelRadio.onclick = bind(
+                    function (levelData){
+                        var mutliDimDom = q('q-di-mutlidim', this._eMain)[0];
+                        handleMutliDimSuccess(levelData,this._eMain);
+                    },
+                    this,
+                    multiData[i]
+                );
+               
+            };
+            
+            //默认先执行一次拼接维度值html片段的操作
+            handleMutliDimSuccess(selectedLevel,this._eMain);
+            this._uForm.center();
+            
+            //  统一加入调整代码（因为无处获知是否由 di-stub 调用、是否为双层iframe嵌套）
+            DIALOG.adjustDialogPosition(this._uForm.getMain());
+        }
+        catch (e) {
+            // 需求变化性很大，数据源很杂，真不敢保证返回数据总是匹配，
+            // 所以暂用try catch
+            this.$handleTreeError();
+        }
+    };
+
+    // 选中层级之后，要构建该层级下的维值checkbox片段
+    function handleMutliDimSuccess (selectedLevel,eMain){
+        var mutliDimDom = q('q-di-mutlidim', eMain)[0];
+            mutliDimDom.innerHTML = "";
+            for (var j = 0 ; j < selectedLevel.children.length ; j++) {
+                var dimData = selectedLevel.children[j];
+                var dimCheckBox = document.createElement("INPUT");  
+                    dimCheckBox.type = "checkbox";  
+                    dimCheckBox.name = "selectedDims";  
+                    dimCheckBox.value = dimData.name; 
+                    addClass(dimCheckBox, 'di-mutlidim-checkbox'); 
+                    dimCheckBox.onclick =bind(
+                        function (dimData){
+                            // var mutliDimDom = q('q-di-mutlidim', eMain)[0];
+                            dimClickHandle(dimData,eMain);
+                        },
+                        this,
+                        dimCheckBox
+                );
+                if(dimData.selected == true ){
+                    dimCheckBox.checked = "checked";
+                }
+                var dimEl = document.createElement("span");
+                dimEl.innerHTML = " " + dimData.caption;
+                var dimDiv = document.createElement("div"); 
+                dimDiv.appendChild(dimCheckBox);
+                dimDiv.appendChild(dimEl);
+                mutliDimDom.appendChild(dimDiv);
+            }
+        // 检查默认选中状态
+        checkSelectedStatus(eMain);
+    }
+
+    //检查维度值默认勾选状态，如果“全选”被选中，则所有维值都需要被选中，
+    //反之，如果其他除过“全选”以外的维值被选中，那么“全选”也应该被选中
+    function checkSelectedStatus(eMain){
+        var firstDimDom = q('di-mutlidim-checkbox', eMain)[0];
+        var dimDoms = q('di-mutlidim-checkbox', eMain);
+        if (firstDimDom.checked == true){
+            for (var i = 0 ;i < dimDoms.length ; i++){
+                dimDoms[i].checked = true;
+            }
+        } else {
+            var otherFlag = true;
+            for (var i = 1 ;i < dimDoms.length ; i++){
+               if (dimDoms[i].checked == false){
+                   otherFlag = false; 
+               } 
+            } 
+            if (otherFlag == true){
+                firstDimDom.checked=true;
+            }
+        }
+    }
+
+    // 点击维值的checkbox之后，要提供“全选”、“反选”功能
+    function dimClickHandle(dimData,eMain){
+        var firstDimDom = q('di-mutlidim-checkbox', eMain)[0];
+        var dimDoms = q('di-mutlidim-checkbox', eMain);
+        var flag = dimData.checked;
+        // 如果选中的是第一个“全选”节点，那么不管其选中还是未选中，都将其余节点全选中或全不中
+        if (dimData.value == firstDimDom.value){
+            for (var i = 0 ;i < dimDoms.length ; i++){
+                dimDoms[i].checked = flag;
+            }
+        } else{
+            // 如果是别的节点，如果此次选择是不选中，那么“全选”也不选中
+            if (flag == false){
+                firstDimDom.checked = false;
+            } else {
+                var otherFlag = true;
+                for (var i = 1 ;i < dimDoms.length ; i++){
+                   if (dimDoms[i].checked == false){
+                       otherFlag = false; 
+                   } 
+                } 
+                if (otherFlag == true){
+                    firstDimDom.checked=true;
+                }
+            }
+        }
+    }
+    /**
+     * 原因添加失败结果处理
+     *
+     * @protected
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$handleTreeError = function() {
+        var me = this;
+        // 获取维度树出错，提示并关闭面板
+        DIALOG.alert(
+            LANG.GET_DIM_TREE_ERROR,
+            function() {
+                me._uForm.hide();
+            }
+        );
+    };
+
+    /**
+     * 原因添加成功结果处理
+     *
+     * @protected
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$handleSubmitSuccess = function() {
+        this._uForm.hide();
+        /**
+         * @event di.shared.ui.DimSelectPanel#submit.close
+         */
+        this.notify('submit.close');
+
+        this._oOptions.onconfirm();
+    };
+
+    /**
+     * 原因添加失败结果处理
+     *
+     * @protected
+     */
+    MULTIDIM_SELECT_PANEL_CLASS.$handleSubmitError = function(status) {
+        DIALOG.alert(LANG.SAVE_FAILURE);
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+(function() {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+=======
+/**
+ * di.shared.model.DimSelectModel  
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    维度选择model
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+
+    var FORMATTER = di.helper.Formatter;
+    var DICT = di.config.Dict;
+    var LANG = di.config.Lang;
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var extend = xutil.object.extend;
+    var getByPath = xutil.object.getByPath;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var g = xutil.dom.g;
+    var bind = xutil.fn.bind;
+    var assign = xutil.object.assign;
+    var hasValue = xutil.lang.hasValue;
+    var stringToDate = xutil.date.stringToDate;
+    var dateToString = xutil.date.dateToString;
+    var textParam = xutil.url.textParam;
+    var wrapArrayParam = xutil.url.wrapArrayParam;
+    var arrayProtoPush = Array.prototype.push;    
+    var download = UTIL.download;
+    var logError = UTIL.logError;
+    var XDATASOURCE = xui.XDatasource;
+        
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    /**
+     * 维度选择Model
+     *
+     * @class
+     * @extends xui.XDatasource
+     */
+    var DIM_SELECT_MODEL = 
+            $namespace().DimSelectModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var DIM_SELECT_MODEL_CLASS = 
+            DIM_SELECT_MODEL.prototype;
+  
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 
+     */
+    function constructor(options) {
+        /**
+         * hierachy的根，子女节点是维度树
+         *
+         * @type {Array.<Object>}
+         * @private
+         */
+        this._oHierarchyRoot;
+        /**
+         * 当前hierachy的维度树
+         *
+         * @type {Array.<Object>}
+         * @private
+         */
+        this._oCurrDimTree;
+        /**
+         * 维度名
+         *
+         * @type {string} 
+         * @private
+         */
+        this._sDimName;
+        /**
+         * schema名
+         *
+         * @type {string} 
+         * @private
+         */
+        this._sSchemaName;
+        /**
+         * 维度类型, 目前可能为'TIME'或'NORMAL'
+         *
+         * @type {string} 
+         * @private
+         */
+        this._sDimType;
+        /**
+         * 每个hierarchy的层级列表, key为hierarchy的name
+         *
+         * @type {Map} 
+         * @private
+         */
+        this._oLevelMap;
+    }
+
+    var URL_MAP = {
+        TREE: {
+            RTPL_OLAP_TABLE: URL.fn('DIM_TREE_TABLE'),
+            RTPL_OLAP_CHART: URL.fn('DIM_TREE_CHART')
+        },
+        SAVE: {
+            RTPL_OLAP_TABLE: URL.fn('DIM_SELECT_SAVE_TABLE'),
+            RTPL_OLAP_CHART: URL.fn('DIM_SELECT_SAVE_CHART')
+        }
+    };
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DIM_SELECT_MODEL_CLASS.url = function(options) {
+        return URL_MAP[options.datasourceId][options.args.reportType]();
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DIM_SELECT_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            // 请求维度树参数
+            TREE: function(options) {
+                var paramArr = this.$createBaseParam(options);
+                if (options.args.dimMode == 'TIME') {
+                    paramArr.push('isTimeDim=true');
+                }
+                return paramArr.join('&');
+            },
+
+            // 保存维度树当前选中参数
+            SAVE: function(options) {
+                var args = options.args;
+                var paramArr = this.$createBaseParam(options);
+
+                paramArr.push(
+                    'hierarchyName=' + textParam(this._oCurrDimTree.name)
+                );
+                arrayProtoPush.apply(
+                    paramArr,
+                    wrapArrayParam(args.treeSelected, 'selectedNodes')
+                );
+                arrayProtoPush.apply(
+                    paramArr,
+                    wrapArrayParam(args.levelSelected, 'levelUniqueNames')
+                );
+
+                if (args.dimMode == 'TIME') {
+                    // 暂时只支持范围选择
+                    var start = args.timeSelect.start
+                        ? dateToString(args.timeSelect.start) : '';
+                    var end = args.timeSelect.end 
+                        ? dateToString(args.timeSelect.end) : start;
+                    paramArr.push('startDay=' + start);
+                    paramArr.push('endDay=' + end);
+                }
+                
+                return paramArr.join('&');
+            }
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DIM_SELECT_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            // 请求维度树后台返回解析
+            TREE: function(data, ejsonObj, options) {
+                try {
+                    // timeType表示静态动态时间等，后面加. 0代表默认
+                    var timeType = data['timeType'];
+                    // 时间选择
+                    this._oTimeSelect = data['timeSelects'] || {};
+
+                    var dimTree = data['dimTree'];
+                    var root = this._oHierarchyRoot = dimTree['dimTree'];
+                    // 暂时都使用第一个hierarchy，后续再添加多hierarchy的支持
+                    this._oCurrDimTree = root['children'][0];
+                    this._oLevelMap = dimTree['hierarchyLevelUniqueNames'];
+                    this._sDimName = dimTree['dimName'];
+                    this._sSchemaName = dimTree['schemaName'];
+                    this._sDimType = dimTree['isTimeDim'] ? 'TIME' : 'NORMAL';
+                }
+                catch (e) {
+                    logError(e);
+                    this.$goError();
+                }
+            }
+        }
+    );
+
+    /**
+     * 得到当前维度树
+     * 
+     * @public
+     * @return {Object} 维度树
+     */
+    DIM_SELECT_MODEL_CLASS.getCurrDimTree = function() {
+        return this._oCurrDimTree;
+    };
+
+    /**
+     * 得到当前时间选择
+     * 
+     * @public
+     * @return {Object} 时间选择
+     */
+    DIM_SELECT_MODEL_CLASS.getTimeSelect = function() {
+        return this._oTimeSelect;
+    };
+
+    /**
+     * 得到当前层级列表
+     * 
+     * @public
+     * @return {Array.<Object>} 层级列表
+     */
+    DIM_SELECT_MODEL_CLASS.getCurrLevelList = function() {
+        return (this._oLevelMap && this._oCurrDimTree)
+            ? this._oLevelMap[this._oCurrDimTree.name]
+            : null;
+    };
+
+    /**
+     * 构造公用参数
+     * 
+     * @protected
+     * @param {Object} options sync参数
+     * @return {Array.<string>} 公用参数
+     */
+    DIM_SELECT_MODEL_CLASS.$createBaseParam = function(options) {
+        var args = options.args;
+        var paramArr = [];
+
+        if (args.commonParamGetter) {
+            paramArr.push(args.commonParamGetter());
+        }
+        paramArr.push(
+            'dimSelectName=' + textParam(args.uniqName)
+        );
+        paramArr.push(
+            'from=' + textParam(args.selLineName)
+        );
+
+        return paramArr;
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    var FORMATTER = di.helper.Formatter;
+    var DICT = di.config.Dict;
+    var LANG = di.config.Lang;
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var extend = xutil.object.extend;
+    var getByPath = xutil.object.getByPath;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var g = xutil.dom.g;
+    var bind = xutil.fn.bind;
+    var assign = xutil.object.assign;
+    var hasValue = xutil.lang.hasValue;
+    var stringToDate = xutil.date.stringToDate;
+    var dateToString = xutil.date.dateToString;
+    var textParam = xutil.url.textParam;
+    var wrapArrayParam = xutil.url.wrapArrayParam;
+    var arrayProtoPush = Array.prototype.push;    
+    var download = UTIL.download;
+    var logError = UTIL.logError;
+    var XDATASOURCE = xui.XDatasource;
+        
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+=======
+/**
+ * ist.opanaly.fcanaly.ui.DimSelectPanel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    维度选择面板
+ * @author:  sushuang(sushuang)
+ * @depend:  xui
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //-----------------------------------
+    // 引用
+    //-----------------------------------
+    
+    var URL = di.config.URL;
+    var DIALOG = di.helper.Dialog;
+    var UTIL = di.helper.Util;
+    var DICT = di.config.Dict;
+    var LANG = di.config.Lang;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var template = xutil.string.template;
+    var q = xutil.dom.q;
+    var addClass = xutil.dom.addClass;
+    var createSingleton = xutil.object.createSingleton;
+    var hasValueNotBlank = xutil.lang.hasValueNotBlank;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var textLength = xutil.string.textLength;
+    var textSubstr = xutil.string.textSubstr;
+    var stringToDate = xutil.date.stringToDate;
+    var trim = xutil.string.trim;
+    var bind = xutil.fn.bind;
+    var XVIEW = xui.XView;
+    var UI_FORM = ecui.ui.Form;
+    var UI_BUTTON = ecui.ui.Button;
+    var UI_IND_TREE = ecui.ui.IndTree;
+    var UI_CALENDAR = ecui.ui.IstCalendar;
+    var DIM_SELECT_MODEL;
+
+    $link(function() {
+        DIM_SELECT_MODEL = di.shared.model.DimSelectModel;
+    });
+
+    //-----------------------------------
+    // 类型声明
+    //-----------------------------------
+
+    /**
+     * 维度树选择浮层
+     * 单例，直接使用DIM_SELECT_PANEL()可得到实例
+     * 
+     * @class
+     * @extends xui.XView
+     */
+    var DIM_SELECT_PANEL = 
+        $namespace().DimSelectPanel = createSingleton(
+            XVIEW,
+            dimSelectPanelConstructor
+        );
+    var DIM_SELECT_PANEL_CLASS = DIM_SELECT_PANEL.prototype;
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @param {Object} options 参数
+     */
+    function dimSelectPanelConstructor(options) {
+        createModel.call(this, options);
+        createView.call(this, options);
+        this.init();
+    }
+
+    //-----------------------------------
+    // 模板
+    //-----------------------------------
+
+    var TPL_MAIN = [
+            '<div class="q-di-form">',
+                '<label>维度选择</label>',
+                '<div class="di-dim-select-tree">',
+                    '<div class="q-di-tree"></div>',
+                '</div>',
+                '<div class="di-dim-select-cal">',
+                    '<div class="q-calendar"></div>',
+                '</div>',
+                '<div>',
+                    '<div class="di-dim-select-btn">',
+                        '<div class="ui-button-g ui-button q-di-submit">确定</div>',
+                        '<div class="ui-button q-di-cancel">取消</div>',
+                    '</div>',
+                '<div>',
+            '</div>'
+        ].join('');
+
+    //-----------------------------------
+    // 方法
+    //-----------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @private
+     */
+    function createModel() {
+        this._mDimSelectModel = new DIM_SELECT_MODEL();
+    };
+
+    /**
+     * 创建控件
+     *
+     * @private
+     */
+    function createView() {
+        // 创建主dom
+        var el = this._eMain = document.createElement('div');
+        addClass(el, 'di-dim-select-panel');
+
+        document.body.appendChild(el);
+        el.innerHTML = TPL_MAIN;
+
+        // 创建控件
+        this._uForm = ecuiCreate(
+            UI_FORM,
+            q('q-di-form', el)[0],
+            null,
+            { hide: true }
+        );
+
+        this._uDimTree = ecuiCreate(
+            UI_IND_TREE,
+            q('q-di-tree', el)[0]
+        );
+
+        this._uCalendar = ecuiCreate(
+            UI_CALENDAR,
+            q('q-calendar', el)[0],
+            null, 
+            {
+                mode: 'RANGE',
+                viewMode: 'FIX',
+                shiftBtnDisabled: true
+            }
+        );
+
+        this._uSubmitBtn = ecuiCreate(
+            UI_BUTTON,
+            q('q-di-submit', el)[0]
+        );
+        this._uCancelBtn = ecuiCreate(
+            UI_BUTTON,
+            q('q-di-cancel', el)[0]
+        );
+    };
+
+    /**
+     * @override
+     */
+    DIM_SELECT_PANEL_CLASS.init = function() {
+        var me = this;
+
+        // 事件绑定
+        this._mDimSelectModel.attach(
+            ['sync.preprocess.TREE', this.disable, this],
+            ['sync.result.TREE', this.$handleTreeSuccess, this],
+            ['sync.error.TREE', this.$handleTreeError, this],
+            ['sync.complete.TREE', this.enable, this]
+        );
+        this._mDimSelectModel.attach(
+            ['sync.preprocess.SAVE', this.disable, this],
+            ['sync.result.SAVE', this.$handleSubmitSuccess, this],
+            ['sync.error.SAVE', this.$handleSubmitError, this],
+            ['sync.complete.SAVE', this.enable, this]
+        );
+        this._uSubmitBtn.onclick = bind(this.$submitHandler, this);
+        this._uCancelBtn.onclick = bind(this.$cancelHandler, this);
+
+        // Init
+        this._uForm.init();
+        this._uDimTree.init();
+        this._uSubmitBtn.init();
+        this._uCancelBtn.init();
+        this._uCalendar.init();
+
+        this._uCalendar.hide();
+        // this._uForm.$resize();
+
+        this.$resetInput();
+    };
+    
+    /**
+     * @override
+     */
+    DIM_SELECT_PANEL_CLASS.dispose = function() {
+        DIM_SELECT_PANEL.superClass.dispose.call(this);
+    };
+
+    /**
+     * 打开面板
+     *
+     * @public
+     * @param {string} mode 可取值：
+     *                       'VIEW': 查看
+     *                       'EDIT': 修改
+     * @param {Object} options 参数
+     * @param {string=} options.uniqName
+     * @param {string} options.selLineName
+     * @param {Function} options.commonParamGetter
+     * @param {string} options.reportType 值为RTPL_OLAP_TABLE或者RTPL_OLAP_CHART
+     * @param {string=} options.dimMode 模式，
+     *      可选值为'NORMAL'（默认）, 'TIME'（时间维度面板）
+     */
+    DIM_SELECT_PANEL_CLASS.open = function(mode, options) {
+        this._sMode = mode;
+        this._oOptions = options;
+
+        this.$resetInput();
+
+        // 每次打开时从后台获取维度树和当前所选
+        this._mDimSelectModel.sync(
+            { 
+                datasourceId: 'TREE', 
+                args: this._oOptions
+            }
+        );
+    };
+
+    /**
+     * 重置
+     * 
+     * @public
+     */
+    DIM_SELECT_PANEL_CLASS.$resetInput = function() {
+        // 清空以及恢复状态
+        // 如果后续只有此一行代码则移除此方法直接调用clear prompt
+        this.$clearPrompt();
+    };
+
+    /**
+     * 清除prompt
+     *
+     * @protected
+     */
+    DIM_SELECT_PANEL_CLASS.$clearPrompt = function() {
+        // TODO
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @override
+     * @public
+     */
+    DIM_SELECT_PANEL_CLASS.enable = function(enable) {
+        if (this._bDisabled && this._sMode == 'EDIT') {
+            this._uSubmitBtn.enable();
+            this._uCancelBtn.enable();
+            this._uDimTree.enable(); // FIXME 验证
+        }
+        DIM_SELECT_PANEL.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @override
+     * @public
+     */
+    DIM_SELECT_PANEL_CLASS.disable = function(enable) {
+        if (!this._bDisabled) {
+            this._uSubmitBtn.disable();
+            this._uCancelBtn.disable();
+            this._uDimTree.disable(); // FIXME 验证
+        }
+        DIM_SELECT_PANEL.superClass.disable.call(this);
+    };    
+
+    /**
+     * 提交事件处理
+     *
+     * @protected
+     * @event
+     */
+    DIM_SELECT_PANEL_CLASS.$submitHandler = function() {
+        this._mDimSelectModel.sync(
+            { 
+                datasourceId: 'SAVE',
+                args: extend(
+                    {
+                        treeSelected: this._uDimTree.getSelected(),
+                        levelSelected: this._uDimTree.getLevelSelected(),
+                        timeSelect: {
+                            start: this._uCalendar.getDate(),
+                            end: this._uCalendar.getDateEnd() 
+                        }
+                    },
+                    this._oOptions
+                )
+            }
+        );
+    };
+
+    /**
+     * 取消事件处理
+     *
+     * @protected
+     * @event
+     */
+    DIM_SELECT_PANEL_CLASS.$cancelHandler = function() {
+        this._uForm.hide();
+    };
+
+    /**
+     * 原因添加成功结果处理
+     *
+     * @protected
+     */
+    DIM_SELECT_PANEL_CLASS.$handleTreeSuccess = function() {
+        try {
+            var model = this._mDimSelectModel;
+
+            this._uForm.showModal(DICT.DEFAULT_MASK_OPACITY);
+
+            // 渲染维度树
+            this._uDimTree.render(
+                {
+                    tree: model.getCurrDimTree(),
+                    level: model.getCurrLevelList()
+                }
+            );
+
+            if (this._oOptions.dimMode == 'TIME') {
+                this._uCalendar.show();
+                var timeSelect = model.getTimeSelect();
+                this._uCalendar.setDate(
+                    stringToDate(timeSelect.start),
+                    stringToDate(timeSelect.end)
+                );
+            }
+            else {
+                this._uCalendar.hide();
+            }
+            
+            this._uForm.center();
+        }
+        catch (e) {
+            // 需求变化性很大，数据源很杂，真不敢保证返回数据总是匹配，
+            // 所以暂用try catch
+            this.$handleTreeError();
+        }
+    };
+
+    /**
+     * 原因添加失败结果处理
+     *
+     * @protected
+     */
+    DIM_SELECT_PANEL_CLASS.$handleTreeError = function() {
+        var me = this;
+        // 获取维度树出错，提示并关闭面板
+        DIALOG.alert(
+            LANG.GET_DIM_TREE_ERROR,
+            function() {
+                me._uForm.hide();
+            }
+        );
+    };
+
+    /**
+     * 原因添加成功结果处理
+     *
+     * @protected
+     */
+    DIM_SELECT_PANEL_CLASS.$handleSubmitSuccess = function() {
+        this._uForm.hide();
+        /**
+         * @event di.shared.ui.DimSelectPanel#submit.close
+         */
+        this.notify('submit.close');
+    };
+
+    /**
+     * 原因添加失败结果处理
+     *
+     * @protected
+     */
+    DIM_SELECT_PANEL_CLASS.$handleSubmitError = function(status) {
+        DIALOG.alert(LANG.SAVE_FAILURE);
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    /**
+     * 维度选择Model
+     *
+     * @class
+     * @extends xui.XDatasource
+     */
+    var MULTIDIM_SELECT_MODEL = 
+            $namespace().MultiDimSelectModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var MULTIDIM_SELECT_MODEL_CLASS = 
+    		MULTIDIM_SELECT_MODEL.prototype;
+  
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 
+     */
+    function constructor(options) {
+
+        this._multiSelectData;
+    }
+
+    var URL_MAP = {
+        MULTISELECT: {
+            RTPL_OLAP_TABLE: URL.fn('DIM_MULTISELECT_TABLE'),
+            RTPL_OLAP_CHART: URL.fn('DIM_MULTISELECT_CHART')
+        },
+        SAVE: {
+            RTPL_OLAP_TABLE: URL.fn('DIM_SELECT_SAVE_TABLE'),
+            RTPL_OLAP_CHART: URL.fn('DIM_SELECT_SAVE_CHART')
+        }
+    };
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    MULTIDIM_SELECT_MODEL_CLASS.url = function(options) {
+        return URL_MAP[options.datasourceId][options.args.reportType]();
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    MULTIDIM_SELECT_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            // 请求维度树参数
+            TREE: function(options) {
+                var paramArr = this.$createBaseParam(options);
+                if (options.args.dimMode == 'TIME') {
+                    paramArr.push('isTimeDim=true');
+                }
+                return paramArr.join('&');
+            },
+
+             // 请求维度多选参数
+            MULTISELECT: function(options) {
+                var paramArr = this.$createBaseParam(options);
+                if (options.args.dimMode == 'TIME') {
+                    paramArr.push('isTimeDim=true');
+                }
+                return paramArr.join('&');
+            },
+
+            // 保存维度树当前选中参数
+            SAVE: function(options) {
+                var args = options.args;
+                var paramArr = this.$createBaseParam(options);
+
+                paramArr.push(
+                    'selectedLevel=' + textParam(args.selectedLevel)
+                );
+                if(args.selectedDims){
+                    for(var i = 0; i < args.selectedDims.length ; i ++){
+                        paramArr.push(
+                            'selectedNodes=' + textParam(args.selectedDims[i])
+                        );  
+                    }
+                }
+                
+                return paramArr.join('&');
+            }
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    MULTIDIM_SELECT_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            MULTISELECT: function(data) {
+                this._multiSelectData = data.dimValue;
+            }
+        }
+    );
+
+    MULTIDIM_SELECT_MODEL_CLASS.getMultiSelectData = function() {
+        return this._multiSelectData;
+    };
+
+
+    /**
+     * 构造公用参数
+     * 
+     * @protected
+     * @param {Object} options sync参数
+     * @return {Array.<string>} 公用参数
+     */
+    MULTIDIM_SELECT_MODEL_CLASS.$createBaseParam = function(options) {
+        var args = options.args;
+        var paramArr = [];
+
+        if (args.commonParamGetter) {
+            paramArr.push(args.commonParamGetter());
+        }
+        paramArr.push(
+            'dimSelectName=' + textParam(args.uniqName)
+        );
+        paramArr.push(
+            'from=' + textParam(args.selLineName)
+        );
+        paramArr.push(
+            'componentId=' + textParam(args.componentId)
+        );
+
+        return paramArr;
+    };
+
+=======
+/**
+ * di.shared.ui.OlapMetaDragger
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    多维分析报表元数据拖拽
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.vui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var extend = xutil.object.extend;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var template = xutil.string.template;
+    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    var getByPath = xutil.object.getByPath;
+    var getUID = xutil.uid.getIncreasedUID;
+    var XOBJECT = xui.XObject;
+    var UI_DROPPABLE_LIST;
+    var UI_DRAGPABLE_LIST;
+    var MULTIDIM_SELECT_PANEL;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var ecuiDispose = UTIL.ecuiDispose;
+
+    $link(function () {
+        UI_DROPPABLE_LIST = getByPath('ecui.ui.DroppableList');
+        UI_DRAGPABLE_LIST = getByPath('ecui.ui.DraggableList');
+        MULTIDIM_SELECT_PANEL = di.shared.ui.MultiDimSelectPanel;
+    });
+    
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 元数据（指标维度）条件拖动选择
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {HTMLElement} options.el 容器元素
+     * @param {Object} options.reportType 类型，
+     *          TABLE(默认)或者CHART
+     * @param {Function=} options.commonParamGetter 公共参数获取     
+     */
+    var OLAP_META_DRAGGER = $namespace().OlapMetaDragger = 
+            inheritsObject(XOBJECT, constructor);
+    var OLAP_META_DRAGGER_CLASS = OLAP_META_DRAGGER.prototype;
+    
+    //------------------------------------------
+    // 模板 
+    //------------------------------------------
+
+    var TPL_MAIN = [
+        '<div class="meta-condition-src">',
+            '<div class="meta-condition-ind">',
+                '<div class="meta-condition-head-text">选择指标：</div>',
+                '<div class="meta-condition-ind-line q-di-meta-ind"></div>',
+            '</div>',
+            '<div class="meta-condition-dim">',
+                '<div class="meta-condition-head-text">选择维度：</div>',
+                '<div class="meta-condition-dim-line q-di-meta-dim"></div>',
+            '</div>',
+        '</div>',
+        '<div class="meta-condition-tar q-di-meta-tar">',
+        '</div>'
+    ].join('');
+
+    var TPL_SEL_LINE = [
+        '<div class="meta-condition-sel">',
+            '<div class="meta-condition-head-text">#{0}</div>',
+            '<div class="meta-condition-sel-line q-di-meta-sel-line"></div>',
+        '</div>'
+    ].join('');
+
+    var DEFAULT_SEL_LINE_TITLE = {
+        ROW: '维度：',
+        FILTER: '条件：',
+        COLUMN: '指标：'
+    };
+
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        var el = this._eMain = options.el;
+        addClass(el, 'meta-condition');
+
+        // 模板
+        el.innerHTML = TPL_MAIN;
+
+        this._sReportType = options.reportType || 'RTPL_OLAP_TABLE';
+        
+        // 控件/DOM引用
+        this._eSelLineArea = q('q-di-meta-tar', el)[0];
+
+        // selLine控件集合，key为selLineName
+        this._oSelLineWrap = new LINKED_HASH_MAP();
+        // selLine控件id集合，key为selLineName
+        this._oSelLineIdWrap = {};
+    };
+    
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    OLAP_META_DRAGGER_CLASS.init = function () {
+    };
+
+    /**
+     * 设置数据
+     *
+     * @public
+     * @param {Object} data 数据
+     * @param {Object} data.inddim
+     *      控件所需的item 的数据结构
+     *      {string} uniqName （相当于控件的value）
+     *      {string} caption （相当于控件的text）
+     *      {string} clazz （标志是'IND'还是'DIM'）
+     *      {boolean} fixed 是否固定
+     *      {string} align item居左（'LEFT'）还是居右（'RIGHT'）
+     * @param {Object} data.selLineDataWrap
+     * @param {Object=} data.selLineTitleDef 标题定义，
+     *      形如{ ROW: '行', COLUMN: '列, FITER: '过滤' }，
+     *      为空则取默认。
+     * @param {Object=} data.rule 拖拽规则
+     *      FIXME
+     *      这些规则配置没有实现，后续重构规则配置
+     *      {Object=} data.rule.IND 指标规则
+     *      {Object=} data.rule.DIM 维度规则
+     *          规则项有：
+     *              {Array.<string>} dropPos 可下落的位置（null则全可下落）
+     *                  每项值可为'COL'\'ROW'\'FILTER'
+     *      {Object=} data.rule.COL 列规则
+     *      {Object=} data.rule.ROW 行规则
+     *      {Object=} data.rule.FILTER 过滤器规则
+     *          规则项有：
+     *              {boolean} canEmpty 是否可为空（默认true）
+     *              {boolean} draggable 是否可拖拽（默认true）
+     *              {boolean} selectable 是否可选择（默认true）
+     * @param {boolean} isSilent
+     */
+    OLAP_META_DRAGGER_CLASS.setData = function (data, isSilent) {
+        this._oData = data || {};
+        this._mModel = data.model;
+        this._oRule = data.rule || {};
+        !isSilent && this.render();
+    };
+
+    /**
+     * 渲染
+     *
+     * @public
+     */
+    OLAP_META_DRAGGER_CLASS.render = function () {
+        var me = this;
+        var el = this._eMain;
+        var data = this._oData;
+
+        // 清空
+        this.$disposeInner();
+
+        // 指标维度
+        var sourceEcuiId = [
+            '\x06_DI_META_COND_IND' + getUID('DI_META_COND'),
+            '\x06_DI_META_COND_DIM' + getUID('DI_META_COND')
+        ];
+        var inddim = data.inddim;
+
+        // 指标控件
+        this._uIndSrc = ecuiCreate(
+            UI_DRAGPABLE_LIST,
+            q('q-di-meta-ind', el)[0],
+            null,
+            {
+                id: sourceEcuiId[0],
+                disableSelected: true, // 暂禁止重复拖动
+                clazz: 'IND'
+            }
+        );
+        inddim.indList.foreach(
+            function (uniqName, item) {
+                me._uIndSrc.addItem(
+                    {
+                        value: item.uniqName, 
+                        text: item.caption, 
+                        clazz: item.clazz,
+                        fixed: item.fixed,
+                        align: item.align
+                    }
+                );
+            }
+        );
+
+        // 维度控件
+        this._uDimSrc = ecuiCreate(
+            UI_DRAGPABLE_LIST,
+            q('q-di-meta-dim', el)[0],
+            null,
+            {
+                id: sourceEcuiId[1],
+                disableSelected: true,
+                clazz: 'DIM'
+            }
+        );
+        inddim.dimList.foreach(
+            function (uniqName, item) {
+                me._uDimSrc.addItem(
+                    {
+                        value: item.uniqName, 
+                        text: item.caption, 
+                        clazz: item.clazz,
+                        fixed: item.fixed,
+                        align: item.align,
+                        configBtn: item.isConfig
+                    }
+                );
+            }
+        );
+
+        // 增加默认的selLine
+        data.selLineDataWrap.foreach(
+            function (name, selLineData, index) {
+                me.$addSelLine(
+                    name,
+                    (data.selLineTitleDef || DEFAULT_SEL_LINE_TITLE)[
+                        name.split('_')[0]
+                    ],
+                    sourceEcuiId.join(','),
+                    selLineData
+                );
+            }
+        );
+
+        // 事件绑定
+        this._uIndSrc.onchange = bind(this.$handleSelLineChange, this);
+        this._uDimSrc.onchange = bind(this.$handleSelLineChange, this); 
+        this._oSelLineWrap.foreach(
+            function (selLineName, selLineCtrl) {
+                selLineCtrl.onitemclick = bind(
+                    me.$handleItemClick, 
+                    me, 
+                    selLineName
+                );
+
+                selLineCtrl.oncheckdroppable = bind(
+                    me.$checkSelLineDroppable, me
+                );
+                selLineCtrl.oncheckdraggable = bind(
+                    me.$checkSelLineDraggable, me
+                );
+            }
+        );
+    };
+
+    /**
+     * @override
+     */
+    OLAP_META_DRAGGER_CLASS.dispose = function () {
+        this.$disposeInner();
+        this._eSelLineArea = null;
+        OLAP_META_DRAGGER.superClass.dispose.call(this);
+    };
+
+    /**
+     * 内部清空
+     * 
+     * @protected
+     */
+    OLAP_META_DRAGGER_CLASS.$disposeInner = function () {
+        if (this._uIndSrc) {
+            ecuiDispose(this._uIndSrc);
+            this._uIndSrc = null;
+        }
+        if (this._uDimSrc) {
+            ecuiDispose(this._uDimSrc);
+            this._uDimSrc = null;
+        }
+        this._oSelLineWrap.foreach(
+            function (name, item, index) {
+                ecuiDispose(item);
+            }
+        );
+        this._eSelLineArea.innerHTML = '';
+        this._oSelLineWrap.cleanWithoutDefaultAttr();
+        this._oSelLineIdWrap = {};
+    };
+
+    /**
+     * 增加选择行
+     * 
+     * @protected
+     * @param {string} selLineName selLine名
+     * @param {string} selLineTitle selLine显示名
+     * @param {string} source 来源ecui控件id
+     * @param {xutil.LinkedHashMap=} selLineData selLine数据
+     */
+    OLAP_META_DRAGGER_CLASS.$addSelLine = function (
+        selLineName, selLineTitle, source, selLineData
+    ) {
+        if (selLineName == null) {
+            return;
+        }
+        var selLineWrap = this._oSelLineWrap;
+        var selLineIdWrap = this._oSelLineIdWrap;
+
+        // 增加selLine
+        var o = document.createElement('div');
+        o.innerHTML = template(TPL_SEL_LINE, selLineTitle);
+        this._eSelLineArea.appendChild(o = o.firstChild);
+
+        selLineWrap.addLast(
+            ecuiCreate(
+                UI_DROPPABLE_LIST, 
+                q('q-di-meta-sel-line', o)[0],
+                null,
+                {
+                    id: selLineIdWrap[selLineName] = 
+                        '\x06_DI_META_COND_SEL' + getUID('DI_META_COND'),
+                    source: source,
+                    name: selLineName,
+                    configBtn: false
+                }
+            ),
+            selLineName
+        );
+
+        // 设置新增控件target，并对所有其他selLine设置target
+        for (var name in selLineIdWrap) {
+            if (name != selLineName) {
+                selLineWrap.get(name).addTarget(selLineIdWrap[selLineName]);
+            }
+            selLineWrap.get(selLineName).addTarget(selLineIdWrap[name]);
+        }
+        this._uIndSrc.addTarget(selLineIdWrap[selLineName]);
+        this._uDimSrc.addTarget(selLineIdWrap[selLineName]);
+
+        // 初始数据
+        if (selLineData) {
+            selLineData.foreach( 
+                function (uniqName, item, index) {
+                    selLineWrap.get(selLineName).addItem(
+                        {
+                            value: item.uniqName, 
+                            text: item.caption,
+                            clazz: item.clazz,
+                            fixed: item.fixed,
+                            align: item.align,
+                            configBtn: item.isConfig
+                        }
+                    );
+                }
+            );
+        }
+    };
+
+    /**
+     * 更新控件的元数据状态
+     *
+     * @public
+     */
+    OLAP_META_DRAGGER_CLASS.refreshStatus = function (statusWrap) {
+        if (statusWrap) {
+            this._uIndSrc.setState(
+                { 
+                    disable: statusWrap.indMetas.disabledMetaNames,
+                    selected: statusWrap.indMetas.selectedMetaNames
+                }
+            );
+            this._uDimSrc.setState(
+                { 
+                    disable: statusWrap.dimMetas.disabledMetaNames,
+                    selected: statusWrap.dimMetas.selectedMetaNames
+                }
+            );
+        }
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     * @param {string} key 禁用者的标志
+     */
+    OLAP_META_DRAGGER_CLASS.enable = function (key) {
+        // TODO 检查
+        objKey.remove(this, key);
+
+        if (objKey.size(this) == 0 && this._bDisabled) {
+            this._uIndSrc && this._uIndSrc.enable();
+            this._uDimSrc && this._uDimSrc.enable();
+            this._oSelLineWrap.foreach(
+                function (name, item, index) {
+                    item.enable();
+                }
+            );
+            OLAP_META_DRAGGER.superClass.enable.call(this);
+        }
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     * @param {string} key 禁用者的标志
+     */
+    OLAP_META_DRAGGER_CLASS.disable = function (key) {
+        objKey.add(this, key);
+
+        // TODO 检查
+        if (!this._bDisabled) {
+            this._uIndSrc && this._uIndSrc.disable();
+            this._uDimSrc && this._uDimSrc.disable();
+            this._oSelLineWrap.foreach(
+                function (name, item, index) {
+                    item.disable();
+                }
+            );
+        }
+        OLAP_META_DRAGGER.superClass.disable.call(this);
+    };    
+
+    /**
+     * 获取元数据选择处理
+     * 
+     * @protected
+     */
+    OLAP_META_DRAGGER_CLASS.$handleSelLineChange = function (
+        itemData, itemIndex, selLineName, oriItemIndex, oriSelLineName
+    ) {
+        var wrap = {};
+        this._oSelLineWrap.foreach(
+            function (k, o, index) {
+                wrap[k] = o.getValue();
+            }
+        );
+
+        var changeWrap = {
+            from: oriSelLineName,
+            to: selLineName,
+            toPosition: itemIndex,
+            uniqNameList: [itemData.value]
+        };
+
+        // 根据规则修正变化
+        // this.$fixSelLineChange(itemData, itemIndex, selLineName, changeWrap);
+
+        /**
+         * 选择变化事件
+         *
+         * @event
+         */
+        this.notify('sellinechange', [wrap, changeWrap]);
+    };
+
+    /**
+     * selLine上指标维度点击事件处理
+     * 
+     * @protected
+     */
+    OLAP_META_DRAGGER_CLASS.$handleItemClick = function (
+        selLineName, event, itemData
+    ) {
+        var metaItem = 
+            this._mModel.getMetaItem(itemData.value);
+
+        // 维度--打开维度选择面板
+        if (metaItem && metaItem.clazz == 'DIM') {
+            var me = this;
+            var wrap = {};
+                this._oSelLineWrap.foreach(
+                    function (k, o, index) {
+                        wrap[k] = o.getValue();
+                    }
+                );
+            MULTIDIM_SELECT_PANEL().open(
+                'EDIT',
+                {
+                    componentId: this.$di('getId').split('.')[1],
+                    uniqName: itemData.value,
+                    reportType: this._sReportType,
+                    selLineName: selLineName,
+                    dimMode: metaItem.isTimeDim ? 'TIME' : 'NORMAL',
+                    onconfirm: function(){
+                        me.notify('selitemchange',[wrap]);
+                    },
+                    commonParamGetter: this._mModel._fCommonParamGetter
+                }
+            );
+        }
+        // 指标--打开指标设置面板
+        else {
+            // TODO
+        }
+    };
+
+    /**
+     * 从selline中寻找item
+     *
+     * @private
+     * @param {string} clazz 'IND'或者'DIM'
+     * @param {string=} selLineName 指定的selLineName，缺省则全局找
+     * @param {Item=} exclude 排除
+     * @return {Array.<Object>} 每项中含有：
+     *          item：查找到的item
+     *          selLineName：行名
+     *          index：item的index
+     */
+    OLAP_META_DRAGGER_CLASS.$findItemFromSelLine = function(
+        clazz, selLineName, exclude
+    ) {
+        var ret = [];
+
+        function findInLine(selLineName, selLine) {
+            var itemList = selLine.getItems();
+            for (var i = 0, item; item = itemList[i]; i ++) {
+                if (item != exclude && item.getClazz() == clazz) {
+                    ret.push(
+                        { 
+                            item: item, 
+                            selLineName: selLineName, 
+                            index: i 
+                        }
+                    );
+                }
+            }
+        }
+
+        if (selLineName) {
+            findInLine(selLineName, this._oSelLineWrap.get(selLineName));
+        }
+        else {
+            this._oSelLineWrap.foreach(findInLine);
+        }
+
+        return ret;
+    }
+
+
+    //---------------------------------------------------
+    // 拖拽规则(后续重构) FIXME
+    //---------------------------------------------------
+
+    /**
+     * selLine上检查是否可以drop
+     * 
+     * @protected
+     */
+    OLAP_META_DRAGGER_CLASS.$checkSelLineDroppable = function (
+        itemData, index, selLineName
+    ) {
+        var rule = this._oRule;
+        // var ruleIND = rule.IND || {};
+        // var ruleDIM = rule.DIM || {};
+
+        // 规则 FORBID_1：指标只能拖到列上
+        if (itemData.clazz == 'IND' && selLineName.indexOf('COL') < 0) {
+            return false;
+        }
+
+        // 规则 FORBID_5：维度不能拖到列上
+        // if (itemData.clazz == 'DIM' && selLineName.indexOf('COL') >= 0) {
+        //     return false;
+        // }
+
+        // 规则 FORBID_7：filter不能drop
+        // if (selLineName.indexOf('FILTER') >= 0) {
+        //     return false;
+        // }
+
+        var selLine = this._oSelLineWrap.get(selLineName);
+
+        // 规则 FORBID_4：有align标志的，只能在左或右
+        // 这里假设后台来的数据都已经是align正确的，前台仅就拖拽行为进行限制
+        var items = selLine.getItems();
+        var item;
+        if ((
+                (item = items[index]) 
+                && item.getWrap().align == 'LEFT'
+            )
+            || (
+                (item = items[index - 1]) 
+                && item.getWrap().align == 'RIGHT'
+            )
+        ) {
+            return false;
+        }
+
+        return true;
+    };
+    
+    /**
+     * selLine上检查是否可以drag
+     * 
+     * @protected
+     */    
+    OLAP_META_DRAGGER_CLASS.$checkSelLineDraggable = function (
+        itemData, index, selLineName
+    ) {
+        var rule = this._oRule;
+
+        // 规则 FORBID_2：禁止指标维度全部拖空
+        var selLine = this._oSelLineWrap.get(selLineName);
+        if (selLine.count() <= 1) {
+            if (rule.forbidColEmpty && selLineName.indexOf('COL') >= 0) {
+                return false;
+            }
+            if (rule.forbidRowEmpty && selLineName.indexOf('ROW') >= 0) {
+                return false;
+            }
+        }
+
+        // 规则 FORBID_3：有fixed标志的，不能拖走
+        if (itemData.fixed) {
+            return false;
+        }
+
+        // 规则 FORBID_6：filter不能操作（禁止拖动、放大镜）
+        // if (selLineName.indexOf('FILTER') >= 0) {
+        //     return false;
+        // }
+
+        return true;
+    }
+
+    /**
+     * 根据规则对拖拽结果进行修正
+     * （这段逻辑没有启用，后面会移到后台）
+     * 
+     * @protected
+     * @deprecated
+     */
+    OLAP_META_DRAGGER_CLASS.$fixSelLineChange = function (
+        itemData, itemIndex, selLineName, changeWrap
+    ) {
+        if (itemIndex == null) {
+            // 移除的情况，不作修正
+            return;
+        }
+        
+        // 规则 FIX_1：所有指标和计算列，总是连在一起。
+        //          （指标和计算列的连带暂未实现）
+
+        // 规则 FIX_2：指标区要么在头部，要么在尾部。
+
+        // 被移动的项是否是计算列
+        var isCal = (itemData.calcColumnRefInd || []).length > 0;
+        var selLine = this._oSelLineWrap.get(selLineName);
+        var selLineItems = selLine.getItems() || [];
+        var dragItem = selLineItems[itemIndex];
+        var prev = selLineItems[itemIndex - 1];
+        var next = selLineItems[itemIndex + 1];
+        var prevData = prev && prev.getWrap();
+        var nextData = next && next.getWrap();
+        var oList;
+        var o;
+        var des;
+        var targetIndex;
+        var i;
+
+        // 判断dragItem的两边状况
+        var side = { IND: [], DIM: [], WALL: [] };
+        prevData 
+            ? (side[prevData.clazz][0] = 1)
+            : (side.WALL[0] = 1);
+        nextData 
+            ? (side[nextData.clazz][1] = 1)
+            : (side.WALL[1] = 1);
+
+        // IF 拖拽的dragItem是dim
+        if (itemData.clazz == 'DIM') {
+            // IF dragItem两边都是dim，THEN do nothing
+
+            // IF dragItem一边是ind，另一边是dim，THEN do nothing
+
+            // IF dragItem一边是ind，另一边是墙 
+            if (side.IND.length > 0 && side.WALL.length > 0) {
+                // THEN 同行所有dim都移入ind区和dragItem间
+                oList = this.$findItemFromSelLine('DIM', selLineName, dragItem);                                
+                for (i = 0; o = oList[i]; i ++) {
+                    this._oSelLineWrap.get(o.selLineName).remove(o.item);
+                }
+                for (i = 0; o = oList[i]; i ++) {
+                    selLine.add(o.item, side.IND[0] ? (selLine.count() - 1) : 1);
+                }
+            }
+
+            // IF dragItem两边都是ind
+            else if (side.IND[0] && side.IND[1]) {
+                // THEN 往两边找到dim区，item移入dim区和ind区之间
+                // 用首尾判断即可
+                des = selLineItems[0].getClazz() == 'DIM';
+                for (
+                    i = des ? 0 : (selLineItems.length - 1); 
+                    o = selLineItems[i]; 
+                    i += des ? 1 : -1
+                ) {
+                    if (o.getClazz() == 'IND') {
+                        targetIndex = des ? i : (i + 1);
+                        break;
+                    }
+                }
+                selLine.remove(dragItem);
+                selLine.add(
+                    dragItem, 
+                    targetIndex <= itemIndex ? targetIndex : targetIndex - 1
+                );
+            }
+        }
+
+        // IF 拖拽的dragItem是ind
+        else if (itemData.clazz == 'IND') {
+            // IF dragItem两边都是ind，THEN do nothing
+
+            // IF dragItem一边是ind，另一边是dim，THEN do nothing
+
+            // IF dragItem一边是dim，另一边是墙 
+            if (side.DIM.length > 0 && side.WALL.length > 0) {
+                // THEN 全局所有ind都移入dim区和dragItem间
+                oList = this.$findItemFromSelLine('IND', null, dragItem);
+                for (i = 0; o = oList[i]; i ++) {
+                    this._oSelLineWrap.get(o.selLineName).remove(o.item);
+                }
+                for (i = 0; o = oList[i]; i ++) {
+                    selLine.add(o.item, side.DIM[0] ? (selLine.count() - 1) : 1);
+                }
+            }
+
+            // IF dragItem两边都是dim
+            else if (side.DIM[0] && side.DIM[1]) {
+                // THEN 找到离墙近的那边，把dragItem移动到墙边，
+                des = itemIndex > (selLineItems.length - 1) / 2;
+                selLine.remove(dragItem);
+                selLine.add(dragItem, des ? selLine.count() : 0);
+                
+                // 再把所有ind移动到dragItem和dragItem之间
+                oList = this.$findItemFromSelLine('IND', null, dragItem);
+                for (i = 0; o = oList[i]; i ++) {
+                    this._oSelLineWrap.get(o.selLineName).remove(o.item);
+                }
+                for (i = 0; o = oList[i]; i ++) {
+                    selLine.add(o.item, des ? (selLine.count() - 1) : 1);
+                }
+            }
+        }
+
+        // 修正changeWrap的toPosition
+        selLineItems = selLine.getItems() || [];
+        for (i = 0; o = selLineItems[i]; i ++) {
+            if (o.getClazz == 'IND') {
+
+            }
+        }
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+})();
+<<<<<<< HEAD
 
 
 /**
@@ -75010,6 +89697,321 @@ $namespace('di.shared.vui');
         return wrap;
     };
 
+=======
+/**
+ * di.shared.vui.OlapMetaSelect
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    元数据的选择
+ *           这是下拉框选择，每个系列组（或column）一个下拉框，
+ *           因为系列组可能代表不同的图形（柱、折线），所以要分开下拉框选择
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.vui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var DICT = di.config.Dict;
+    var inheritsObject = xutil.object.inheritsObject;
+    var extend = xutil.object.extend;
+    var encodeHTML = xutil.string.encodeHTML;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var q = xutil.dom.q;
+    var isArray = xutil.lang.isArray;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var bind = xutil.fn.bind;
+    var trim = xutil.string.trim;
+    var template = xutil.string.template;
+    var getByPath = xutil.object.getByPath;
+    var UI_SELECT = ecui.ui.Select;
+    var XOBJECT = xui.XObject;
+
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 隐藏的输入，用于传递报表引擎外部传来的参数
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {HTMLElement} options.el 容器元素
+     */
+    var OLAP_META_SELECT = $namespace().OlapMetaSelect = 
+            inheritsObject(XOBJECT, constructor);
+    var OLAP_META_SELECT_CLASS = OLAP_META_SELECT.prototype;
+    
+    var TPL_SEL = [
+        '<span>',
+            '<span class="olap-meta-select-txt">#{colName}</span>',
+            '<span class="olap-meta-select-sel"></span>',
+        '</span>'
+    ].join('');
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        this._sels = {};
+        this._el = options.el;
+    };
+
+    /**
+     * 设置数据
+     *
+     * @public
+     * @param {Object} data 数据
+     */
+    OLAP_META_SELECT_CLASS.setData = function (data) {
+        // 如果发现传入的有renderType参数并且renderType为‘liteOlap’，则走setLiteOlapData逻辑
+        if(data['renderType'] && (data['renderType'] == 'liteOlap')){
+            this.setLiteOlapData(data);
+        }
+        else {
+            var me = this;
+            var el = this._el;
+
+            var indList = data.inddim.indList;
+            var inds = [];
+            indList && indList.foreach(
+                function (k, item, index) {
+                    if (item.status != DICT.META_STATUS.DISABLED) {
+                        inds.push(
+                            { 
+                                text: item.caption, 
+                                value: item.uniqName 
+                            }
+                        );
+                    }
+                }
+            );
+
+            // 清空内部
+            this.$disposeInner();
+
+            // 渲染
+            // 获得控件的类型（select或者multiselect，在dataOpt中设置）
+            var ctrlClz = getByPath(data.ctrlClz);
+            var eo;
+            // 如果只有一个col，不显示“系列组”描述（表格就是只有一个的情况）
+            var colNum = 0;
+            data.selLineDataWrap.foreach(
+                function (name, selLineData, index) {
+                    if (name.indexOf('COLUMN') == 0) {
+                        colNum ++;
+                    }
+                }
+            );
+
+            var seriesCfg = data.seriesCfg;
+            data.selLineDataWrap.foreach(
+                function (name, selLineData, index) {
+                    // 只对系列组有效
+                    if (name.indexOf('COLUMN') < 0) {
+                        return;
+                    }
+
+                    // 创建控件
+                    var seriesType = (seriesCfg[name] || {}).type;
+                    var desc = colNum <= 1 
+                        ? '' 
+                        : (
+                            '系列组' + name.split('_')[1] 
+                            + (
+                                seriesType 
+                                    ? ('（' + DICT.getGraphByType(seriesType).text + '）')
+                                    : ''
+                            )
+                        );
+                    var ctrl = createCtrl(el, ctrlClz, data.ctrlClz, data, desc);
+                    me._sels[name] = ctrl;
+
+                    // 绑定事件
+                    ctrl.onchange = bind(handleChange, null, me, name);
+
+                    // 取得当前选中
+                    var selected = [];
+                    selLineData.foreach(function (uniqName) {
+                        selected.push(uniqName);
+                    });
+
+                    // 设置数据
+                    setSelectData(ctrl, inds, selected);
+                }
+            );  
+        }
+        
+    };
+
+
+    /**
+     * 设置liteOlap数据
+     *
+     * @public
+     * @param {Object} data 数据
+     */
+    OLAP_META_SELECT_CLASS.setLiteOlapData = function (data) {
+        var me = this;
+        var el = this._el;
+
+        var indList = data.indList;
+        var inds = [];
+         // 取得当前选中
+        var selected = [];
+        for (var i = 0; i < indList.length; i++) {
+            inds.push(
+                        { 
+                            text: indList[i].caption, 
+                            value: indList[i].custIndName 
+                        }
+                    );
+            // 如果传入的选中指标有值,那么取选中值给下拉框，如果没值，则取第一个元素
+            if(data.selectedInds.length > 0){
+                for (var j = 0; j < data.selectedInds.length; j++) {
+                    if(data.selectedInds[j] == indList[i].custIndName){
+                        selected.push(
+                        { 
+                            text: indList[i].caption, 
+                            value: indList[i].custIndName 
+                        }
+                    );
+                    }
+                };
+            }else{
+                selected.push(
+                        { 
+                            text: indList[0].caption, 
+                            value: indList[0].custIndName 
+                        }
+                        )
+            }
+        };
+
+        // 清空内部
+        this.$disposeInner();
+
+        // 渲染
+        // 获得控件的类型（select或者multiselect，在dataOpt中设置）
+        var ctrlClz = getByPath(data.ctrlClz);
+        var ctrl = createCtrl(el, ctrlClz, data.ctrlClz, data, '');
+        me._sels[data.selLineName] = ctrl;
+
+        // 绑定事件
+        ctrl.onchange = bind(handleChange, null, me, name);
+
+       
+        // selLineData.foreach(function (uniqName) {
+        //     selected.push(uniqName);
+        // });
+
+        // 设置数据
+        setSelectData(ctrl, inds, selected);
+    };
+    function handleChange(me, selLineName, value) {
+        // 得到的当前值
+        var wrap = me.getValue();
+        // 设置被change的ctrl
+        // wrap[selLineName] = value;
+
+        me.notify('change', [wrap]);
+    }
+
+    function createCtrl(el, ctrlClz, ctrlClzPath, data, colName) {
+        var eo = document.createElement('DIV');
+        // 创建控件
+        eo.innerHTML = template(TPL_SEL, { colName: colName });
+        var ctrl = ecuiCreate(
+            ctrlClz, 
+            q('olap-meta-select-sel', eo)[0],
+            null,
+            {
+                primary: ctrlClzPath == 'ecui.ui.MultiSelect'
+                    ? 'ui-multi-select' : 'ui-select',
+                optionSize: data.optionSize 
+            }
+        )
+        el.appendChild(eo.firstChild);
+        // 禁用鼠标事件
+        ctrl.$mousewheel = new Function();
+        // 用于区别类型
+        ctrl.$__ctrlClzPath = trim(ctrlClzPath);
+        ctrl.init();
+        return ctrl;
+    }
+
+    function disposeSelect(ctrl) {
+        ecuiDispose(ctrl);
+    }
+    function setSelectData(ctrl, datasource, selected) {
+        // 添加
+        for (var i = 0, o; o = datasource[i]; i++) {
+            var txt = String(o.text != null ? o.text : '');
+            ctrl.add(
+                txt, 
+                null,
+                { value: o.value, prompt: txt }
+            );
+        }
+
+        // 设置默认选中
+        selected.length && ctrl.setValue(
+            ctrl.$__ctrlClzPath == 'ecui.ui.MultiSelect'
+                ? selected : selected[0]['value']
+        ); 
+    }
+
+    /**
+     * 清空内部
+     */
+    OLAP_META_SELECT_CLASS.$disposeInner = function () {
+        for (var selLineName in this._sels) {
+            disposeSelect(this._sels[selLineName]);
+        }
+        this._sels = {};
+        this._el.innerHTML = '';
+    };
+
+    /**
+     * 得到当前值
+     *
+     * @public
+     * @return {*} 当前数据
+     */
+    OLAP_META_SELECT_CLASS.getValue = function () {
+        var wrap = {};
+        for (var selLineName in this._sels) {
+            var sel = this._sels[selLineName];
+            var value;
+            if (sel.$__ctrlClzPath == 'ecui.ui.Select') {
+                var sl = sel.getSelected();
+                value = sl ? sl.getValue() : null;
+            }
+            else {
+                value = sel.getValue();
+            }
+            wrap[selLineName] = isArray(value) 
+                ? value 
+                : (value == null ? [] : [value]);
+        }
+        return wrap;
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
 /**
  * di.shared.vui.SaveButton
@@ -76097,6 +91099,7 @@ $namespace('di.shared.vui');
         el.innerHTML = html.join('');
     }
 })();
+<<<<<<< HEAD
 /**
  * di.shared.vui.TextLabel
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -76210,6 +91213,121 @@ $namespace('di.shared.vui');
         }
     }
 
+=======
+/**
+ * di.shared.vui.TextLabel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    文字区
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.vui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var extend = xutil.object.extend;
+    var encodeHTML = xutil.string.encodeHTML;
+    var isObject = xutil.lang.isObject;
+    var isArray = xutil.lang.isArray;
+    var template = xutil.string.template;
+    var XOBJECT = xui.XObject;
+
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 文字区
+     * 直接指定文字，或者html，
+     * 或者模板（模板形式参见xutil.string.template）
+     * 初始dom中的内容被认为是初始模板。
+     * 也可以用参数传入模板。
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {HTMLElement} options.el 容器元素
+     */
+    var TEXT_LABEL = $namespace().TextLabel = 
+            inheritsObject(XOBJECT, constructor);
+    var TEXT_LABEL_CLASS = TEXT_LABEL.prototype;
+    
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        var el = this._eMain = options.el;
+        addClass(el, 'vui-text-area');
+
+        this._sInitTpl = el.innerHTML;
+        el.innerHTML = '';
+
+        this.setData(options);
+    };
+    
+    /**
+     * 设置数据
+     *
+     * @public
+     * @param {Object} data 数据
+     * @param {string} data.html html
+     * @param {string} data.text 文本
+     * @param {string} data.tpl 模板
+     * @param {(Array|Object)} data.args 参数
+     */
+    TEXT_LABEL_CLASS.setData = function (data) {
+        var el = this._eMain;
+        data = data || {};
+
+        if (data.html != null) {
+            el.innerHTML = data.html;
+        }
+        else if (data.text != null) {
+            el.innerHTML = encodeHTML(data.text);
+        }
+        else if (data.tpl != null) {
+            renderTpl.call(this, data.tpl, data.args);
+        }
+        else if (this._sInitTpl != null) {
+            renderTpl.call(this, this._sInitTpl, data.args);
+        }
+    };
+
+    /**
+     * 按照模板渲染
+     * 
+     * @private
+     */
+    function renderTpl(tpl, args) {
+        var el = this._eMain;
+
+        if (isObject(args)) {
+            el.innerHTML = template(tpl, args);
+        }
+        else if (isArray(args)) {
+            el.innerHTML = template.apply(null, tpl, args);
+        }
+        else {
+            el.innerHTML = template.tpl || '';
+        }
+    }
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
 /**
  * di.shared.adapter.GeneralAdapterMethod
@@ -76288,6 +91406,15 @@ $namespace('di.shared.adapter');
 })();
 
 
+<<<<<<< HEAD
+/**
+ * di.shared.model.AuthModel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * desc:    [通用模型] 权限数据模型
+ * author:  sushuang(sushuang)
+ */
+=======
 /**
  * di.shared.model.AuthModel
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -76319,6 +91446,3402 @@ $namespace('di.shared.model');
     };    
     
 })();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+$namespace('di.shared.model');
+=======
+/**
+ * di.shared.model.DateModel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * desc:    [通用模型] 时间数据模型
+ * author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+(function() {
+    
+    /* 外部引用 */
+    var inheritsObject = xutil.object.inheritsObject; 
+    var XDATASOURCE = xui.XDatasource;
+        
+    /* 类型声明 */
+    var DATE_MODEL = $namespace().DateModel = inheritsObject(XDATASOURCE);
+    var DATE_MODEL_CLASS = DATE_MODEL.prototype;
+        
+    /**
+     * 初始化当前值
+     * @override
+     */
+    DATE_MODEL_CLASS.setData = function(data) {
+        this.businessData = true;
+        this._nInitServerTime = parseInt(data.serverTime) || new Date().getTime();
+        this._nServerTimeOffset = this._nInitServerTime - (new Date).getTime();
+    };
+    
+    /**
+     * 获得服务器的当前时间
+     * 不保证准确的地方：
+     * 1. 网路延迟没有考虑
+     * 2. 如果用户在打开了网页后修改了客户端的系统时间，则此值会错误
+     * @public
+     * 
+     * @return {Date} 当前时间
+     */
+    DATE_MODEL_CLASS.now = function() {
+        var date = new Date();
+        date.setTime(date.getTime() + this._nServerTimeOffset);
+        return date;
+    };
+    
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+(function () {
+    
+    /* 外部引用 */
+    var inheritsObject = xutil.object.inheritsObject;
+    var XDATASOURCE = xui.XDatasource;
+        
+    /* 类型声明 */
+    var AUTH_MODEL = $namespace().AuthModel = inheritsObject(XDATASOURCE);
+    var AUTH_MODEL_CLASS = AUTH_MODEL.prototype;
+        
+    /**
+     * 获得用户Id
+     * @public
+     * 
+     * @return {string} 用户id
+     */
+    AUTH_MODEL_CLASS.getUserId = function () {
+        // TODO
+    };    
+    
+=======
+/**
+ * di.shared.model.UserModel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    [通用模型] 用户数据模型
+ * @author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    /* 外部引用 */
+    var inheritsObject = xutil.object.inheritsObject;
+    var XDATASOURCE = xui.XDatasource;
+        
+    /* 类型声明 */
+    var USER_MODEL = $namespace().UserModel = inheritsObject(XDATASOURCE);
+    var USER_MODEL_CLASS = USER_MODEL.prototype;
+        
+    /**
+     * 获得用户Id
+     * @public
+     * 
+     * @return {string} 用户id
+     */
+    USER_MODEL_CLASS.getUserId = function () {
+        // TODO
+    };    
+    
+})();
+
+
+/**
+ * di.shared.model.GlobalModel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * desc:    [通用模型] 全局数据模型
+ * author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+/**
+ * @usage 单例，直接如此获取单例即可：var g = di.shared.GlobalModel();
+ */
+(function() {
+    
+    /* 外部引用 */
+    var inherits = xutil.object.inherits;
+    var USER_MODEL;
+    var AUTH_MODEL;
+    var DATE_MODEL;
+    var GLOBAL_MENU_MANAGER;
+    var XDATASOURCE = xui.XDatasource;
+    
+    $link(function() {
+        var sharedNS = di.shared;
+        USER_MODEL = sharedNS.model.UserModel;
+        AUTH_MODEL = sharedNS.model.AuthModel;
+        DATE_MODEL = sharedNS.model.DateModel;
+        GLOBAL_MENU_MANAGER = sharedNS.model.GlobalMenuManager;
+    });
+    
+    /* 类型声明 */
+    var GLOBAL_MODEL = $namespace().GlobalModel = function(options) {
+            if (instance && options) {
+                throw new Error('global model has been created');
+            }
+            if (!instance && !options) {
+                throw new Error('global model creation needs options');
+            }
+
+            if (!instance) {
+                (instance = new SINGLETON(options))
+            }
+            return instance;
+        };
+    var GLOBAL_MODEL_CLASS = inherits(GLOBAL_MODEL, XDATASOURCE);
+        
+    function SINGLETON(options) {
+        XDATASOURCE.client.call(this);
+        
+        this._sBizKey = options.bizKey;
+
+        // 初始化全局模型
+        this._mUserModel = new USER_MODEL();
+        this._mAuthModel = new AUTH_MODEL();
+        this._mDateModel = new DATE_MODEL();
+        this._mDateModel.setData(options);
+
+        this._sGlobalType = options.globalType;
+        if (this._sGlobalType == 'CONSOLE') {
+            this._mGlobalMenuManager = new GLOBAL_MENU_MANAGER(options)
+        }
+    };
+    
+    var instance;
+
+    /**
+     * 获得DateModel
+     * @public
+     */
+    GLOBAL_MODEL_CLASS.getDateModel = function() {
+        return this._mDateModel;
+    };
+    
+    /**
+     * 获得UserModel
+     * @public
+     */
+    GLOBAL_MODEL_CLASS.getUserModel = function() {
+        return this._mUserModel;
+    };
+    
+    /**
+     * 获得AuthModel
+     * @public
+     */
+    GLOBAL_MODEL_CLASS.getAuthModel = function() {
+        return this._mAuthModel;
+    };
+    
+    /**
+     * 获得GlobalMenuManager
+     * @public
+     */
+    GLOBAL_MODEL_CLASS.getGlobalMenuManager = function() {
+        return this._mGlobalMenuManager;
+    };
+
+    /**
+     * 获得bizkey（目前的逻辑，全局唯一）
+     * @public
+     */
+    GLOBAL_MODEL_CLASS.getBizKey = function() {
+        return this._sBizKey;
+    };
+
+    inherits(SINGLETON, GLOBAL_MODEL);
+    
+})();
+
+
+/**
+ * di.shared.model.CommonParamFactory
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    通用请求参数处理器工厂
+ * @author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    var clone = xutil.object.clone;
+    var extend = xutil.object.extend;
+    var textParam = xutil.url.textParam;
+    var jsonStringify = di.helper.Util.jsonStringify;
+    var isArray = xutil.lang.isArray;
+    var isObject = xutil.lang.isObject;
+
+    /** 
+     * 通用请求参数获取器工厂
+     * 
+     * @class
+     * @param {Object} options 参数
+     * @param {Object} options.externalParam 报表外部参数
+     */
+    var COMMON_PARAM_FACTORY = $namespace().CommonParamFactory = 
+        function (options) {
+            // 外部传来的报表参数。
+            // 这些参数会回传给前端，而后在前后端传递。
+            this.externalParam = options 
+                && clone(options.externalParam) 
+                || {};
+        };
+    var COMMON_PARAM_FACTORY_CLASS = COMMON_PARAM_FACTORY.prototype;
+
+    /**
+     * 要将对象格式化为json传输的标志
+     */
+    var STRINGIFY_FLAG = 'diF\x06^_^jsonnosj^_^\x06';
+
+    /**
+     * 如果是对象，
+     * 则标注用http传输数据使用的格式，
+     * 可以是stringify成json的格式，
+     * 或者普通格式
+     *
+     * @public
+     * @static
+     * @param {*} data 可转为json的对象
+     * @param {string} paramMode 可为'NORMAL'（默认），'JSON'
+     * @return 原输入
+     */
+    COMMON_PARAM_FACTORY.markParamMode = function(data, paramMode) {
+        if (isObject(data)) {
+            if (!paramMode || paramMode == 'NORMAL') {
+                delete data[STRINGIFY_FLAG];
+            }
+            else {
+                data[STRINGIFY_FLAG] = paramMode;
+            }
+        }
+        return data;
+    };
+
+    /**
+     * 得到生产环境的getter
+     *
+     * @public
+     * @param {Object} options 参数
+     * @param {Object} options.reportTemplateId 后台的reportTemplateId
+     */
+    COMMON_PARAM_FACTORY_CLASS.getGetter = function(options) {
+        options = options || {};
+
+        var externalParam = this.externalParam;
+
+        /**
+         * 即后台的reportTemplateId。
+         * reportTemplateId在必须以snippet为单位。
+         * 每次请求后台都须调用commonParamGetter.update(data)对其进行更新，
+         * 因为针对于每个报表，一个snippet中的第一个请求总要是使用记录在模板中reportTemplateId
+         * （形如PERSISTENT***）来请求，后台用这个id从DB中取出报表，生成一个副本，放入缓存，
+         * 并返回这个副本的reportTemplateId（形如：SESSION_LOADED***），后续，此snippet中的所有请求，
+         * 都须以这个副本的reportTemplateId作为参数。
+         * 所以要用update函数对这个reportTemplateId进行更新。
+         */
+        var reportId = options.reportId;
+
+        /**
+         * 初始为'INIT'，允许调用commonParamGetter。
+         * 第一次调用而未返回时变为'FORBIDDEN'，这时再次调用则抛出异常，
+         * （这是为了防止报表设计时，设计出：一个报表初始用）
+         * 第一次调用返回时，变为'OPEN'，以后可随意调用。
+         */
+        var loadValve = 'INIT';
+
+        /**
+         * 通用参数获取器，
+         * 会进行encodeURIComponent，和去除空值
+         *
+         * @public
+         * @param {Object=} paramObj 请求参数
+         *      key为参数名，
+         *      value为参数值，{string}或者{Array.<string>}类型
+         * @param {string=} paramMode 什么格式传输，值可为：
+         *      'NORMAL'（默认）：普通格式（数组使用aa=2&aa=3&aa=5的方式，不支持对象传输）；
+         *      'JSON'：使用json格式传输对象（含数组）
+         * @param {Object=} options 可选参数
+         * @param {Array} options.excludes 要排除的属性
+         * @return {string} 最终请求参数最终请求参数
+         */
+        function commonParamGetter(paramObj, options) {
+            options = options || {};
+
+            if (loadValve == 'INIT') {
+                loadValve = 'FORBIDDEN';
+            }
+            else if (loadValve == 'FORBIDDEN') {
+                throw new Error('' 
+                    + '一个snippet中的第一个请求不能并发，请调整报表设计。' 
+                    + '在第一请求返回后再发出其他请求。'
+                    + '可能引起这个错误的情况比如有：'
+                    + '多个组件用同一个reportTempalteId，但并发得发请求。'
+                    + '（注：多个组件用同一个reportTempalteId，这本身是允许的，比如meta－config和table共用，'
+                    + '但是，他们是作为一个实例使用，目前未支持建立多个实例。）'
+                );
+            }
+
+            var o = {};
+            // 后天的参数的优先级比externalParam高
+            extend(o, externalParam, paramObj);
+            // o.reportTemplateId = reportTemplateId;
+            o.reportId = reportId;
+            var excludes = options.excludes || [];
+            for (var i = 0; i < excludes.length; i ++) {
+                delete o[excludes[i]];
+            }
+
+            return stringifyParam(o, { paramMode: options.paramMode });
+        };
+
+        /** 
+         * 通用参数更新方法
+         *
+         * @public
+         * @return {Object} options 参数
+         * @return {Object} options.reportId 后台模板id
+         */
+        commonParamGetter.update = function (options) {
+            // 后台的约定：无论何时，
+            // 总是以reprotTemplateId这个名字进行 传参 和 回传。
+            var rTplId = options && options.reportId || null;
+            if (rTplId) {
+                loadValve = 'OPEN';
+                reportId = rTplId;
+            }
+            else if (loadValve != 'OPEN') {
+                loadValve = 'INIT';
+            }
+        };
+
+        /** 
+         * 得到当前reportId
+         *
+         * @public
+         * @return {string} 当前reportTemplateId
+         */
+        commonParamGetter.getReportTemplateId = function () {
+            return reportId;
+        };
+
+        /**
+         * 挂上便于调用
+         */
+        commonParamGetter.markParamMode = COMMON_PARAM_FACTORY.markParamMode;
+
+        return commonParamGetter;
+    };
+
+    /**
+     * 请求参数变为string
+     * null和undefined会被转为空字符串
+     * 可支持urlencoding
+     * 
+     * @public
+     * @param {Object} paramObj 请求参数封装
+     *      key为参数名，
+     *      value为参数值，{string}或者{Array.<string>}类型   
+     * @param {Object=} options 参数
+     * @param {string=} options.paramMode 什么格式传输，值可为：
+     *      'NORMAL'（默认）：普通格式（数组使用aa=2&aa=3&aa=5的方式，不支持对象传输）；
+     *      'JSON'：使用json格式传输对象（含数组）
+     * @param {string=} options.suffix 参数名后缀
+     * @return {Array.<string>} 请求参数数组
+     */
+    function stringifyParam(paramObj, options) {
+        var paramArr = [];
+        options = options || {};
+
+        function pushParam(name, value) {
+            paramArr.push(textParam(name) + '=' + textParam(value));
+        }
+
+        var name;
+        var value;
+        var i;
+
+        for (name in paramObj) {
+            value = paramObj[name];
+
+            // paramMode为'JSON'，
+            // 无论数组还是对象，都格式化成json传输
+            if (isObject(value) 
+                && (options.paramMode == 'JSON' || value[STRINGIFY_FLAG] == 'JSON')
+            ) {
+                // 格式化成json前清理
+                delete value[STRINGIFY_FLAG];
+
+                // 格式化成json
+                pushParam(name, jsonStringify(value));
+
+                // 格式化成json后恢复
+                value[STRINGIFY_FLAG] = 1;
+            }
+            // 没有json化标志，则用传统方式处理
+            else {
+                if (isArray(value)) {
+                    for (i = 0; i < value.length; i ++) {
+                        pushParam(name, value[i]);
+                    }
+                }
+                else {
+                    pushParam(name, value);
+                }
+            }
+        }
+
+        return paramArr.join('&');
+    };    
+
+})();
+
+
+/**
+ * di.product.display.ui.Engine
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    报表展示页面
+ * @author:  lizhantong(lztlovely@126.com)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+
+    var inheritsObject = xutil.object.inheritsObject;
+    var XVIEW = xui.XView;
+    var SNIPPET_PARSER = di.helper.SnippetParser;
+    var extend = xutil.object.extend;
+    var merge = xutil.object.merge;
+    var DICT = di.config.Dict;
+    var DI_FACTORY;
+    var COMMON_PARAM_FACTORY;
+
+
+    $link(function () {
+        URL = di.config.URL;
+        DI_FACTORY = di.shared.model.DIFactory;
+        COMMON_PARAM_FACTORY = di.shared.model.CommonParamFactory;
+    });
+
+    /**
+     * 报表展示页面
+     *
+     * @class
+     * @extends xui.XView
+     */
+    var ENGINE = $namespace().Engine =
+        inheritsObject(XVIEW, constructor);
+    var ENGINE_CLASS = ENGINE.prototype;
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @public
+     */
+    function constructor(options) {
+        // web根路径
+        URL.setWebRoot(options.webRoot);
+
+        this._diFactory = DI_FACTORY();
+        this._diFactory.dispose();
+
+        this._engineOptions = options || {};
+        this._engineOptions.extraOpt = this._engineOptions.extraOpt || {};
+
+        // 设置功能权限
+        this._diFactory.setFuncAuth(this._engineOptions.funcAuth);
+    }
+
+    /**
+     * 启动引擎
+     *
+     * @public
+     * @param {Object} depict 组件json对象
+     * @param {Object} depict.entityDefs 实例定义
+     */
+    ENGINE_CLASS.start = function (depict) {
+        var me = this;
+        var diFactory = me._diFactory;
+        var engineOptions = me._engineOptions;
+        var def;
+
+        // 将每个报表特有的depict和公共定义的clzDef融合
+        mergeClzDef(depict);
+
+        // 初始化repo中的所有class
+        diFactory.installClz();
+
+        // 解析snippet生成def
+        SNIPPET_PARSER().parseProdSnippet(
+            engineOptions.reportBody || document,
+            depict,
+            engineOptions,
+            diFactory
+        );
+
+        var eParam = engineOptions.externalParam = engineOptions.externalParam || {};
+        // prod端的标志，用于后台日志记录
+        eParam._V_SRC = 'PROD';
+        var commonParamFactory = new COMMON_PARAM_FACTORY(
+            { externalParam: eParam }
+        );
+
+        // 创建commonParamGetter
+        var pGetterMapByRTPL = {};
+        var pGetterMapByEntity = {};
+        var rtplRoot;
+        var rootSnippet = diFactory.rootSnippet();
+        diFactory.forEachEntity(
+            ['COMPONENT'],
+            function (def, ins, id) {
+                var belongSnippet = def.belong.snippet;
+
+                // 创建commonParamGetter
+                var rtplId = def.reportId
+                    // 如果component上没有reportId，则从snippet上找
+                    || findEntityDef(depict, belongSnippet).reportId
+                    // 如果没指定reportId，默认均为最外层reportId
+                    || 'RTPL_VIRTUAL_ID';
+
+                // 寻找rootCmpts
+                // FIXME
+                // @deprecated
+                // 对根snippet，用vm中的reportId更新（因为此时已为session loaded）
+                // 这是之前的做法，现在淡化snippet的概念，不使用根snippet了，
+                // 而是遍历component，找reportType为RTPL_VIRTUAL的，进行替换。
+                if (rootSnippet && rootSnippet == belongSnippet) {
+                    rtplRoot = rtplId;
+                }
+
+                // 创建commonParamGetter，以reportId为单位。
+                // 每个commonParamGetter对应一个后台的sessinoLoaded实例，
+                // 因为有需要多个conponent对应一个sessionLoaded实例的情况，
+                // （如meta-config（即拖拽改维度）和olap-table需要共享sessionLoaded），
+                // 所以commonParamGetter现在定为以reportId为单位，而不是以component。
+                var pGetter;
+                if (!(pGetter = pGetterMapByRTPL[rtplId])) {
+                    pGetter = pGetterMapByRTPL[rtplId] =
+                        commonParamFactory.getGetter(
+                            { reportId: rtplId }
+                        );
+                    // 此为定位问题方便而纪录
+                    pGetter.___rtplId = rtplId;
+                    pGetter.___defId = id;
+                }
+                pGetterMapByEntity[id] = pGetter;
+            }
+        );
+
+        // 更新root的reportId
+        var rootGetter = pGetterMapByRTPL[rtplRoot]
+            || pGetterMapByRTPL[engineOptions.persistentreportId]
+            || pGetterMapByRTPL['RTPL_VIRTUAL_ID']
+
+        // 存在没有rootGetter的情况
+        rootGetter && rootGetter.update(
+            { reportId: engineOptions.reportId }
+        );
+
+        // 创健建实例
+        diFactory.forEachEntity(
+            [
+                'SNIPPET',
+                'VCONTAINER',
+                'COMPONENT'
+            ],
+            function (def, ins, id) {
+                var options = {};
+
+                // 设置上通用请求参数获取器
+                if (def.clzType == 'COMPONENT') {
+                    options.commonParamGetter = pGetterMapByEntity[def.id];
+
+                    // 设置默认值
+                    /**
+                     * valueDisabledMode, 值可为：
+                     *      'NORMAL'：如果disabled则不传参数
+                     *      'DI'：如果disabled则传参数值为空（如asdf=&zxcv=)
+                     *          （因为di中参数值为空则表示清空，不传则表示保留）
+                     */
+                        def.valueDisabledMode == null
+                        && (def.valueDisabledMode = 'DI');
+                }
+
+                // 创建实例
+                diFactory.createIns(def, options);
+            }
+        );
+
+        // rendered事件
+        diFactory.forEachEntity(
+            ['VCONTAINER', 'COMPONENT'],
+            function (def, ins, id) {
+                ins.$di(
+                    'addEventListener',
+                    'rendered',
+                    me.$invalidateView,
+                    me
+                );
+            }
+        );
+
+        // component事件绑定
+        diFactory.forEachEntity(
+            'COMPONENT',
+            function (def, ins, id) {
+                diFactory.mountInteractions(ins);
+            }
+        );
+
+        // 初始化
+        diFactory.forEachEntity(
+            [
+                'SNIPPET',
+                'VCONTAINER',
+                'COMPONENT'
+            ],
+            function (def, ins, id) {
+                ins.init();
+            }
+        );
+
+        diFactory.addEntity(
+            def = {
+                "clzType": "COMPONENT",
+                "id": diFactory.INIT_EVENT_AGENT_ID,
+                "clzKey": "GENERAL_COMPONENT"
+            },
+            'DEF'
+        );
+        def = diFactory.getEntity(def.id, 'DEF');
+        var initEventAgent = diFactory.createIns(def);
+
+        // 初始化后行为
+        diFactory.forEachEntity(
+            'COMPONENT',
+            function (def, ins, id) {
+                if (def.init) {
+                    diFactory.mountInteraction(
+                        ins,
+                        extend(
+                            {
+                                event: {
+                                    rid: diFactory.INIT_EVENT_AGENT_ID,
+                                    name: diFactory.INIT_EVENT_NAME
+                                }
+                            },
+                            def.init
+                        )
+                    );
+                }
+            }
+        );
+
+        // 功能权限验证
+        diFactory.forEachEntity(
+            [ 'COMPONENT' ],
+            function (def, ins, id) {
+                ins.$di('funcAuthVerify');
+            }
+        );
+
+        // 触发init事件
+        initEventAgent.$di('dispatchEvent', diFactory.INIT_EVENT_NAME);
+    }
+
+    /**
+     * 获取diFactory实例
+     *
+     * @public
+     * @param {Object} depict 组件json对象
+     * @param {Object} depict.entityDefs 实例定义
+     */
+    ENGINE_CLASS.getDIFactory = function () {
+        return this._diFactory;
+    };
+
+    /**
+     * 获得depict的内容
+     * 获得depict的内容
+     *
+     * @public
+     */
+    ENGINE_CLASS.mergeDepict = function (rptJsonArray) {
+        // 定义在snippet文件中的depict优先级最高
+        rptJsonArray.splice(0, 0, this._engineOptions.extraOpt.depict || {});
+
+        var rootSnippet;
+        var prompt = {};
+        var clzDefsMap = {};
+        var entityDefsMap = [];
+        var key;
+
+        for (var i = 0, de; i < rptJsonArray.length; i ++) {
+            if (de = rptJsonArray[i]) {
+                if (de.rootSnippet) {
+                    rootSnippet = de.rootSnippet;
+                }
+                if (de.prompt) {
+                    merge(prompt, de.prompt);
+                }
+
+                var j;
+                var def;
+                var o;
+
+                for (j = 0; j < (de.clzDefs || []).length; j ++) {
+                    // clz定义
+                    if ((def = de.clzDefs[j]) && (key = def.clzKey)) {
+                        if (!(o = clzDefsMap[key])) {
+                            o = clzDefsMap[key] = {};
+                        }
+                        merge(o, def);
+                    }
+                }
+
+                for (j = 0; j < (de.entityDefs || []).length; j ++) {
+                    // entity定义
+                    if ((def = de.entityDefs[j]) && (key = def.id)) {
+                        if (!(o = entityDefsMap[key])) {
+                            o = entityDefsMap[key] = {};
+                        }
+                        merge(o, def);
+                    }
+                }
+            }
+        }
+
+        var clzDefs = [];
+        for (key in clzDefsMap) {
+            clzDefs.push(clzDefsMap[key]);
+        }
+        var entityDefs = [];
+        for (key in entityDefsMap) {
+            entityDefs.push(entityDefsMap[key]);
+        }
+
+        return {
+            rootSnippet: rootSnippet,
+            prompt: prompt,
+            clzDefs: clzDefs,
+            entityDefs: entityDefs
+        };
+    };
+
+    /**
+     * 设置视图过期
+     *
+     * @private
+     */
+    ENGINE_CLASS.$invalidateView = function () {
+        var me = this;
+
+        /**
+         * resize处理器
+         *
+         * @private
+         */
+        if (!this._hResizeHandler) {
+            this._hResizeHandler = setTimeout(
+                function () {
+                    // resize
+                    var eventChannel = me._diFactory.getEventChannel();
+                    if (eventChannel) {
+                        eventChannel.triggerEvent('resize');
+                    }
+
+                    me._hResizeHandler = null;
+                },
+                0
+            )
+        }
+    };
+
+    /**
+     * 析构
+     *
+     * 静态的DICT回归默认状态
+     * globalModel实例释放掉
+     * diFactory实例释放掉
+     * @public
+     */
+    ENGINE_CLASS.dispose = function () {
+        var diFactory = this._diFactory;
+
+        diFactory.forEachEntity(
+            [ 'COMPONENT' ],
+            function (def, ins, id) {
+                ins.dispose();
+            }
+        );
+        DICT.reset();
+        diFactory.dispose();
+    };
+
+    /**
+     * 融合clzDef
+     *
+     * @private
+     */
+    function mergeClzDef(depict) {
+        var clzDefs = depict.clzDefs || [];
+        var clzDefMap = {};
+        for (var i = 0, clzDef; clzDef = clzDefs[i]; i ++) {
+            clzDefMap[clzDef.clzKey] = clzDef;
+        }
+        merge(DICT.CLZ, clzDefMap);
+    }
+
+    /**
+     * @private
+     */
+    function findEntityDef(depict, id) {
+        var entityDefs;
+
+        if (depict && (entityDefs = depict.entityDefs)) {
+            for (var i = 0, o; i < entityDefs.length; i ++) {
+                if ((o = entityDefs[i]) && o.id == id) {
+                    return o;
+                }
+            }
+        }
+    };
+})();
+
+
+/**
+ * di.shared.model.DIFactory
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    工厂
+ *           约定：
+ *              各种组件的类型均从这里获取，不直接引用。
+ *              全局实例从这里获取。
+ *
+ * @author:  sushuang(sushuang),lizhantong(lztlovely@126.com)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+
+    //-------------------------------------------------------
+    // 引用 
+    //-------------------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var DICT = di.config.Dict;
+    var xlang = xutil.lang;
+    var xobject = xutil.object;
+    var isString = xlang.isString;
+    var isArray = xlang.isArray;
+    var isObject = xlang.isObject;
+    var isFunction = xlang.isFunction;
+    var isEmptyObj = xobject.isEmptyObj;
+    var getByPath = xobject.getByPath;
+    var objKey = xobject.objKey;
+    var assign = xobject.assign;
+    var extend = xobject.extend;
+    var merge = xobject.merge;
+    var clone = xobject.clone;
+    var getUID = xutil.uid.getUID;
+    var bind = xutil.fn.bind;
+    var assert = UTIL.assert;
+    var arraySlice = [].slice;
+    var UNDEFINED;
+    // FIXME
+    // 独立此引用
+    var ecuiAddEventListener = UTIL.ecuiAddEventListener;
+    var ecuiTriggerEvent = UTIL.ecuiTriggerEvent;
+    var targetBlank = UTIL.targetBlank;
+    var objProtoToString = Object.prototype.toString;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var arrayPush = Array.prototype.push;
+    var isEcuiControl = UTIL.isEcuiControl;
+    var evalJsonLogic = UTIL.evalJsonLogic;
+    var XOBJECT = xui.XObject;
+    var COMMON_PARAM_FACTORY;
+    var ARG_HANDLER_FACTORY;
+    var replaceIntoParam = xutil.url.replaceIntoParam;
+
+    $link(function () {
+        ARG_HANDLER_FACTORY = di.shared.arg.ArgHandlerFactory;
+        COMMON_PARAM_FACTORY = di.shared.model.CommonParamFactory;
+    });
+
+    //----------------------------------------------------------
+    // 类型声明 
+    //----------------------------------------------------------
+
+    /**
+     * Unit工厂
+     *
+     * @usage
+     *      单例，
+     *      这样得到实例：var factory = di.shared.model.DIFactory();
+     */
+    $namespace().DIFactory = function () {
+        if (!instance) {
+
+            instance = {
+                installClz: installClz,
+                getClz: getClz,
+                addEntity: addEntity,
+                removeEntity: removeEntity,
+                createIns: createIns,
+                mountInteractions: mountInteractions,
+                mountInteraction: mountInteraction,
+                getDIMethod: getDIMethod,
+                getEntity: function (id, mode) {
+                    return getEntity(id, mode == 'RAW' ? 'DEF' : mode);
+                },
+                findEntity: findEntity,
+                forEachEntity: forEachEntity,
+                createDIEvent: createDIEvent,
+                getRef: getRef,
+                mergeOpt: mergeOpt,
+                setGlobalTemp: setGlobalTemp,
+                getGlobalTemp: getGlobalTemp,
+                setEventChannel: setEventChannel,
+                getEventChannel: getEventChannel,
+                setInteractMemo: setInteractMemo,
+                getInteractMemo: getInteractMemo,
+                rootSnippet: rootSnippet,
+                isDIEvent: isDIEvent,
+                setFuncAuth: setFuncAuth,
+                setDIAgent: function (diAgt) {
+                    instance.diAgent = diAgt;
+                },
+                setDIReportImageId: function (rptImgId) {
+                    instance.reportImageId = rptImgId;
+                },
+                getDIReportImageId: function () {
+                    return instance.reportImageId;
+                },
+                dispose: function () {
+                    resetInstanceAttributes();
+                },
+                INIT_EVENT_NAME: INIT_EVENT_NAME,
+                INIT_EVENT_AGENT_ID: INIT_EVENT_AGENT_ID
+            };
+
+            resetInstanceAttributes();
+        }
+        return instance;
+    };
+
+
+    //----------------------------------------------------------
+    // 常量/内部变量
+    //----------------------------------------------------------
+
+    /**
+     * 为实例挂载属性或方法时使用的前缀，
+     * 以及一些隐含的引用名
+     */
+    var DI_ATTR_PREFIX = '\x06diA^_^';
+    var DI_METHOD_PREFIX = '\x06diM^_^';
+    var DI_ADAPTER_METHOD_PREFIX = '\x06diMAdpt^_^';
+    var DI_DEF_TAG = '\x06diDef^_^';
+    var DI_EVENT_AGENT_TAG = '\x06diEAgt^_^';
+    var DI_EVENT_TAG = '\x06diEvt^_^';
+    var DI_TMP_TAG = '\x06diTmp^_^';
+    var DI_OPT_HOME_TAG = '\x06diOpt^_^';
+    var DI_OPT_CACHE_TAG = '\x06diOpt_cache^_^';
+    var DI_OPT_ID_TAG = '\x06diOpt_id^_^';
+    var SEP = '\x06_';
+    var INIT_EVENT_NAME = '\x06diEvt_init^_^';
+    var INIT_EVENT_AGENT_ID = '\x06diEvtAgtId_init^_^';
+
+    /**
+     * clzType
+     */
+    var INS_CLZ_TYPE = [
+        'SNIPPET',
+        'COMPONENT',
+        'VUI',
+        'VCONTAINER',
+        'VPART'
+    ];
+
+    /**
+     * 默认的vui adapter
+     */
+    var GENERAL_ADAPTER_METHOD_PATH = 'di.shared.adapter.GeneralAdapterMethod';
+    var generalAdapterMethod;
+
+    /**
+     * DIFactory实例
+     */
+    var instance;
+
+
+    //-----------------------------------------------------------------
+    // 契约方法
+    //-----------------------------------------------------------------
+
+    /**
+     * 调用挂载到各个实例上的di方法（如果找不到，则调用同名原有方法）
+     * 挂载后，在实例中使用this.$di('someMethodName')调用挂载的方法
+     * 如果调用时要传参，则为this.$di('someMethodName', arg1, arg2)
+     * （PS：之所以没做成$di('someMethodName')(arg1, arg2)的样子，
+     * 因为这样不好得到this）
+     *
+     * @param {string} methodName 方法名
+     * @param {*...} args 调用参数
+     *      支持apply和call，methodName后面一个参数可为apply或call，
+     *      后面继续的参数是scope，以及其他参数，同apply和call的用法。
+     *      如：some.$di('apply', this, [1234, 5214]);
+     */
+    var $di = {
+        INS: function (methodName) {
+            var scope;
+            var args;
+            var mk = arguments[1];
+
+            if (mk == 'call') {
+                scope = arguments[2];
+                args = arraySlice.call(arguments, 3);
+            }
+            else if (mk == 'apply') {
+                scope = arguments[2];
+                args = arguments[3];
+            }
+            else {
+                scope = this;
+                args = arraySlice.call(arguments, 1);
+            }
+
+            return (
+                // 寻找di挂载的方法
+                this[DI_METHOD_PREFIX + methodName]
+                // 如果找不到，找adapter方法
+                || this[DI_ADAPTER_METHOD_PREFIX + methodName]
+                // 如果找不到，则调用同名原有方法
+                || this[methodName]
+            ).apply(scope, args);
+        },
+        DEF: function (methodName) {
+            var scope;
+            var args;
+            var mk = arguments[1];
+
+            if (mk == 'call') {
+                scope = arguments[2];
+                args = arraySlice.call(arguments, 3);
+            }
+            else if (mk == 'apply') {
+                scope = arguments[2];
+                args = arguments[3];
+            }
+            else {
+                scope = this;
+                args = arraySlice.call(arguments, 1);
+            }
+
+            return DEF_CONTRACT_METHOD[methodName]
+                .apply(scope, args);
+        }
+    };
+
+    /**
+     * 通用契约方法，用于注入
+     */
+    var COMMON_CONTRACT_METHOD = {
+        /**
+         * COMPONENT创建时需要调用
+         */
+        start: function (options) {
+            var opt = options[DI_TMP_TAG];
+            this.$di('setId', opt.id);
+            this.$di('setEl', opt.el);
+
+            var def = getEntity(opt.id, 'DEF');
+            if (opt.el && opt.el.style.display == 'none') {
+                setDIAttr(this, 'styleDisplay', def.styleDisplay);
+            }
+
+            var func;
+            (func = getDIMethod(this, 'setTplMode'))
+            && func.call(this, opt.tplMode);
+            (func = getDIMethod(this, 'setCommonParamGetter'))
+            && func.call(this, opt.commonParamGetter);
+        },
+
+        getDIFactory: function () {
+            return instance;
+        },
+
+        getMethod: function (methodName) {
+            return getDIMethod(this, methodName);
+        },
+
+        getDef: function () {
+            return getEntity(
+                COMMON_CONTRACT_METHOD.getId.call(this),
+                'DEF'
+            );
+        },
+
+        setId: function (id) {
+            setDIAttr(this, 'id', id);
+        },
+
+        getId: function () {
+            return getDIAttr(this, 'id');
+            // return getAttrIncludeGlobal(this, 'id');
+        },
+
+        setEl: function (el) {
+            setDIAttr(this, 'el', el);
+        },
+
+        getEl: function (id) {
+            return getDIAttr(this, 'el');
+        },
+
+        diShow: function () {
+            var def = this.$di('getDef');
+            var el = this.$di('getEl');
+            var styleDisplay = getDIAttr(this, 'styleDisplay');
+            var hideByAuth = getDIAttr(this, 'hideByAuth');
+            if (styleDisplay != null && !hideByAuth) {
+                setDIAttr(this, 'styleDisplay', null);
+                el.style.display = styleDisplay;
+            }
+        },
+
+        diHide: function () {
+            var el = this.$di('getEl');
+            if (el && getDIAttr(this, 'styleDisplay') == null) {
+                setDIAttr(this, 'styleDisplay', el.style.display);
+                el.style.display = 'none';
+            }
+        },
+
+        /**
+         * 设置耳聋，聋则不收到任何事件
+         *
+         * @param {boolean} isDeaf 是否耳聋
+         * @param {string=} key 禁用者的标志，缺省则忽略
+         */
+        setDeaf: function (isDeaf, key) {
+            var keyName = 'deaf';
+
+            // 设置禁用，并记录objKey
+            if (isDeaf) {
+                objKey.add(this, key, keyName);
+                setDIAttr(this, keyName, true);
+            }
+            // 所有key都清除了，或者未传key，才解除禁用
+            else {
+                objKey.remove(this, key, keyName);
+                (key == null || objKey.size(this, keyName) == 0)
+                && setDIAttr(this, keyName, false);
+            }
+        },
+
+        isDeaf: function () {
+            return getDIAttr(this, 'deaf');
+        },
+
+        /**
+         * 设置getValue禁用
+         *
+         * @param {boolean} valueDisabled 是否getValue禁用
+         * @param {string=} key 禁用者的标志，缺省则忽略
+         */
+        setValueDisabled: function (valueDisabled, key) {
+            var keyName = 'valueDisabled';
+
+            // 设置禁用，并记录objKey
+            if (valueDisabled) {
+                objKey.add(this, key, keyName);
+                setDIAttr(this, keyName, true);
+            }
+            // 所有key都清除了，或者未传key，才解除禁用
+            else {
+                objKey.remove(this, key, keyName);
+                (key == null || objKey.size(this, keyName) == 0)
+                && setDIAttr(this, keyName, false);
+            }
+        },
+
+        isValueDisabled: function () {
+            return getDIAttr(this, 'valueDisabled');
+        },
+
+        getClzType: 'placeholder',
+
+        /**
+         * 解禁操作
+         *
+         * @protected
+         * @param {string=} key 禁用者的标志
+         */
+        disable: function (key) {
+            objKey.add(this, key);
+
+            if (!getDIAttr(this, 'disabled')) {
+                setDIAttr(this, 'disabled', true);
+                this.disable && this.disable();
+            }
+        },
+
+        /**
+         * 禁用操作
+         *
+         * @protected
+         * @param {string=} key 禁用者的标志，空则无条件解禁
+         */
+        enable: function (key) {
+            objKey.remove(this, key);
+
+            if (objKey.size(this) == 0 && getDIAttr(this, 'disabled')) {
+                setDIAttr(this, 'disabled', false);
+                this.enable && this.enable();
+            }
+        },
+
+        /**
+         * 得到opt或opt值的统一入口
+         *
+         * @public
+         * @param {string} optName 如cfgOpt、baseOpt
+         * @param {string=} attr 属性名，如果为空，则得到opt本身
+         * @return {Object} 得到的opt
+         */
+        getOpt: function (optName, attr) {
+            var def = getEntity(this.$di('getId'), 'RAW');
+            return getOpt(def, optName, attr, { clone: true });
+        },
+
+        /**
+         * 设置def的参数
+         *
+         * @public
+         * @param {string} optName 如cfgOpt、baseOpt
+         * @param {string} attr 属性名
+         * @param {*} value 属性值
+         */
+        setOpt: function (optName, attr, value) {
+            var def = getEntity(this.$di('getId'), 'RAW');
+            setOpt(def, optName, attr, value);
+        },
+
+        /**
+         * @param {string} refName 如'vuiRef'，'vpartRef'
+         * @param {string} refPath 引用定位路径，如'someAttr.some[4][5].some'
+         * @param {string=} modee 值为'DEF'（默认）或者'INS'
+         * @return {(Array.<Object>|Object)} ref的数组
+         *      例如：vuiDef的内容为：
+         *      {string} vuiDef.id ID
+         *      {Object} vuiDef.clz 类
+         *      {string} vuiDef.clzKey 类key
+         *      {Object} vuiDef.initObject 初始化参数，可能为空
+         */
+        getRef: function (refName, refPath, mode) {
+            return getRef(this, refName, refPath, mode);
+        },
+
+        /**
+         * 为给定的事件注册事件代理。注册事件代理后，
+         * 对此事件的addEventListener和dispatch都只针对于代理，屏蔽了原生事件。
+         * 此方法常在vui的adapter中用于隔离原生事件。
+         * 例如：
+         *      某控件有事件change，为了挂接到DI，需要为其写adapter，
+         *      adapter中有需要修改change事件的含义以符合COMPONENT的需求。
+         *      则在adapter中，首先：
+         *          ctrl.$di('registerEventAgent', 'change');
+         *      然后：
+         *          ctrl.onchange = function () { 
+         *              // ...
+         *              ctrl.$di('dispatchEvent', 'change');
+         *          };
+         *      因为有了eventAgent，那么向ctrl挂事件（ctrl.$di('addEventListener', ...)
+         *      的时候只会挂到eventAgent上，而不会深入到ctrl本身。
+         *
+         * @public
+         * @param {string=} eventName 事件名，缺省则对于全部事件都使用event agent
+         */
+        registerEventAgent: function (eventName) {
+            registerEventAgent(this, eventName);
+        },
+
+        /**
+         * 添加事件监听
+         * 目前只支持XObject和ecui
+         *
+         * @param {string} eventName 事件名
+         * @param {Function} handler 事件处理函数
+         * @param {Object} scope 域，handler执行时的this
+         * @param {Object=} options 选项
+         * @param {string=} options.interactionId interact的id
+         * @param {string=} options.dispatcherId 触发event的di ins的id
+         * @param {Function=} options.argHandler 参数转化函数，用于适配事件的参数
+         *      输入为 {Array} 参数构成的数组
+         *      输出为 {Array} 转化完成后的参数构成的数组
+         *      注意argHandler如果要更改原参数对象的内容，需要新建副本，
+         *      以免影响其他事件处理器的响应。
+         * @param {Array} options.bindArgs 绑定的参数，总在最前面传入handler，
+         *      但是不会传入argHandler
+         * @param {boolean=} options.once handler是否只调用一次后就注销
+         * @param {boolean=} options.dontClone 是否禁用clone。默认不禁用。
+         *      clone的用意是，每次创建一个参数副本给事件处理器，
+         *      防止事件处理修改了参数而影响其他事件处理器的调用，
+         *      只有普通Object和Array和基本类型能被clone，否则抛置异常。
+         * @param {(Function|boolean)=} checkDeaf 检查是否deaf，deaf则不响应事件
+         *      默认是true，如果传false则不检查，如果传function则用此function检查
+         * @param {string} options.viewDisableDef 视图禁用定义
+         * @param {(Array|Object)=} options.rule 事件路径定义
+         */
+        addEventListener: function (
+            eventName, handler, scope, options
+        ) {
+            assert(
+                    eventName && handler && scope,
+                'Event listener can not be empty.'
+            );
+
+            options = options || {};
+            var argHandler = options.argHandler;
+            var dontClone = options.dontClone;
+            var once = options.once;
+            var checkDeaf = options.checkDeaf;
+            var bindArgs = options.bindArgs || [];
+            var id = options.id;
+            var dispatcherId = options.dispatcherId;
+            var interactionId = options.interactionId;
+            var viewDisableDef = options.viewDisableDef;
+            var rule = options.rule;
+            var eventMatchMode = options.eventMatchMode;
+            var eventAgent = getEventAgentByName(this, eventName) || this;
+
+            var newHandler = function () {
+                // 耳聋则不响应事件
+                if (checkDeaf !== false
+                    && (isFunction(checkDeaf)
+                        ? checkDeaf(scope)
+                        : (scope && scope.$di && scope.$di('isDeaf'))
+                        )
+                ) {
+                    return;
+                }
+
+                // 处理diEvent
+                var diEvent = arguments[0];
+                var args = Array.prototype.slice.call(
+                    arguments,
+                    isDIEvent(diEvent)
+                        ? (
+                        // diEvent或者由事件dispatch者传来
+                        //（从而支持interactPath）
+                        diEvent = cloneEvent(diEvent),
+                            1
+                        )
+                        : (
+                        // diEvent未传来，则在此处创建。
+                        diEvent = createDIEvent(eventName),
+                            0
+                        )
+                );
+                // 注入触发事件的ins的diId
+                setEventAttr(diEvent, 'dispatcherId', dispatcherId, true);
+                setEventAttr(diEvent, 'interactionId', interactionId, true);
+                diEvent.viewDisableDef = viewDisableDef;
+
+                // 对interactionRule求值
+                if (rule && !evalJsonLogic(
+                        rule,
+                        bind(evalRule, null, diEvent)
+                    )
+                ) {
+                    return;
+                }
+
+                // 克隆参数
+                !dontClone && (args = argsClone(args));
+
+                // 执行arg handler
+                args = argHandler ? argHandler.call(scope, args) : args;
+
+                // 设定interact memo
+                scope.$di && setInteractMemo(scope, 'diEvent', diEvent);
+
+                // 执行action
+                var ret = handler.apply(scope, bindArgs.concat(args));
+
+                // 清除interact memo
+                scope.$di && setInteractMemo(scope, 'diEvent', UNDEFINED);
+
+                return ret;
+            };
+
+            // FIXME 
+            // 这部分应该拆出来。
+            // 现在这么写耦合了ecui。这是现在还遗留的耦合ecui的地方，还没来得及改。
+            // 考虑后续可能会引入其他控件库（比如嫌ecui重的时候），往后加else是较邋遢的结构。后续改。            
+            if (eventAgent instanceof XOBJECT) {
+                eventAgent[once ? 'attachOnce' : 'attach'](eventName, newHandler);
+            }
+            else if (isEcuiControl(eventAgent)) {
+                ecuiAddEventListener(eventAgent, eventName, newHandler, once);
+            }
+
+            options = null;
+        },
+
+        /**
+         * 分发事件
+         * 目前只支持XObject和ecui
+         *
+         * @param {(string|DIEvent)} eventName 事件名（或者diEvent对象）
+         * @param {Array} args 事件参数
+         */
+        dispatchEvent: function (eventName, args, options) {
+            options = options || {};
+
+            var eventAgent = getEventAgentByName(this, eventName) || this;
+
+            // diEvent用以支持interactPath功能
+            if (isDIEvent(eventName)) {
+
+                // 这个限制，是为了保证：收到diEvent的eventHandler都是用$di('reportTemplate')注册的
+                // 因为diEvent要暗自用第一个参数传递，$di('addEventListener')注册的才能识别
+                assert(
+                    eventAgent != this,
+                    '如果使用diEvent，必须先registerEventAgent。'
+                );
+
+                // 暗自用第一个参数传递diEvent对象
+                (args = args || []).splice(0, 0, eventName);
+                eventName = eventName.getEventName();
+            }
+
+            // FIXME 
+            // 这部分应该拆出来。后序改。说明同上面addEventListener中。            
+            if (eventAgent instanceof XOBJECT) {
+                eventAgent.notify(eventName, args);
+            }
+            else if (isEcuiControl(efventAgent)) {
+                ecuiTriggerEvent(eventAgent, eventName, null, args);
+            }
+        }
+    };
+
+    var DEF_CONTRACT_METHOD = {
+        getDIFactory: COMMON_CONTRACT_METHOD.getDIFactory,
+        getMethod: function (methodName) {
+            return DEF_CONTRACT_METHOD[methodName];
+        },
+        setId: function (id) {
+            this.id = id;
+        },
+        getId: function () {
+            return this.id;
+        },
+        getOpt: COMMON_CONTRACT_METHOD.getOpt,
+        setOpt: COMMON_CONTRACT_METHOD.setOpt,
+        getRef: COMMON_CONTRACT_METHOD.getRef
+    };
+
+    var COMPONENT_CONTRACT_METHOD = {
+        setTplMode: function (tplMode) {
+            setDIAttr(this, 'tplMode', tplMode);
+        },
+
+        getTplMode: function () {
+            return getDIAttr(this, 'tplMode');
+            // return getAttrIncludeGlobal(this, 'tplMode');
+        },
+
+        /**
+         * 创建VUI实例
+         * 如果工厂里有VUI定义，则用工厂里的定义创建，
+         * 否则返回空
+         *
+         * 例：在component中创建一个vui，
+         *  这个vui本身是一个ecui控件，
+         *  如果在模板中有定义，则用模板中定义的创建，
+         *  否则使用ecui的$fastCreate创建：
+         *      var options = { myAttr1: 1, myAttr2: 'yyy' };
+         *      this._uSomeControl = this.$di
+         *          && this.$di('create', ['theVUINameInTpl', 1], options)
+         *          || ecui.$fastCreate(ecui.ui.MyControl, mainEl, null, options);
+         *
+         * @param {string} refPath 引用定位路径，如'someAttr.some[4][5].some'
+         * @param {Object=} options 被创建者需要的初始化参数
+         * @return {Object} vui实例，如果创建失败则返回空
+         */
+        vuiCreate: function (refPath, options) {
+            var def = this.$di('getRef', 'vuiRef', refPath, 'DEF');
+            if (!def) { return null; }
+
+            options = mergeOpt(
+                def,
+                extend({}, options, { id: def.id, el: def.el }),
+                'DATA_INIT'
+            );
+
+            // vuiSet用于component引用自身的vui
+            var vuiSet = getMakeAttr(this, 'vuiSet');
+            var vuiSetKey = makePathKey(refPath);
+
+            assert(
+                !vuiSet[vuiSetKey],
+                'vui已经存在: refPath=' + refPath + ' vuiSetKey=' + vuiSetKey
+            );
+
+            // 设置默认值
+            if (getOpt(def, 'cfgOpt', 'paramMode') == null) {
+                setOpt(def, 'cfgOpt', 'paramMode', 'NORMAL');
+            }
+
+            // 得到适配器和适配方法
+            var adptMethod = def.adapterMethod || {};
+            var adpt = def.adapter && def.adapter(def, options) || {};
+
+            // 创建实例
+            var ins;
+            if (adpt['create']) {
+                ins = adpt['create'](def, options);
+            }
+            else if (adptMethod['create']) {
+                ins = generalAdapterMethod[adptMethod['create']](def, options);
+            }
+
+            // 实例创建失败
+            if (!ins) {
+                return null;
+            }
+
+            // 绑定$di
+            ins.$di = $di.INS;
+
+            // 家长的引用
+            setDIAttr(ins, 'parent', this);
+
+            // 设置基本属性
+            setDIAttr(ins, 'id', def.id);
+            setDIAttr(ins, 'el', def.el);
+            if (def.el && def.el.style.display == 'none') {
+                setDIAttr(ins, 'styleDisplay', def.styleDisplay);
+            }
+
+            // 保存实例
+            vuiSet[vuiSetKey] = ins;
+            setDIAttr(ins, 'parentVUISetKey', vuiSetKey);
+            addEntity(ins, 'INS');
+
+            // 拷贝adapter方法到实例上
+            var setDataMethod;
+            var methodName;
+            for (methodName in adptMethod) {
+                assert(
+                    !COMMON_CONTRACT_METHOD[methodName],
+                    'common contract method can not be overwrite!' + methodName
+                );
+                if (methodName != 'create') {
+                    // adapter method专门存储。
+                    // 这设计看起来不好看，但是够用了，不用加更复杂的机制。
+                    // 因为：
+                    // (1) 不宜让adapterMethod覆盖控件原有方法。
+                    // 因为控件原有方法还可能被控件自身调用。
+                    // (2) 不能在此处使用setDIMethod。
+                    // 因为adapterMethod理应在installClz中挂上的DIMethod下层，
+                    // 被它们调用。而如果此处用setDIMethod，就override了后者。
+                    setDIAdapterMethod(
+                        ins,
+                        methodName,
+                        generalAdapterMethod[methodName]
+                    );
+                }
+            }
+            for (methodName in adpt) {
+                assert(
+                    !COMMON_CONTRACT_METHOD[methodName],
+                    'common contract method can not be overwrite!' + methodName
+                );
+                if (methodName != 'create') {
+                    // 说明同上
+                    setDIAdapterMethod(
+                        ins,
+                        methodName,
+                        adpt[methodName]
+                    );
+                }
+            }
+
+            return ins;
+        },
+
+        /**
+         * component获得自己的vui实例
+         *
+         * @public
+         * @param {string} refPath 引用定位路径，如'someAttr.some[4][5].some'
+         * @return {Object} vui实例
+         */
+        vuiGet: function (refPath) {
+            return getMakeAttr(this, 'vuiSet')[makePathKey(refPath)];
+        },
+
+        /**
+         * Component的getValue的统一实现，
+         * 遍历每个vui，调用其getValue方法，
+         * 用每个vui的name作为key，组成返回值对象。
+         * （如果没有name，则不会被getValue），
+         * 如果要控制某个vui的getValue，可自己实现vuiGetValue方法
+         *
+         * @public
+         * @return {Object} value
+         */
+        getValue: function () {
+            var def = this.$di('getDef');
+            var valueDisabledMode = def.valueDisabledMode;
+
+            var cmptValDisabled = this.$di('isValueDisabled');
+            if (cmptValDisabled && valueDisabledMode == 'NORMAL') {
+                return null;
+            }
+
+            var value = {};
+            var vuiSet = getMakeAttr(this, 'vuiSet');
+            var vuiIns;
+            var vuiDef;
+            var vuiValue;
+
+            if (this.getValue) {
+                value = this.getValue() || {};
+            }
+
+            var valDisabled;
+            for (var refPathKey in vuiSet) {
+                vuiIns = vuiSet[refPathKey];
+                vuiDef = vuiIns.$di('getDef');
+                valDisabled = cmptValDisabled || vuiIns.$di('isValueDisabled');
+
+                if (vuiDef.name == null
+                    || (valDisabled && valueDisabledMode == 'NORMAL')
+                ) {
+                    continue;
+                }
+
+                value[vuiDef.name] = valDisabled && valueDisabledMode == 'DI'
+                    ? null
+                    : (
+                        isObject(vuiValue = vuiIns.$di('getValue'))
+                            ? COMMON_PARAM_FACTORY.markParamMode(
+                                vuiValue,
+                                getOpt(vuiDef, 'cfgOpt', 'paramMode')
+                            )
+                            : vuiValue
+                    );
+            }
+
+            return value;
+        },
+
+        /**
+         * COMPONENT中，在interaction时得到event，
+         * 其中含有disableFunc和enableFunc，
+         * 调用则会执行disable和enable.
+         * 用于在异步行为时做用户操作屏蔽。
+         * 只能在interaction的action开始执行时调用
+         *
+         * @public
+         * @return {Object} event
+         *      {Function} event.disableFunc
+         *      {Function} event.enableFunc
+         */
+        getEvent: function () {
+            var event = getInteractMemo(this, 'diEvent');
+            /*
+             // 使用sync view disable配置代替
+             var visDef = event.viewDisableDef;
+             if (visDef) {
+             var key = 'INTERACTION_VIEW_DISABLE_' + this.$di('getId');
+             event.viewDisable = {
+             disable: makeViewDisableFunc(visDef, 'disable', key),
+             enable: makeViewDisableFunc(visDef, 'enable', key)
+             }
+             };
+             */
+            return event;
+        },
+
+        getEventChannel: getEventChannel,
+
+        setCommonParamGetter: function (commonParamGetter) {
+            setDIAttr(this, 'commonParamGetter', commonParamGetter);
+        },
+
+        getCommonParamGetter: function () {
+            return getDIAttr(this, 'commonParamGetter');
+        },
+
+        getReportTemplateId: function () {
+            var getter = getDIAttr(this, 'commonParamGetter');
+            if (getter) {
+                return getter.getReportTemplateId()
+            }
+        },
+
+        /**
+         * 报表跳转
+         *
+         * @protected
+         * @param {string} linkBridgeType 跳转类型，值可为'I'(internal)或者'E'(external)
+         * @param {string} url 目标url
+         * @param {string} param 参数
+         */
+        linkBridge: function (linkBridgeType, url, param) {
+            // 报表引擎内部处理，直接跳转
+            if (linkBridgeType == 'I') {
+                targetBlank(url + '?' + param);
+            }
+            // 给di-stub发事件，由引用报表引擎的系统来跳转
+            else if (linkBridgeType == 'E') {
+                instance.eventChannel && instance.eventChannel.triggerEvent(
+                    'linkbridge',
+                    [url, param]
+                );
+            }
+        },
+
+        /**
+         * 报表刷新
+         *
+         * @protected
+         * @param {Object} paramObj 新添加的参数
+         * @param {Object} paramObj.reportImageId 镜像id
+         */
+        reloadReport: function (paramObj) {
+            // 如果是从di-stub初始化的报表
+            if (instance.diAgent === 'STUB') {
+                instance.eventChannel.triggerEvent('reloadReport', [paramObj]);
+
+            }
+            // 如果是用户自己创建iframe加载的报表
+            else {
+                var url = window.location.href;
+                url = replaceIntoParam(url, 'reportImageId', paramObj.reportImageId, 1);
+                window.location.href = url;
+            }
+        },
+
+        /**
+         * 执行view disable
+         *
+         * @protected
+         * @param {string} actName 值为disable或者enable
+         * @param {string} datasourceId
+         */
+        syncViewDisable: function (actName, datasourceId) {
+            assert(
+                    actName == 'enable' || actName == 'disable',
+                    'Wrong actName: ' + actName
+            );
+            var def = this.$di('getDef');
+            var key = 'ASYNC_VIEW_DISABLE_' + this.$di('getId');
+            var vdDef = (def.sync || {}).viewDisable;
+            doViewDisable(
+                vdDef == 'ALL'
+                    ? vdDef
+                    : (isObject(vdDef) && vdDef[datasourceId]),
+                actName,
+                key
+            );
+        },
+
+        /**
+         * 因为功能权限而禁用vui, 此为默认行为，可重载改变
+         *
+         * @public
+         */
+        funcAuthVerify: function () {
+            var vuiSet = getMakeAttr(this, 'vuiSet');
+            var vuiIns;
+            var vuiDef;
+
+            for (var refPathKey in vuiSet) {
+                vuiIns = vuiSet[refPathKey];
+                vuiDef = vuiIns.$di('getDef');
+                if (// 如果vui配了funcAuth，则要检查查权限
+                    vuiDef.funcAuth
+                    && !(vuiDef.funcAuth in instance.funcAuthKeys)
+                ) {
+                    // 没权限禁用
+                    vuiIns.$di('getEl').style.display = 'none';
+                    setDIAttr(vuiIns, 'hideByAuth', true);
+                }
+            }
+        }
+    };
+
+    var VCONTAINER_CONTRACT_METHOD = {
+        /**
+         * 创建VPART实例
+         * 如果工厂里有VPART定义，则用工厂里的定义创建，
+         * 否则返回空
+         *
+         * @param {string} refPath 引用定位路径，如'someAttr.some[4][5].some'
+         * @param {Object=} options 被创建者需要的初始化参数
+         * @return {Object} vpart实例，如果创建失败则返回空
+         */
+        vpartCreate: function (refPath, options) {
+            var def = this.$di('getRef', 'vpartRef', refPath, 'DEF');
+            if (!def) { return null; }
+
+            options = mergeOpt(
+                def,
+                extend({}, options, { id: def.id, el: def.el }),
+                'DATA_INIT'
+            );
+
+            // vpartSet用于component引用自身的vpart
+            var vpartSet = getMakeAttr(this, 'vpartSet');
+            var vpartSetKey = makePathKey(refPath);
+
+            assert(
+                !vpartSet[vpartSetKey],
+                'vpart已经存在: refPath=' + refPath + ' vpartSetKey=' + vpartSetKey
+            );
+
+            // 创建实例
+            var ins = new def.clz(options);
+
+            // 实例创建失败
+            if (!ins) {
+                return null;
+            }
+
+            // 绑定$di
+            ins.$di = $di.INS;
+
+            // 家长的引用
+            setDIAttr(ins, 'parent', this);
+
+            // 设置基本属性
+            setDIAttr(ins, 'id', def.id);
+            setDIAttr(ins, 'el', def.el);
+            if (def.el && def.el.style.display == 'none') {
+                setDIAttr(ins, 'styleDisplay', def.styleDisplay);
+            }
+
+            // 保存实例
+            vpartSet[vpartSetKey] = ins;
+            setDIAttr(ins, 'parentVPartSetKey', vpartSetKey);
+            addEntity(ins, 'INS');
+
+            return ins;
+        },
+
+        /**
+         * vcontainer获得自己的vpart实例
+         *
+         * @public
+         * @param {string} refPath 引用定位路径，如'someAttr.some[4][5].some'
+         * @return {Object} vui实例
+         */
+        vpartGet: function (refPath) {
+            return getMakeAttr(this, 'vpartSet')[makePathKey(refPath)];
+        }
+    };
+
+    var VUI_CONTRACT_METHOD = {
+        /**
+         * vui本身要求提供setData方法，
+         * vui提供的setData意为重新设置完全数据并渲染
+         * 这里的setData方法又为vui的setData方法的加了一层包装，
+         * 用于将模板里自定义的dataOpt与传入的options融合
+         * （融合顺序依照mergeOpt方法的定义）。
+         * Component对vui进行操作时须调用此setData方法，
+         * （如：this._uSomeVUi.$di('setData', data);）
+         * 而非直接调用vui本身提供的setData方法。
+         *
+         * @public
+         * @param {*} data
+         * @param {Object=} options 参数
+         * @param {*=} options.forceData 最高merge优先级的data
+         * @param {Object=} options.diEvent di事件
+         */
+        setData: function (data, options) {
+            if (!this.$di) {
+                return this.setData.apply(this, arguments);
+            }
+
+            var existMethod = getDIAdapterMethod(this, 'setData') || this.setData;
+            if (existMethod) {
+                options = options || {};
+                data = mergeOpt(
+                    this.$di('getDef'), data, 'DATA_SET', options
+                );
+                // TODO 
+                // isSilent的统一支持
+                return existMethod.call(this, data);
+            }
+        },
+
+        /**
+         * vui的getValue方法的封装
+         *
+         * @public
+         */
+        getValue: function () {
+            if (!this.$di) {
+                return this.setData.apply(this, arguments);
+            }
+
+            var existMethod = getDIAdapterMethod(this, 'getValue') || this.getValue;
+            if (existMethod) {
+                return this.$di('isValueDisabled')
+                    ? null
+                    : existMethod.call(this);
+            }
+        },
+
+        /**
+         * vui的init方法的封装
+         *
+         * @public
+         */
+        init: function () {
+            if (!this.$di) {
+                return this.init.apply(this, arguments);
+            }
+
+            var existMethod = getDIAdapterMethod(this, 'init') || this.init;
+            mountInteractions(this);
+            existMethod && existMethod.call(this);
+        },
+
+        /**
+         * 析构
+         *
+         * @public
+         */
+        dispose: function () {
+            if (!this.$di) {
+                return this.dispose.apply(this, arguments);
+            }
+
+            var existMethod = getDIAdapterMethod(this, 'dispose') || this.dispose;
+            var vuiSet = getDIAttr(getDIAttr(this, 'parent'), 'vuiSet');
+            if (vuiSet) {
+                delete vuiSet[getDIAttr(this, 'parentVUISetKey')];
+            }
+            removeEntity(this);
+            existMethod && existMethod.call(this);
+            this.$di('setEl', null);
+        }
+    };
+
+    var VPART_CONTRACT_METHOD = {
+        /**
+         * 析构
+         *
+         * @public
+         */
+        dispose: function () {
+            var vpartSet = getDIAttr(getDIAttr(this, 'parent'), 'vpartSet');
+            if (vpartSet) {
+                delete vpartSet[getDIAttr(this, 'parentVPartSetKey')];
+            }
+            removeEntity(this);
+            this.dispose && this.dispose.call(this);
+            this.$di('setEl', null);
+        }
+    }
+
+
+
+    //----------------------------------------------------------------------
+    // rule相关
+    //----------------------------------------------------------------------
+
+    /**
+     * 处理interaction规则
+     *
+     * @private
+     * @param {Object} diEvent
+     * @param {Array.<Object>} atomRule
+     *      结构例如：
+     *      { operator: 'includes', interactionIds: ['aaaaa-rid1', 'aaaa-rid2' ]}
+     * @return {boolean} 判断结果
+     */
+    function evalRule(diEvent, atomRule) {
+        // 目前支持的operator：
+        var ruleMap = {
+            includes: evalRuleIncludesExcludes,
+            excludes: evalRuleIncludesExcludes,
+            equals: evalRuleEquals
+        };
+
+        assert(
+                atomRule.operator in ruleMap,
+                'Illegal rule: ' + atomRule.operator
+        );
+
+        return ruleMap[atomRule.operator](diEvent, atomRule);
+    }
+
+    /**
+     * 处理interaction规则 incudes excludes
+     *
+     * @private
+     * @param {Object} diEvent
+     * @param {Array.<Object>} atomRule
+     *      结构例如：
+     *      { operator: 'includes', interactionIds: ['aaaaa-rid1', 'aaaa-rid2' ]}
+     * @return {boolean} 判断结果
+     */
+    function evalRuleIncludesExcludes(diEvent, atomRule) {
+        if (!diEvent) { return false; }
+
+        var rSet = { includes: {}, excludes: {} };
+
+        for (var j = 0; j < (atomRule.interactionIds || []).length; j ++) {
+            rSet[atomRule.operator][atomRule.interactionIds[j]] = 1;
+        }
+
+        var path = getEventAttr(diEvent, 'interactPath');
+        for (var i = 0, e, iid; e = path[path.length - i - 1]; i ++) {
+            iid = getEventAttr(e, 'interactionId');
+
+            if (iid in rSet.excludes) {
+                return false;
+            }
+
+            if (rSet.includes[iid]) {
+                delete rSet.includes[iid];
+            }
+        }
+
+        if (!isEmptyObj(rSet.includes)) {
+            return false;
+        }
+
+        return true;
+
+        // TODO
+        // 按路径模式匹配的代码（如下类似），后续有需求再加
+        // for (
+        //     var i = 0, e, eDef; 
+        //     eDef = interactPathDef[dlen - i - 1], e = realPath[rlen - i - 1];
+        //     i ++
+        // ) {
+        //     if (!eDef) {
+        //         if (eventMatchMode == 'EXACT') { return false; }
+        //         else { break; }
+        //     }
+
+        //     if (getEventAttr(e, 'dispatcherId') != eDef.dispatcherId
+        //         || getEventAttr(e, 'eventName') != eDef.name
+        //     ) {
+        //         return false;
+        //     }
+        // }
+    }
+
+    /**
+     * 处理interaction规则 equals
+     *
+     * @private
+     * @param {Object} diEvent
+     * @param {Array.<Object>} atomRule
+     *      结构例如：
+     *      { atomRule: 'equals', argHandlers: [ ... ], value: 1234 }
+     * @return {boolean} 判断结果
+     */
+    function evalRuleEquals(diEvent, atomRule) {
+        var val = parseArgHandlerDesc(atomRule).call(null, [])[0];
+        return val == atomRule.value;
+    }
+
+
+
+
+
+    //-------------------------------------------------------------------
+    // DI Event
+    //-------------------------------------------------------------------
+
+    /**
+     * DI事件
+     *
+     * @private
+     * @param {string=} eventName 事件名
+     * @param {Object=} options 参数
+     * @param {string=} options.dispatcherId 触发event的di ins的id
+     * @param {string=} options.interactionId interaction的id
+     * @param {string=} options.isClone 是否是clone
+     * @param {Array.<Object>=} options.interactPath 事件路径
+     * @return {Function} event实例
+     */
+    function createDIEvent(eventName, options) {
+        options = options || {};
+
+        var evt = function (eName) {
+            return createDIEvent(
+                eName,
+                // interactPath上所有event对象都引用本interactPath
+                { interactPath: evt[DI_EVENT_TAG].interactPath }
+            );
+        }
+
+        // event对象中保存数据的地方
+        var repo = evt[DI_EVENT_TAG] = {
+            eventName: eventName,
+            dispatcherId: options.dispatcherId,
+            interactionId: options.interactionId,
+            interactPath: (options.interactPath || []).slice()
+        };
+
+        // 最新一个event总在interactPath末尾
+        var path = repo.interactPath;
+        options.isClone
+            ? path.splice(path.length - 1, 1, evt)
+            : path.push(evt);
+
+        // event对象的方法
+        extend(evt, DI_EVENT_METHODS);
+
+        return evt;
+    };
+
+    var DI_EVENT_METHODS = {
+        /**
+         * 得到事件名
+         *
+         * @public
+         * @this {Object} diEvent对象
+         * @return {string} 事件名
+         */
+        getEventName: function () {
+            return this[DI_EVENT_TAG].eventName;
+        },
+
+        /**
+         * 得到interactionId
+         *
+         * @public
+         * @this {Object} diEvent对象
+         * @return {string} interactionIdId
+         */
+        getInteractionId: function () {
+            return this[DI_EVENT_TAG].interactionId;
+        }
+
+        /**
+         * 是否为用户触发的事件中的第一个事件
+         *
+         * @public
+         */
+        // isUserFirst: function () {
+        //     var path = this[DI_EVENT_TAG].interactPath;
+        //     return path && path[0] && path[0].getEventName() != INIT_EVENT_NAME
+        // },
+
+        /**
+         * 是否为自然初始化的事件中的第一个有效事件
+         *
+         * @public
+         */
+        // isInitFirst: function () {
+        //     var path = this[DI_EVENT_TAG].interactPath;
+        //     if (path 
+        //         && path[0] 
+        //         && path[0].getEventName() == INIT_EVENT_NAME
+        //         && path[1] === this
+        //     ) {
+        //         return true;
+        //     }
+        //     else {
+        //         return false;
+        //     }
+        // }
+    };
+
+    /**
+     * 得到副本
+     *
+     * @public
+     * @this {Event} 对象
+     * @param {Object} event 事件对象
+     * @return {string} 事件
+     */
+    function cloneEvent(event) {
+        var repo = event[DI_EVENT_TAG];
+        return createDIEvent(
+            repo.eventName,
+            {
+                dispatcherId: repo.dispatcherId,
+                interactionId: repo.interactionId,
+                interactPath: repo.interactPath,
+                isClone: true
+            }
+        );
+    }
+
+    /**
+     * 得到event对象的属性值
+     *
+     * @private
+     */
+    function getEventAttr(event, attrName) {
+        return event[DI_EVENT_TAG][attrName];
+    }
+
+    /**
+     * 设置event对象的属性值
+     *
+     * @private
+     */
+    function setEventAttr(event, attrName, value, checkExist) {
+        if (checkExist && event[DI_EVENT_TAG][attrName] !== UNDEFINED) {
+            throw new Error('请使用diEvent("newEventName")创建新的diEvent实例');
+        }
+        event[DI_EVENT_TAG][attrName] = value;
+    }
+
+    /**
+     * 是否为event对象
+     *
+     * @private
+     */
+    function isDIEvent(obj) {
+        return isObject(obj) && obj[DI_EVENT_TAG];
+    }
+
+
+
+
+
+    //--------------------------------------------------------------------
+    // DI Opt 相关方法
+    //--------------------------------------------------------------------
+
+    /**
+     * 初始化opt
+     * 现在支持的opt定义方式：
+     *      (1) def[optName] ==> Object
+     *      (2) def[optName + 's'] ==> Array
+     *
+     * @private
+     * @param {Object} src 源
+     * @param {string} optName opt名
+     * @return {Object} opt
+     */
+    function initializeOpt(def, optName) {
+
+        // 创建optCache
+        var optCacheHome = def[DI_OPT_CACHE_TAG];
+        if (!optCacheHome) {
+            optCacheHome = def[DI_OPT_CACHE_TAG] = {};
+        }
+        optCacheHome[optName] = {};
+
+        // 创建opt存储位置
+        var optHome = def[DI_OPT_HOME_TAG];
+        if (!optHome) {
+            optHome = def[DI_OPT_HOME_TAG] = {};
+        }
+
+        var opt = optHome[optName] = def[optName] || {};
+        var opts = optHome[optName + 's'] = def[optName + 's'] || [];
+
+        // 删除def[optName]防止直接得到（只允许通过getOpt方法得到）
+        def[optName] = null;
+        def[optName + 's'] = null;
+
+        // 生成id，用于optCache
+        opt[DI_OPT_ID_TAG] = 'DI_OPT_' + getUID('DI_OPT');
+        for (var i = 0; i < opts.length; i ++) {
+            opts[i][optName][DI_OPT_ID_TAG] = 'DI_OPT_' + getUID('DI_OPT');
+        }
+    }
+
+    /**
+     * 提取定义的opt
+     *
+     * @private
+     * @param {Object} src 源
+     * @param {string} optName opt名
+     * @param {string=} attr 属性名，如果为空，则得到opt本身
+     * @param {Obejct=} options 参数
+     * @param {Object=} options.diEvent di事件
+     * @param {boolean=} options.clone 是否返回副本，默认是false
+     * @return {Object} opt
+     */
+    function getOpt(def, optName, attr, options) {
+        options = options || {};
+
+        var optHome = def[DI_OPT_HOME_TAG];
+        var optCache = def[DI_OPT_CACHE_TAG][optName];
+        var opt = optHome[optName];
+        var opts = optHome[optName + 's'];
+        var diEvent = options.diEvent;
+        var i;
+        var o;
+        var ret;
+        var matchedOpt = [];
+        var matchedIds = [];
+        var evalRuleFunc = bind(evalRule, null, diEvent);
+
+        matchedOpt.push(opt);
+        matchedIds.push(opt[DI_OPT_ID_TAG]);
+
+        // 根据rule找到匹配的opt
+        for (i = 0; i < opts.length; i ++) {
+            if ((o = opts[i])
+                && o.rule
+                && o[optName]
+                && evalJsonLogic(o.rule, evalRuleFunc)
+            ) {
+                matchedOpt.push(o[optName]);
+                matchedIds.push(o[optName][DI_OPT_ID_TAG]);
+            }
+        }
+
+        var cacheKey = matchedIds.join(SEP);
+
+        // 优先取缓存，否则merge
+        if (!(ret = optCache[cacheKey])) {
+            ret = optCache[cacheKey] = {};
+            for (i = 0; i < matchedOpt.length; i ++) {
+                merge(
+                    ret,
+                    matchedOpt[i],
+                    { overwrite: true, clone: 'WITHOUT_ARRAY' }
+                );
+            }
+        }
+
+        if (attr != null) {
+            ret = ret[attr];
+        }
+
+        return options.clone
+            ? clone(ret, { exclusion: [DI_OPT_CACHE_TAG] })
+            : ret;
+    }
+
+    /**
+     * 设置opt
+     *
+     * @private
+     * @param {Object} src 源
+     * @param {string} optName 如cfgOpt、dataOpt
+     * @param {string} attr 属性名
+     * @param {*} value 属性值
+     */
+    function setOpt(def, optName, attr, value) {
+        def[DI_OPT_HOME_TAG][optName][attr] = value;
+
+        // 清除optcache
+        def[DI_OPT_CACHE_TAG][optName] = {};
+    }
+
+    /**
+     * 融合参数
+     *
+     * @public
+     * @param {Object} def 目标实例定义
+     * @param {Object} invokerData 调用者提供的options
+     * @param {string} optType 可为'INIT', 'DATA'
+     * @param {Object=} options
+     * @param {Object=} options.forceData 最高等级的参数
+     * @param {Object=} options.diEvent di事件
+     */
+    function mergeOpt(def, invokerData, optType, options) {
+        def = def || {};
+        options = options || {};
+        var ret = {};
+
+        // 使用了clone模式的merge，但是为减少消耗，不clone array
+        var mOpt = { overwrite: true, clone: 'WITHOUT_ARRAY' };
+        var mOpt2 = extend({}, mOpt, { exclusion: [DI_OPT_ID_TAG] });
+        var optopt = { diEvent: options.diEvent };
+
+        var clzDef = getClz(def.clzKey) || {};
+        var clzDataOpt = getOpt(clzDef, 'dataOpt', null, optopt);
+        var dataOpt = getOpt(def, 'dataOpt', null, optopt);
+
+        merge(ret, clzDataOpt, mOpt2);
+        merge(ret, invokerData, mOpt);
+        merge(ret, dataOpt, mOpt2);
+
+        if (optType == 'DATA_SET') {
+            merge(ret, getOpt(def, 'dataSetOpt', null, optopt), mOpt2);
+        }
+        else if (optType == 'DATA_INIT') {
+            merge(ret, getOpt(def, 'dataInitOpt', null, optopt), mOpt2);
+        }
+        else {
+            throw new Error('error optType:' + optType);
+        }
+
+        options.forceData &&
+        merge(ret, options.forceData, mOpt);
+
+        return ret;
+    }
+
+
+
+
+
+
+    //-----------------------------------------------------------------------
+    // Arg Handler 相关
+    //-----------------------------------------------------------------------
+
+    /**
+     * 解析argHandler定义
+     *
+     * @param {Object} container 定义argHandler的容器
+     * @param {Object=} scope 可缺省
+     * @private
+     */
+    function parseArgHandlerDesc(container, scope) {
+        var argH;
+        var argHs = [];
+
+        if (argH = container.argHandler) {
+            argHs.push(argH);
+        }
+        if (argH = container.argHandlers) {
+            argHs.push.apply(argHs, argH);
+        }
+
+        for (var i = 0; i < argHs.length; i ++) {
+            argHs[i] = [scope].concat(argHs[i]);
+        }
+
+        return ARG_HANDLER_FACTORY.apply(null, argHs);
+    }
+
+
+
+
+
+
+    //-----------------------------------------------------------------------
+    // DI Factory方法
+    //-----------------------------------------------------------------------
+
+    /**
+     * 对注册的类实例化并enhance（对各种类挂载DI提供的方法）。
+     * 各种方法，均用setDIMethod的方式绑定到类的prototype上。
+     * (a) 不使用直接覆盖原有方法的方式，因为不能改变原有方法的行为，
+     * 而原有方法还会被其他地方（如自身、如组合某控件的其他控件）调用。
+     * (b) 挂载上DI方法后，DI对此类生成的实例的操作，均使用$('someMethod', ...)进行。
+     *
+     * @private
+     */
+    function installClz() {
+        var clzKey;
+        var clzDef;
+        var proto;
+
+        generalAdapterMethod = getByPath(
+            GENERAL_ADAPTER_METHOD_PATH,
+            $getNamespaceBase()
+        );
+
+        for (clzKey in DICT.CLZ) {
+            instance.repository['CLZ'][clzKey] = clzDef = clone(DICT.CLZ[clzKey]);
+
+            // 得到类实例
+            if (clzDef.clzPath
+                && (clzDef.clz = getByPath(clzDef.clzPath, $getNamespaceBase()))
+            ) {
+                proto = clzDef.clz.prototype;
+
+                // 当有公用一个类时，不需要重复绑定了。
+                if (!getDIAttr(proto, 'protoInstalled', true)) {
+                    setDIAttr(proto, 'protoInstalled', 1);
+
+                    // 绑定$di
+                    proto.$di = $di.INS;
+
+                    // 添加约定方法
+                    mountMethod(
+                        proto,
+                        [
+                            'start',
+                            'getDIFactory',
+                            'setId',
+                            'getId',
+                            'getDef',
+                            'isDeaf',
+                            'setDeaf',
+                            'setEl',
+                            'getEl',
+                            'disable',
+                            'enable',
+                            'diShow',
+                            'diHide',
+                            'setValueDisabled',
+                            'isValueDisabled',
+                            'addEventListener',
+                            'dispatchEvent',
+                            'registerEventAgent',
+                            'getOpt',
+                            'setOpt',
+                            'getRef'
+                        ],
+                        COMMON_CONTRACT_METHOD
+                    );
+
+                    if (clzDef.clzType == 'COMPONENT') {
+                        mountMethod(
+                            proto,
+                            [
+                                'setTplMode',
+                                'getTplMode',
+                                'vuiCreate',
+                                'vuiGet',
+                                'getValue',
+                                'getEvent',
+                                'getEventChannel',
+                                'getCommonParamGetter',
+                                'setCommonParamGetter',
+                                'getReportTemplateId',
+                                'linkBridge',
+                                'syncViewDisable',
+                                'funcAuthVerify',
+                                'reloadReport'
+                            ],
+                            COMPONENT_CONTRACT_METHOD
+                        );
+                    }
+
+                    if (clzDef.clzType == 'VCONTAINER') {
+                        mountMethod(
+                            proto,
+                            [
+                                'vpartCreate',
+                                'vpartGet'
+                            ],
+                            VCONTAINER_CONTRACT_METHOD
+                        );
+                    }
+
+                    if (clzDef.clzType == 'VUI') {
+                        mountMethod(
+                            proto,
+                            [
+                                'setData',
+                                'getValue',
+                                'init',
+                                'dispose'
+                            ],
+                            VUI_CONTRACT_METHOD
+                        );
+                    }
+
+                    if (clzDef.clzType == 'VPART') {
+                        mountMethod(
+                            proto,
+                            [
+                                'dispose'
+                            ],
+                            VPART_CONTRACT_METHOD
+                        );
+                    }
+
+                    // 赋予类型
+                    setDIMethod(
+                        proto,
+                        'getClzType',
+                        (function (clzType) {
+                            return function () { return clzType; }
+                        })(clzDef.clzType)
+                    );
+                }
+            }
+
+            // 得到adapter实例
+            clzDef.adapterPath && (
+                clzDef.adapter =
+                    getByPath(clzDef.adapterPath, $getNamespaceBase())
+                );
+
+            // 选项初始化
+            initializeOpt(clzDef, 'dataOpt');
+            initializeOpt(clzDef, 'dataInitOpt');
+            initializeOpt(clzDef, 'dataSetOpt');
+            initializeOpt(clzDef, 'valueGetOpt');
+            initializeOpt(clzDef, 'cfgOpt');
+        }
+    }
+
+    /**
+     * 为类挂载di的方法。如果类中已经有此方法，则不挂载。
+     *
+     * @private
+     * @param {Object} proto 类的prototype
+     * @param {Array.<string>} methodNameList 方法名
+     * @param {Array.<string>} methodSet 方法集合
+     */
+    function mountMethod(proto, methodNameList, methodSet) {
+        for (
+            var i = 0, methodName, prefixedMethodName;
+            methodName = methodNameList[i];
+            i ++
+        ) {
+            setDIMethod(proto, methodName, methodSet[methodName]);
+        }
+    }
+
+    /**
+     * 创建di实例
+     *
+     * @private
+     * @param {Object} def 实例定义
+     * @param {Object} options 初始化参数
+     * @param {string} options.tplMode （默认为'FROM_SNIPPET'）
+     * @param {string} options.commonParamGetter
+     * @return {Object} 创建好的实例
+     */
+    function createIns(def, options) {
+        options = options || {};
+        // 为了下面new时能在构造方法中访问这些数据，
+        // 所以放到globalTemp中
+        var opt = {
+            id: def.id,
+            el: def.el,
+            // 标志html片段从snippet中取，而不是组件自己创建
+            tplMode: options.tplMode || 'FROM_SNIPPET',
+            commonParamGetter: options.commonParamGetter
+        };
+        opt[DI_TMP_TAG] = extend({}, opt);
+
+        var ins = new def.clz(
+            mergeOpt(def, extend(options, opt), 'DATA_INIT')
+        );
+
+        addEntity(ins);
+
+        return ins;
+    }
+
+    /**
+     * 根据配置，挂载多个interaction
+     *
+     * @public
+     * @param {Object} ins 实例
+     */
+    function mountInteractions(ins) {
+        var def = ins.$di('getDef');
+
+        // 模板中定义的事件绑定(interaction)
+        if (!def.interactions) { return; }
+
+        for (
+            var i = 0, interact;
+            interact = def.interactions[i];
+            i ++
+        ) {
+            mountInteraction(ins, interact);
+        }
+    }
+
+    /**
+     * 根据配置，挂载interaction
+     *
+     * @public
+     * @param {Object} ins 实例
+     */
+    function mountInteraction(ins, interact) {
+        var def = ins.$di('getDef');
+
+        var events = [];
+        interact.event && events.push(interact.event);
+        interact.events && arrayPush.apply(events, interact.events);
+
+        for (var j = 0, evt, triggerIns; j < events.length; j ++) {
+            evt = events[j];
+            triggerIns = evt.triggerIns || getEntity(evt.rid, 'INS');
+
+            // 设置这个断言的部分原因是，vui事件不保证能提供diEvent
+            assert(
+                triggerIns.$di('getDef').clzType != 'VUI',
+                '不允许监听vui事件'
+            );
+
+            if (!triggerIns) { return; }
+
+            triggerIns.$di(
+                'addEventListener',
+                evt.name,
+                getDIMethod(ins, interact.action.name),
+                ins,
+                {
+                    interactionId: interact.id,
+                    dispatcherId: evt.rid,
+                    argHandler: parseArgHandlerDesc(interact, ins),
+                    once: interact.once,
+                    viewDisableDef: interact.viewDisable,
+                    rule: evt.rule
+                        ? ['and', interact.rule, evt.rule]
+                        : interact.rule
+                }
+            );
+        }
+    }
+
+    /**
+     * 根据引用路径（refPath）得到引用。
+     * 路径可直接指向对象树叶节点，也可以指向途中的节点。
+     *
+     * @public
+     * @param {Object} obj 目标INS或者DEF
+     * @param {string} refName 如'vuiRef'，'vpartRef'
+     * @param {string} refPath 引用定位路径，如'someAttr.some[4][5].some'
+     * @param {string=} mode 值为'DEF'（默认）或者'INS'
+     * @param {Object=} options 选项
+     * @param {boolean=} options.flatReturn
+     *      true则返回一个数组，里面是所有目标实例，
+     *      false则返回源结构，里面的id会替换为目标实例（默认）。
+     * @return {(Array.<Object>|Object)} ref数组或者ref项
+     */
+    function getRef(obj, refName, refPath, mode, options) {
+        options = options || {};
+
+        var refBase = (
+            getEntity(obj.$di('getId'), 'DEF') || {}
+        )[refName];
+
+        if (!refBase) { return null; }
+
+        return findEntity(
+            getByPath(refPath, refBase),
+            mode,
+            { isClone: true, flatReturn: options.flatReturn }
+        );
+    }
+
+    /**
+     * 设置方法，如果已经有此方法的话（除非在prototype上），报错（以免后续开发中弄错）
+     *
+     * @private
+     * @param {Object} o 类的prototype或者实例
+     * @param {string} methodName 方法名
+     * @param {Function} method 方法
+     */
+    function setDIMethod(o, methodName, method) {
+        var pName = DI_METHOD_PREFIX + methodName;
+        assert(!o.hasOwnProperty(pName), 'diMethod exists! ' + methodName);
+        o[pName] = method;
+    }
+
+    /**
+     * 获取方法
+     *
+     * @private
+     * @param {Object} o 类的prototype或者实例
+     * @param {string} methodName 方法名
+     * @return {Function} method 方法
+     */
+    function getDIMethod(o, methodName) {
+        // 寻找di挂载的方法
+        return o[DI_METHOD_PREFIX + methodName]
+            // 如果找不到，则返回同名原有方法
+            || o[methodName];
+    }
+
+    /**
+     * 设置adapter方法，如果已经有此方法的话（除非在prototype上），报错（以免后续开发中弄错）
+     *
+     * @private
+     * @param {Object} o 类的prototype或者实例
+     * @param {string} methodName 方法名
+     * @param {Function} method 方法
+     */
+    function setDIAdapterMethod(o, methodName, method) {
+        var pName = DI_ADAPTER_METHOD_PREFIX + methodName;
+        assert(!o.hasOwnProperty(pName), 'diAdapterMethod exists! ' + methodName);
+        o[pName] = method;
+    }
+
+    /**
+     * 获取adapter方法
+     *
+     * @private
+     * @param {Object} o 类的prototype或者实例
+     * @param {string} methodName 方法名
+     * @return {Function} method 方法
+     */
+    function getDIAdapterMethod(o, methodName) {
+        return o[DI_ADAPTER_METHOD_PREFIX + methodName];
+    }
+
+    /**
+     * 得到类
+     *
+     * @public
+     * @param {string} clzKey 类的key
+     * @return {Object} clzDef 类定义
+     *      clzDef.clz 类
+     *      clzDef.clzKey 类key
+     *      clzDef.clzPath 类路径
+     *      clzDef.adapterPath 适配器路径
+     *      clzDef.adapter 适配器
+     *      clzDef.dataOpt 初始化参数
+     */
+    function getClz(clzKey) {
+        return instance.repository['CLZ'][clzKey];
+    }
+
+    /**
+     * 添加实体（ins或def）
+     *
+     * @public
+     * @param {Object} o 实例或实例定义
+     * @param {string} mode 'INS'（默认）, 'DEF'
+     * @return {DIFactory} 本身
+     */
+    function addEntity(o, mode) {
+        if (mode == 'DEF') {
+            if (o.clzType && o.id) {
+
+                // 装上clz
+                var clzDef = getClz(
+                        o.clzKey || DICT.DEFAULT_CLZ_KEY[o.clzType]
+                );
+                o = merge(clone(clzDef), o);
+
+                // def标志
+                o[DI_DEF_TAG] = true;
+
+                // 赋予$di
+                o.$di = $di.DEF;
+
+                // 选项初始化
+                initializeOpt(o, 'dataOpt');
+                initializeOpt(o, 'dataInitOpt');
+                initializeOpt(o, 'dataSetOpt');
+                initializeOpt(o, 'valueGetOpt');
+                initializeOpt(o, 'cfgOpt');
+
+                // 保存
+                instance.repository[o.clzType + '_DEF'][o.id] = assign({}, o);
+            }
+        }
+        else {
+            instance.repository[o.$di('getClzType')][o.$di('getId')] = o;
+        }
+        return instance;
+    }
+
+    /**
+     * 删除实例
+     *
+     * @public
+     * @param {Object} o 实例或实例定义
+     */
+    function removeEntity(o) {
+        if (o[DI_DEF_TAG]) {
+            delete instance.repository[o.clzType + '_DEF'][o.id];
+        }
+        else {
+            delete instance.repository[o.$di('getClzType')][o.$di('getId')];
+        }
+    }
+
+    /**
+     * 得到实例
+     *
+     * @private
+     * @param {string} id 实例id
+     * @param {string} mode 'INS', 'DEF'（默认）, 'RAW'（原定义对象，内部使用）
+     * @return {Object} 实例
+     */
+    function getEntity(id, mode) {
+        var suffix = mode == 'INS' ? '' : '_DEF';
+        var o;
+        var ret;
+        var optCache;
+
+        for (var i = 0, clzType; clzType = INS_CLZ_TYPE[i]; i ++) {
+            if (clzType != 'CLZ'
+                && (o = instance.repository[clzType + suffix][id])
+            ) {
+                if (mode == 'INS' || mode == 'RAW') {
+                    return o;
+                }
+                // mode为'DEF'则返回副本
+                else {
+                    ret = clone(o, { exclusion: [DI_OPT_CACHE_TAG] });
+                    // 不克隆optCache节省开销
+                    ret[DI_OPT_CACHE_TAG] = o[DI_OPT_CACHE_TAG];
+                    return ret;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 为对象装填ins或def，或者返回装填好的副本
+     *
+     * @public
+     * @param {(Object|Array)} target 目标对象中，
+     *      只可以含有Object或Array或实例id
+     * @param {string} mode 'INS', 'DEF'（默认）
+     * @param {Object=} options 选项
+     * @param {boolean=} options.flatReturn
+     *      true则返回一个数组，里面是所有目标实例，
+     *      false则返回源结构，里面的id会替换为目标实例（默认）。
+     * @param {boolean=} options.isClone 是否是clone模式，
+     *      true则不修改target，返回值是新对象，
+     *      false则修改target，返回target。（默认）
+     * @return {Object} target 源对象
+     */
+    function findEntity(target, mode, options) {
+        options = options || {}
+        var result;
+        var i;
+        var flatRet = options.flatReturn ? [] : null;
+
+        if (isArray(target)) {
+            result = options.isClone ? [] : target;
+            for (i = 0; i < target.length; i ++) {
+                target.hasOwnProperty(i)
+                && (result[i] = findEntity(target[i], mode));
+            }
+        }
+        else if (isObject(target)) {
+            result = options.isClone ? {} : target;
+            for (i in target) {
+                target.hasOwnProperty(i)
+                && (result[i] = findEntity(target[i], mode));
+            }
+        }
+        else {
+            result = getEntity(target, mode);
+            flatRet && flatRet.push(result);
+        }
+
+        return flatRet ? flatRet : result;
+    }
+
+    /**
+     * 遍历unit
+     *
+     * @protected
+     * @param {(string|Array)} clzType 单值或数组，
+     *      如果是数组，则顺序遍历
+     * @param {Function} callback 回调，参数为
+     *              {Object} def
+     *              {Object} ins
+     *              {string} id
+     */
+    function forEachEntity(clzType, callback) {
+        clzType = isString(clzType)
+            ? [clzType] : (clzType || []);
+
+        for (var i = 0, c, repoIns, repoDef; c = clzType[i]; i ++) {
+            var repoDef = instance.repository[c + '_DEF'];
+            var repoIns = instance.repository[c];
+            for (var id in repoDef) {
+                repoDef[id] && callback(repoDef[id], repoIns[id], id);
+            }
+        }
+    }
+
+    /**
+     * 设置di私有的属性
+     *
+     * @private
+     * @param {Object} o 目标ins
+     * @param {string} attrName 属性名
+     * @param {*} attrValue 属性值
+     */
+    function setDIAttr(o, attrName, attrValue) {
+        if (o && attrName != null) {
+            o[DI_ATTR_PREFIX + attrName] = attrValue;
+        }
+    }
+
+    /**
+     * 得到di私有的属性
+     *
+     * @private
+     * @param {Object} o 来源ins
+     * @param {string} attrName 属性名
+     * @param {bolean} notProto 排除prototype上的，默认为false
+     * @return {*} attrValue 属性值
+     */
+    function getDIAttr(o, attrName, notProto) {
+        if (o && attrName != null) {
+            var name = DI_ATTR_PREFIX + attrName;
+            return (!notProto || o.hasOwnProperty(name)) ? o[name] : null;
+        }
+        return null;
+    }
+
+    /**
+     * 获得对象，如果没有就创建
+     *
+     * @param {Object} di实例
+     * @param {string} attrName
+     * @param {*=} makeValue 如果没有，则创建的值，默认为{}
+     * @private
+     */
+    function getMakeAttr(ins, attrName, makeValue) {
+        if (makeValue === UNDEFINED) {
+            makeValue = {};
+        }
+        var value = getDIAttr(ins, attrName);
+        if (value === UNDEFINED) {
+            setDIAttr(ins, attrName, value = makeValue);
+        }
+        return value;
+    }
+
+    /**
+     * 得到di私有的属性，如果没有则从global中取
+     * 专用于new创建时
+     *
+     * @private
+     * @param {Object} o 来源对象
+     * @param {string} attrName 属性名
+     * @return {*} attrValue 属性值
+     */
+    function getAttrIncludeGlobal(o, attrName) {
+        var ret = getDIAttr(o, attrName);
+        if (ret == null) {
+            ret = (getGlobalTemp('DI_DEF_FOR_NEW') || {})[attrName];
+        }
+        return ret;
+    }
+
+    /**
+     * 设置事件通道
+     *
+     * @public
+     * @param {Object} ec 事件通道
+     */
+    function setEventChannel(ec) {
+        instance.eventChannel = ec;
+    }
+
+    /**
+     * 得到事件通道
+     *
+     * @public
+     * @param {Object} 事件通道
+     */
+    function getEventChannel() {
+        return instance.eventChannel;
+    }
+
+    /**
+     * 设置或获取临时全局参数
+     * 除非一些不好处理的问题，
+     * 否则不建议使用！
+     *
+     * @public
+     * @param {string} key 使用者标志
+     * @param {*} data
+     */
+    function setGlobalTemp(key, data) {
+        instance.globalTempData[key] = data;
+    }
+
+    /**
+     * 设置或获取临时全局参数
+     * 除非一些不好处理的问题，
+     * 否则不建议使用！
+     *
+     * @public
+     * @param {string} key 使用者标志
+     * @return {*} data
+     */
+    function getGlobalTemp(key) {
+        return instance.globalTempData[key];
+    }
+
+    /**
+     * refPath变成唯一的key
+     *
+     * @private
+     */
+    function makePathKey(refPath) {
+        return refPath.replace(/[\]\s]/g, '').replace(/\[/g, '.');
+    }
+
+    /**
+     * 创建事件代理
+     *
+     * @private
+     */
+    function registerEventAgent(obj, eventName) {
+        var agent = obj[DI_EVENT_AGENT_TAG];
+        if (!agent) {
+            agent = obj[DI_EVENT_AGENT_TAG] = new XOBJECT();
+            agent.eventNameMap = {};
+        }
+        if (eventName != null) {
+            agent.eventNameMap[eventName] = 1;
+        }
+        else {
+            agent.eventNameAll = 1;
+        }
+    }
+
+    /**
+     * 得到事件代理
+     *
+     * @private
+     */
+    function getEventAgentByName(obj, eventName) {
+        var agent = obj[DI_EVENT_AGENT_TAG];
+        if (agent
+            && (
+                agent.eventNameAll
+                || agent.eventNameMap[eventName]
+                )
+        ) {
+            return agent;
+        }
+    }
+
+    // @deprecated
+    // 为兼容原有报表而保留
+    function rootSnippet(id) {
+        if (!id && !rootSnippet) {
+            return null;
+        }
+        id && (rootSnippet = id) || (id = rootSnippet);
+        var def = getEntity(id, 'DEF');
+        return def;
+    }
+
+    /*
+     function makeViewDisableFunc(disDef, actName, key) {
+     if (!disDef) { return null; }
+
+     var repCmpt = instance.repository['COMPONENT'];
+     var repCtnr = instance.repository['VCONTAINER'];
+
+     if (disDef == 'ALL') {
+     disDef = [];
+     for (id in repCmpt) { disDef.push(id); }
+     for (id in repCtnr) { disDef.push(id); }
+     }
+
+     return function () {
+     for (var i = 0, ins, id; i < disDef.length; i ++) {
+     id = disDef[i];
+     ins = repCmpt[id] || repCtnr[id];
+     ins && ins.$di(actName, key);
+     }
+     }
+     }*/
+
+    function setFuncAuth(auth) {
+        if (!auth) {
+            return;
+        }
+        instance.funcAuthKeys = {};
+        for (var i = 0; i < (auth || []).length; i ++) {
+            instance.funcAuthKeys[auth[i]] = 1;
+        }
+    }
+
+    function doViewDisable(disDef, actName, key) {
+        if (!disDef) { return null; }
+
+        var repCmpt = instance.repository['COMPONENT'];
+        var repCtnr = instance.repository['VCONTAINER'];
+
+        if (disDef == 'ALL') {
+            disDef = [];
+            for (var id in repCmpt) { disDef.push(id); }
+            for (var id in repCtnr) { disDef.push(id); }
+        }
+
+        for (var i = 0, ins, id; i < disDef.length; i ++) {
+            id = disDef[i];
+            ins = repCmpt[id] || repCtnr[id];
+            ins && ins.$di(actName, key);
+        }
+    }
+
+    function setInteractMemo(ins, attr, value) {
+        var memo = getDIAttr(ins, 'interactMemo');
+        if (!memo) {
+            setDIAttr(ins, 'interactMemo', memo = {});
+        }
+        if (value !== UNDEFINED) {
+            memo[attr] = value;
+        }
+        else {
+            delete memo[attr];
+        }
+    }
+
+    function getInteractMemo(ins, attr) {
+        var memo = getDIAttr(ins, 'interactMemo');
+        return memo ? memo[attr] : UNDEFINED;
+    }
+
+    /**
+     * 参数clone
+     * 如果不为可clone的类型，则抛出异常
+     *
+     * @private
+     * @param {*} args
+     * @return {*} clone结果
+     */
+    function argsClone(args) {
+        var result;
+        var i;
+        var len;
+        var objStr = objProtoToString.call(args);
+        var isArr;
+
+        if (objStr == '[object Date]') {
+            result = new Date(args.getTime());
+        }
+        else if (
+            objStr == '[object Function]'
+            || objStr == '[object RegExp]'
+        ) {
+            result = args;
+        }
+        else if (
+        // array也用下面方式复制，从而非数字key属性也能被复制
+            (isArr = objStr == '[object Array]')
+            // 对于其他所有Object，先检查是否是可以拷贝的object，
+            // 如果不是，抛出异常，防止隐含错误
+            || args === Object(args)
+        ) {
+            result = isArr ? [] : {};
+            !isArr && checkObjectClonable(args);
+            for (i in args) {
+                if (args.hasOwnProperty(i)) {
+                    result[i] = argsClone(args[i]);
+                }
+            }
+        }
+        else {
+            result = args;
+        }
+        return result;
+    }
+
+    /**
+     * 检查对象是否可以拷贝。
+     * 如果不可以，抛出异常；
+     */
+    function checkObjectClonable(obj) {
+        var clonable = true;
+
+        // 排除DOM元素
+        if (Object.prototype.toString.call(obj) != '[object Object]'
+            // 但是在IE中，DOM元素对上一句话返回true，
+            // 所以使用字面量对象的原型上的isPrototypeOf来判断
+            || !('isPrototypeOf' in obj)) {
+            clonable = false;
+        }
+
+        // 试图排除new somefunc()创建出的对象
+        if (// 如果没有constructor则通过
+            obj.constructor
+            // 有constructor但不在原型上时通过
+            && !hasOwnProperty.call(obj, 'constructor')
+            // 用isPrototypeOf判断constructor是否为Object对象本身
+            && !hasOwnProperty.call(obj.constructor.prototype, 'isPrototypeOf')
+        ) {
+            clonable = false;
+        }
+
+        if (!clonable) {
+            throw new Error('Object can not be clone: ' + obj);
+        }
+    };
+
+    /**
+     * instance下面的变量回归默认状态
+     */
+    function resetInstanceAttributes() {
+        /**
+         * 库
+         */
+        instance.repository = {
+            // 类库
+            CLZ: {},
+            // 各种实例库
+            SNIPPET: {},
+            SNIPPET_DEF: {},
+            COMPONENT: {},
+            COMPONENT_DEF: {},
+            VUI: {},
+            VUI_DEF: {},
+            VCONTAINER: {},
+            VCONTAINER_DEF: {},
+            VPART: {},
+            VPART_DEF: {}
+        };
+        /**
+         * 根snippet
+         */
+        instance.rootSnippetId = null;
+
+        /**
+         * 对外事件通道
+         */
+        instance.eventChannel = null;
+
+        /**
+         * 设置或获取临时全局参数，参见setGlobalTemp
+         */
+        instance.globalTempData = {};
+
+        /**
+         * 功能权限key集合
+         */
+        instance.funcAuthKeys = {};
+
+        /**
+         * 客户端标志（STUB、或空）
+         */
+        instance.diAgent = null;
+
+        /**
+         * 报表镜像id
+         */
+        instance.reportImageId = null;
+    }
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+})();
+<<<<<<< HEAD
 
 
 /**
@@ -76366,7 +94889,235 @@ $namespace('di.shared.model');
         return date;
     };
     
+=======
+/**
+ * di.shared.ui.InteractEntity
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    Base Entity
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var URL = di.config.URL;
+    var inheritsObject = xutil.object.inheritsObject;
+    var assign = xutil.object.assign;
+    var addClass = xutil.dom.addClass;
+    var isObject = xutil.lang.isObject;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var getByPath = xutil.object.getByPath;
+    var XOBJECT = xui.XObject;
+    var LANG = di.config.Lang;
+    var AJAX = di.config.Ajax;
+    var alert;
+    
+    $link(function () {
+        alert = di.helper.Dialog.alert;
+    });    
+
+    /**
+     * Base Entity
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {HTMLElement} options.el 容器元素
+     * @param {Function=} options.commonParamGetter 
+     *      得到公用的请求参数     
+     */
+    var INTERACT_ENTITY = $namespace().InteractEntity = 
+        inheritsObject(
+            XOBJECT,
+            function (options) {
+
+                // di开始必须
+                this.$di('start', options);
+
+                // 统一注册事件代理
+                this.$di('registerEventAgent');
+
+                // 禁用自身的notify和attach（只允许使用$di提供的）
+                this.notify = this.attach = this.attachOnce =                 
+                    function () {
+                        throw new Error('Forbiden function');
+                    };
+
+                // 挂主cssClass
+                var el = this.$di('getEl');
+                var className = this.DEF.className;
+                el && className && addClass(el, className);
+
+                // 根据DEF创建model
+                this.$createModelByDef(options);
+
+                // 创建view
+                this.$createView && this.$createView(options);
+            }
+        );
+    var INTERACT_ENTITY_CLASS = INTERACT_ENTITY.prototype;
+    
+    /**
+     * 定义信息
+     */
+    INTERACT_ENTITY_CLASS.DEF = {};
+
+    /**
+     * 根据定义信息，创建model
+     *
+     * @private
+     */
+    INTERACT_ENTITY_CLASS.$createModelByDef = function (options) {
+        var modelDef = this.DEF.model;
+        if (!modelDef) { return; }
+
+        var clz = modelDef.clz 
+            || (modelDef.clzPath && getByPath(modelDef.clzPath));
+        if (!clz) { return; }
+
+        // 创建model实例
+        this._mModel = new clz(
+            assign(
+                {
+                    commonParamGetter: this.$di('getCommonParamGetter'),
+                    diFactory: this.$di('getDIFactory')
+                },
+                this.$createModelInitOpt(options)
+            )
+        );
+
+        // 绑定默认方法   
+        this._mModel.ajaxOptions = {
+            defaultFailureHandler:
+                bind(this.$defaultFailureHandler, this)
+        };
+    };
+
+    /**
+     * 得到model初始化参数
+     * 由派生类自行实现
+     *
+     * @protected
+     * @return {Object} 初始化参数
+     */
+    INTERACT_ENTITY_CLASS.$createModelInitOpt = function (options) {
+        return {};
+    };
+
+    /**
+     * 得到model
+     *
+     * @public
+     * @return {Object} model
+     */
+    INTERACT_ENTITY_CLASS.getModel = function () {
+        return this._mModel;
+    };
+
+    /**
+     * 组装model sync的参数的统一方法
+     *
+     * @protected
+     * @param {Object} model
+     * @param {string} datasourceId
+     * @param {Object} param
+     * @param {Object} diEvent
+     * @param {Object} opt
+     * @param {Object} ajaxOptions
+     */
+    INTERACT_ENTITY_CLASS.$sync = function (
+        model, datasourceId, param, diEvent, opt, ajaxOptions
+    ) {
+        var o = {
+            datasourceId: datasourceId,
+            args: {
+                param: param,
+                diEvent: diEvent
+            }
+        }
+        assign(o.args, opt);
+        // 为sync方法新增ajaxOptions参数，以后每次ajax请求都可以有单独自己的行为
+        assign(o, ajaxOptions);
+        return model.sync(o);
+    };
+
+    /**
+     * 创建或得到dievent的方便方法
+     * 用法一：$diEvent(options) 
+     *      则得到options中的原有的diEvent（可能为undefined） 
+     * 用法二：$diEvent('someEventName', options) 
+     *      则得到事件名为'someEventName'的衍生diEvent，
+     *      或者（没有使用diEvent时）得到eventnName本身
+     *
+     * @protected
+     * @param {(string|Object)} eventName 如果为对象则表示此参数为options
+     * @param {string=} options 走xdatasource的options，里面含有传递的diEvent属性
+     */
+    INTERACT_ENTITY_CLASS.$diEvent = function (eventName, options) {
+        if (arguments.length == 1 && isObject(eventName)) {
+            options = eventName;
+            eventName = null;
+        }
+
+        var diEvent = options.args.diEvent;
+        return eventName
+            ? (diEvent ? diEvent(eventName) : eventName)
+            : diEvent;
+    };
+
+    /**
+     * sync时的解禁操作
+     *
+     * @protected
+     */
+    INTERACT_ENTITY_CLASS.$syncEnable = function (datasourceId) {
+        this.$di('syncViewDisable', 'enable', datasourceId);
+        this.$di('enable', 'DI_SELF_' + datasourceId);
+    };
+
+    /**
+     * sync时的禁用操作
+     *
+     * @protected
+     */
+    INTERACT_ENTITY_CLASS.$syncDisable = function (datasourceId) {
+        this.$di('syncViewDisable', 'disable', datasourceId);
+        this.$di('disable', 'DI_SELF_' + datasourceId);
+    };
+
+    /**
+     * 请求失败的默认处理
+     *
+     * @protected
+     */
+    INTERACT_ENTITY_CLASS.$defaultFailureHandler = function (status, ejsonObj) {
+        var eventChanel = this.$di('getEventChannel');
+
+        switch (status) {
+            case AJAX.ERROR_SESSION_TIMEOUT: // session 过期
+                eventChanel.triggerEvent('sessiontimeout');
+                alert(LANG.SAD_FACE + LANG.RE_LOGIN, null, true);
+                break;
+            case AJAX.ERROR_PARAM: // olap查询参数错误，由应用程序自己处理
+                break;
+            default:
+                alert(LANG.SAD_FACE + LANG.ERROR);
+        }
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 
 
 /**
@@ -80077,6 +98828,173 @@ $namespace('di.shared.ui');
     PANEL_PAGE_CLASS.$inactive = function() {};
 
 })();
+=======
+/**
+ * ecui.ui.PanelPage
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    容器中子页面基类
+ * @author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+
+    var inheritsObject = xutil.object.inheritsObject;
+    var arraySlice = Array.prototype.slice;
+    var addClass = xutil.dom.addClass;
+    var UI_CONTROL = ecui.ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+    var XVIEW = xui.XView;
+
+    var PANEL_PAGE = $namespace().PanelPage = 
+        inheritsObject(
+            XVIEW,
+            function(options) {
+                addClass(options.el, 'panel-page');
+                this._bVisible = true;
+                this._aPendingUpdater = [];
+                this._sPageId = options.pageId;
+                this._sFromPageId = options.fromPageId;
+                this._sPageTitle = options.pageTitle;
+            }
+        );
+    var PANEL_PAGE_CLASS = PANEL_PAGE.prototype;
+    
+    /**
+     * 析构
+     * @override
+     * @private
+     */
+    PANEL_PAGE_CLASS.dispose = function() {
+        this._aPendingUpdater = [];
+        PANEL_PAGE.superClass.dispose.call(this);
+    };
+
+    /**
+     * 更新page视图
+     * 因为page视图在要被更新时，可能正处于隐藏的状态，
+     *（例如ajax回调时页面已经被切走），
+     * 这样有可能导致dom计算出问题（根据page具体实现而定）。
+     * 此方法用于延迟更新视图的情况，
+     * 如果页面处于显示状态，则正常执行视图更新
+     * 如果页面处于隐藏状态，则到显示时（active时）再执行视图更新
+     * 
+     * @public
+     * @param {!Function} updater 更新器（回调）
+     * @param {Object=} scope updater执行的scope，缺省则为window
+     * @param {...*} args updater执行时传递的参数
+     */
+    PANEL_PAGE_CLASS.updateView = function(updater, scope, args) {
+        if (this._bVisible) {
+            updater.apply(scope, arraySlice.call(arguments, 2));
+        }
+        else {
+            this._aPendingUpdater.push(
+                {
+                    updater: updater,
+                    scope: scope,
+                    args: arraySlice.call(arguments, 2)
+                }
+            );
+        }
+    };
+
+    /**
+     * 得到pageId
+     *
+     * @public
+     * @return {string} pageId
+     */
+    PANEL_PAGE_CLASS.getPageId = function() {
+        return this._sPageId;
+    };
+    
+    /**
+     * 得到pageTitle
+     *
+     * @public
+     * @return {string} pageTitle
+     */
+    PANEL_PAGE_CLASS.getPageTitle = function() {
+        return this._sPageTitle;
+    };
+    
+    /**
+     * 得到来源的pageId
+     *
+     * @public
+     * @return {string} fromPageId
+     */
+    PANEL_PAGE_CLASS.getFromPageId = function() {
+        return this._sFromPageId;
+    };
+    
+    /**
+     * 设置来源的pageId
+     *
+     * @public
+     * @param {string} fromPageId
+     */
+    PANEL_PAGE_CLASS.setFromPageId = function(fromPageId) {
+        this._sFromPageId = fromPageId;
+    };
+    
+    /**
+     * 激活，PanelPageManager使用
+     *
+     * @public
+     */
+    PANEL_PAGE_CLASS.active = function(options) {
+        this._bVisible = true;
+
+        // 执行panding的视图更新
+        var updaterWrap;
+        while(updaterWrap = this._aPendingUpdater.shift()) {
+            updaterWrap.updater.apply(updaterWrap.scope, updaterWrap.args);
+        }
+
+        this.$active(options || {});
+    };
+
+    /**
+     * 睡眠，PanelPageManager使用
+     *
+     * @public
+     */
+    PANEL_PAGE_CLASS.inactive = function(options) {
+        this._bVisible = false;
+        this.$inactive(options);
+    };
+
+    /**
+     * 是否active
+     *
+     * @public
+     */
+    PANEL_PAGE_CLASS.isActive = function() {
+        return this._bVisible;
+    };
+
+    /**
+     * 激活，由派生类实现
+     *
+     * @protected
+     * @abstract
+     */
+    PANEL_PAGE_CLASS.$active = function() {};
+    
+    /**
+     * 睡眠，由派生类实现
+     *
+     * @protected
+     * @abstract
+     */
+    PANEL_PAGE_CLASS.$inactive = function() {};
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.adapter.CalendarPlusVUIAdapter
@@ -82989,6 +101907,15 @@ $namespace('di.shared.model');
 })();
 
 
+<<<<<<< HEAD
+/**
+ * di.shared.model.GlobalMenuManager
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * desc:    [通用模型] 全局菜单管理
+ * author:  sushuang(sushuang)
+ */
+=======
 /**
  * di.shared.model.GlobalMenuManager
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -82997,6 +101924,108 @@ $namespace('di.shared.model');
  * author:  sushuang(sushuang)
  */
 
+$namespace('di.shared.model');
+
+/**
+ * [外部注入]
+ * globalMenu
+ */
+(function() {
+    
+    /* 外部引用 */
+    var inheritsObject = xutil.object.inheritsObject;
+    var bind = xutil.fn.bind;
+    var getByPath = xutil.object.getByPath;
+    var XDATASOURCE = xui.XDatasource;
+        
+    /* 类型声明 */
+    var GLOBAL_MENU_MANAGER = $namespace().GlobalMenuManager = 
+            inheritsObject(
+                XDATASOURCE,
+                function (options) {
+                    this.businessData = options.globalMenu;
+                }
+            );
+    var GLOBAL_MENU_MANAGER_CLASS = GLOBAL_MENU_MANAGER.prototype;
+    
+    /**
+     * 析构
+     * @protected
+     */
+    GLOBAL_MENU_MANAGER_CLASS.$dispose = function() {
+        GLOBAL_MENU_MANAGER.superClass.$dispose.call(this);
+    };
+    
+    /**
+     * 获得当前所选
+     * @public
+     * 
+     * @return {Object} 当前选择
+     *          {string} menuId 菜单ID
+     *          {string} menuName 菜单名
+     *          {string} menuPage 额外数据
+     *          {string} menuUrl 菜单URL
+     */
+    GLOBAL_MENU_MANAGER_CLASS.getSelected = function() {
+        return this.businessData && this.businessData.selMenu;
+    };
+    
+    /**
+     * 获得菜单数据
+     * @public
+     * 
+     * @return {Array} 菜单数据
+     */
+    GLOBAL_MENU_MANAGER_CLASS.getMenuData = function() {
+        return this.businessData && this.businessData.menuList;
+    }
+    
+    /**
+     * 获得当前页面根控件类型
+     * @public
+     * 
+     * @return {Constructor#ecui.ui.Control} 当前页面根控件类型
+     */
+    GLOBAL_MENU_MANAGER_CLASS.getControlClass = function() {
+        var classPath = (this.getSelected() || {}).menuPage;
+        return classPath ? getByPath(classPath) : null;
+    };
+    
+    /**
+     * 获得数据
+     * @protected
+     */
+    GLOBAL_MENU_MANAGER_CLASS.parse = function(data) {
+        // 从GLOBAL_MODEL中获取数据，并保存在此
+        var globalMenu = data && data.globalMenu || {};
+        this.businessData = {
+            menuList: globalMenu.menuList, 
+            selMenu: globalMenu.selMenu
+        };
+        return this.businessData;
+    };
+    
+    /**
+     * 顶层页跳转
+     * @public
+     */
+    GLOBAL_MENU_MANAGER_CLASS.changeMenu = function(args) {
+        // to be continued ...
+    };
+
+    /**
+     * 设置
+     * 在派生类中使用
+     */
+    GLOBAL_MENU_MANAGER_CLASS.setGlobalMenu = function(gm) {
+        this._uGlobalMenu = gm;
+    };    
+        
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 $namespace('di.shared.model');
 
 /**
@@ -83272,6 +102301,183 @@ $namespace('di.shared.model');
 
 // })();
 
+=======
+/**
+ * di.shared.model.MenuPageManager
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    [通用管理器] 菜单行为的托管，菜单页的管理
+ * @author:  sushuang(sushuang)
+ * @deprecated: 已弃用，因为没必要搞这么多抽象设计得这么复杂，
+ *          代码适当堆一块儿反而好找。
+ */
+
+// $namespace('di.shared.model');
+
+/**
+ * [外部注入]
+ * {ecui.ui.PlMenu} menu 左侧菜单
+ * {di.shared.model.PanelPageManager} pangelPageManager 页面管理
+ */
+// (function() {
+    
+//     //-----------------------------------------
+//     // 引用
+//     //-----------------------------------------
+
+//     var inheritsObject = xutil.object.inheritsObject; 
+//     var bind = xutil.fn.bind;
+//     var parseParam = xutil.url.parseParam;
+//     var isString = xutil.lang.isString;
+//     var getByPath = xutil.object.getByPath;
+//     var ecuiCreate = di.helper.Util.ecuiCreate;
+//     var XDATASOURCE = xui.XDatasource;
+//     var GLOBAL_MODEL;
+        
+//     $link(function() {
+//         GLOBAL_MODEL = di.shared.model.GlobalModel;
+//     });
+    
+//     //-----------------------------------------
+//     // 类型声明
+//     //-----------------------------------------
+
+//     /**
+//      * 菜单管理类
+//      *
+//      * @class
+//      * @extends xui.XDatasource
+//      */
+//     var MENU_PAGE_MANAGER = $namespace().MenuPageManager = 
+//         inheritsObject(XDATASOURCE);
+//     var MENU_PAGE_MANAGER_CLASS = MENU_PAGE_MANAGER.prototype;
+    
+//     //-----------------------------------------
+//     // 方法
+//     //-----------------------------------------
+
+//     /**
+//      * 初始化
+//      * @public
+//      */    
+//     MENU_PAGE_MANAGER_CLASS.init = function() {
+//         this._uMenu.onchange = bind(this.$menuChangeHandler, this);
+//         this._mPanelPageManager.attach(
+//             'page.active', 
+//             this.$pageActiveHandler, 
+//             this
+//         );
+//     };
+    
+//     /**
+//      * 获得请求参数
+//      * @public
+//      */    
+//     MENU_PAGE_MANAGER_CLASS.param = function(options) {
+//         var globalMenuSel = GLOBAL_MODEL()
+//             .getGlobalMenuManager()
+//             .getSelected() || {};
+
+//         return 'rootMenuId=' + (globalMenuSel.menuId || '');
+//     };
+    
+//     /**
+//      * 解析后台返回
+//      * @public
+//      */    
+//     MENU_PAGE_MANAGER_CLASS.parse = function(data) {
+//         var menuTree = data['menuTree'];
+//         if (menuTree) {
+//             // 菜单数据设置
+//             this._uMenu.setData(menuTree.menuList);
+//             // 初始时默认选择
+//             // this._uMenu.select(menuTree.selMenuId);
+//             // this.$menuChangeHandler(this._uMenu.getSelected());
+//         }
+//     };
+    
+//     *
+//      * 菜单选择行为
+//      * @protected
+//      * 
+//      * @param {Object} menuItem 节点数据对象
+//      *          {string} menuId 节点ID
+//      *          {string} menuName 节点名
+//      *          {string} menuUrl 节点URL
+     
+//     MENU_PAGE_MANAGER_CLASS.$menuChangeHandler = function(menuItem) {
+//         var page;
+//         var arr;
+//         var pageClass;
+//         var param;
+//         var menuId = menuItem.menuId;
+
+//         arr = menuItem.menuUrl.split('?');
+//         // menuPage中保存的是页面panel page类型
+//         pageClass = getByPath(arr[0]);
+//         param = parseParam(arr[1]);
+            
+//         var title = menuItem.menuName;
+
+//         // FIXME
+//         // 暂时在此处设置title
+//         if (param && param.reportType == 'TABLE') {
+//             title = '[表] ' + title;
+//         }
+//         else if (param && param.reportType == 'CHART') {
+//             title = '[图] ' + title;
+//         }
+
+//         // FIXME 
+//         // 暂时改为总是新建
+//         var pageId;
+//         if (true || !this._mPanelPageManager.exists(menuId)) {
+//             // 不存在页面则新建
+//             pageId = 
+//             this._mPanelPageManager.add(
+//                 function(opt) {
+//                     var page;
+//                     opt.el.appendChild(param.el = document.createElement('div'));
+//                     // 这里的pageClass都是di.shared.ui.PanelPage的派生类
+//                     page = new pageClass(param);
+//                     page.init(); 
+//                     return page;
+//                 },
+//                 {
+//                     // FIXME
+//                     // 暂时改为自动生成pageId
+//                     /* pageId: menuId, */
+//                     title: title,
+//                     canClose: true
+//                 }
+//             );
+//         }
+        
+//         // 选择激活
+//         /* this._mPanelPageManager.select(menuId); */
+//         this._mPanelPageManager.select(pageId); 
+//     };
+    
+//     /**
+//      * 页面选中后的行为
+//      */
+//     MENU_PAGE_MANAGER_CLASS.$pageActiveHandler = function(menuId) {
+//         this._uMenu.select(menuId);
+//     };
+    
+//     /**
+//      * 注入管控的对象
+//      *
+//      * @public
+//      */
+//     MENU_PAGE_MANAGER_CLASS.inject = function(menu, panelPageManager) {
+//         this._uMenu = menu;
+//         this._mPanelPageManager = panelPageManager;
+//     };
+
+// })();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.model.MetaConditionModel
@@ -84790,6 +103996,16 @@ $namespace('di.shared.model');
 })();
 
 
+<<<<<<< HEAD
+/**
+ * di.shared.model.PageInfo
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:   分页信息对象
+ *          可屏蔽前后台对分页对象的定义不一致的情况
+ * @author: sushuang(sushuang)
+ */
+=======
 /**
  * di.shared.model.PageInfo
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -84957,7 +104173,11 @@ $namespace('di.shared.model');
 
 })();
 
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+$namespace('di.shared.model');
+=======
 /**
  * di.shared.model.PanelPageRadioAdapter
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -85021,6 +104241,2473 @@ $namespace('di.shared.model');
     }
         
 })();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+(function() {
+    
+    //---------------------------------------
+    // 引用
+    //---------------------------------------
+    
+    var textParam = xutil.url.textParam;
+    var clone = xutil.object.clone;
+        
+    //---------------------------------------
+    // 类型声明
+    //---------------------------------------
+=======
+/**
+ * di.shared.model.PanelPageTabAdapter
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    PanelPageManager的适配器（TAB型）
+ * @author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    var bind = xutil.fn.bind;
+    var addClass = xutil.dom.addClass;
+    var removeClass = xutil.dom.removeClass;
+    
+    var PANEL_PAGE_TAB_ADAPTER = $namespace().PanelPageTabAdapter = {};
+        
+    /**
+     * 绑定事件
+     */
+    PANEL_PAGE_TAB_ADAPTER.$bind = function () {
+        this._uPanelPageContainer.onbeforechange = bind(this.$pageBeforeChangeHandler, this);
+        this._uPanelPageContainer.onafterchange = bind(this.$pageAfterChangeHandler, this);
+        this._uPanelPageContainer.ontabclose = bind(this.$pageCloseHandler, this);
+    };
+    
+    /**
+     * 增加item
+     */
+    PANEL_PAGE_TAB_ADAPTER.$addItem = function (panelPage, options) {
+        var o = this._uPanelPageContainer.addTab(
+            function (el, parent) {
+                return panelPage(
+                    { 
+                        el: el, 
+                        parent: parent, 
+                        pageId: options.pageId
+                    }
+                );
+            }, 
+            {
+                title: options.title,
+                index: options.index,
+                canClose: options.canClose,
+                memo: options.pageId
+            }
+        );
+        return {content: o.tabContent, item: o.tabItem};
+    };
+    
+    /**
+     * 选择item
+     */
+    PANEL_PAGE_TAB_ADAPTER.$selectItem = function (pageWrap) {
+        this._uPanelPageContainer.selectTab(pageWrap.item);
+    };
+        
+    
+    /**
+     * 得到pageId
+     */
+    PANEL_PAGE_TAB_ADAPTER.$retrievalPageId = function () {
+        var item = arguments[0];
+        return item.getMemo();
+    }
+
+    /**
+     * 更改标题
+     */
+    PANEL_PAGE_TAB_ADAPTER.$setTitle = function (pageId, title) {
+        var pageWrap = this._oPanelPageSet.get(pageId);
+        pageWrap && pageWrap.item.setTitle(title);
+    }    
+
+    /**
+     * 打标记
+     */
+    PANEL_PAGE_TAB_ADAPTER.$mark = function (pageId, mark) {
+        var pageWrap = this._oPanelPageSet.get(pageId);
+        if (pageWrap) {
+            var item = pageWrap.item;
+            mark
+                ? addClass(item.getOuter(), item.getType() + '-mark')
+                : removeClass(item.getOuter(), item.getType() + '-mark');
+        }
+    }    
+    
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    /**
+     * 分页对象
+     *
+     * @class
+     * @constructor
+     * @param {(Object|PageInfo)=} pageInfo 分页信息，可缺省
+     *          {number} disabled 是否禁用
+     *          {number} totalRecordCount 总记录数
+     *          {number} pageSize 每页大小
+     *          {number} currentPage 当前页号，从1开始
+     */
+    var PAGE_INFO = $namespace().PageInfo = function(pageInfo) {
+        /**
+         * 是否禁用
+         *
+         * @type {boolean}
+         * @public
+         */
+        this.disable;
+        /**
+         * 总记录数
+         *
+         * @type {number}
+         * @public
+         */
+        this.totalRecordCount;
+        /**
+         * 每页大小
+         *
+         * @type {number}
+         * @public
+         */
+        this.pageSize;
+=======
+/**
+ * di.shared.model.PanelPageManager
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    [通用管理器] panel page关系页管理：
+ *          维护页面引用，页面打开先后顺序，当前页面等。适应不同的页面展现方式（如tab方式或窗口方式等）。
+ * @author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+/**
+ * [外部注入]
+ * {ecui.ui.Control} panelPageContainer 页面容器
+ */
+(function() {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+    
+    var inheritsObject = xutil.object.inheritsObject;
+    var XDATASOURCE = xui.XDatasource;
+    var bind = xutil.fn.bind;
+    var isString = xutil.lang.isString;
+    var hasValue = xutil.lang.hasValue;
+    var extend = xutil.object.extend;
+    var getUID = xutil.uid.getUID;
+    var getByPath = xutil.object.getByPath;
+    var parseParam = xutil.url.parseParam;
+    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    var PANEL_PAGE_MANAGER = $namespace().PanelPageManager = 
+        inheritsObject(
+            XDATASOURCE,
+            /**
+             * @param {Object} options
+             *          {Object} adapter 适配器
+             */
+            function(options) {
+                // 记录页面访问顺序的队列，队尾为最近访问的
+                this._oPanelPageSet = new LINKED_HASH_MAP();
+                this._oCurrPageWrap;
+                this._sCurrPageId;
+                // 挂适配器的方法
+                extend(this, options.adapter);
+            }
+        );
+    var PANEL_PAGE_MANAGER_CLASS = PANEL_PAGE_MANAGER.prototype;
+        
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    PANEL_PAGE_MANAGER_CLASS.init = function() {
+        this.$bind();
+    };
+
+    /**
+     * 根据url。如果没有则创建，如果有则打开
+     *
+     * @public 
+     * @param {string} uri 如di.some.SomePage?pageId=XXX&pageTitle=XXX&otherParam=XXX
+     * @param {Object} options 其他要传入页面的参数（所有在uri中的参数，都可以用这个覆盖）
+     * @param {string} options.pageId
+     * @param {string} options.pageTitle
+     * @param {boolean} options.forceCreate 强制创建新页面。如果为true，则传入的pageId不起作用，会新建pageId
+     * @param {boolean} options.forceActive 强制激活, 默认为false
+     */
+    PANEL_PAGE_MANAGER_CLASS.openByURI = function(uri, options, oncreate) {
+        var arr = uri.split('?');
+        var pageClass = getByPath(arr[0]);
+        var param = parseParam(arr[1]);
+        options = options || {};
+        extend(param, options);
+        var forceCreate = param.forceCreate;
+        var pageId = forceCreate
+            ? ('PANEL_PAGE_' + getUID('PANEL_PAGE'))
+            : param.pageId;
+        var pageTitle = param.pageTitle;
+        param.panelPageManager = this;
+
+        // 不存在则新建tab页
+        var page = this.getPage(pageId);
+        if (!page || forceCreate) {
+            this.add(
+                function(opt) {
+                    opt.el.appendChild(param.el = document.createElement('div'));
+                    // 这里的pageClass都是di.shared.ui.PanelPage的派生类
+                    page = new pageClass(param);
+                    return page;
+                },
+                {
+                    pageId: pageId,
+                    title: pageTitle,
+                    canClose: true
+                }
+            );
+            // 初始化
+            page.init();
+            oncreate && oncreate(page);
+        }
+
+        // 选择激活
+        this.select(pageId, param);
+
+        return page;
+    };
+
+    /**
+     * 增加 panel pange
+     *
+     * @public 
+     * @param {ecui.ui.PanelPage|Function} panelPage 要添加的panel page，
+     *          或者创建panel page的回调函数
+     *          如果为函数，则：
+     *          @param {Object} options 参数
+     *                      {HTMLElement} el 在此dom元素内创建
+     *                              （根据不同的实现类，可能为空）
+     *                      {ecui.ui.Control} parent 父控件
+     *                      {string} pageId 页ID
+     *          @return {ecui.ui.PanelPage} 页内对象
+     * @param {Object} options 参数
+     *          {string} pageId 页面ID，如果不传则自动生成一个
+     *          {string} title 页面标题，可缺省
+     *          {number} index 序号，缺省则在最后添加
+     *          {boolean} canClose 是否可以关闭
+     * @return {number} 页面实例ID
+     */
+    PANEL_PAGE_MANAGER_CLASS.add = function(panelPage, options) {
+        var o, pageId;
+        options = options || {};
+        
+        if (!panelPage) { return null; }
+
+        !hasValue(pageId = options.pageId) 
+            && (pageId = options.pageId = this.$genPageId());
+
+        if (this._oPanelPageSet.containsKey(pageId)) {
+            throw new Error('Duplicate panel page ID! id=' + pageId); 
+        }
+        
+        o = this.$addItem(panelPage, options);
+        
+        this._oPanelPageSet.addFirst(
+            { page: o.content, item: o.item }, 
+            pageId
+        );
+        
+        return pageId;
+    };
+    
+    /**
+     * panel pange是否存在
+     *
+     * @public 
+     * @param {string} panelPageWrap 页面的ID
+     * @return {boolean} 是否存在
+     */
+    PANEL_PAGE_MANAGER_CLASS.exists = function(pageId) {
+        return !!this._oPanelPageSet.containsKey(pageId);
+    };
+    
+    /**
+     * 选择 panel pange
+     *
+     * @public 
+     * @param {string} nextPageId 页面的ID
+     * @param {Object} options 额外参数
+     * @param {boolean=} options.forceActive 强制激活（默认为false）
+     */
+    PANEL_PAGE_MANAGER_CLASS.select = function(nextPageId, options) {
+        options = options || {};
+        var forceActive = options.forceActive;
+        var nextPageWrap = this._oPanelPageSet.get(nextPageId);
+        
+        if (nextPageWrap) {
+            var isChange = nextPageWrap != this._oCurrPageWrap;
+
+            if (isChange) {
+                // inactive上一个页面
+                if (this._oCurrPageWrap) {
+                    this._oCurrPageWrap.page.inactive();
+                    this.notify('page.inactive', [this._sCurrPageId]);
+                }
+                // tab切换
+                this._oCurrPageWrap = nextPageWrap;
+                var lastPageId = this._sCurrPageId;
+                this._sCurrPageId = nextPageId;
+                this.$selectItem(nextPageWrap);
+                // 下一个页面移动到队尾
+                this._oPanelPageSet.remove(nextPageId);
+                this._oPanelPageSet.addLast(nextPageWrap, nextPageId);
+                this.notify('page.change', [nextPageId, lastPageId]);
+            }
+
+            if (forceActive || isChange) {
+                // active下一个页面
+                nextPageWrap.page.active(options);
+                this.notify('page.active', [nextPageId]);
+            }
+        }
+    };
+
+    /**
+     * 跳到栈中的某一页面
+     *
+     * @public
+     * @return {number} pageId page号
+     * @return {Object} options 额外参数
+     */
+    PANEL_PAGE_MANAGER_CLASS.goTo = function(pageId, options) {
+        this.select(pageId, options);
+    };
+    
+    /**
+     * 含有的panel page数量
+     *
+     * @public
+     * @return {number} 数量
+     */
+    PANEL_PAGE_MANAGER_CLASS.size = function() {
+        return this._oPanelPageSet.size();
+    };
+    
+    /**
+     * 得到页面实例
+     *
+     * @public
+     * @param {string} pageId 页id
+     * @return {PanelPage} panelPage
+     */
+    PANEL_PAGE_MANAGER_CLASS.getPage = function(pageId) {
+        return (this._oPanelPageSet.get(pageId) || {}).page;
+    };
+    
+    /**
+     * 得到当前页面实例
+     *
+     * @public
+     * @return {PanelPage} panelPage
+     */
+    PANEL_PAGE_MANAGER_CLASS.getCurrentPage = function() {
+        return this._oCurrPageWrap ? this._oCurrPageWrap.page : null;
+    };
+
+    /**
+     * 得到当前页面ID
+     *
+     * @public
+     * @return {string} pageId
+     */
+    PANEL_PAGE_MANAGER_CLASS.getCurrentPageId = function() {
+        return this._sCurrPageId;
+    };
+    
+    /**
+     * 更改标题
+     *
+     * @public
+     * @param {string} pageId 页id
+     * @param {string} title 标题
+     */
+    PANEL_PAGE_MANAGER_CLASS.setTitle = function(pageId, title) {
+        return this.$setTitle(pageId, title);
+    };
+
+    /**
+     * 打标记
+     *
+     * @public
+     * @param {string} pageId 页id
+     * @return {string} title 标题
+     */
+    PANEL_PAGE_MANAGER_CLASS.mark = function(pageId, mark) {
+        return this.$mark(pageId, mark);
+    };
+    
+    /**
+     * page before change事件处理
+     *
+     * @protected
+     */
+    PANEL_PAGE_MANAGER_CLASS.$pageBeforeChangeHandler = function() {
+        if (this._oCurrPageWrap) {
+            // inactive上一页
+            this._oCurrPageWrap.page.inactive();
+            this.notify('page.inactive', [this._sCurrPageId]);
+        }
+    };
+    
+    /**
+     * page after change事件处理
+     *
+     * @protected
+     */
+    PANEL_PAGE_MANAGER_CLASS.$pageAfterChangeHandler = function() {
+        var nextPageId = this.$retrievalPageId.apply(this, arguments);
+        var lastPageId = this._sCurrPageId;
+        var nextPageWrap;
+        
+        if (nextPageWrap = this._oPanelPageSet.get(nextPageId)) {
+            // 当前页面放到记录列表最后
+            this._oCurrPageWrap = nextPageWrap;
+            this._sCurrPageId = nextPageId;
+            this._oPanelPageSet.remove(nextPageId);
+            this._oPanelPageSet.addLast(nextPageWrap, nextPageId);
+            this.notify('page.change', [nextPageId, lastPageId]);
+            // active下一页
+            nextPageWrap.page.active();
+            this.notify('page.active', [nextPageId]);
+        }
+    };
+    
+    /**
+     * close事件处理
+     *
+     * @protected
+     */
+    PANEL_PAGE_MANAGER_CLASS.$pageCloseHandler = function() {
+        var closePageId = this.$retrievalPageId.apply(this, arguments);
+        
+        // 如果只有一个页面，禁止关闭 
+        if (this._oPanelPageSet.size() <= 1) {
+            return false;
+        }
+        
+        var closePageWrap = this._oPanelPageSet.remove(closePageId);
+
+        // 修正fromPageId
+        this._oPanelPageSet.foreach(
+            function(pageId, wrap, index) {
+                if (wrap.page.getFromPageId() == closePageId) {
+                    wrap.page.setFromPageId(closePageWrap.page.getFromPageId());
+                }
+            }
+        );
+
+        // 关闭页面
+        closePageWrap.page.dispose();
+        
+        // 如果是当前页面，关闭后取最近访问过的一个页面
+        if (this._oCurrPageWrap && this._oCurrPageWrap == closePageWrap) {
+            this._oCurrPageWrap = null;
+            this._sCurrPageId = null;
+            this.goTo(this._oPanelPageSet.lastKey());
+        }
+
+        this.notify('page.close', [closePageId]);
+    };
+    
+    /**
+     * 生成pageId
+     *
+     * @protected
+     * @return {string} 生成的pageId
+     */
+    PANEL_PAGE_MANAGER_CLASS.$genPageId = function() {
+        var id = 1;
+        while (this._oPanelPageSet.containsKey(id)) { id ++; }
+        return id;
+    };  
+        
+    /**
+     * 注入管控对象
+     *
+     * @public
+     */
+    PANEL_PAGE_MANAGER_CLASS.inject = function(panelPageContainer) {
+        // @protected
+        this._uPanelPageContainer = panelPageContainer;
+    };
+
+    /**
+     * 遍历pages
+     *
+     * @public
+     */
+    PANEL_PAGE_MANAGER_CLASS.forEachPage = function(callback) {
+        this._oPanelPageSet.foreach(
+            function (id, item, index) {
+                callback(id, item.page, index);
+            }
+        );
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+        this.setData(pageInfo);
+    };
+    var PAGE_INFO_CLASS = PAGE_INFO.prototype;
+        
+    /**
+     * 设置数据
+     * 
+     * @public
+     * @param {Object} pageInfo 分页信息，
+     *          如果pageInfo某个属性没有值，则此属性不会被设值改动
+     *          {number} disabled 是否禁用
+     *          {number} totalRecordCount 总记录数
+     *          {number} pageSize 每页大小
+     *          {number} currentPage 当前页号，从1开始
+     */
+    PAGE_INFO_CLASS.setData = function(pageInfo) {
+        if (pageInfo) {
+            if (pageInfo.disabled != null) {
+                this.disabled = pageInfo.disabled;
+            }
+            if (pageInfo.totalRecordCount != null) {
+                this.totalRecordCount = pageInfo.totalRecordCount;
+            }
+            if (pageInfo.pageSize != null) {
+                this.pageSize = pageInfo.pageSize;
+            }
+            if (pageInfo.currentPage != null) {
+                this.currentPage = pageInfo.currentPage;
+            }
+        }
+    };
+=======
+/**
+ * di.shared.model.TableModel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:   表格Model的基类，
+ *          支持前台分页、排序，后台分页、排序，
+ *          各表格页面Model可继承或聚合此类
+ * @author: sushuang(sushuang)
+ * @depend: xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+/**
+ * @usage 先调用prepareArgs准备参数（用cmd和changeArgs指定参数），
+ *        再调用persistent进行模型刷新，最后用getData获取显示数据。
+ *
+ * 数据格式说明：
+ *    {Object|Array{Object}} sortInfo 排序信息
+ *        如果为Object，结构为：
+ *        {string} orderby 'asc'或'desc'或空
+ *        {string} sortby 根据什么列排序
+ *        如果为Array，则示按多列排序，
+ *        第一列作为主排序在getData时会被返回，不常用
+ *    {(Object|PageInfo)} pageInfo 分页信息
+ *        {number} disabled 是否禁用
+ *        {number} totalRecordCount 总记录数
+ *        {number} pageSize 每页大小
+ *        {number} currentPage 当前页号，从1开始
+ */
+(function() {
+    
+    //-------------------------------------------
+    // 引用
+    //-------------------------------------------
+
+    var xobject = xutil.object;
+    var xlang = xutil.lang;
+    var extend = xobject.extend;
+    var inheritsObject = xobject.inheritsObject;
+    var q = xutil.dom.q;
+    var g = xutil.dom.g;
+    var sortList = xutil.collection.sortList;
+    var hasValue = xlang.hasValue;
+    var isArray = xlang.isArray;
+    var XDATASOURCE = xui.XDatasource;
+    var DICT = di.config.Dict;
+    var URL = di.config.URL;
+    var PAGE_INFO;
+
+    $link(function() {
+        PAGE_INFO = di.shared.model.PageInfo;
+    });
+
+    //-------------------------------------------
+    // 类型定义
+    //-------------------------------------------
+
+    /**
+     * 表格模型基础类
+     *
+     * @class
+     * @extend xui.XDatasource
+     */
+    var TABLE_MODEL = 
+            $namespace().TableModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var TABLE_MODEL_CLASS = TABLE_MODEL.prototype;
+
+    TABLE_MODEL_CLASS.DEFAULT_PAGE_SIZE = 20;
+
+    //-------------------------------------------
+    // 方法
+    //-------------------------------------------
+
+    /**
+     * 构造方法
+     * 
+     * @constructor
+     * @private
+     */
+    function constructor() {
+        /**
+         * 所有数据
+         * （在使用前端分页时，这是数据的全集）
+         *
+         * @type {Array.<Object>}
+         * @private
+         */
+        this._oDatasource = [];
+        /**
+         * 数据信息包装（包括当页数据，分页信息，排序信息）
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oWrap = {
+            sortInfo: {},
+            pageInfo: new PAGE_INFO(),
+            pageData: []
+        }
+    }
+
+    /**
+     * 获取数据（包括当页数据，分页信息，排序信息）
+     *
+     * @public
+     * @return {Object} 显示数据
+     *          {Array} pageData
+     *          {Object} sortInfo
+     *          {PageInfo} pageInfo
+     */
+    TABLE_MODEL_CLASS.getData = function() {
+        var ret = extend({}, this._oWrap);
+        ret.sortInfo = this.$getMainSortInfo(ret.sortInfo);
+        return ret;
+    };
+
+    /**
+     * 获得数据信息封装（包括当页数据，分页信息，排序信息）
+     *（返回原引用而非副本，派生类中使用）
+     *
+     * @protected
+     * @return {Object} 数据信息封装
+     *          {Array} pageData
+     *          {Object} sortInfo
+     *          {PageInfo} pageInfo     
+     */
+    TABLE_MODEL_CLASS.$getWrap = function() {
+        return this._oWrap;
+    };
+
+    /**
+     * 获取所有数据
+     *
+     * @public
+     * @return {Array.<Object>} 所有数据
+     */
+    TABLE_MODEL_CLASS.getDatasource = function() {
+        return this._oDatasource || [];
+    };
+
+    /**
+     * 准备参数
+     *
+     * @public
+     * @param {string} cmd 命令，
+     *          默认的有'CMD_INIT', 'CMD_SORT', 
+     *          'CMD_PAGE_CHANGE', 'CMD_PAGE_SIZE_CHANGE'
+     * @param {Object} changeArgs 需要改变的参数参数，
+     *          结构如下，只传需要改变的属性
+     *          {(Object|Array.<Object>)} sortInfo
+     *          {(Object|PageInfo)} pageInfo
+     * @return {Object} initArgs
+     *          {Object} sortInfo
+     *          {PageInfo} pageInfo
+     */
+    TABLE_MODEL_CLASS.prepareArgs = function(cmd, changeArgs) {
+        var wrap = this._oWrap;
+        return this['$' + cmd](cmd, changeArgs);
+    };
+
+    /**
+     * 持久化Model
+     *
+     * @public
+     * @param {Object} datasource 数据源，如果不传则使用已经持久化的数据源
+     * @param {Object} initArgs 初始化参数，根据此参数初始化
+     *          {(Object|Array.<Object>)} sortInfo
+     *          {(Object|PageInfo)} pageInfo
+     * @param {boolean} useRawData 不处理数据（用于后台分页和排序），缺省是false
+     */
+    TABLE_MODEL_CLASS.persistent = function(datasource, initArgs, useRawData) {
+        this._oWrap = extend({}, initArgs);
+        this._oDatasource = datasource || this._oDatasource;
+
+        if (useRawData) {
+            this._oWrap.pageData = datasource;
+        } 
+        else {
+            this._oWrap.pageInfo.totalRecordCount = this._oDatasource.length;
+            this.$sortTable(datasource, this._oWrap.sortInfo);
+            this._oWrap.pageData = this.$pagingTable(
+                datasource, 
+                this._oWrap.pageInfo
+            );
+        }
+    };
+
+
+    /**
+     * 命令处理，生成initArgs，可添加或重载
+     *
+     * @protected
+     */
+    TABLE_MODEL_CLASS.$CMD_INIT = function(cmd, changeArgs) {
+        var wrap = this._oWrap;
+        var initArgs = {};
+        var pageSize = wrap.pageInfo.pageSize;
+        initArgs.sortInfo = this.$initSortInfo();
+        initArgs.pageInfo = this.$initPageInfo();
+        pageSize && (initArgs.pageInfo.pageSize = pageSize);
+        return initArgs;
+    };
+    TABLE_MODEL_CLASS.$CMD_SORT = function(cmd, changeArgs) {
+        var wrap = this._oWrap;
+        var initArgs = {};
+        var pageSize = wrap.pageInfo.pageSize;
+        if (this.$getMainSortInfo(changeArgs.sortInfo).sortby != 
+                this.$getMainSortInfo(wrap.sortInfo).sortby
+        ) {
+            initArgs.sortInfo = this.$changeSortby(
+                this.$getMainSortInfo(changeArgs.sortInfo).sortby
+            );
+        } else {
+            initArgs.sortInfo = wrap.sortInfo;
+            this.$getMainSortInfo(initArgs.sortInfo).orderby = 
+                this.$changeOrderby(initArgs.sortInfo);
+        }
+        initArgs.pageInfo = wrap.pageInfo;
+        pageSize && (initArgs.pageInfo.pageSize = pageSize);
+        return initArgs;
+    };
+    TABLE_MODEL_CLASS.$CMD_CHANGE_PAGE = function(cmd, changeArgs) {
+        var wrap = this._oWrap;
+        var initArgs = {};
+        var pageSize = wrap.pageInfo.pageSize;
+        initArgs.sortInfo = wrap.sortInfo;
+        initArgs.pageInfo = wrap.pageInfo;
+        initArgs.pageInfo.currentPage = Number(
+            changeArgs.pageInfo.currentPage
+        );
+        pageSize && (initArgs.pageInfo.pageSize = pageSize);
+        return initArgs;
+    };
+    TABLE_MODEL_CLASS.$CMD_CHANGE_PAGE_SIZE = function(cmd, changeArgs) {
+        var wrap = this._oWrap; 
+        var initArgs = {};
+        var pageSize = wrap.pageInfo.pageSize;
+        initArgs.sortInfo = this.$initSortInfo();
+        initArgs.pageInfo = this.$initPageInfo();
+        initArgs.pageInfo.pageSize = Number(
+            changeArgs.pageInfo.pageSize
+        );
+        return initArgs;
+    };
+
+    /**
+     * 默认的pageInfo初始化，可重载
+     *
+     * @protected
+     * @return {PageInfo} pageInfo
+     */
+    TABLE_MODEL_CLASS.$initPageInfo = function() {
+        return new PAGE_INFO(
+            {
+                disabled: false,
+                currentPage: 1,
+                pageSize: this.DEFAULT_PAGE_SIZE
+            }
+        );
+    };
+
+    /**
+     * 默认的sortInfo初始化，可重载
+     * 
+     * @protected
+     * @return {(Object|Array.<Object>)} sortInfo
+     */
+    TABLE_MODEL_CLASS.$initSortInfo = function() {
+        return { sortby: null, orderby: null, dataField: null };
+    };
+
+    /**
+     * 修改sortby，可重载
+     * 
+     * @protected
+     * @param {string} newSortby
+     * @return {(Object|Array.<Object>)} sortInfo
+     */
+    TABLE_MODEL_CLASS.$changeSortby = function(newSortby) {
+        return { sortby: newSortby, orderby: null, dataField: newSortby };
+    };
+
+    /**
+     * 修改orderby，可重载
+     * 
+     * @protected
+     * @param {(Object|Array.<Object>)} oldSortInfo
+     * @return {string} orderby
+     */
+    TABLE_MODEL_CLASS.$changeOrderby = function(oldSortInfo) {
+        var sInfo = isArray(oldSortInfo) ? oldSortInfo[0] : oldSortInfo;
+        return sInfo.orderby == 'asc' ? 'desc' : 'asc'; 
+    };
+
+    /**
+     * 表格排序
+     * 会更新输入的原数据集和sortInfo的orderby字段
+     * 不支持“还原成默认”，只在asc和desc间切换
+     * 
+     * @protected
+     * @param {Array{Object}} datasource
+     * @param {(Object|Array.<Object>)} sortInfo
+     */
+    TABLE_MODEL_CLASS.$sortTable = function(datasource, sortInfo) {
+        if (!datasource || !sortInfo) { 
+            return; 
+        }
+        
+        var sortInfoArr = isArray(sortInfo) ? sortInfo : [sortInfo];
+        for (
+            var i = sortInfoArr.length - 1, o, compareFunc; 
+            o = sortInfoArr[i]; 
+            i --
+        ) {
+            if (hasValue(o.dataField) && o.orderby) {
+                compareFunc = o.orderby == 'asc' ? '<' : '>'; 
+                sortList(datasource, o.dataField, compareFunc, false);
+            }
+        }
+    };    
+    
+    /**
+     * 前端表格分页
+     * 
+     * @protected
+     * @param {Array.<Object>} datasource
+     * @param {(Object|PageInfo)} pageInfo
+     * @return {Array} 当前页数据
+     */
+    TABLE_MODEL_CLASS.$pagingTable = function(datasource, pageInfo) {
+        var start;
+        var length;
+        var ret = [];
+        if (pageInfo.disabled) {
+            start = 0;
+            length = datasource.length;
+        } else {
+            start = (pageInfo.currentPage - 1) * pageInfo.pageSize;
+            length = pageInfo.pageSize;
+        }
+        for (
+            var i = 0, o; 
+            i < length && (o = datasource[start + i]); 
+            i ++
+        ) {
+            ret.push(o);
+        }
+        return ret;
+    };
+
+    /**
+     * 得到主sortInfo
+     *
+     * @protected
+     */
+    TABLE_MODEL_CLASS.$getMainSortInfo = function(sortInfo) {
+        return isArray(sortInfo) ? sortInfo[0] : sortInfo;
+    };  
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    /**
+     * 用后台数据设置page info
+     * 
+     * @public
+     * @param {Object} serverPageInfo 后台page info的json对象
+     * @param {string=} type 后台page bean类型，
+     *              可取值：'TCOM', 
+     *              为空则是默认模式
+     */
+    PAGE_INFO_CLASS.setServerData = function(serverPageInfo, type) {
+        var pageInfo;
+=======
+/**
+ * di.shared.ui.BaseConfigPanel
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    简单配置面板的基类，做一些共性的事情，
+ *           配置面板可继承此类。
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var URL = di.config.URL;
+    var DIALOG = di.helper.Dialog;
+    var UTIL = di.helper.Util;
+    var DICT = di.config.Dict;
+    var LANG = di.config.Lang;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var addClass = xutil.dom.addClass;
+    var disposeInnerControl = UTIL.disposeInnerControl;
+    var template = xutil.string.template;
+    var toShowText = xutil.string.toShowText;
+    var q = xutil.dom.q;
+    var inheritsObject = xutil.object.inheritsObject;
+    var hasValueNotBlank = xutil.lang.hasValueNotBlank;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var alert = di.helper.Dialog.alert;
+    var isString = xutil.lang.isString;
+    var textLength = xutil.string.textLength;
+    var textSubstr = xutil.string.textSubstr;
+    var stringToDate = xutil.date.stringToDate;
+    var removeDom = xutil.dom.remove;
+    var trim = xutil.string.trim;
+    var bind = xutil.fn.bind;
+    var XVIEW = xui.XView;
+    var UI_FORM = ecui.ui.Form;
+    var UI_BUTTON = ecui.ui.Button;
+        
+    $link(function() {
+    });
+    
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 简单配置面板的基类，做一些共性的事情
+     * 派生类可使用单例(xutil.object.createSingle)
+     * 
+     * @class
+     * @extends xui.XView
+     */
+    var BASE_CONFIG_PANEL = $namespace().BaseConfigPanel = 
+            inheritsObject(XVIEW, constructor);
+    var BASE_CONFIG_PANEL_CLASS = BASE_CONFIG_PANEL.prototype;
+
+    //-----------------------------------
+    // 模板
+    //-----------------------------------
+
+    var TPL_MAIN = [
+            '<div class="q-di-form">',
+                '<label>#{0}</label>',
+                '<div class="q-di-form-content">#{1}</div>',
+                '<div>',
+                    '<div class="di-dim-select-btn">',
+                        '<div class="q-di-submit">确定</div>',
+                        '<div class="q-di-cancel">取消</div>',
+                    '</div>',
+                '<div>',
+            '</div>'
+        ].join('');
+
+    //-----------------------------------
+    // 待实现的抽象方法
+    //-----------------------------------
+
+    /**
+     * 创建View
+     *
+     * @abstract
+     * @protected
+     * @param {Object} options 初始化参数
+     */
+    BASE_CONFIG_PANEL_CLASS.$doCreateView = function(options) {
+    };
+
+    /**
+     * 创建Model
+     *
+     * @abstract
+     * @protected
+     * @param {Object} options 初始化参数
+     */
+    BASE_CONFIG_PANEL_CLASS.$doCreateModel = function(options) {
+    };
+
+    /**
+     * 得到model
+     *
+     * @abstract
+     * @protected
+     * @return {xui.XDatasource} model
+     */
+    BASE_CONFIG_PANEL_CLASS.$doGetModel = function() {
+        // 如果中派生类中的model就用this._mModel命名，则不用重载这个方法
+        return this._mModel;
+    };
+
+    /**
+     * 其他初始化
+     *
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doInit = function() {
+    };
+
+    /**
+     * 得到内容tpl
+     *
+     * @abstract
+     * @protected
+     * @param {Object} options 初始化参数
+     * @return {string} 内容的html模板
+     */
+    BASE_CONFIG_PANEL_CLASS.$doGetContentTPL = function(options) {
+        return '';
+    };
+
+    /**
+     * 重置输入
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doResetInput = function() {
+    };
+
+    /**
+     * 渲染内容
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doRender = function(contentEl, data) {
+    };
+
+    /**
+     * 打开
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doOpen = function(mode, options) {
+    };
+
+    /**
+     * 打开时候的请求（默认为请求后台）
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doOpenSync = function() {
+        // 每次打开时从后台获取初始值
+        var dsId = this.$getDS().INIT;
+        if (dsId) {
+            this.$doGetModel().sync(
+                { 
+                    datasourceId: dsId,
+                    args: this.$doGetInitArgs()
+                }
+            );
+        }
+        else {
+            this.$handleInitSuccess({});
+        }
+    };
+
+    /**
+     * 提交（默认为请求后台）
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doSubmit = function() {
+        var args = this.$doGetSubmitArgs();
+        if (isString(args)) {
+            // 表示验证失败，不提交
+            alert(args);
+            return;
+        }
+
+        var dsId = this.$getDS().SUBMIT;
+        var options = { datasourceId: dsId, args: args };
+        if (dsId) {
+            this.$doGetModel().sync(options);
+        }
+        else {
+            this.$handleSubmitSuccess(null, null, options);
+        }
+    };
+
+    /**
+     * 取消事件处理（默认为关闭浮层）
+     *
+     * @protected
+     * @event
+     */
+    BASE_CONFIG_PANEL_CLASS.$doCancel = function() {
+        this.close();
+    };
+
+    /**
+     * 渲染内容
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doSubmitSuccess = function(contentEl, data) {
+    };
+
+    /**
+     * 其他启用
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doEnable = function() {
+    };
+
+    /**
+     * 其他禁用
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doDisable = function() {
+    };
+
+    /**
+     * 得到初始化时的参数
+     * 
+     * @abstract
+     * @protected
+     * @return {Object} 提交参数包装，如{ aaa: 1, bbb: '123' }
+     */
+    BASE_CONFIG_PANEL_CLASS.$doGetInitArgs = function() {
+        return {};
+    };
+
+    /**
+     * 得到提交时的参数
+     * 
+     * @abstract
+     * @protected
+     * @return {Object} 提交参数包装，如{ aaa: 1, bbb: '123' }
+     */
+    BASE_CONFIG_PANEL_CLASS.$doGetSubmitArgs = function() {
+        return {};
+    };
+
+    /**
+     * 析构
+     * 
+     * @abstract
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$doDispose = function() {
+        // 一般不用实现
+    };
+
+    //-----------------------------------
+    // 已实现的方法
+    //-----------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @param {Object} options 初始化参数
+     * @param {Object=} options.model
+     * @param {Object=} options.parent
+     * @param {string} options.cssName 主css名字 
+     * @param {string} options.panelTitle 标题 
+     */
+    function constructor(options) {
+
+        this._mModel = options.model;
+        this._uParent = options.parent;
+
+        // 创建Model
+        this.$doCreateModel(options);
+
+        this._bOpened = false;
+
+        // 创建主dom
+        var el = this._el = options.el || document.createElement('div');
+        addClass(el, options.cssName || 'di-config-panel')
+
+        document.body.appendChild(el);
+        el.innerHTML = template(
+            TPL_MAIN, 
+            toShowText(options.panelTitle || this.PANEL_TITLE, '', true),
+            this.$doGetContentTPL(options)
+        );
+
+        // 创建基本控件
+        this._uForm = ecuiCreate(
+            UI_FORM,
+            q('q-di-form', el)[0],
+            null,
+            { hide: true }
+        );
+        this._uSubmitBtn = ecuiCreate(
+            UI_BUTTON,
+            q('q-di-submit', el)[0],
+            null,
+            { primary: 'ui-button-g' }
+        );
+        this._uCancelBtn = ecuiCreate(
+            UI_BUTTON,
+            q('q-di-cancel', el)[0],
+            null,
+            { primary: 'ui-button' }
+        );
+        this._eContent = q('q-di-form-content', el)[0];
+
+        // 创建其他View
+        this.$doCreateView(options);
+    }
+
+    /**
+     * @override
+     */
+    BASE_CONFIG_PANEL_CLASS.init = function() {
+        var me = this;
+        var ds;
+        var model = this.$doGetModel();
+
+        this._uSubmitBtn.onclick = bind(this.$doSubmit, this);
+        this._uCancelBtn.onclick = bind(this.$doCancel, this);
+
+        this._uForm.onhide = function () {
+            me._bOpened = false;
+        };
+
+        // Init
+        this._uForm.init();
+        this._uSubmitBtn.init();
+        this._uCancelBtn.init();
+
+        // 其他初始化
+        this.$doInit();
+
+        this.$doResetInput();
+    };
+    
+    /**
+     * @override
+     */
+    BASE_CONFIG_PANEL_CLASS.dispose = function() {
+        // 其他析构
+        this.$doDispose();
+
+        this._uForm && this._uForm.dispose();
+        this._uSubmitBtn && this._uSubmitBtn.dispose();
+        this._uCancelBtn && this._uCancelBtn.dispose();
+        this._eContent = null;
+        removeDom(this._el);
+        this._el = null;
+
+        BASE_CONFIG_PANEL.superClass.dispose.call(this);
+    };
+
+    /**
+     * 得到主DOM元素
+     *
+     * @public
+     */
+    BASE_CONFIG_PANEL_CLASS.getEl = function() {
+        return this._el;
+    };
+
+    /**
+     * 得到内容部分DOM元素
+     *
+     * @public
+     */
+    BASE_CONFIG_PANEL_CLASS.getContentEl = function() {
+        return this._eContent;
+    };
+
+    /**
+     * 打开面板
+     *
+     * @public
+     * @param {string} mode 可取值：
+     *                       'VIEW': 查看
+     *                       'EDIT': 修改
+     */
+    BASE_CONFIG_PANEL_CLASS.open = function(mode, options) {
+        this._sMode = mode;
+        this._bOpened = true;
+        var model = this._mModel;
+
+        // 事件绑定
+        // 允许改变DATASOURCE_ID_MAPPING，所以在open前确定DATASOURCE_ID_MAPPING即可
+        if (ds = this.$getDS().INIT) {
+            model.attachOnce(
+                ['sync.preprocess.' + ds, openCheck(this.disable), this],
+                ['sync.result.' + ds, openCheck(this.$handleInitSuccess), this],
+                ['sync.error.' + ds, openCheck(this.$handleInitError), this],
+                ['sync.complete.' + ds, openCheck(this.enable), this]
+            );
+        }
+        if (ds = this.$getDS().SUBMIT) {
+            model.attachOnce(
+                ['sync.preprocess.' + ds, openCheck(this.disable), this],
+                ['sync.result.' + ds, openCheck(this.$handleSubmitSuccess), this],
+                ['sync.error.' + ds, openCheck(this.$handleSubmitError), this],
+                ['sync.complete.' + ds, openCheck(this.enable), this]
+            );
+        }
+
+        this.$doOpen(mode, options);
+
+        this.$doResetInput();
+
+        this.$doOpenSync();
+    };
+
+    /**
+     * 关闭面板
+     *
+     * @public
+     */
+    BASE_CONFIG_PANEL_CLASS.close = function() {
+        this._uForm.hide();
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @override
+     * @public
+     */
+    BASE_CONFIG_PANEL_CLASS.enable = function() {
+        if (this._bDisabled) {
+            this._uSubmitBtn.enable();
+            this._uCancelBtn.enable();
+            // 其他启用
+            this.$doEnable();
+        }
+        BASE_CONFIG_PANEL.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @override
+     * @public
+     */
+    BASE_CONFIG_PANEL_CLASS.disable = function() {
+        if (!this._bDisabled) {
+            this._uSubmitBtn.disable();
+            this._uCancelBtn.disable();
+            // 其他禁用
+            this.$doDisable();
+        }
+        BASE_CONFIG_PANEL.superClass.disable.call(this);
+    };    
+
+    /**
+     * 初始数据成功结果处理
+     *
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$handleInitSuccess = function(data) {
+        try {
+            this._uForm.showModal(DICT.DEFAULT_MASK_OPACITY);
+
+            // 渲染内容
+            this.$doRender(this.getContentEl(), data);
+
+            this._uForm.resize();
+            
+            this._uForm.center();
+        }
+        catch (e) {
+            // 需求变化性很大，数据源很杂，不敢保证返回数据总是匹配，
+            // 所以用try catch
+            // this.$handleInitError();
+        }
+    };
+
+    /**
+     * 原因添加失败结果处理
+     *
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$handleInitError = function() {
+        var me = this;
+        // 获取初始数据出错，提示并关闭面板
+        DIALOG.alert(
+            LANG.GET_DIM_TREE_ERROR,
+            function() {
+                me.close();
+            }
+        );
+    };
+
+    /**
+     * 原因添加成功结果处理
+     *
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$handleSubmitSuccess = function(data, ejsonObj, options) {
+        this.$doSubmitSuccess(this.getContentEl(), data, ejsonObj, options);
+        this.close();
+        /**
+         * @event di.shared.ui.BaseConfigPanel#submit.close
+         */
+        this.notify('submit.close', [data, ejsonObj, options]);
+    };
+
+    /**
+     * 原因添加失败结果处理
+     *
+     * @protected
+     */
+    BASE_CONFIG_PANEL_CLASS.$handleSubmitError = function(status) {
+        DIALOG.alert(LANG.SAVE_FAILURE);
+    };
+
+    /**
+     * @private
+     */
+    BASE_CONFIG_PANEL_CLASS.$getDS = function(status) {
+        return this.DATASOURCE_ID_MAPPING || {};
+    };
+
+    /**
+     * @public
+     */
+    BASE_CONFIG_PANEL_CLASS.center = function() {
+        this._uForm.center();
+    };
+
+    function openCheck(fn) {
+        return function () {
+            if (this._bOpened) {
+                return fn.apply(this, arguments);
+            }
+        }
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+        switch (type) {
+            case 'TCOM': 
+                pageInfo = {};
+                if (serverPageInfo) {
+                    pageInfo.disabled = false;
+                    pageInfo.totalRecordCount = 
+                        parseInt(serverPageInfo.totalRecNum) || 0;
+                    pageInfo.pageSize = 
+                        parseInt(serverPageInfo.pageSize) || 0;
+                    pageInfo.currentPage = 
+                        parseInt(serverPageInfo.curPageNum) || 0;
+                }
+                break;
+
+            default:
+                pageInfo = serverPageInfo;
+        }
+
+        this.setData(pageInfo);
+    };
+
+    /**
+     * 得到请求server的参数
+     * 
+     * @public
+     * @param {string=} prefix 参数名前缀，如: 
+     *              请求参数想要为'model.page.cur_page_num ...'，
+     *              则此参数可传'model.page.',
+     *              缺省为'page.'
+     * @param {string=} type 后台page bean类型，
+     *              可取值：'TCOM', 
+     *              为空则是默认模式
+     * @return {string} 后台的page info的请求参数
+     */
+    PAGE_INFO_CLASS.getServerParam = function(prefix, type) {
+        var paramArr = [];
+
+        if (prefix == null) {
+            prefix = 'page.';
+        }
+
+        switch (type) {
+            case 'TCOM': 
+                paramArr.push(
+                    prefix + 'curPageNum=' + textParam(this.currentPage)
+                );
+                paramArr.push(
+                    prefix + 'pageSize=' + textParam(this.pageSize)
+                );
+                break;
+
+            default:
+                paramArr.push(
+                    prefix + 'currentPage' + textParam(this.currentPage)
+                );
+                paramArr.push(
+                    prefix + 'pageSize' + textParam(this.pageSize)
+                );
+        }
+
+        return paramArr.join('&');            
+    };
+
+=======
+/**
+ * di.shared.ui.DIChart
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 图视图组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var URL = di.config.URL;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var download = UTIL.download;
+    var foreachDo = UTIL.foreachDo;
+    var DIALOG = di.helper.Dialog;
+    var LANG = di.config.Lang;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 图视图组件
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     */
+    var DI_ECHART = $namespace().DIEChart =
+        inheritsObject(INTERACT_ENTITY);
+    var DI_ECHART_CLASS = DI_ECHART.prototype;
+    
+    //------------------------------------------
+    // 常量 
+    //------------------------------------------
+
+    /**
+     * 暴露给interaction的api
+     */
+    DI_ECHART_CLASS.EXPORT_HANDLER = {
+        sync: { datasourceId: 'DATA' },
+        syncX: { datasourceId: 'X_DATA' },
+        syncLiteOlapChart: { datasourceId: 'LITEOLAPCHART_DATA' },
+        syncS: { datasourceId: 'S_DATA' },
+        syncSAdd: { datasourceId: 'S_ADD_DATA' },
+        syncSRemove: { datasourceId: 'S_REMOVE_DATA' },
+        clear: {}
+    };
+
+    /**
+     * 定义
+     */
+    DI_ECHART_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            syncX: { datasourceId: 'X_DATA' },
+            syncLiteOlapChart: { datasourceId: 'LITEOLAPCHART_DATA' },
+            syncS: { datasourceId: 'S_DATA' },
+            syncSAdd: { datasourceId: 'S_ADD_DATA' },
+            syncSRemove: { datasourceId: 'S_REMOVE_DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'di-chart',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.DIEChartModel'
+        }
+    };
+
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    DI_ECHART_CLASS.$createView = function (options) {
+        var el = this.$di('getEl');
+
+        this._uChart = this.$di('vuiCreate', 'mainChart');
+
+        // 下载按钮
+        this._uDownloadBtn = this.$di('vuiCreate', 'download');
+
+        // 离线下载
+        this._uOfflineDownloadBtn = this.$di('vuiCreate', 'offlineDownload');
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_ECHART_CLASS.init = function () {
+        var key;
+        var exportHandler = this.DEF.exportHandler;
+        
+        // 事件绑定
+        for (key in exportHandler) {
+            var id = exportHandler[key].datasourceId;
+            this.getModel().attach(
+                ['sync.preprocess.' + id, this.$syncDisable, this, id],
+                ['sync.result.' + id, this.$renderMain, this],
+                ['sync.result.' + id, this.$handleDataLoaded, this],
+                ['sync.error.' + id, this.$handleDataError, this],
+                ['sync.complete.' + id, this.$syncEnable, this, id]
+            );
+        }
+        key = 'OFFLINE_DOWNLOAD';
+        this.getModel().attach(
+            ['sync.preprocess.' + key, this.$syncDisable, this, key],
+            ['sync.error.' + key, this.$handleOfflineDownloadError, this],
+            ['sync.complete.' + key, this.$syncEnable, this, key]
+        );
+        this._uDownloadBtn && (
+            this._uDownloadBtn.onclick = bind(this.$handleDownload, this)
+        );
+        this._uOfflineDownloadBtn && (
+            this._uOfflineDownloadBtn.attach('confirm', this.$handleOfflineDownload, this)
+        );
+
+        foreachDo(
+            [
+                this.getModel(),
+                this._uChart, 
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn
+            ], 
+            'init'
+        );
+    };
+
+    /**
+     * @override
+     */
+    DI_ECHART_CLASS.dispose = function () {
+        this._uChart && this._uChart.$di('dispose');
+        DI_ECHART.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     * @param {Object} options 参数
+     */
+    (function () {
+        var exportHandler = DI_ECHART_CLASS.DEF.exportHandler;
+        for (var funcName in exportHandler) {
+            DI_ECHART_CLASS[funcName] = getSyncMethod(
+                exportHandler[funcName].datasourceId
+            );
+        }
+        function getSyncMethod(datasourceId) {
+            return function (options) {
+                // 视图禁用
+                /*
+                var diEvent = this.$di('getEvent');
+                var vd = diEvent.viewDisable;
+                vd && this.getModel().attachOnce(
+                    ['sync.preprocess.' + datasourceId, vd.disable],
+                    ['sync.complete.' + datasourceId, vd.enable]
+                );*/
+                options = options || {};
+                options.componentId = this.$di('getId').split('.')[1];
+                // 请求后台
+                this.$sync(
+                    this.getModel(),
+                    datasourceId,
+                    options,
+                    this.$di('getEvent')
+                );
+            };
+        }
+    })();
+
+    /**
+     * 清空视图
+     * 
+     * @public
+     */
+    DI_ECHART_CLASS.clear = function () {
+        this._uChart && this._uChart.$di('setData');
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    DI_ECHART_CLASS.$renderMain = function (data, ejsonObj, options) {
+        this._uChart.$di(
+            'setData', 
+            this.getModel().getChartData(),
+            { diEvent: this.$diEvent(options) }
+        );
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_ECHART_CLASS.resize = function () {
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    DI_ECHART_CLASS.enable = function () {
+        foreachDo(
+            [this._uChart, this._uDownloadBtn, this._uOfflineDownloadBtn], 
+            'enable'
+        );
+        DI_ECHART.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    DI_ECHART_CLASS.disable = function () {
+        foreachDo(
+            [this._uChart, this._uDownloadBtn, this._uOfflineDownloadBtn], 
+            'disable'
+        );
+        DI_ECHART.superClass.disable.call(this);
+    };    
+
+    /**
+     * 下载操作
+     *
+     * @protected
+     */
+    DI_ECHART_CLASS.$handleDownload = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+
+        var url = URL('OLAP_CHART_DOWNLOAD') 
+            + '?' + commonParamGetter();
+        download(url, null, true);
+
+        // 对于下载，不进行reportTemplateId控制，直接打开
+        commonParamGetter.update();
+    };
+
+    /**
+     * 离线下载操作
+     *
+     * @protected
+     */
+    DI_ECHART_CLASS.$handleOfflineDownload = function () {
+        var val = this._uOfflineDownloadBtn.getValue() || {};
+        this.$sync(
+            this.getModel(),
+            'OFFLINE_DOWNLOAD',
+            { email: val.email }
+        );
+    };
+
+    /**
+     * 数据加载成功
+     * 
+     * @protected
+     */
+    DI_ECHART_CLASS.$handleDataLoaded = function  (data, ejsonObj, options) {
+        /**
+         * 数据成功加载事件（分datasourceId）
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent', 
+            this.$diEvent('dataloaded.' + options.datasourceId, options)
+        );
+
+        /**
+         * 数据成功加载事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('dataloaded', options));
+    };
+
+    /**
+     * 获取数据错误处理
+     * 
+     * @protected
+     */
+    DI_ECHART_CLASS.$handleDataError = function (status, ejsonObj, options) {
+
+        // 设置空视图
+        this.clear();
+
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+        /**
+         * 数据加载失败事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('dataerror', options));
+        DIALOG.alert(ejsonObj.statusInfo);
+    };
+
+    /**
+     * 离线下载错误处理
+     * 
+     * @protected
+     */
+    DI_ECHART_CLASS.$handleOfflineDownloadError = function (status, ejsonObj, options) {
+        DIALOG.alert(LANG.SAD_FACE + LANG.OFFLINE_DOWNLOAD_FAIL);
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+})();
+<<<<<<< HEAD
+
+
+/**
+ * di.shared.model.PanelPageRadioAdapter
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    PanelPageManager的适配器（RADIO型）
+ * @author:  sushuang(sushuang)
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    var bind = xutil.fn.bind; 
+        
+    var PANEL_PAGE_RADIO_ADAPTER = $namespace().PanelPageRadioAdapter = {};
+        
+    /**
+     * 绑定事件
+     */
+    PANEL_PAGE_RADIO_ADAPTER.$bind = function () {
+        this._uPanelPageContainer.onbeforechange = bind(this.$pageBeforeChangeHandler, this);
+        this._uPanelPageContainer.onafterchange = bind(this.$pageAfterChangeHandler, this);
+    };
+    
+    /**
+     * 增加item
+     */
+    PANEL_PAGE_RADIO_ADAPTER.$addItem = function (panelPage, options) {
+        var container = this._uPanelPageContainer,
+            content = container.add({value: options.id, text: options.title}, 
+                function() { return panelPage({el: null, parent: container, pageId: options.pageId}); });
+        return {content: content, item: options.id};
+    };
+        
+    /**
+     * 选择item
+     */
+    PANEL_PAGE_RADIO_ADAPTER.$selectItem = function (pageWrap) {
+        this._uPanelPageContainer.select(pageWrap.item);
+    };
+    
+    /**
+     * 得到pageId
+     */
+    PANEL_PAGE_RADIO_ADAPTER.$retrievalPageId = function () {
+        return arguments[0];
+    }
+    
+    /**
+     * 更改标题
+     */
+    PANEL_PAGE_RADIO_ADAPTER.$setTitle = function (pageId, title) {
+        // not supported yet
+    }
+        
+    /**
+     * 打标记
+     */
+    PANEL_PAGE_RADIO_ADAPTER.$$mark = function (pageId, mark) {
+        // not supported yet
+    }
+        
+=======
+/**
+ * di.shared.ui.DIForm
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 表单视图组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var isObject = xutil.lang.isObject;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var extend = xutil.object.extend;
+
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 表单视图组件
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {string} options.submitMode 提交方式，可选值为
+     *      'IMMEDIATE'（输入后立即提交，默认）
+     *      'CONFIRM'（按确定按钮后提交）
+     * @param {(Object|boolean)=} options.confirmBtn 是否有确认按钮
+     *      如果为Object则内容为，{ text: '按钮文字' }
+     */
+    var DI_FORM = $namespace().DIForm = 
+        inheritsObject(INTERACT_ENTITY);
+    var DI_FORM_CLASS = DI_FORM.prototype;
+
+    /**
+     * 定义
+     */
+    DI_FORM_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'di-form',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.DIFormModel'
+        }
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    DI_FORM_CLASS.$createView = function (options) {
+        this._oOptions = extend({}, options);
+        options.submitMode = options.submitMode || 'IMMEDIATE';
+
+        // 创建参数输入控件
+        this._aInput = [];
+        for (var i = 0, o; o = this.$di('vuiCreate', 'input.' + i); i ++) {
+            this._aInput.push(o);
+            // 使用json格式传输数据
+            o.$di('setOpt', 'cfgOpt', 'paramMode', 'JSON');
+        }
+
+        // 创建“确认”控件
+        this._uConfirmBtn = this.$di('vuiCreate', 'confirm');
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_FORM_CLASS.init = function() {
+        var me = this;
+        var i;
+        var input;
+        var def;
+        var cfgOpt;
+
+        // 绑定组件事件
+        this.getModel().attach(
+            ['sync.preprocess.DATA', this.$syncDisable, this, 'DATA'],
+            ['sync.result.DATA', this.$renderMain, this],
+            //['sync.result.DATA', this.$handleDataLoaded, this],
+            ['sync.error.DATA', this.$handleDataError, this],
+            ['sync.complete.DATA', this.$syncEnable, this, 'DATA'],
+
+            // ASYNC不加disable，否则suggest框会在disasble的时候动input框，与输入法冲突。            
+            // ['sync.preprocess.ASYNC_DATA', this.disable, this, 'DI_FORM'],
+            ['sync.result.ASYNC_DATA', this.$renderAsync, this],
+            ['sync.error.ASYNC_DATA', this.$handleAsyncError, this],
+            // ['sync.complete.ASYNC_DATA', this.enable, this, 'DI_FORM']
+
+            ['sync.preprocess.UPDATE_CONTEXT', this.$syncDisable, this, 'UPDATE_CONTEXT'],
+            ['sync.result.UPDATE_CONTEXT', this.$renderUpdateContext, this],
+            ['sync.result.UPDATE_CONTEXT', this.$handleDataLoaded, this],
+            ['sync.error.UPDATE_CONTEXT', this.$handleUpdateContextError, this],
+            ['sync.complete.UPDATE_CONTEXT', this.$syncEnable, this, 'UPDATE_CONTEXT']
+        );
+
+        // 绑定控件事件
+        for (i = 0; input = this._aInput[i]; i ++ ) {
+            def = input.$di('getDef');
+            cfgOpt = input.$di('getOpt', 'cfgOpt');
+
+            // 改变事件
+            if (!cfgOpt.changeSilent) {
+                input.$di(
+                    'addEventListener',
+                    'change',
+                    this.$handleChange,
+                    this
+                );
+            }
+
+            // 异步取值事件
+            if (cfgOpt.async) {
+                input.$di(
+                    'addEventListener',
+                    'async',
+                    this.$handleAsync,
+                    this,
+                    { bindArgs: [input] }
+                );
+            }
+        }
+
+        if (this._uConfirmBtn) {
+            this._uConfirmBtn.onclick = function() {
+                me.$submit();
+            }
+        }
+
+        for (i = 0; input = this._aInput[i]; i ++ ) {
+            input.$di('init');
+        }
+    };
+
+    /**
+     * @override
+     */
+    DI_FORM_CLASS.dispose = function() {
+        for (var i = 0, input; input = this._aInput[i]; i ++ ) {
+            input.$di('dispose');
+        }
+        DI_FORM.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     */
+    DI_FORM_CLASS.sync = function(options) {
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.DATA',  vd.disable],
+            ['sync.complete.DATA', vd.enable]
+        );*/
+
+        // 初始化参数
+        var paramList = [];
+        for (var i = 0, input; input = this._aInput[i]; i ++ ) {
+            paramList.push(input.$di('getDef').name);
+        }
+        this.$sync(
+            this.getModel(),
+            'DATA',
+            { paramList: paramList },
+            null,
+            this.$di('getEvent')
+        );
+    };
+
+    /**
+     * 清空视图
+     *
+     * @public
+     */
+    DI_FORM_CLASS.clear = function(options) {
+        // TODO
+    };
+
+    /**
+     * 提交
+     *
+     * @protected
+     */
+    DI_FORM_CLASS.$submit = function() {
+        // 提交之前，先更换日历参数的key
+        // 应后端要求，日历中的每个粒度的参数key都是不一样的
+        var inputs = this._aInput;
+        var dateName;
+        var dateKey;
+        for (var i = 0, input = inputs[i]; i < inputs.length; i++ ) {
+            if (input.$di('getDef').clzKey === 'X_CALENDAR') {
+                dateName = input.$di('getDef').name;
+                dateKey = input.$di('getDef').dateKey;
+            }
+        }
+        if (dateName) {
+            var dateParam = this.$di('getValue')[dateName];
+            var options = {};
+            options[dateKey[dateParam.granularity]] = dateParam;
+        }
+
+        this.$sync(
+            this.getModel(),
+            'UPDATE_CONTEXT',
+            options
+        );
+    };
+
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    DI_FORM_CLASS.$renderMain = function(data, ejsonObj, options) {
+
+        var setDataOpt = { diEvent: this.$diEvent(options) };
+
+        // 设置数据并渲染
+        for (var i = 0, input; input = this._aInput[i]; i ++ ) {
+        	var curData = buildData(ejsonObj.data, input);
+            input.$di(
+                'setData',
+                curData,
+                setDataOpt
+            );
+        }
+
+        this.$sync(
+            this.getModel(),
+            'UPDATE_CONTEXT',
+            this.$di('getValue')
+        );
+
+    };
+    
+    /**
+     * 重组form里面input标签需要的默认数据
+     * 
+     * @private
+     * @param {Object} data 数据
+     * @param {HTMLElement} el form里面的表单元素
+     */
+    function buildData(data, el) {
+    	 var curData;
+         var def = el.$di('getDef');
+         var sourceData;
+         var defaultData;
+         
+         // 如果data存在，再进行赋值
+         if (data) {
+         	sourceData = data.params;
+         	defaultData = data.interactResult;
+         } 
+         
+         // 如果是时间，把时间默认数据格式重组为{ timeType: 'M' }返回
+         if (def.clzKey === 'X_CALENDAR') {
+             defaultData && (curData = defaultData[def.name]);
+             
+             if (curData && curData.value) {
+                 curData = {
+                     timeType: curData.value.granularity
+                 };
+             }
+         }
+         else {
+         	 // 如果渲染数据存在，就获取到当前渲染数据
+             sourceData && (curData = sourceData[def.name]);
+             // 如果当前渲染数据存在
+             curData
+             && curData.datasource
+             // 渲染数据的默认值存在
+             && defaultData 
+             && defaultData[def.name]
+             && defaultData[def.name].value
+             // 更新渲染数据里面的value为默认值
+             && (curData.value = defaultData[def.name].value);
+         }
+         
+         return curData;
+    }
+
+    /**
+     * 渲染同步
+     * 
+     * @protected
+     */
+    DI_FORM_CLASS.$renderAsync = function(data, ejsonObj, options) {
+        var args = options.args;
+        args.callback(data[args.input.$di('getDef').name] || {});
+    };
+
+    /**
+     * 渲染同步
+     *
+     * @protected
+     */
+    DI_FORM_CLASS.$renderAsync = function(data, ejsonObj, options) {
+        var args = options.args;
+        args.callback(data[args.input.$di('getDef').name] || {});
+    };
+
+    /**
+     * 渲染同步
+     *
+     * @protected
+     */
+    DI_FORM_CLASS.$renderUpdateContext= function(data, ejsonObj, options) {
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+    
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_FORM_CLASS.resize = function() {
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    DI_FORM_CLASS.enable = function() {
+        for (var i = 0, input; input = this._aInput[i]; i ++) {
+            input.$di('enable');
+        }
+        this._uConfirmBtn && this._uConfirmBtn.$di('enable');
+        DI_FORM.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    DI_FORM_CLASS.disable = function() {
+        for (var i = 0, input; input = this._aInput[i]; i ++) {
+            input.$di('disable');
+        }
+        this._uConfirmBtn && this._uConfirmBtn.$di('disable');
+        DI_FORM.superClass.disable.call(this);
+    };    
+
+    /**
+     * 初始数据加载完成
+     * 
+     * @protected
+     */
+    DI_FORM_CLASS.$handleDataLoaded = function(data, ejsonObj, options) {
+        /**
+         * 初始数据加载完成
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent', 
+            this.$diEvent('dataloaded', options)
+        );
+    };
+
+    /**
+     * 条件变化事件
+     *
+     * @event
+     * @protected
+     */
+    DI_FORM_CLASS.$handleChange = function() {
+        if (this._oOptions.submitMode == 'IMMEDIATE') {
+            this.$submit();
+        }
+    };
+
+    /**
+     * 异步取数据事件
+     *
+     * @event
+     * @protected
+     */
+    DI_FORM_CLASS.$handleAsync = function(input, value, callback) {
+        var name = input.$di('getDef').name;
+        var arg = {};
+
+        this.$sync(
+            this.getModel(),
+            'ASYNC_DATA',
+            {
+                paramName: name,
+                arg: value
+            },
+            null,
+            {
+                value: value,
+                callback: callback,
+                input: input
+            }
+        );
+    };
+
+    /**
+     * 获取数据错误处理
+     * 
+     * @protected
+     */
+    DI_FORM_CLASS.$handleDataError = function(status, ejsonObj, options) {
+        // 清空视图
+        this.clear();
+
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+
+    /**
+     * 获取数据错误处理
+     *
+     * @protected
+     */
+    DI_FORM_CLASS.$handleUpdateContextError = function(status, ejsonObj, options) {
+        // 清空视图
+        this.clear();
+
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+
+    /**
+     * 获取async数据错误处理
+     * 
+     * @protected
+     */
+    DI_FORM_CLASS.$handleAsyncError = function() {
+        // TODO
+        this.$di('dispatchEvent', 'rendered');
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+})();
+<<<<<<< HEAD
 
 
 /**
@@ -85111,7 +106798,353 @@ $namespace('di.shared.model');
         }
     }    
     
+=======
+/**
+ * di.shared.ui.DILiteOlapChart
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 图视图组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var URL = di.config.URL;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var download = UTIL.download;
+    var foreachDo = UTIL.foreachDo;
+    var DIALOG = di.helper.Dialog;
+    var LANG = di.config.Lang;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 图视图组件
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     */
+    var DI_LITEOLAP_CHART = $namespace().DILiteOlapChart = 
+        inheritsObject(INTERACT_ENTITY);
+    var DI_LITEOLAP_CHART_CLASS = DI_LITEOLAP_CHART.prototype;
+    
+    //------------------------------------------
+    // 常量 
+    //------------------------------------------
+
+    /**
+     * 暴露给interaction的api
+     */
+    DI_LITEOLAP_CHART_CLASS.EXPORT_HANDLER = {
+        sync: { datasourceId: 'DATA' },
+        syncX: { datasourceId: 'X_DATA' },
+        syncLiteOlapChart: { datasourceId: 'LITEOLAPCHART_DATA' },
+        syncS: { datasourceId: 'S_DATA' },
+        syncSAdd: { datasourceId: 'S_ADD_DATA' },
+        syncSRemove: { datasourceId: 'S_REMOVE_DATA' },
+        clear: {}
+    };
+
+    /**
+     * 定义
+     */
+    DI_LITEOLAP_CHART_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            syncX: { datasourceId: 'X_DATA' },
+            syncLiteOlapChart: { datasourceId: 'LITEOLAPCHART_DATA' },
+            syncS: { datasourceId: 'S_DATA' },
+            syncSAdd: { datasourceId: 'S_ADD_DATA' },
+            syncSRemove: { datasourceId: 'S_REMOVE_DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'di-chart',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.DIEChartModel'
+        }
+    };
+
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    DI_LITEOLAP_CHART_CLASS.$createView = function (options) {
+        var el = this.$di('getEl');
+
+        this._uChart = this.$di('vuiCreate', 'mainChart');
+
+        // 下载按钮
+        this._uDownloadBtn = this.$di('vuiCreate', 'download');
+
+        // 离线下载
+        this._uOfflineDownloadBtn = this.$di('vuiCreate', 'offlineDownload');
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_LITEOLAP_CHART_CLASS.init = function () {
+        var key;
+        var exportHandler = this.DEF.exportHandler;
+        
+        // 事件绑定
+        for (key in exportHandler) {
+            var id = exportHandler[key].datasourceId;
+            this.getModel().attach(
+                ['sync.preprocess.' + id, this.$syncDisable, this, id],
+                ['sync.result.' + id, this.$renderMain, this],
+                ['sync.result.' + id, this.$handleDataLoaded, this],
+                ['sync.error.' + id, this.$handleDataError, this],
+                ['sync.complete.' + id, this.$syncEnable, this, id]
+            );
+        }
+        key = 'OFFLINE_DOWNLOAD';
+        this.getModel().attach(
+            ['sync.preprocess.' + key, this.$syncDisable, this, key],
+            ['sync.error.' + key, this.$handleOfflineDownloadError, this],
+            ['sync.complete.' + key, this.$syncEnable, this, key]
+        );
+        this._uDownloadBtn && (
+            this._uDownloadBtn.onclick = bind(this.$handleDownload, this)
+        );
+        this._uOfflineDownloadBtn && (
+            this._uOfflineDownloadBtn.attach('confirm', this.$handleOfflineDownload, this)
+        );
+
+        foreachDo(
+            [
+                this.getModel(),
+                this._uChart, 
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn
+            ], 
+            'init'
+        );
+    };
+
+    /**
+     * @override
+     */
+    DI_LITEOLAP_CHART_CLASS.dispose = function () {
+        this._uChart && this._uChart.$di('dispose');
+        DI_LITEOLAP_CHART.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     * @param {Object} options 参数
+     */
+    (function () {
+        var exportHandler = DI_LITEOLAP_CHART_CLASS.DEF.exportHandler;
+        for (var funcName in exportHandler) {
+            DI_LITEOLAP_CHART_CLASS[funcName] = getSyncMethod(
+                exportHandler[funcName].datasourceId
+            );
+        }
+        function getSyncMethod(datasourceId) {
+            return function (options) {
+                // 视图禁用
+                /*
+                var diEvent = this.$di('getEvent');
+                var vd = diEvent.viewDisable;
+                vd && this.getModel().attachOnce(
+                    ['sync.preprocess.' + datasourceId, vd.disable],
+                    ['sync.complete.' + datasourceId, vd.enable]
+                );*/
+                options = options || {};
+                options.componentId = this.$di('getId').split('.')[1];
+                // 请求后台
+                this.$sync(
+                    this.getModel(),
+                    datasourceId,
+                    options,
+                    this.$di('getEvent')
+                );
+            };
+        }
+    })();
+
+    /**
+     * 清空视图
+     * 
+     * @public
+     */
+    DI_LITEOLAP_CHART_CLASS.clear = function () {  
+        this._uChart && this._uChart.$di('setData');
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.$renderMain = function (data, ejsonObj, options) {
+        this._uChart.$di(
+            'setData', 
+            this.getModel().getChartData(),
+            { diEvent: this.$diEvent(options) }
+        );
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_LITEOLAP_CHART_CLASS.resize = function () {
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.enable = function () {
+        foreachDo(
+            [this._uChart, this._uDownloadBtn, this._uOfflineDownloadBtn], 
+            'enable'
+        );
+        DI_LITEOLAP_CHART.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.disable = function () {
+        foreachDo(
+            [this._uChart, this._uDownloadBtn, this._uOfflineDownloadBtn], 
+            'disable'
+        );
+        DI_LITEOLAP_CHART.superClass.disable.call(this);
+    };    
+
+    /**
+     * 下载操作
+     *
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.$handleDownload = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+
+        var url = URL('OLAP_CHART_DOWNLOAD') 
+            + '?' + commonParamGetter();
+        download(url, null, true);
+
+        // 对于下载，不进行reportTemplateId控制，直接打开
+        commonParamGetter.update();
+    };
+
+    /**
+     * 离线下载操作
+     *
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.$handleOfflineDownload = function () {
+        var val = this._uOfflineDownloadBtn.getValue() || {};
+        this.$sync(
+            this.getModel(),
+            'OFFLINE_DOWNLOAD',
+            { email: val.email }
+        );
+    };
+
+    /**
+     * 数据加载成功
+     * 
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.$handleDataLoaded = function  (data, ejsonObj, options) {
+        /**
+         * 数据成功加载事件（分datasourceId）
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent', 
+            this.$diEvent('dataloaded.' + options.datasourceId, options)
+        );
+
+        /**
+         * 数据成功加载事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('dataloaded', options));
+    };
+
+    /**
+     * 获取数据错误处理
+     * 
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.$handleDataError = function (status, ejsonObj, options) {
+
+        // 设置空视图
+        this.clear();
+
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+        /**
+         * 数据加载失败事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('dataerror', options));
+        DIALOG.alert(ejsonObj.statusInfo);
+    };
+
+    /**
+     * 离线下载错误处理
+     * 
+     * @protected
+     */
+    DI_LITEOLAP_CHART_CLASS.$handleOfflineDownloadError = function (status, ejsonObj, options) {
+        DIALOG.alert(LANG.SAD_FACE + LANG.OFFLINE_DOWNLOAD_FAIL);
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
+<<<<<<< HEAD
 
 
 /**
@@ -88238,6 +110271,648 @@ $namespace('di.shared.ui');
         DIALOG.alert(LANG.SAD_FACE + LANG.OFFLINE_DOWNLOAD_FAIL);
     };
 
+=======
+/**
+ * di.shared.ui.DIPlaneTable
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 平面表视图组件（支持分页）
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var URL = di.config.URL;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var assign = xutil.object.assign;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var getByPath = xutil.object.getByPath;
+    var download = UTIL.download;
+    var foreachDo = UTIL.foreachDo;
+    var jsonStringify = baidu.json.stringify;
+    var DIALOG = di.helper.Dialog;
+    var LANG = di.config.Lang;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var ARG_HANDLER_FACTORY;
+
+    $link(function () {
+        ARG_HANDLER_FACTORY = di.shared.arg.ArgHandlerFactory;
+    });
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 表视图组件
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     */
+    var DI_PLANE_TABLE = $namespace().DIPlaneTable = 
+        inheritsObject(INTERACT_ENTITY);
+    var DI_PLANE_TABLE_CLASS = DI_PLANE_TABLE.prototype;
+    
+    //------------------------------------------
+    // 常量 
+    //------------------------------------------
+
+    /**
+     * 定义
+     */
+    DI_PLANE_TABLE_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'di-plane-table',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.DIPlaneTableModel'
+        }
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    DI_PLANE_TABLE_CLASS.$createView = function (options) {
+        var el = this.$di('getEl');
+
+        this._uTable = this.$di('vuiCreate', 'mainTable');
+
+        // 下载按钮
+        this._uDownloadBtn = this.$di('vuiCreate', 'download');
+
+        // 下载Excel按钮 add by MENGRAN at 2013-12-17
+        this._uDownloadExcelBtn = this.$di('vuiCreate', 'downloadExcel');
+
+        // 离线下载
+        this._uOfflineDownloadBtn = this.$di('vuiCreate', 'offlineDownload');
+
+        // 分页
+        this._uPager = this.$di('vuiCreate', 'pager');
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_PLANE_TABLE_CLASS.init = function () {
+        var me = this;
+        var key;
+        var model = this.getModel();
+        var table = this._uTable;
+        var downloadBtn = this._uDownloadBtn;
+        var downloadExcelBtn = this._uDownloadExcelBtn;
+        var offlineDownloadBtn = this._uOfflineDownloadBtn;  
+        var pager = this._uPager;
+
+        // 事件绑定
+        for (key in { 
+                'DATA': 1, 
+                'DRILL': 1, 
+                'SORT': 1
+            }
+        ) {
+            model.attach(
+                ['sync.preprocess.' + key, this.$syncDisable, this, key],
+                ['sync.result.' + key, this.$renderMain, this],
+                ['sync.result.' + key, this.$handleDataLoaded, this],
+                ['sync.error.' + key, this.$handleDataError, this],
+                ['sync.complete.' + key, this.$syncEnable, this, key]
+            );
+        }
+        key = 'OFFLINE_DOWNLOAD';
+        model.attach(
+            ['sync.preprocess.' + key, this.$syncDisable, this, key],
+            ['sync.error.' + key, this.$handleOfflineDownloadError, this],
+            ['sync.complete.' + key, this.$syncEnable, this, key]
+        );
+        model.attach(
+            ['sync.preprocess.CHECK', this.$syncDisable, this, 'CHECK'],
+            ['sync.result.CHECK', this.$handleRowAsync, this, false],
+            ['sync.error.CHECK', this.$handleRowAsync, this, true],
+            ['sync.complete.CHECK', this.$syncEnable, this, 'CHECK']
+        );
+        model.attach(
+            ['sync.preprocess.SELECT', this.$syncDisable, this, 'SELECT'],
+            ['sync.result.SELECT', this.$handleRowAsync, this, false],
+            ['sync.error.SELECT', this.$handleRowAsync, this, true],
+            ['sync.complete.SELECT', this.$syncEnable, this, 'SELECT']
+        );
+
+        model.init();
+
+        table.onsort = bind(this.$handleSort, this);
+        table.onrowclick = bind(this.$handleRowClick, this);
+        table.onrowselect = bind(this.$handleRowCheck, this, 'rowselect', 'SELECT');
+        table.onrowcheck = bind(this.$handleRowCheck, this, 'rowcheck', 'CHECK');
+        table.onrowuncheck = bind(this.$handleRowCheck, this, 'rowuncheck', 'CHECK');
+        table.oncelllinkbridge = bind(this.$handleLinkBridge, this);
+
+        if (pager) {
+            pager.onchange = bind(this.$handlePageChange, this);
+            pager.onpagesizechange = bind(this.$handlePageSizeChange, this);
+        }
+
+        downloadBtn && (
+            downloadBtn.onclick = bind(this.$handleDownload, this)
+        );
+        downloadExcelBtn && (
+            downloadExcelBtn.onclick = bind(this.$handleDownloadExcel, this)
+        );
+        offlineDownloadBtn && (
+            offlineDownloadBtn.attach('confirm', this.$handleOfflineDownload, this)
+        );
+
+        foreachDo(
+            [
+                table,
+                downloadBtn,
+                offlineDownloadBtn,
+                pager
+            ],
+            'init'
+        );
+
+        this.$di('getEl').style.display = 'none';
+    };
+
+    /**
+     * @override
+     */
+    DI_PLANE_TABLE_CLASS.dispose = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uPager,
+                this._uDownloadBtn,
+                this._uDownloadExcelBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'dispose'
+        );
+        DI_PLANE_TABLE.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     * @event
+     * @param {Object} options 参数
+     */
+    DI_PLANE_TABLE_CLASS.sync = function (options) {
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.DATA', vd.disable],
+            ['sync.complete.DATA', vd.enable]
+        );*/
+
+        options = assign({ DI_querySessionClear: true }, options);
+        if (this._uPager) {
+            options.pageSize = this._uPager.getPageSize();
+        }
+
+        // 请求后台
+        this.$sync(this.getModel(), 'DATA', options, this.$di('getEvent'));
+    };
+
+    /**
+     * 视图清空
+     *
+     * @public
+     * @event
+     */
+    DI_PLANE_TABLE_CLASS.clear = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uPager
+            ],
+            'setData'
+        );
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$renderMain = function (data, ejsonObj, options) {
+        this.$di('getEl').style.display = '';
+
+        foreachDo(
+            [
+                this._uTable,
+                this._uPager,
+                this._uDownloadBtn,
+                this._uDownloadExcelBtn,
+                this._uOfflineDownloadBtn               
+            ],
+            'diShow'
+        );
+
+        var setDataOpt = { diEvent: this.$diEvent(options) };
+
+        // 表格
+        this._uTable.$di('setData', data, setDataOpt);
+
+        // 分页信息
+        if (this._uPager) {
+            if (data.pageInfo) {
+                this._uPager.show();
+                this._uPager.$di('setData', data.pageInfo, setDataOpt);
+            }
+            else {
+                this._uPager.hide();
+            }
+        }
+
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_PLANE_TABLE_CLASS.resize = function () {
+        this._uTable && this._uTable.resize();
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.enable = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uPager,
+                this._uDownloadBtn,
+                this._uDownloadExcelBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'enable'
+        );
+        DI_PLANE_TABLE.superClass.enable.call(this);
+    };
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.disable = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uPager,
+                this._uDownloadBtn,
+                this._uDownloadExcelBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'disable'
+        );
+        DI_PLANE_TABLE.superClass.disable.call(this);
+    };
+
+    /**
+     * 参见DIFactory中dimTagsList的描述
+     *
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.getDimTagsList = function () {
+        var dimTagsList =  ARG_HANDLER_FACTORY(
+            [this, "getValue", this.$di("getId"), "table.rowChecked", "dimTagsList"],
+            [this, "attrArr", "dimTagsList", "value"]
+        )([{}])[0].dimTagsList;
+
+        // 平面表的dimTagsList约定在前端拼成json传
+        for (var i = 0, o; i < dimTagsList.length; i ++) {
+            if (o = dimTagsList[i]) {
+                dimTagsList[i] = jsonStringify(o);
+            }
+        }
+
+        return dimTagsList;
+    };
+
+    /**
+     * 下载操作
+     *
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleDownload = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+
+        var url = URL('PLANE_TABLE_DOWNLOAD')
+            + '?' + commonParamGetter();
+        download(url, null, true);
+
+        // 对于下载，不进行reportTemplateId控制，直接打开
+        commonParamGetter.update();
+    };
+
+    /**
+     * 下载Excel操作
+     *
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleDownloadExcel = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+
+        var url = URL('PLANE_TABLE_DOWNLOADEXCEL')
+            + '?' + commonParamGetter();
+        download(url, null, true);
+
+        // 对于下载，不进行reportTemplateId控制，直接打开
+        commonParamGetter.update();
+    };
+
+    /**
+     * 离线下载操作
+     *
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleOfflineDownload = function () {
+        var val = this._uOfflineDownloadBtn.getValue() || {};
+        this.$sync(
+            this.getModel(),
+            'OFFLINE_DOWNLOAD',
+            { email: val.email }
+        );
+    };
+
+    /**
+     * 报表跳转
+     *
+     * @protected
+     * @param {string} linkBridgeType 跳转类型，值可为'I'(internal)或者'E'(external)
+     * @param {string} url 目标url
+     * @param {Object} options 参数
+     */
+    DI_PLANE_TABLE_CLASS.$handleLinkBridge = function (colDefItem, rowDefItem) {
+        // FIXME
+        // 参数不一样了，这个是原来olap的，后面修改
+        this.$di(
+            'linkBridge', 
+            colDefItem.linkBridge, 
+            URL('PLANE_TABLE_LINK_BRIDGE'),
+            this.$di('getCommonParamGetter')(
+                {
+                    colUniqName: colDefItem.uniqueName,
+                    rowUniqName: rowDefItem.uniqueName,
+                    colDefineId: colDefItem.colDefineId
+                }
+            )
+        );
+    };    
+
+    /**  
+     * 行点击
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleRowClick = function (rowDefItem) {
+        /**
+         * 行点击事件
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent',
+            'rowclick',
+            [{ uniqueName: rowDefItem.uniqueName }]
+        );
+    };
+
+    /**  
+     * 行选中
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleRowCheck = function (eventName, datasourceId, rowData, callback) {
+        this.$sync(
+            this.getModel(),
+            datasourceId,
+            { uniqueName: rowData.uniqueName },
+            null,
+            {
+                rowData: rowData,
+                eventName: eventName,
+                callback: callback
+            }
+        );
+    };
+
+    /**  
+     * 排序
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleSort = function (orderbyParamKey) {
+        this.$sync(
+            this.getModel(),
+            'DATA',
+            { orderbyParamKey: orderbyParamKey }
+        );
+    };
+
+    /**  
+     * 行选中
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleRowAsync = function (isFailed, data, ejsonObj, options) {
+        var args = options.args;
+
+        // 根据后台结果，改变行选中与否
+        args.callback(data.selected);
+
+        /**
+         * line check模式下行选中和取消选中事件
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent',
+            args.eventName,
+            [ assign({}, args.rowData) ]
+        );
+    };
+
+    /**
+     * 翻页
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handlePageChange = function (currentPage) {
+        this.$sync(
+            this.getModel(),
+            'DATA',
+            { 
+                currentPage: currentPage,
+                pageSize: this._uPager ? this._uPager.getPageSize() : void 0
+            }
+        );
+    };
+
+    /**
+     * 页数改变
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handlePageSizeChange = function (pageSize) {
+        this.$sync(
+            this.getModel(),
+            'DATA',
+            { pageSize: pageSize }
+        );
+    };
+
+    /**
+     * 数据加载成功
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleDataLoaded = function (data, ejsonObj, options) {
+        var datasourceId = options.datasourceId;    
+        var value = this.$di('getValue');
+        var args;
+        var param = options.args.param;
+
+        if (datasourceId == 'DATA') {
+            args = [value];
+        }
+        else if (datasourceId == 'SORT') {
+            args = [assign({}, param, ['field', 'orderby'])];
+        }
+
+        /**
+         * 数据成功加载事件（分datasourceId）
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent',
+            this.$diEvent('dataloaded.' + datasourceId, options),
+            args
+        );
+
+        if (datasourceId in { DATA: 1, SORT: 1 }) {
+            /**
+             * 数据改变事件（DRILL在逻辑上是添加数据，不算在此事件中）
+             *
+             * @event
+             */
+            this.$di(
+                'dispatchEvent',
+                this.$diEvent('datachange', options),
+                [value]
+            );
+        }
+
+        /**
+         * 数据成功加载事件
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent', 
+            this.$diEvent('dataloaded', options), 
+            [value]
+        );
+
+        /**
+         * 真实使用的查询sql，在此输出
+         */
+        this.$di(
+            'dispatchEvent', 
+            this.$diEvent('outputexecinfo', options), 
+            [{ data: data }]
+        );
+    };
+
+    /**
+     * 获取表格数据错误处理
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleDataError = function (status, ejsonObj, options) {
+        this.$di('getEl').style.display = '';
+
+        foreachDo(
+            [
+                this._uTable,
+                this._uPager,
+                this._uDownloadBtn,
+                this._uDownloadExcelBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'diShow'
+        ); 
+
+        // 设置空视图
+        this.clear();
+
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+        /**
+         * 数据加载失败事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('dataerror', options));
+    };
+
+    /**
+     * 离线下载错误处理
+     * 
+     * @protected
+     */
+    DI_PLANE_TABLE_CLASS.$handleOfflineDownloadError = function (status, ejsonObj, options) {
+        DIALOG.alert(LANG.SAD_FACE + LANG.OFFLINE_DOWNLOAD_FAIL);
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 })();
 /**
  * di.shared.ui.DIReportSave
@@ -88640,6 +111315,19 @@ $namespace('di.shared.ui');
         };
     }
 })();
+<<<<<<< HEAD
+/**
+ * di.shared.ui.DITable
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI OLAP表视图组件
+ *          （这个命名不好，历史原因。
+ *          其实现在来说应该叫做DIPivotTable或DIOlapTable。
+ *          因为并列的有DIPlaneTable。）
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+=======
 /**
  * di.shared.ui.DITable
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -88652,6 +111340,3418 @@ $namespace('di.shared.ui');
  * @depend:  xui, xutil
  */
 
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var URL = di.config.URL;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var assign = xutil.object.assign;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var getByPath = xutil.object.getByPath;
+    var download = UTIL.download;
+    var foreachDo = UTIL.foreachDo;
+    var DIALOG = di.helper.Dialog;
+    var LANG = di.config.Lang;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var ARG_HANDLER_FACTORY;
+    var alert = di.helper.Dialog.alert;
+
+    $link(function () {
+        ARG_HANDLER_FACTORY = di.shared.arg.ArgHandlerFactory;
+    });
+
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 模板镜像操作组件
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     */
+    var DI_RTPLCLONE = $namespace().DIRtplClone = 
+        inheritsObject(INTERACT_ENTITY);
+    var DI_RTPLCLONE_CLASS = DI_RTPLCLONE.prototype;
+    
+    //------------------------------------------
+    // 常量 
+    //------------------------------------------
+
+    /**
+     * 定义
+     */
+    DI_RTPLCLONE_CLASS.DEF = {
+        // 主元素的css
+        className: 'di-rtplclone',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.DIRtplCloneModel'
+        }
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    DI_RTPLCLONE_CLASS.$createView = function (options) {
+        var el = this.$di('getEl');
+         // 
+        this._saveRtplCloneBtn = this.$di('vuiCreate', 'saveRtplClone');
+        this._clearRtplCloneBtn = this.$di('vuiCreate', 'clearRtplClone');
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_RTPLCLONE_CLASS.init = function () {
+        var me = this;
+        var key;
+        var model = this.getModel();
+        var saveRtplCloneBtn = this._saveRtplCloneBtn;
+        var clearRtplCloneBtn = this._clearRtplCloneBtn;
+
+        foreachDo(
+            [
+             	saveRtplCloneBtn,
+             	clearRtplCloneBtn
+            ],
+            'init'
+        );
+        // 事件绑定
+        model.attach(
+            ['sync.preprocess.SAVE', this.disable, this],
+            ['sync.result.SAVE', this.$handleSaveSuccess, this],
+            ['sync.error.SAVE', this.$handleError, this],
+            ['sync.complete.SAVE', this.enable, this]
+        );
+        model.attach(
+            ['sync.preprocess.GET_DEFAUL_IMAGENAME', this.disable, this],
+            ['sync.result.GET_DEFAUL_IMAGENAME', this.$handleClear, this],
+            ['sync.error.GET_DEFAUL_IMAGENAME', this.$handleError, this],
+            ['sync.complete.GET_DEFAUL_IMAGENAME', this.enable, this]
+        );
+        model.attach(
+            ['sync.preprocess.CLEAR', this.disable, this],
+            ['sync.result.CLEAR', this.$handleClearSuccess, this],
+            ['sync.error.CLEAR', this.$handleError, this],
+            ['sync.complete.CLEAR', this.enable, this]
+        );
+        saveRtplCloneBtn && (
+        		saveRtplCloneBtn.onclick = bind(this.$handleSaveRtplClone, this)
+        );
+        clearRtplCloneBtn && (
+        		clearRtplCloneBtn.onclick = bind(this.$handleClearRtplClone, this)
+        );
+    };
+
+    /**
+     * @override
+     */
+    DI_RTPLCLONE_CLASS.dispose = function () {
+        foreachDo(
+            [
+                this._saveRtplCloneBtn,
+                this._clearRtplCloneBtn,
+            ],
+            'dispose'
+        );
+    	DI_RTPLCLONE.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     * @event
+     * @param {Object} options 参数
+     */
+    DI_RTPLCLONE_CLASS.sync = function (options) {
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.DATA', vd.disable],
+            ['sync.complete.DATA', vd.enable]
+        );*/
+
+    };
+
+    /**
+     * 视图清空
+     *
+     * @public
+     * @event
+     */
+    DI_RTPLCLONE_CLASS.clear = function () {
+    };
+
+    /**
+     * 保存成功之后提醒
+     * 
+     * @protected
+     */
+    DI_RTPLCLONE_CLASS.$handleSaveSuccess = function (data, ejsonObj, options) {
+        alert(LANG.SMILE_FACE + '保存成功');
+    };
+
+
+    DI_RTPLCLONE_CLASS.$handleClearSuccess = function (data, ejsonObj, options) {
+        alert(LANG.SMILE_FACE + '清除成功，将在下次进入页面时生效');
+    };
+
+    DI_RTPLCLONE_CLASS.$handleClear = function (data, ejsonObj, options) {
+        //alert(data.defaultImageName);
+        var reportImageName = data.defaultImageName;
+        var commonParamGetter = this.$di('getCommonParamGetter');
+        var model = this.getModel();
+         // 清除默认镜像的时候，需要先获取默认镜像的名称
+        model.sync(
+            { 
+                datasourceId: 'CLEAR', 
+                args: {
+                    reportImageName: reportImageName
+                }
+            }
+        );
+        commonParamGetter.update();
+    };
+
+    /**
+     * 操作失败之后提醒
+     * 
+     * @protected
+     */
+    DI_RTPLCLONE_CLASS.$handleError = function (data, ejsonObj, options) {
+        //alert('操作异常');
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_RTPLCLONE_CLASS.resize = function () {
+
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    DI_RTPLCLONE_CLASS.enable = function () {
+        foreachDo(
+            [
+                this._saveRtplCloneBtn,
+                this._clearRtplCloneBtn
+            ],
+            'enable'
+        ); 
+    	DI_RTPLCLONE.superClass.enable.call(this);
+    };
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    DI_RTPLCLONE_CLASS.disable = function () {
+        foreachDo(
+            [
+                this._saveRtplCloneBtn,
+                this._clearRtplCloneBtn
+            ],
+            'disable'
+        ); 
+    	DI_RTPLCLONE.superClass.disable.call(this);
+    };
+
+    /**
+     * 保存镜像操作
+     *
+     * @protected
+     */
+    DI_RTPLCLONE_CLASS.$handleSaveRtplClone = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+        var model = this.getModel();
+         // 保存的时候发镜像保存请求
+        model.sync(
+            { 
+                datasourceId: 'SAVE', 
+                args: {
+                    asDefault: true
+                }
+            }
+        );
+        commonParamGetter.update();
+
+    };
+    
+    /**
+     * 清除镜像操作
+     *
+     * @protected
+     */
+    DI_RTPLCLONE_CLASS.$handleClearRtplClone = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+        var model = this.getModel();
+         // 清除默认镜像的时候，需要先获取默认镜像的名称
+        model.sync(
+            { 
+                datasourceId: 'GET_DEFAUL_IMAGENAME', 
+                args: {
+                    asdadasda: 'asdadadad'
+                }
+            }
+        );
+        commonParamGetter.update();
+    };
+
+})();
+/**
+ * di.shared.ui.DITab
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI tab容器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var q = xutil.dom.q;
+    var assign = xutil.object.assign;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var TAB_CONTAINER = ecui.ui.TabContainer;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI tab容器
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {boolean=} options.autoDeaf 使用deaf模式，
+     *                  即隐藏时deaf内部实体，默认为true
+     * @param {boolean=} options.autoComponentValueDisabled component自动在隐藏时valueDisabled模式，
+     *                  即隐藏时value disable内部实体，默认为false
+     * @param {boolean=} options.autoVUIValueDisabled vui自动在隐藏时使用valueDisabled模式，
+     *                  即隐藏时value disable内部实体，默认为true
+     */
+    var DI_TAB = $namespace().DITab = 
+            inheritsObject(INTERACT_ENTITY, constructor);
+    var DI_TAB_CLASS = DI_TAB.prototype;
+    
+    /**
+     * 定义
+     */
+    DI_TAB_CLASS.DEF = {
+        // 主元素的css
+        className: 'di-tab'
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @public
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        var el = this.$di('getEl');
+        var o = document.createElement('div');
+        el.appendChild(o);
+
+        this._bAutoDeaf = options.autoDeaf == null ? true : options.autoDeaf;
+        this._bAutoComponentValueDisabled = 
+            options.autoComponentValueDisabled == null
+                ? false : options.autoComponentValueDisabled;
+        this._bAutoVUIValueDisabled = 
+            options.autoVUIValueDisabled == null
+                ? true : options.autoVUIValueDisabled;
+
+        this._aTab = [];        
+        // TODO
+        // 后续要写成vui的形式，剥离ecui
+        this._uTab = ecuiCreate(TAB_CONTAINER, o);
+        this._aBodyPart = [];
+
+        // 添加tab 创建vpart实例
+        var tabs = this.$di('getRef', 'vpartRef', 'tab');
+        var bodys = this.$di('getRef', 'vpartRef', 'body');
+        for (var i = 0, tabDef, bodyDef; tabDef = tabs[i]; i ++) {
+            bodyDef = bodys[i];
+            this._aTab.push(
+                this._uTab.addTab(
+                    null, 
+                    assign(
+                        {
+                            tabEl: tabDef.el,
+                            contentEl: bodyDef.el
+                        },
+                        tabDef.$di('getOpt', 'dataOpt'),
+                        ['title', 'canClose']
+                    )
+                )
+            );
+
+            this._aBodyPart.push(this.$di('vpartCreate', 'body.' + i));
+        }
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_TAB_CLASS.init = function() {
+        var me = this;
+
+        // 事件绑定
+        this._uTab.onafterchange = function(ctrlItem, lastCtrlItem) {
+
+            // 设置耳聋
+            me.$resetDisabled();
+
+            for (
+                var i = 0, item, bodyPart; 
+                bodyPart = me._aBodyPart[i], item = me._aTab[i]; 
+                i ++
+            ) {
+                /** 
+                 * vpart显示事件
+                 * 
+                 * @event
+                 */
+                if (item.tabItem == ctrlItem) {
+                    bodyPart.$di('dispatchEvent', 'active');
+                }
+                /** 
+                 * vpart隐藏事件
+                 * 
+                 * @event
+                 */
+                if (item.tabItem == lastCtrlItem) {
+                    bodyPart.$di('dispatchEvent', 'inactive');
+                }
+            }
+
+            /**
+             * 渲染完毕事件
+             *
+             * @event
+             */
+            me.$di('dispatchEvent', 'rendered');
+            /**
+             * tab更改事件
+             *
+             * @event
+             */
+            me.$di('dispatchEvent', 'change');
+        }
+
+        var opt = this.$di('getOpt', 'dataOpt');
+        // 默认选中
+        var selIndex = opt.selected - 1;
+        var sel;
+        if (sel = this._aTab[selIndex]) {
+            this._uTab.selectTab(sel.tabItem);
+            me.$di('dispatchEvent', 'rendered');
+        }
+
+        this.$resetDisabled();
+
+        sel && this._aBodyPart[selIndex].$di('dispatchEvent', 'active');
+    };
+
+    /**
+     * @protected
+     */
+    DI_TAB_CLASS.$resetDisabled = function() {
+        var key = this.$di('getId');
+        var bodys = this.$di('getRef', 'vpartRef', 'body', 'DEF');
+
+        for (var i = 0, tab, inners, notCurr; tab = this._aTab[i]; i ++) {
+            notCurr = this._uTab.getSelected() != tab.tabItem;
+
+            inners = bodys[i].$di(
+                'getRef', 'componentRef', 'inner', 'INS'
+            ) || [];
+
+            for (var j = 0; j < inners.length; j ++) {
+                if (inners[j]) {
+                    this._bAutoDeaf 
+                        && inners[j].$di('setDeaf', notCurr, key);
+                    this._bAutoComponentValueDisabled 
+                        && inners[j].$di('setValueDisabled', notCurr, key);
+                }
+            }
+
+            if (this._bAutoVUIValueDisabled) {
+                inners = bodys[i].$di(
+                    'getRef', 'vuiRef', 'inner', 'INS'
+                ) || [];
+
+                for (var j = 0; j < inners.length; j ++) {
+                    inners[j] && inners[j].$di('setValueDisabled', notCurr, key);
+                }
+            }
+        }    
+    };
+
+    /**
+     * @override
+     */
+    DI_TAB_CLASS.dispose = function() {
+        this._uTab && ecuiDispose(this._uTab);
+        this._aTab = [];
+        DI_TAB.superClass.dispose.call(this);
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_TAB_CLASS.resize = function() {
+        this._uTab && this._uTab.resize();
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     * @param {string} key 禁用者的标志
+     */
+    DI_TAB_CLASS.enable = function(key) {
+        this._uTab && this._uTab.enable();
+        DI_TAB.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     * @param {string} key 禁用者的标志
+     */
+    DI_TAB_CLASS.disable = function(key) {
+        this._uTab && this._uTab.disable();
+        DI_TAB.superClass.disable.call(this);
+    };
+
+})();
+/**
+ * di.shared.ui.DITable
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI OLAP表视图组件
+ *          （这个命名不好，历史原因。
+ *          其实现在来说应该叫做DIPivotTable或DIOlapTable。
+ *          因为并列的有DIPlaneTable。）
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var URL = di.config.URL;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var assign = xutil.object.assign;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var getByPath = xutil.object.getByPath;
+    var download = UTIL.download;
+    var foreachDo = UTIL.foreachDo;
+    var DIALOG = di.helper.Dialog;
+    var LANG = di.config.Lang;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var ARG_HANDLER_FACTORY;
+
+    $link(function () {
+        ARG_HANDLER_FACTORY = di.shared.arg.ArgHandlerFactory;
+    });
+
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 表视图组件
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     */
+    var DI_TABLE = $namespace().DITable = 
+        inheritsObject(INTERACT_ENTITY);
+    var DI_TABLE_CLASS = DI_TABLE.prototype;
+    
+    //------------------------------------------
+    // 常量 
+    //------------------------------------------
+
+    /**
+     * 定义
+     */
+    DI_TABLE_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'di-table',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.DITableModel'
+        }
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    DI_TABLE_CLASS.$createView = function (options) {
+        var el = this.$di('getEl');
+        //新增“是否需要指标解释开关，如果需要指标解释，则要发起ajax请求每个指标的说明”
+        this._needMeasureDes = this.$di('getDef').needMeasureDes;
+        this._uTable = this.$di('vuiCreate', 'mainTable');
+
+        // 面包屑
+        this._uBreadcrumb = this.$di('vuiCreate', 'breadcrumb', { maxShow: 5 });
+
+        // 下载按钮
+        this._uDownloadBtn = this.$di('vuiCreate', 'download');
+
+        // 离线下载
+        this._uOfflineDownloadBtn = this.$di('vuiCreate', 'offlineDownload');
+
+        // 条目数值等信息
+        // 模板配置接口：totalRecordCount, currRecordCount
+        this._uCountInfo = this.$di('vuiCreate', 'countInfo');
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    DI_TABLE_CLASS.init = function () {
+        var me = this;
+        var key;
+        var model = this.getModel();
+        var table = this._uTable;
+        var breadcrumb = this._uBreadcrumb;
+        var countInfo = this._uCountInfo;
+        var downloadBtn = this._uDownloadBtn;
+        var offlineDownloadBtn = this._uOfflineDownloadBtn;                
+
+        // 事件绑定
+        for (key in { 
+                'DATA': 1, 
+                'DRILL': 1, 
+                'LINK_DRILL': 1,
+                'SORT': 1
+            }
+        ) {
+            model.attach(
+                ['sync.preprocess.' + key, this.$syncDisable, this, key],
+                ['sync.result.' + key, this.$renderMain, this],
+                ['sync.result.' + key, this.$handleDataLoaded, this],
+                ['sync.error.' + key, this.$handleDataError, this],
+                ['sync.complete.' + key, this.$syncEnable, this, key]
+            );
+        }
+        key = 'OFFLINE_DOWNLOAD';
+        model.attach(
+            ['sync.preprocess.' + key, this.$syncDisable, this, key],
+            ['sync.error.' + key, this.$handleOfflineDownloadError, this],
+            ['sync.complete.' + key, this.$syncEnable, this, key]
+        );
+        model.attach(
+            ['sync.preprocess.CHECK', this.$syncDisable, this, 'CHECK'],
+            ['sync.result.CHECK', this.$handleRowAsync, this, false],
+            ['sync.error.CHECK', this.$handleRowAsync, this, true],
+            ['sync.complete.CHECK', this.$syncEnable, this, 'CHECK']
+        );
+        model.attach(
+            ['sync.preprocess.SELECT', this.$syncDisable, this, 'SELECT'],
+            ['sync.result.SELECT', this.$handleRowAsync, this, false],
+            ['sync.error.SELECT', this.$handleRowAsync, this, true],
+            ['sync.complete.SELECT', this.$syncEnable, this, 'SELECT']
+        );
+
+        if(this._needMeasureDes && this._needMeasureDes == true){
+           model.attach(
+                ['sync.result.MEASURE_DES', this.$setMeasureDes4Table, this]
+            ); 
+        }
+        
+
+
+        model.init();
+
+        table.onexpand = bind(this.$handleExpand, this);
+        table.oncollapse = bind(this.$handleCollapse, this);
+        table.onsort = bind(this.$handleSort, this);
+        table.onrowclick = bind(this.$handleRowClick, this);
+        table.onrowselect = bind(this.$handleRowCheck, this, 'rowselect', 'SELECT');
+        table.onrowcheck = bind(this.$handleRowCheck, this, 'rowcheck', 'CHECK');
+        table.onrowuncheck = bind(this.$handleRowCheck, this, 'rowuncheck', 'CHECK');
+        table.oncelllinkdrill = bind(this.$handleLinkDrill, this);
+        table.oncelllinkbridge = bind(this.$handleLinkBridge, this);
+
+        breadcrumb && (
+            breadcrumb.onchange = bind(this.$handleBreadcrumbChange, this)
+        );
+        downloadBtn && (
+            downloadBtn.onclick = bind(this.$handleDownload, this)
+        );
+        offlineDownloadBtn && (
+            offlineDownloadBtn.attach('confirm', this.$handleOfflineDownload, this)
+        );
+
+        foreachDo(
+            [
+                table,
+                breadcrumb,
+                countInfo,
+                downloadBtn,
+                offlineDownloadBtn
+            ],
+            'init'
+        )
+        breadcrumb && breadcrumb.hide();
+
+        this.$di('getEl').style.display = 'none';
+    };
+
+    /**
+     * @override
+     */
+    DI_TABLE_CLASS.dispose = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uBreadcrumb,
+                this._uCountInfo,
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'dispose'
+        )
+        DI_TABLE.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     * @event
+     * @param {Object} options 参数
+     */
+    DI_TABLE_CLASS.sync = function (options) {
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.DATA', vd.disable],
+            ['sync.complete.DATA', vd.enable]
+        );*/
+        options = options || {};
+        options.componentId = this.$di('getId').split('.')[1];
+        // 请求后台
+        this.$sync(
+            this.getModel(),
+            'DATA',
+            options,
+            this.$di('getEvent')
+        );
+    };
+
+    /**
+     * 视图清空
+     *
+     * @public
+     * @event
+     */
+    DI_TABLE_CLASS.clear = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uBreadcrumb,
+                this._uCountInfo
+            ],
+            'setData'
+        );
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$renderMain = function (data, ejsonObj, options) {
+        this.$di('getEl').style.display = '';
+
+        foreachDo(
+            [
+                this._uTable,
+                this._uBreadcrumb,
+                this._uCountInfo,
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn                
+            ],
+            'diShow'
+        ); 
+
+        var setDataOpt = { diEvent: this.$diEvent(options) };
+
+        /*
+         * 为了解决 展开行头、收起行头、排序、下钻时 表格的跳动问题
+         * 目前采取的方案是：
+         * 第①步，在表格setData之前（也就是旧表格还存在的时候），获取表格垂直和水平滚动条的滚动值；
+         * 第②步，在表格setData之后（渲染了新表格），“还原”垂直和水平滚动条的原本位置。
+         * 
+         * 实际实践中，当拖拽滚动条后，第一次进行上述（展开、收起、排序、下钻）操作时，垂直和水平滚动条均会出现1-3px的小幅度抖动，
+         * 第二次以后则不会。如果再次拖动滚动，则抖动情况仍会发生（通过点击滚动条空白部或上下左右箭头触发的滚动，则不会发生抖动）。
+         * 目前还没有找到原因。推测可能是 由于滚动条在定位时，为了得到某些倍数值 而做了数值修正
+         */
+        var UI_SCROLLBAR_CLASS = ecui.ui.Scrollbar.prototype;
+        var lastScrollTop = this._uTable._uVScrollbar.getValue();   //  上一次垂直滚动条的滚动值
+        var lastScrollLeft = this._uTable._uHScrollbar.getValue();  //  上一次水平滚动条的滚动值
+        
+        // 表格
+        this._uTable.$di('setData', data.tableData, setDataOpt);
+
+        /*
+         * ecui.ui.Scrollbar.prototype.setValue 方法，是从 table.js 的 UI_TABLE_SCROLL_SETVALUE 方法中“学”到的。
+         * 一开始是使用 this._uTable._uVScrollbar.setValue(lastScrollTop)，
+         * 但这么使用会先调用 UI_TABLE_SCROLL_SETVALUE 方法，导致最后使用计算后的值 而不是原来的 lastScrollTop。（这样滚动条就达不到预期的位置）
+         */
+        UI_SCROLLBAR_CLASS.setValue.call(this._uTable._uVScrollbar, lastScrollTop);
+        UI_SCROLLBAR_CLASS.setValue.call(this._uTable._uHScrollbar, lastScrollLeft);
+        //  ----------------- 代码修改结束 -----------------
+
+        // 如果json模板地方有配置needMeasureDes为true，那么才发起相应
+        if(this._needMeasureDes && this._needMeasureDes == true){
+            // 根据olaptable的表头定义，发一次ajax请求，得到每个表头指标的相应描述
+            var paramArr = [];
+                for (var j = 0; j < this._uTable._aColDefine.length; j++) {
+                    if(this._uTable._aColDefine[j] && this._uTable._aColDefine[j].uniqueName){
+                       paramArr.push('colUniqueNames='+this._uTable._aColDefine[j].uniqueName); 
+                    }
+                };
+            this.$sync(
+                this.getModel(),
+                'MEASURE_DES',
+                { colUniqueNamesArr: paramArr},
+                null,
+                null,
+                { 
+                    ajaxOptions:{
+                        showWaiting : false
+                    }
+                    
+                }
+            );
+        }
+        // 面包屑
+        if (this._uBreadcrumb) {
+            if (data.breadcrumbData.datasource
+                && data.breadcrumbData.datasource.length > 0
+            ) {
+                this._uBreadcrumb.show();
+                this._uBreadcrumb.$di('setData', data.breadcrumbData, setDataOpt);
+            }
+            else {
+                this._uBreadcrumb.hide();
+            }
+        }
+
+        // 页信息
+        this._uCountInfo && this._uCountInfo.$di(
+            'setData', 
+            {
+                args: {
+                    totalRecordCount: data.pageInfo.totalRecordCount,
+                    currRecordCount: data.pageInfo.currRecordCount
+                }
+            },
+            setDataOpt
+        );
+
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    DI_TABLE_CLASS.resize = function () {
+        this._uTable && this._uTable.resize();
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.enable = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uBreadcrumb,
+                this._uCountInfo,
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'enable'
+        ); 
+        DI_TABLE.superClass.enable.call(this);
+    };
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.disable = function () {
+        foreachDo(
+            [
+                this._uTable,
+                this._uBreadcrumb,
+                this._uCountInfo,
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'disable'
+        ); 
+        DI_TABLE.superClass.disable.call(this);
+    };
+
+    /**
+     * 参见DIFactory中dimTagsList的描述
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.getDimTagsList = function () {
+        return ARG_HANDLER_FACTORY(
+            [this, "getValue", this.$di("getId"), "table.rowChecked", "dimTagsList"],
+            [this, "attrArr", "dimTagsList", "value.uniqueName"]
+        )([{}])[0].dimTagsList;
+    };
+
+    /**
+     * 下载操作
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleDownload = function (wrap) {
+        var commonParamGetter = this.$di('getCommonParamGetter');
+
+        var url = URL('OLAP_TABLE_DOWNLOAD') 
+            + '?' + commonParamGetter();
+        download(url, null, true);
+
+        // 对于下载，不进行reportTemplateId控制，直接打开
+        commonParamGetter.update();
+    };
+
+    /**
+     * 离线下载操作
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleOfflineDownload = function () {
+        var val = this._uOfflineDownloadBtn.getValue() || {};
+        this.$sync(
+            this.getModel(),
+            'OFFLINE_DOWNLOAD',
+            { email: val.email }
+        );
+    };
+
+    /**
+     * 面包屑点击
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleBreadcrumbChange = function (wrap) {
+        this.$sync(
+            this.getModel(),
+            'LINK_DRILL',
+            {
+                componentId: this.$di('getId').split('.')[1],
+                //action: 'EXPAND',
+                action: 'expand',
+                // 这接口定的很乱，这里是简写的uniq
+                uniqueName: wrap['uniqName']
+            }
+        );
+    };  
+
+    /**
+     * link式下钻
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleLinkDrill = function (cellWrap, lineWrap) {
+        this.$sync(
+            this.getModel(),
+            'LINK_DRILL',
+            {
+                componentId: this.$di('getId').split('.')[1],
+                //action: 'EXPAND',
+                action: 'expand',
+                uniqueName: cellWrap['uniqueName'],
+                lineUniqueName: (lineWrap || {})['uniqueName']
+            }
+        );
+    };        
+
+    /**
+     * 报表跳转
+     *
+     * @protected
+     * @param {string} linkBridgeType 跳转类型，值可为'I'(internal)或者'E'(external)
+     * @param {string} url 目标url
+     * @param {Object} options 参数
+     */
+    DI_TABLE_CLASS.$handleLinkBridge = function (colDefItem, rowDefItem) {
+        this.$di(
+            'linkBridge', 
+            colDefItem.linkBridge, 
+            URL('OLAP_TABLE_LINK_BRIDGE'),
+            this.$di('getCommonParamGetter')(
+                {
+                    colUniqName: colDefItem.uniqueName,
+                    rowUniqName: rowDefItem.uniqueName,
+                    colDefineId: colDefItem.colDefineId
+                },
+                {
+                    excludes: ['diAgent']
+                }
+            )
+        );
+    };    
+
+    /**
+     * 展开（下钻）
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleExpand = function (cellWrap, lineWrap) {
+        this.$sync(
+            this.getModel(),
+            'DRILL',
+            {
+                componentId: this.$di('getId').split('.')[1],
+                //action: 'EXPAND',
+                action: 'expand',
+                uniqueName: cellWrap['uniqueName'],
+                lineUniqueName: (lineWrap || {})['uniqueName']
+
+            }
+        );
+    };
+
+    /**
+     * 收起（上卷）
+     *
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleCollapse = function (cellWrap, lineWrap) {
+        this.$sync(
+            this.getModel(),
+            'DRILL',
+            {
+                componentId: this.$di('getId').split('.')[1],
+                //action: 'COLLAPSE',
+                action: 'collapse',
+                uniqueName: cellWrap['uniqueName'],
+                lineUniqueName: (lineWrap || {})['uniqueName']
+            }
+        );
+    };
+
+    /**  
+     * 行点击
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleRowClick = function (rowDefItem) {
+        /**
+         * 行点击事件
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent', 
+            'rowclick',
+            [{ uniqueName: rowDefItem.uniqueName }]
+        );
+    };
+
+    /**  
+     * 行选中
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleRowCheck = function (eventName, datasourceId, rowDefItem, callback) {
+        if(rowDefItem.uniqueName == 'SUMMARY_CUST: [SUMMARY_NODE].[ALL]'){
+            //如果发现是手动加起来的“汇总行”，那么当选中的时候，不要做任何选中操作
+        }
+        else{
+            this.$sync(
+                this.getModel(),
+                datasourceId, 
+                {
+                    uniqueName: rowDefItem.uniqueName,
+                    componentId : this.$di('getId').split('.')[1]
+                },
+                null,
+                {
+                    eventName: eventName,
+                    callback: callback
+                }
+            );
+       }
+        
+    };
+
+    /**  
+     * 排序
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleSort = function (colDefineItem) {
+        // TODO:到时候需要把下面注释去掉，并与后端约定一下sort路径
+//        this.$sync(
+//            this.getModel(),
+//            'SORT',
+//            colDefineItem
+//        );
+    };  
+    /**
+    * 根据返回数据设置olap表格的指标解释到表格td的title标签中
+    */
+    DI_TABLE_CLASS.$setMeasureDes4Table = function (data, ejsonObj, options) {
+        this._uTable.$setMeasureDes4Table(data);
+    };
+
+    /**  
+     * 行选中
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleRowAsync = function (isFailed, data, ejsonObj, options) {
+
+        // 根据后台结果，改变行选中与否
+        options.args.callback(data.selected);
+
+        /**
+         * line check模式下行选中和取消选中事件
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent',
+            options.args.eventName,
+            [{ uniqueName: options.args.param.uniqueName }]
+        );
+    };
+
+    /**
+     * 数据加载成功
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleDataLoaded = function (data, ejsonObj, options) {
+        var datasourceId = options.datasourceId;     
+        var value = this.$di('getValue');
+        var args;
+        var param = options.args.param;
+
+        if (datasourceId == 'DATA') {
+            args = [value];
+        }
+        else if (datasourceId == 'LINK_DRILL') {
+            args = [assign({}, param, ['uniqueName'])];
+        }
+        else if (datasourceId == 'DRILL') {
+            args = [assign({}, param, ['uniqueName', 'lineUniqueName'])];
+        }
+        else if (datasourceId == 'SORT') {
+            args = [assign({}, param, ['uniqueName', 'currentSort'])];
+        }
+
+        /**
+         * 数据成功加载事件（分datasourceId）
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent',
+            this.$diEvent('dataloaded.' + datasourceId, options),
+            args
+        );
+
+        if (datasourceId in { DATA: 1, LINK_DRILL: 1, SORT: 1 }) {
+            /**
+             * 数据改变事件（DRILL在逻辑上是添加数据，不算在此事件中）
+             *
+             * @event
+             */
+            this.$di(
+                'dispatchEvent', 
+                this.$diEvent('datachange', options), 
+                [value]
+            );
+        }
+
+        /**
+         * 数据成功加载事件
+         *
+         * @event
+         */
+        this.$di(
+            'dispatchEvent', 
+            this.$diEvent('dataloaded', options), 
+            [value]
+        );
+    };
+
+    /**
+     * 获取表格数据错误处理
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleDataError = function (status, ejsonObj, options) {
+        this.$di('getEl').style.display = '';
+        
+        foreachDo(
+            [
+                this._uTable,
+                this._uBreadcrumb,
+                this._uCountInfo,
+                this._uDownloadBtn,
+                this._uOfflineDownloadBtn
+            ],
+            'diShow'
+        ); 
+
+        // 设置空视图
+        this.clear();
+
+        /**
+         * 渲染事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('rendered', options));
+        /**
+         * 数据加载失败事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', this.$diEvent('dataerror', options));
+
+        DIALOG.alert(ejsonObj.statusInfo);
+    };
+
+    /**
+     * 离线下载错误处理
+     * 
+     * @protected
+     */
+    DI_TABLE_CLASS.$handleOfflineDownloadError = function (status, ejsonObj, options) {
+        DIALOG.alert(LANG.SAD_FACE + LANG.OFFLINE_DOWNLOAD_FAIL);
+    };
+
+})();
+/**
+ * di.shared.ui.FoldPanel
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    折叠面板
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var assign = xutil.object.assign;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 折叠面板
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {boolean=} options.autoDeaf 使用deaf模式，
+     *                  即隐藏时deaf内部实体，默认为true
+     * @param {boolean=} options.autoComponentValueDisabled component自动在隐藏时valueDisabled模式，
+     *                  即隐藏时value disable内部实体，默认为false
+     * @param {boolean=} options.autoVUIValueDisabled vui自动在隐藏时使用valueDisabled模式，
+     *                  即隐藏时value disable内部实体，默认为true
+     */
+    var FOLD_PANEL = $namespace().FoldPanel = 
+            inheritsObject(INTERACT_ENTITY, constructor);
+    var FOLD_PANEL_CLASS = FOLD_PANEL.prototype;
+
+    /**
+     * 定义
+     */
+    FOLD_PANEL_CLASS.DEF = {
+        // 主元素的css
+        className: 'di-fold-panel'
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @public
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        var el = this.$di('getEl');
+        var o = document.createElement('div');
+        el.appendChild(o);
+
+        this._bFolded = true;
+        this._bAutoDeaf = options.autoDeaf == null 
+            ? true : options.autoDeaf;
+        this._bAutoComponentValueDisabled = 
+            options.autoComponentValueDisabled == null
+                ? false : options.autoComponentValueDisabled;
+        this._bAutoVUIValueDisabled = 
+            options.autoVUIValueDisabled == null
+                ? true : options.autoVUIValueDisabled;
+
+        this._oBodyDef = this.$di('getRef', 'vpartRef', 'body', 'DEF');
+        this._oCtrlBtnDef = this.$di('getRef', 'vpartRef', 'ctrlBtn', 'DEF');
+
+        var defaultHide = options.defaultHide == null
+                ? true : options.defaultHide;
+
+        this.$createCtrlBtn();
+        this.$resetCtrlBtnText();
+        this.$ctrlBtnChange(defaultHide);
+    };
+
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    FOLD_PANEL_CLASS.init = function() {
+        this.$resetDisabled();
+    };
+
+    /**
+     * 创建ctrlBtn
+     *
+     * @protected
+     */
+    FOLD_PANEL_CLASS.$createCtrlBtn = function() {
+        // 目前只支持文字式的ctrlBtn
+        this._oCtrlBtnDef.el.innerHTML = [
+            '<a href="#" class="di-fold-panel-ctrl-btn">',
+                '<span class="di-fold-panel-ctrl-btn-text">&nbsp;</span>',
+            '</a>',
+            '<span class="di-fold-panel-ctrl-down"></span>'
+        ].join('');
+
+        var el = this._oCtrlBtnDef.el.firstChild;
+        var me = this;
+        el.onclick = function() {
+            if (!me._bDisabled) { 
+                me.$ctrlBtnChange();
+                me.$resetDisabled();
+            }
+            return false;
+        }
+    };
+
+    /**
+     * @override
+     */
+    FOLD_PANEL_CLASS.dispose = function() {
+        this._oCtrlBtnDef = null;
+        this._oBodyDef = null;
+        FOLD_PANEL.superClass.dispose.call(this);
+    };
+
+    /**
+     * @protected
+     */
+    FOLD_PANEL_CLASS.$resetDisabled = function() {
+        var inners;
+        var key = this.$di('getId');
+
+        inners = this._oBodyDef.$di(
+            'getRef', 'componentRef', 'inner', 'INS'
+        ) || [];
+
+        for (var j = 0; j < inners.length; j ++) {
+            if (inners[j]) {
+                this._bAutoDeaf 
+                    && inners[j].$di('setDeaf', this._bFolded, key);
+                this._bAutoComponentValueDisabled
+                    && inners[j].$di('setValueDisabled', this._bFolded, key);
+            }
+        }
+
+        if (this._bAutoVUIValueDisabled) {
+            inners = this._oBodyDef.$di(
+                'getRef', 'vuiRef', 'inner', 'INS'
+            ) || [];
+
+            for (var j = 0; j < inners.length; j ++) {
+                inners[j] && inners[j].$di('setValueDisabled', this._bFolded, key);
+            }
+        }
+    };
+
+    /**
+     * 窗口改变后重新计算大小
+     *
+     * @public
+     */
+    FOLD_PANEL_CLASS.resize = function() {
+    };
+
+    /**
+     * 设置ctrlBtn文字
+     *
+     * @protected
+     */    
+    FOLD_PANEL_CLASS.$resetCtrlBtnText = function() {
+        var btnDef = this._oCtrlBtnDef;
+        var dataOpt = btnDef.$di('getOpt', 'dataOpt');
+
+        // 暂只支持链接形式
+        // TODO
+        btnDef.el.firstChild.firstChild.innerHTML = this._bFolded
+            ? dataOpt.expandText 
+            : dataOpt.collapseText;
+        btnDef.el.lastChild.className = this._bFolded
+            ? 'di-fold-panel-ctrl-down'
+            : 'di-fold-panel-ctrl-up';
+    };
+
+    /**
+     * 展开折叠
+     *
+     * @protected
+     * @param {boolean=} toFold 是否折叠，如不传，则将折叠与否置反
+     */
+    FOLD_PANEL_CLASS.$ctrlBtnChange = function(toFold) {
+        var style = this._oBodyDef.el.style;
+
+        this._bFolded = toFold == null ? !this._bFolded : toFold;
+
+        this.$resetCtrlBtnText();
+
+        style.display = this._bFolded ? 'none' : '';
+
+        /**
+         * 渲染完事件
+         *
+         * @event
+         */
+        this.$di('dispatchEvent', 'rendered');
+    };
+
+})();
+/**
+ * di.shared.ui.GeneralSnippet
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 片段
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * DI 片段
+     * 
+     * @class
+     * @extends xui.XView
+     */
+    var SNIPPET = $namespace().GeneralSnippet = 
+            inheritsObject(INTERACT_ENTITY, constructor);
+    var SNIPPET_CLASS = SNIPPET.prototype;
+    
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @constructor
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        // ...
+    };
+    
+    /**
+     * @override
+     */
+    SNIPPET_CLASS.dispose = function() {
+    };
+
+})();
+/**
+ * di.shared.ui.GeneralVContainer
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    VCONTAINER
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var assign = xutil.object.assign;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var XVIEW = xui.XView;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * VCONTAINER
+     * 
+     * @class
+     * @extends xui.XView
+     */
+    var GENERAL_VCONTAINER = $namespace().GeneralVContainer = 
+            inheritsObject(XVIEW, constructor);
+    var GENERAL_VCONTAINER_CLASS = GENERAL_VCONTAINER.prototype;
+    
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @constructor
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        this._oOptions = assign({}, options);
+    };
+    
+    /**
+     * @override
+     */
+    GENERAL_VCONTAINER_CLASS.dispose = function() {
+        this.$di('disposeMainEl');
+    };
+
+})();
+/**
+ * di.shared.ui.GeneralVPart
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    VCONTAINER
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var assign = xutil.object.assign;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var XVIEW = xui.XView;
+        
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * VCONTAINER
+     * 
+     * @class
+     * @extends xui.XView
+     */
+    var GENERAL_VPART = $namespace().GeneralVPart = 
+            inheritsObject(XVIEW, constructor);
+    var GENERAL_VPART_CLASS = GENERAL_VPART.prototype;
+    
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @constructor
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        this._oOptions = assign({}, options);
+    };
+    
+    /**
+     * @override
+     */
+    GENERAL_VPART_CLASS.dispose = function() {
+        this.$di('disposeMainEl');
+    };
+
+})();
+/**
+ * di.shared.ui.OlapMetaConfig
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    多维分析报表原数据选择面板
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var DICT = di.config.Dict;
+    var UTIL = di.helper.Util;
+    var DIALOG = di.helper.Dialog;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var template = xutil.string.template;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    var getUID = xutil.uid.getIncreasedUID;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 元数据（指标维度）条件拖动选择
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {Object} options.reportType 类型，
+     *          TABLE(默认)或者CHART
+     * @param {string} options.submitMode 提交模式，可选值为
+     *      'IMMEDIATE'（输入后立即提交，默认）
+     *      'CONFIRM'（按确定按钮后提交）
+     * @param {boolean} options.needShowCalcInds 计算列是否作为指标
+     */
+    var LITEOLAP_META_CONFIG = $namespace().LiteOlapMetaConfig = 
+        inheritsObject(INTERACT_ENTITY);
+    var LITEOLAP_META_CONFIG_CLASS = LITEOLAP_META_CONFIG.prototype;
+    
+    /**
+     * 定义
+     */
+    LITEOLAP_META_CONFIG_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            syncLiteOlapInds: { datasourceId: 'LITEOLAP_INDS_DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'olap-meta-config',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.OlapMetaConfigModel'
+        }
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model初始化参数
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    LITEOLAP_META_CONFIG_CLASS.$createModelInitOpt = function (options) {
+        return { reportType: options.reportType };
+    };
+    
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    LITEOLAP_META_CONFIG_CLASS.$createView = function (options) {
+        /**
+         * 是否计算列作为指标显示
+         *
+         * @type {boolean}
+         * @private
+         */
+        this._bNeedShowCalcInds = options.needShowCalcInds || false;
+        /**
+         * 支持外部配置的datasourceId设置
+         *
+         * @type {Object}
+         * @private
+         */
+        var did = this._oDatasourceId = options.datasourceId || {};
+        did.DATA = did.DATA || 'DATA';
+        did.SELECT = did.SELECT || 'SELECT';
+        /**
+         * 提交模式
+         * 
+         * @type {string}
+         * @private 
+         */
+        this._sSubmitMode = options.submitMode;
+
+        this._uOlapMetaSelector = this.$di('vuiCreate', 'main');
+    };
+    
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    LITEOLAP_META_CONFIG_CLASS.init = function () {
+        // 事件绑定
+        this.getModel().attach(
+            ['sync.preprocess.DATA', this.$syncDisable, this, 'DATA'],
+            ['sync.result.DATA', this.$renderMain, this],
+            ['sync.error.DATA', this.$handleMetaError, this],
+            ['sync.complete.DATA', this.$syncEnable, this, 'DATA']
+        );
+        this.getModel().attach(
+            ['sync.preprocess.LITEOLAP_INDS_DATA', this.$syncDisable, this, 'LITEOLAP_INDS_DATA'],
+            ['sync.result.LITEOLAP_INDS_DATA', this.$renderLiteOlapMain, this],
+            ['sync.error.LITEOLAP_INDS_DATA', this.$handleMetaError, this],
+            ['sync.complete.LITEOLAP_INDS_DATA', this.$syncEnable, this, 'LITEOLAP_INDS_DATA']
+        );
+        this.getModel().attach(
+            ['sync.preprocess.SELECT', this.$syncDisable, this, 'SELECT'],
+            ['sync.result.SELECT', this.$handleSelected, this],
+            ['sync.error.SELECT', this.$handleSelectError, this],
+            ['sync.complete.SELECT', this.$syncEnable, this, 'SELECT']
+        );
+        this.getModel().attach(
+            ['sync.preprocess.LIST_SELECT', this.$syncDisable, this, 'LIST_SELECT'],
+            ['sync.result.LIST_SELECT', this.$handleSelected, this],
+            ['sync.error.LIST_SELECT', this.$handleSelectError, this],
+            ['sync.complete.LIST_SELECT', this.$syncEnable, this, 'LIST_SELECT']
+        );
+        this._uOlapMetaSelector.$di(
+            'addEventListener',
+            'change', 
+            this.$handleChange, 
+            this
+        );
+
+        this._uOlapMetaSelector.$di('init');
+        this.getModel().init();
+    };
+
+    /**
+     * @override
+     */
+    LITEOLAP_META_CONFIG_CLASS.dispose = function () {
+        this._uOlapMetaSelector && this._uOlapMetaSelector.dispose();
+        this.getModel() && this.getModel().dispose();
+        LITEOLAP_META_CONFIG.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     */
+    LITEOLAP_META_CONFIG_CLASS.sync = function () {
+        var datasourceId = this._oDatasourceId.DATA;
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.' + datasourceId, vd.disable],
+            ['sync.complete.' + datasourceId, vd.enable]
+        );*/
+
+        // 请求后台
+        this.$sync(
+            this.getModel(),
+            datasourceId,
+            {
+                needShowCalcInds: this._bNeedShowCalcInds,
+                inEditMode: false
+            },
+            this.$di('getEvent')
+        );
+    };
+
+    // 获取liteOlap的指标选择下拉框数据
+    LITEOLAP_META_CONFIG_CLASS.syncLiteOlapInds = function () {
+        var datasourceId = 'LITEOLAP_INDS_DATA';
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.' + datasourceId, vd.disable],
+            ['sync.complete.' + datasourceId, vd.enable]
+        );*/
+
+        // 请求后台
+        this.$sync(
+            this.getModel(),
+            datasourceId,
+            {
+                needShowCalcInds: this._bNeedShowCalcInds,
+                inEditMode: false,
+                // 使用chart图形的id
+                componentId: this.$di('getId').split('.')[1]
+            },
+            this.$di('getEvent')
+        );
+    };
+
+    /**
+     * 清空视图
+     * 
+     * @public
+     */
+    LITEOLAP_META_CONFIG_CLASS.clear = function () {  
+        // TODO
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.$renderMain = function (data, ejsonObj, options) {
+        var me = this;
+        var el = this.$di('getEl');
+
+        var imme = this._sSubmitMode == 'IMMEDIATE';
+        var model = this.getModel();
+
+        this._uOlapMetaSelector.$di(
+            'setData', 
+            {
+                inddim: model.getIndDim(),
+                selLineDataWrap: model.getSelLineWrap(),
+                seriesCfg: model.getSeriesCfg(),
+                model: model,
+                rule: {
+                    forbidColEmpty: imme,
+                    forbidRowEmpty: imme
+                }
+            },
+            { diEvent: this.$diEvent(options) }
+        );
+        
+        // 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this.getModel().getUpdateData()
+        );
+    };
+
+    /**
+     * 渲染liteOlap主体
+     * 
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.$renderLiteOlapMain = function (data, ejsonObj, options) {
+        var me = this;
+        var el = this.$di('getEl');
+
+        var imme = this._sSubmitMode == 'IMMEDIATE';
+        var model = this.getModel();
+
+        this._uOlapMetaSelector.$di(
+            'setData', 
+            {
+                indList: ejsonObj.data['inds'],
+                selectedInds: ejsonObj.data['currentInds'],
+                model: model,
+                selLineName: 'COLUMN',
+                renderType: 'liteOlap',
+                rule: {
+                    forbidColEmpty: imme,
+                    forbidRowEmpty: imme
+                }
+            },
+            { diEvent: this.$diEvent(options) }
+        );
+        
+        // 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this.getModel().getUpdateData()
+        );
+        /**
+             * 提交事件
+             *
+             * @event
+             */
+        this.$di('dispatchEvent', 'submit');
+    };
+    /**
+     * 选择完成
+     *
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.$handleSelected = function () {
+        // 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this._mModel.getUpdateData()
+        );
+
+        if (this._sSubmitMode == 'IMMEDIATE') {
+            /**
+             * 提交事件
+             *
+             * @event
+             */
+            this.$di('dispatchEvent', 'submit');
+        }
+    };
+
+    /**
+     * liteOlap的指标下拉框的change事件不需要发起selectInd请求，只需发起submit提交请求即可
+     * 
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.$handleChange = function (wrap) {
+    	// 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this._mModel.getUpdateData()
+        );
+
+        if (this._sSubmitMode == 'IMMEDIATE') {
+            /**
+             * 提交事件
+             *
+             * @event
+             */
+            this.$di('dispatchEvent', 'submit');
+        }
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.enable = function () {
+        this._uOlapMetaSelector && this._uOlapMetaSelector.$di('enable');
+        LITEOLAP_META_CONFIG.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.disable = function () {
+        this._uOlapMetaSelector && this._uOlapMetaSelector.$di('disable');
+        LITEOLAP_META_CONFIG.superClass.disable.call(this);
+    };    
+
+    /**
+     * 获取元数据初始化错误处理
+     * 
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.$handleMetaError = function () {
+        this.clear();
+        DIALOG.errorAlert();
+    };
+
+    /**
+     * 元数据拖拽错误处理
+     * 
+     * @protected
+     */
+    LITEOLAP_META_CONFIG_CLASS.$handleSelectError = function () {
+        DIALOG.errorAlert();
+    };
+
+})();
+/**
+ * di.shared.ui.MetaCondition
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    多维分析报表原数据选择面板
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var DICT = di.config.Dict;
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var extend = xutil.object.extend;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var template = xutil.string.template;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    var UI_BUTTON = ecui.ui.Button;
+    var UI_DROPPABLE_LIST;
+    var UI_DRAGPABLE_LIST;
+    var getByPath = xutil.object.getByPath;
+    var getUID = xutil.uid.getIncreasedUID;
+    var XVIEW = xui.XView;
+    var META_CONDITION_MODEL;
+    var DIM_SELECT_PANEL;
+        
+    $link(function () {
+        UI_DROPPABLE_LIST = getByPath('ecui.ui.DroppableList');
+        UI_DRAGPABLE_LIST = getByPath('ecui.ui.DraggableList');
+        META_CONDITION_MODEL = di.shared.model.MetaConditionModel;
+        DIM_SELECT_PANEL = di.shared.ui.DimSelectPanel;
+    });
+    
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 元数据（指标维度）条件拖动选择
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {HTMLElement} options.el 容器元素
+     * @param {Object} options.reportType 类型，
+     *          TABLE(默认)或者CHART
+     * @param {Function=} options.commonParamGetter 公共参数获取     
+     */
+    var META_CONDITOIN = $namespace().MetaCondition = 
+        inheritsObject(
+            XVIEW,
+            function (options) {
+                createModel.call(this, options);
+                createView.call(this, options);
+            }
+        );
+    var META_CONDITOIN_CLASS = META_CONDITOIN.prototype;
+    
+    //------------------------------------------
+    // 模板 
+    //------------------------------------------
+
+    var TPL_MAIN = [
+        '<div class="#{css}-src">',
+            '<div class="#{css}-ind">',
+                '<div class="#{css}-head-text">选择指标：</div>',
+                '<div class="#{css}-ind-line q-di-meta-ind"></div>',
+            '</div>',
+            '<div class="#{css}-dim">',
+                '<div class="#{css}-head-text">选择维度：</div>',
+                '<div class="#{css}-dim-line q-di-meta-dim"></div>',
+            '</div>',
+        '</div>',
+        '<div class="#{css}-btns">',
+            '#{btns}',
+        '</div>',
+        '<div class="#{css}-tar q-di-meta-tar"></div>'
+    ].join('');
+
+    var TPL_SEL_LINE = [
+        '<div class="#{css}-sel">',
+            '<div class="#{css}-head-text">#{txt}（#{selLineName}）：</div>',
+            '<div class="#{css}-sel-line q-di-meta-sel-line"></div>',
+            '#{delBtn}',
+        '</div>'
+    ].join('');
+
+    var TPL_CHART_BTNS = [
+        '<div class="#{css}-add-line-btn ui-button-g ui-button">增加系列组</div>',
+    ].join('');
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function createModel(options) {
+        /**
+         * 类型，TABLE 或者 CHART
+         *
+         * @type {string}
+         * @private
+         */
+        this._sReportType = options.reportType || 'RTPL_OLAP_TABLE';
+        /**
+         * 得到公用的请求参数
+         *
+         * @type {Function}
+         * @private
+         */
+        this._fCommonParamGetter = options.commonParamGetter;
+
+        this._mMetaConditionModel = new META_CONDITION_MODEL(
+            { 
+                reportType: this._sReportType,
+                commonParamGetter: this._fCommonParamGetter
+            }
+        );
+    };
+    
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function createView(options) {
+        var el = this._eMain = options.el;
+        var css = 'meta-condition';
+        var reportType = this._sReportType;
+        addClass(el, css);
+
+        // 模板
+        el.innerHTML = template(
+            TPL_MAIN, 
+            { 
+                css: css,
+                btns: reportType == 'RTPL_OLAP_CHART'
+                    ? template(TPL_CHART_BTNS, { css: css })
+                    : ''
+            }
+        );
+
+        // selLine控件集合，key为selLineName
+        this._oSelLineWrap = new LINKED_HASH_MAP();
+        // selLine控件id集合，key为selLineName
+        this._oSelLineIdWrap = {};
+
+        this._aDelSelLineBtn = [];
+
+        if (reportType == 'RTPL_OLAP_CHART') {
+            this._uAddLineBtn = ecuiCreate(
+                UI_BUTTON, 
+                q(css + '-add-line-btn', el)[0], 
+                null, 
+                { primary: 'ui-button-g' }
+            );
+        }
+    };
+    
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    META_CONDITOIN_CLASS.init = function () {
+        var me = this;
+        
+        // 事件绑定
+        this._mMetaConditionModel.attach(
+            ['sync.preprocess.META_DATA', this.disable, this, 'META_COND'],
+            ['sync.result.META_DATA', this.$renderMain, this],
+            ['sync.error.META_DATA', this.$handleMetaError, this],
+            ['sync.complete.META_DATA', this.enable, this, 'META_COND'],
+            ['sync.preprocess.ADD_SERIES_GROUP', this.disable, this, 'META_COND'],
+            ['sync.result.ADD_SERIES_GROUP', this.$renderMain, this],
+            ['sync.error.ADD_SERIES_GROUP', this.$handleMetaError, this],
+            ['sync.complete.ADD_SERIES_GROUP', this.enable, this, 'META_COND'],
+            ['sync.preprocess.REMOVE_SERIES_GROUP', this.disable, this, 'META_COND'],
+            ['sync.result.REMOVE_SERIES_GROUP', this.$renderMain, this],
+            ['sync.error.REMOVE_SERIES_GROUP', this.$handleMetaError, this],
+            ['sync.complete.REMOVE_SERIES_GROUP', this.enable, this, 'META_COND']
+        );        
+        this._mMetaConditionModel.attach(
+            ['sync.preprocess.SELECT', this.disable, this, 'META_COND'],
+            ['sync.result.SELECT', this.$refreshStatus, this],
+            ['sync.error.SELECT', this.$handleSelectError, this],
+            ['sync.complete.SELECT', this.enable, this, 'META_COND']
+        );
+
+        if (this._sReportType == 'RTPL_OLAP_CHART') {
+            this._uAddLineBtn.onclick = function () {
+                me._mMetaConditionModel.sync('ADD_SERIES_GROUP');
+            }
+        }
+
+        this._mMetaConditionModel.init();
+    };
+
+    /**
+     * @override
+     */
+    META_CONDITOIN_CLASS.dispose = function () {
+        this.$disposeMeta();
+        this._uAddLineBtn && this._uAddLineBtn.dispose();
+        META_CONDITOIN.superClass.dispose.call(this);
+    };
+
+    /**
+     * 清空selline区域
+     *
+     * @private
+     */
+    META_CONDITOIN_CLASS.$disposeMeta = function () {
+        var el = this._eMain;
+        this._uIndSrc && ecuiDispose(this._uIndSrc);
+        this._uDimSrc && ecuiDispose(this._uDimSrc);
+        q('q-di-meta-ind', el)[0].innerHTML = '';
+        q('q-di-meta-dim', el)[0].innerHTML = '';
+        this._oSelLineWrap.foreach(
+            function (name, item, index) {
+                ecuiDispose(item);
+            }
+        );
+        this._oSelLineWrap.cleanWithoutDefaultAttr();
+        for (var i = 0, btn; btn = this._aDelSelLineBtn[i]; i ++) {
+            btn.dispose();
+        }
+        this._aDelSelLineBtn = [];
+        this._oSelLineIdWrap = {};
+        q('q-di-meta-tar', el)[0].innerHTML = '';
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     */
+    META_CONDITOIN_CLASS.sync = function () {
+        this._mMetaConditionModel.sync(
+            { datasourceId: 'META_DATA' }
+        );
+    };
+
+    /**
+     * 得到Model
+     * 
+     * @public
+     * @return {di.shared.model.MetaConditionModel} metaItem
+     */
+    META_CONDITOIN_CLASS.getModel = function () {  
+        return this._mMetaConditionModel;
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    META_CONDITOIN_CLASS.$renderMain = function () {
+        var me = this;
+        var el = this._eMain;
+
+        // 先清空
+        this.$disposeMeta();
+
+        // 指标维度
+        var sourceEcuiId = [
+            '\x06_DI_META_COND_IND' + getUID('DI_META_COND'),
+            '\x06_DI_META_COND_DIM' + getUID('DI_META_COND')
+        ];
+        var inddim = this._mMetaConditionModel.getIndDim();
+        // 图的情况，可以重复拖动
+        var disableSelected = this._sReportType == 'RTPL_OLAP_TABLE';
+
+        // 指标控件
+        var indSrc = this._uIndSrc = ecuiCreate(
+            UI_DRAGPABLE_LIST,
+            q('q-di-meta-ind', el)[0],
+            null,
+            {
+                id: sourceEcuiId[0],
+                disableSelected: disableSelected,
+                clazz: 'IND'
+            }
+        );
+        inddim.indList.foreach(
+            function (uniqName, item) {
+                indSrc.addItem(
+                    {
+                        value: item.uniqName, 
+                        text: item.caption, 
+                        clazz: item.clazz,
+                        fixed: item.fixed,
+                        align: item.align
+                    }
+                );
+            }
+        );
+
+        // 维度控件
+        var dimSrc = this._uDimSrc = ecuiCreate(
+            UI_DRAGPABLE_LIST,
+            q('q-di-meta-dim', el)[0],
+            null,
+            {
+                id: sourceEcuiId[1],
+                disableSelected: disableSelected,
+                clazz: 'DIM'
+            }
+        );
+        inddim.dimList.foreach(
+            function (uniqName, item) {
+                dimSrc.addItem(
+                    {
+                        value: item.uniqName, 
+                        text: item.caption, 
+                        clazz: item.clazz,
+                        fixed: item.fixed,
+                        align: item.align
+                    }
+                );
+            }
+        );
+
+        // 增加默认的selLine
+        var selLineDataWrap = this._mMetaConditionModel.getSelLineWrap();
+        selLineDataWrap.foreach(
+            function (name, selLineData, index) {
+                me.$addSelLine(
+                    name,
+                    me.$getSelLineTitle(name),
+                    sourceEcuiId.join(','),
+                    selLineData
+                );
+            }
+        );
+
+        // 事件绑定
+        this._uIndSrc.onchange = bind(
+            this.$handleSelLineChange, 
+            this, 
+            this._uIndSrc
+        );
+        this._uDimSrc.onchange = bind(
+            this.$handleSelLineChange, 
+            this, 
+            this._uDimSrc
+        ); 
+        this._oSelLineWrap.foreach(
+            function (selLineName, selLineCon) {
+                selLineCon.onitemclick = bind(
+                    me.$handleItemClick, 
+                    me, 
+                    selLineName
+                );
+            }
+        );
+
+        // 更新控件的元数据状态
+        this.$refreshStatus();
+    };
+
+    /**
+     * 增加选择行
+     * 
+     * @protected
+     * @param {string} selLineName 名
+     * @param {string} selLineTitle selLine显示名
+     */
+    META_CONDITOIN_CLASS.$getSelLineTitle = function (selLineName) {
+        var text = '';
+        if (this._sReportType == 'RTPL_OLAP_TABLE') {
+            if (selLineName == 'ROW') {
+                text = '行';
+            }
+            else if (selLineName == 'FILTER') {
+                text = '过滤';
+            } 
+            else {
+                text = '列';
+            }
+        }
+        else {
+            if (selLineName == 'ROW') {
+                text = '轴';
+            }
+            else if (selLineName == 'FILTER') {
+                text = '过滤';
+            } 
+            else {
+                text = '系列组';
+            }
+        }   
+        return text;     
+    };
+
+    /**
+     * 增加选择行
+     * 
+     * @protected
+     * @param {string} selLineName selLine名
+     * @param {string} selLineTitle selLine显示名
+     * @param {string} source 来源ecui控件id
+     * @param {xutil.LinkedHashMap=} selLineData selLine数据
+     */
+    META_CONDITOIN_CLASS.$addSelLine = function (
+        selLineName, selLineTitle, source, selLineData
+    ) {
+        if (selLineName == null) {
+            return;
+        }
+        var me = this;
+        var selLineWrap = this._oSelLineWrap;
+        var selLineIdWrap = this._oSelLineIdWrap;
+        var useDelBtn = this._sReportType == 'RTPL_OLAP_CHART' 
+            && selLineName.indexOf('COLUMN') == 0;
+
+        // 增加selLine
+        var o = document.createElement('div');
+        o.innerHTML = template(
+            TPL_SEL_LINE, 
+            { 
+                css: 'meta-condition', 
+                txt: selLineTitle, 
+                selLineName: selLineName,
+                delBtn: useDelBtn
+                    ? '<span class="ui-button">删除</span>' 
+                    : ''
+            }
+        );
+        q('q-di-meta-tar', this._eMain)[0].appendChild(o = o.firstChild);
+
+        if (useDelBtn) {
+            // 删除系列组按钮
+            var btn = ecuiCreate(
+                UI_BUTTON, 
+                q('ui-button', o)[0], 
+                null, 
+                { primary: 'ui-button' }
+            );
+
+            btn.onclick = function () {
+                me._mMetaConditionModel.sync(
+                    { 
+                        datasourceId: 'REMOVE_SERIES_GROUP', 
+                        args: { selLineName: selLineName } 
+                    }
+                );
+            }
+
+            this._aDelSelLineBtn.push(btn);
+        }
+
+        selLineWrap.addLast(
+            ecuiCreate(
+                UI_DROPPABLE_LIST, 
+                q('q-di-meta-sel-line', o)[0],
+                null,
+                {
+                    id: selLineIdWrap[selLineName] = 
+                        '\x06_DI_META_COND_SEL' + getUID('DI_META_COND'),
+                    source: source,
+                    configBtn: true
+                }
+            ),
+            selLineName
+        );
+
+        // 设置新增控件target，并对所有其他selLine设置target
+        for (var name in selLineIdWrap) {
+            if (name != selLineName) {
+                selLineWrap.get(name).addTarget(selLineIdWrap[selLineName]);
+            }
+            selLineWrap.get(selLineName).addTarget(selLineIdWrap[name]);
+        }
+        this._uIndSrc.addTarget(selLineIdWrap[selLineName]);
+        this._uDimSrc.addTarget(selLineIdWrap[selLineName]);
+
+        // 初始数据
+        if (selLineData) {
+            selLineData.foreach( 
+                function (uniqName, item, index) {
+                    selLineWrap.get(selLineName).addItem(
+                        {
+                            value: item.uniqName, 
+                            text: item.caption,
+                            clazz: item.clazz,
+                            fixed: item.fixed,
+                            align: item.align
+                        }
+                    );
+                }
+            );
+        }
+    };
+
+    /**
+     * 更新控件的元数据状态
+     *
+     * @protected
+     */
+    META_CONDITOIN_CLASS.$refreshStatus = function () {
+        var statusWrap = this._mMetaConditionModel.getStatusWrap();
+        this._uIndSrc.setState(
+            { 
+                disable: statusWrap.indMetas.disabledMetaNames,
+                selected: statusWrap.indMetas.selectedMetaNames
+            }
+        );
+        this._uDimSrc.setState(
+            { 
+                disable: statusWrap.dimMetas.disabledMetaNames,
+                selected: statusWrap.dimMetas.selectedMetaNames
+            }
+        );
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     * @param {string} key 禁用者的标志
+     */
+    META_CONDITOIN_CLASS.enable = function (key) {
+        // TODO 检查
+        objKey.remove(this, key);
+
+        if (objKey.size(this) == 0 && this._bDisabled) {
+            this._uIndSrc && this._uIndSrc.enable();
+            this._uDimSrc && this._uDimSrc.enable();
+            this._oSelLineWrap.foreach(
+                function (name, item, index) {
+                    item.enable();
+                }
+            );
+            for (var i = 0, btn; btn = this._aDelSelLineBtn[i]; i ++) {
+                btn.enable();
+            }
+            this._uAddLineBtn && this._uAddLineBtn.enable();
+            META_CONDITOIN.superClass.enable.call(this);
+        }
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     * @param {string} key 禁用者的标志
+     */
+    META_CONDITOIN_CLASS.disable = function (key) {
+        objKey.add(this, key);
+
+        // TODO 检查
+        if (!this._bDisabled) {
+            this._uIndSrc && this._uIndSrc.disable();
+            this._uDimSrc && this._uDimSrc.disable();
+            this._oSelLineWrap.foreach(
+                function (name, item, index) {
+                    item.disable();
+                }
+            );
+            for (var i = 0, btn; btn = this._aDelSelLineBtn[i]; i ++) {
+                btn.disable();
+            }
+            this._uAddLineBtn && this._uAddLineBtn.disable();
+        }
+        META_CONDITOIN.superClass.disable.call(this);
+    };    
+
+    /**
+     * 获取元数据选择处理
+     * 
+     * @protected
+     */
+    META_CONDITOIN_CLASS.$handleSelLineChange = function () {
+        var wrap = {};
+        this._oSelLineWrap.foreach(
+            function (k, o, index) {
+                wrap[k] = o.getValue();
+            }
+        );
+        var changeWrap = this._mMetaConditionModel.diffSelected(wrap);
+
+        this._mMetaConditionModel.sync(
+            {
+                datasourceId: 'SELECT',
+                args: {
+                    uniqNameList: wrap[name],
+                    changeWrap: changeWrap
+                }
+            }
+        );
+    };
+
+    /**
+     * selLine上指标维度点击事件处理
+     * 
+     * @protected
+     */
+    META_CONDITOIN_CLASS.$handleItemClick = function (
+        selLineName, event, itemData
+    ) {
+        var metaItem = 
+            this._mMetaConditionModel.getMetaItem(itemData.value);
+
+        // 维度--打开维度选择面板
+        if (metaItem && metaItem.clazz == 'DIM') {
+            DIM_SELECT_PANEL().open(
+                'EDIT',
+                {
+                    uniqName: itemData.value,
+                    reportType: this._sReportType,
+                    selLineName: selLineName,
+                    dimMode: metaItem.isTimeDim ? 'TIME' : 'NORMAL',
+                    commonParamGetter: this._fCommonParamGetter
+                }
+            );
+        }
+        // 指标--打开指标设置面板
+        else {
+            // TODO
+        }
+    };
+
+    /**
+     * 获取元数据初始化错误处理
+     * 
+     * @protected
+     */
+    META_CONDITOIN_CLASS.$handleMetaError = function () {
+        // TODO
+    };
+
+    /**
+     * 元数据拖拽错误处理
+     * 
+     * @protected
+     */
+    META_CONDITOIN_CLASS.$handleSelectError = function () {
+        // TODO
+    };
+
+})();
+/**
+ * di.shared.ui.OlapMetaConfig
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    多维分析报表原数据选择面板
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.ui');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用 
+    //------------------------------------------
+
+    var DICT = di.config.Dict;
+    var UTIL = di.helper.Util;
+    var DIALOG = di.helper.Dialog;
+    var inheritsObject = xutil.object.inheritsObject;
+    var addClass = xutil.dom.addClass;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var q = xutil.dom.q;
+    var bind = xutil.fn.bind;
+    var objKey = xutil.object.objKey;
+    var template = xutil.string.template;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    var getUID = xutil.uid.getIncreasedUID;
+    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    
+    //------------------------------------------
+    // 类型声明 
+    //------------------------------------------
+
+    /**
+     * 元数据（指标维度）条件拖动选择
+     * 
+     * @class
+     * @extends xui.XView
+     * @param {Object} options
+     * @param {Object} options.reportType 类型，
+     *          TABLE(默认)或者CHART
+     * @param {string} options.submitMode 提交模式，可选值为
+     *      'IMMEDIATE'（输入后立即提交，默认）
+     *      'CONFIRM'（按确定按钮后提交）
+     * @param {boolean} options.needShowCalcInds 计算列是否作为指标
+     */
+    var OLAP_META_CONFIG = $namespace().OlapMetaConfig = 
+        inheritsObject(INTERACT_ENTITY);
+    var OLAP_META_CONFIG_CLASS = OLAP_META_CONFIG.prototype;
+    
+    /**
+     * 定义
+     */
+    OLAP_META_CONFIG_CLASS.DEF = {
+        // 暴露给interaction的api
+        exportHandler: {
+            sync: { datasourceId: 'DATA' },
+            syncLiteOlapInds: { datasourceId: 'LITEOLAP_INDS_DATA' },
+            clear: {}
+        },
+        // 主元素的css
+        className: 'olap-meta-config',
+        // model配置
+        model: {
+            clzPath: 'di.shared.model.OlapMetaConfigModel'
+        }
+    };
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 创建Model初始化参数
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    OLAP_META_CONFIG_CLASS.$createModelInitOpt = function (options) {
+        return { reportType: options.reportType };
+    };
+    
+    /**
+     * 创建View
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    OLAP_META_CONFIG_CLASS.$createView = function (options) {
+        /**
+         * 是否计算列作为指标显示
+         *
+         * @type {boolean}
+         * @private
+         */
+        this._bNeedShowCalcInds = options.needShowCalcInds || false;
+        /**
+         * 支持外部配置的datasourceId设置
+         *
+         * @type {Object}
+         * @private
+         */
+        var did = this._oDatasourceId = options.datasourceId || {};
+        did.DATA = did.DATA || 'DATA';
+        did.SELECT = did.SELECT || 'SELECT';
+        /**
+         * 提交模式
+         * 
+         * @type {string}
+         * @private 
+         */
+        this._sSubmitMode = options.submitMode;
+
+        this._uOlapMetaSelector = this.$di('vuiCreate', 'main');
+    };
+    
+    /**
+     * 初始化
+     *
+     * @public
+     */
+    OLAP_META_CONFIG_CLASS.init = function () {
+        // 事件绑定
+        this.getModel().attach(
+            ['sync.preprocess.DATA', this.$syncDisable, this, 'DATA'],
+            ['sync.result.DATA', this.$renderMain, this],
+            ['sync.error.DATA', this.$handleMetaError, this],
+            ['sync.complete.DATA', this.$syncEnable, this, 'DATA']
+        );
+        this.getModel().attach(
+            ['sync.preprocess.LITEOLAP_INDS_DATA', this.$syncDisable, this, 'LITEOLAP_INDS_DATA'],
+            ['sync.result.LITEOLAP_INDS_DATA', this.$renderLiteOlapMain, this],
+            ['sync.error.LITEOLAP_INDS_DATA', this.$handleMetaError, this],
+            ['sync.complete.LITEOLAP_INDS_DATA', this.$syncEnable, this, 'LITEOLAP_INDS_DATA']
+        );
+        this.getModel().attach(
+            ['sync.preprocess.SELECT', this.$syncDisable, this, 'SELECT'],
+            ['sync.result.SELECT', this.$handleSelected, this],
+            ['sync.error.SELECT', this.$handleSelectError, this],
+            ['sync.complete.SELECT', this.$syncEnable, this, 'SELECT']
+        );
+        this.getModel().attach(
+            ['sync.preprocess.LIST_SELECT', this.$syncDisable, this, 'LIST_SELECT'],
+            ['sync.result.LIST_SELECT', this.$handleSelected, this],
+            ['sync.error.LIST_SELECT', this.$handleSelectError, this],
+            ['sync.complete.LIST_SELECT', this.$syncEnable, this, 'LIST_SELECT']
+        );
+        this._uOlapMetaSelector.$di(
+            'addEventListener',
+            'change', 
+            this.$handleChange, 
+            this
+        );
+
+        this._uOlapMetaSelector.$di('init');
+        this.getModel().init();
+    };
+
+    /**
+     * @override
+     */
+    OLAP_META_CONFIG_CLASS.dispose = function () {
+        this._uOlapMetaSelector && this._uOlapMetaSelector.dispose();
+        this.getModel() && this.getModel().dispose();
+        OLAP_META_CONFIG.superClass.dispose.call(this);
+    };
+
+    /**
+     * 从后台获取数据并渲染
+     *
+     * @public
+     */
+    OLAP_META_CONFIG_CLASS.sync = function () {
+        var datasourceId = this._oDatasourceId.DATA;
+
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.' + datasourceId, vd.disable],
+            ['sync.complete.' + datasourceId, vd.enable]
+        );*/
+
+        // 请求后台
+        this.$sync(
+            this.getModel(),
+            datasourceId,
+            {
+                needShowCalcInds: this._bNeedShowCalcInds,
+                inEditMode: false,
+                componentId: this.$di('getId').split('.')[1]
+            },
+            this.$di('getEvent')
+        );
+    };
+
+    // 获取liteOlap的指标选择下拉框数据
+    OLAP_META_CONFIG_CLASS.syncLiteOlapInds = function () {
+        var datasourceId = 'LITEOLAP_INDS_DATA';
+        // 视图禁用
+        /*
+        var diEvent = this.$di('getEvent');
+        var vd = diEvent.viewDisable;
+        vd && this.getModel().attachOnce(
+            ['sync.preprocess.' + datasourceId, vd.disable],
+            ['sync.complete.' + datasourceId, vd.enable]
+        );*/
+
+        // 请求后台
+        this.$sync(
+            this.getModel(),
+            datasourceId,
+            {
+                needShowCalcInds: this._bNeedShowCalcInds,
+                inEditMode: false
+            },
+            this.$di('getEvent')
+        );
+    };
+
+    /**
+     * 清空视图
+     * 
+     * @public
+     */
+    OLAP_META_CONFIG_CLASS.clear = function () {  
+        // TODO
+    };
+
+    /**
+     * 渲染主体
+     * 
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.$renderMain = function (data, ejsonObj, options) {
+        var me = this;
+        var el = this.$di('getEl');
+
+        var imme = this._sSubmitMode == 'IMMEDIATE';
+            // 该标识是用以区分是否需要禁止行列拖走最后一个元素
+            imme = true ;
+        var model = this.getModel();
+
+        this._uOlapMetaSelector.$di(
+            'setData', 
+            {
+                inddim: model.getIndDim(),
+                selLineDataWrap: model.getSelLineWrap(),
+                seriesCfg: model.getSeriesCfg(),
+                model: model,
+                rule: {
+                    forbidColEmpty: imme,
+                    forbidRowEmpty: imme
+                }
+            },
+            { diEvent: this.$diEvent(options) }
+        );
+        
+        // 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this.getModel().getUpdateData()
+        );
+    };
+
+    /**
+     * 渲染liteOlap主体
+     * 
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.$renderLiteOlapMain = function (data, ejsonObj, options) {
+        var me = this;
+        var el = this.$di('getEl');
+
+        var imme = this._sSubmitMode == 'IMMEDIATE';
+        var model = this.getModel();
+
+        this._uOlapMetaSelector.$di(
+            'setData', 
+            {
+                indList: model.getLiteOlapIndList(),
+                model: model,
+                selLineName: 'COLUMN',
+                renderType: 'liteOlap',
+                rule: {
+                    forbidColEmpty: imme,
+                    forbidRowEmpty: imme
+                }
+            },
+            { diEvent: this.$diEvent(options) }
+        );
+        
+        // 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this.getModel().getUpdateData()
+        );
+    };
+    /**
+     * 选择完成
+     *
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.$handleSelected = function () {
+        // 更新控件的元数据状态
+        this._uOlapMetaSelector.$di(
+            'updateData',
+            this._mModel.getUpdateData()
+        );
+
+        if (this._sSubmitMode == 'IMMEDIATE') {
+            /**
+             * 提交事件
+             *
+             * @event
+             */
+            this.$di('dispatchEvent', 'submit');
+        }else{
+            // 指标和维度经拖拽选定后，需要和后台同步一下元数据，以防前后端状态不一致。
+            this.sync();
+        }
+    };
+
+    /**
+     * 获取元数据选择处理
+     * 
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.$handleChange = function (wrap) {
+        var didSel = this._oDatasourceId.SELECT;
+
+        this.$sync(
+            this._mModel,
+            didSel,
+            null,
+            null,
+            didSel == 'LIST_SELECT' 
+                ? {
+                    selectedIndNames: wrap,
+                    componentId: this.$di('getId').split('.')[1]
+                }
+                : {
+                    changeWrap: this._mModel.diffSelected(wrap),
+                    needShowCalcInds: this._bNeedShowCalcInds,
+                    componentId: this.$di('getId').split('.')[1]
+                }
+        );
+    };
+
+    /**
+     * 解禁操作
+     *
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.enable = function () {
+        this._uOlapMetaSelector && this._uOlapMetaSelector.$di('enable');
+        OLAP_META_CONFIG.superClass.enable.call(this);
+    };    
+
+    /**
+     * 禁用操作
+     *
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.disable = function () {
+        this._uOlapMetaSelector && this._uOlapMetaSelector.$di('disable');
+        OLAP_META_CONFIG.superClass.disable.call(this);
+    };    
+
+    /**
+     * 获取元数据初始化错误处理
+     * 
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.$handleMetaError = function () {
+        this.clear();
+        DIALOG.errorAlert();
+    };
+
+    /**
+     * 元数据拖拽错误处理
+     * 
+     * @protected
+     */
+    OLAP_META_CONFIG_CLASS.$handleSelectError = function () {
+        DIALOG.errorAlert();
+    };
+
+})();
+/**
+ * di.product.display.ui.LayoutPage
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    报表展示页面
+ * @author:  sushuang(sushuang), lizhantong(lztlovely@126.com)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.product.display.ui');
+
+(function () {
+
+    var inheritsObject = xutil.object.inheritsObject;
+    var XVIEW = xui.XView;
+    var SNIPPET_PARSER = di.helper.SnippetParser;
+    var bind = xutil.fn.bind;
+    var DICT = di.config.Dict;
+    var ajaxRequest = baidu.ajax.request;
+    var jsonParse = baidu.json.parse;
+    var DI_FACTORY;
+    var GLOBAL_MODEL;
+    var URL;
+    var COMMON_PARAM_FACTORY;
+    var DIALOG;
+    var Engine;
+    var engine;
+    var diFactory;
+    $link(function () {
+        URL = di.config.URL;
+        GLOBAL_MODEL = di.shared.model.GlobalModel;
+        DI_FACTORY = di.shared.model.DIFactory;
+        COMMON_PARAM_FACTORY = di.shared.model.CommonParamFactory;
+        DIALOG = di.helper.Dialog;
+        Engine = di.shared.model.Engine;
+    });
+
+    /**
+     * 报表展示页面
+     *
+     * @class
+     * @extends xui.XView
+     */
+    var LAYOUT_PAGE = $namespace().LayoutPage =
+        inheritsObject(XVIEW, constructor);
+    var LAYOUT_PAGE_CLASS = LAYOUT_PAGE.prototype;
+
+    /**
+     * FIXME
+     * 借用ecui的dom ready
+     * @override
+     */
+    XVIEW.$domReady = ecui.dom.ready;
+
+    /**
+     * 构造函数
+     *
+     * @constructor
+     * @public
+     * @param {Object} options 初始化参数
+     * @param {Object} options.externalParam 报表引擎外部传来的参数，
+     *      浏览器端只回传，不识别
+     */
+    function constructor(options) {
+        var me = this;
+
+        options = options || {};
+        options.extraOpt = options.extraOpt || {};
+        engine = new Engine(options);
+        diFactory = engine.getDIFactory();
+
+        /**
+         * agent标志，表示是由stub加载的还是直接url加载的
+         * 值可为'STUB'或空（默认）
+         */
+        me._diAgent = options.diAgent;
+        diFactory.setDIAgent(me._diAgent);
+
+        /**
+         * 预存报表镜像id,每次报表刷新时，会向后台提交镜像id
+         * 报表初始化时，又需要这个id，就在这预存一份
+         * 使用时:var diFactory = DI_FACTORY();
+         * var currentImgId = diFactory.getDIReportImageId();
+         */
+        me._reportImageId = options.externalParam.reportImageId;
+        diFactory.setDIReportImageId(me._reportImageId);
+
+        /**
+         * di-stub加载的情况下，prodStart开始的条件
+         */
+        me._prodStartCond = {};
+
+        /**
+         * 是否已经初始化 prodInitialized
+         */
+        me._prodInitialized = false;
+
+
+        // 初始化全局模型
+        GLOBAL_MODEL(options);
+
+        var eventChannel = SNIPPET_PARSER().setupEventChannel(
+            document, options, diFactory
+        );
+
+        // 对外事件通道注册
+        if (eventChannel) {
+            eventChannel.addEventListener('resize', bind(me.resize, me));
+            eventChannel.addEventListener(
+                'prodStart',
+                function () {
+                    me._prodStartCond.prodStartEvent = true;
+                    me.$prodStart();
+                }
+            );
+        }
+
+        // 设置功能权限
+        diFactory.setFuncAuth(options.funcAuth);
+
+        // 请求depict
+        me.$prepareDepict(options)
+    };
+
+    /**
+     * 生产环境开始
+     *
+     * @private
+     */
+    LAYOUT_PAGE_CLASS.$prodStart = function () {
+        var prodStartCond = this._prodStartCond;
+        if (prodStartCond.prodInitFunc
+            && (
+                // 如果没有di-stub，则直接开始prodInit
+                (this._diAgent != 'STUB')
+                // 如果是由di-stub加载的，则依照di-stub的prodStart事件来触发开始
+                // 否则不能保证保证prodInit在di-stub的iframe的onload事件完后才开始执行
+                // （尤其在ie下，即便在ajax回调中，也不能保证顺序，谁快谁先）
+                || prodStartCond.prodStartEvent
+                )
+            ) {
+            prodStartCond.prodInitFunc();
+        }
+    };
+
+    /**
+     * 生产环境初始化
+     *
+     * @private
+     */
+    LAYOUT_PAGE_CLASS.$prodInit = function (depict) {
+        if (this._prodInitialized) {
+            return;
+        }
+        this._prodInitialized = true;
+        engine.start(depict);
+    };
+
+    /**
+     * @override
+     */
+    LAYOUT_PAGE_CLASS.dispose = function () {
+        LAYOUT_PAGE.superClass.$dispose.call(this);
+    };
+
+    /**
+     * 获得depict的内容
+     *
+     * @public
+     */
+    LAYOUT_PAGE_CLASS.$prepareDepict = function (options) {
+        var me = this;
+        var remoteDepictRef = getRemoteDepictRef(options);
+        var got = [];
+
+        for (var i = 0; i < remoteDepictRef.length; i ++) {
+            if (!remoteDepictRef[i]) {
+                alert('depictRef 定义错误: ' + remoteDepictRef);
+                break;
+            }
+
+            // 请求depict
+//            var url = (
+//                options.mold
+//                    ? [
+//                        options.webRoot,
+//                        DICT.MOLD_PATH,
+//                        remoteDepictRef[i]
+//                    ]
+//                    : [
+//                        options.webRoot,
+//                        DICT.VTPL_ROOT,
+//                        options.bizKey,
+//                            options.phase || 'release',
+//                        remoteDepictRef[i]
+//                    ]
+//                ).join('/') + '?__v__=' + options.repoVersion;
+           //FIXME:下面的路径实现方式不好
+           var url = [
+                    options.webRoot,
+                    DICT.REPORTS,
+                    options.reportId,
+                    DICT.REPORT_JSON
+           ].join('/');
+
+            ajaxRequest(
+                url,
+                {
+                    method: 'GET',
+                    onsuccess: onsuccess,
+                    onfailure: bind(onfailure, null, url)
+                }
+            );
+        }
+
+        function onsuccess(xhr, rspText) {
+            var rspObj = jsonParse(rspText);
+            got.push(rspObj);
+
+            // depicts已经全部获取时
+            if (got.length >= remoteDepictRef.length) {
+
+                me._prodStartCond.prodInitFunc = bind(
+                    me.$prodInit,
+                    me,
+                    engine.mergeDepict(got)
+                );
+
+                me.$prodStart();
+            }
+        }
+
+        function onfailure(url, xhr, rspText) {
+            alert(
+                    '获取depict失败：url=' + url
+                    + ' status=' + xhr.status
+            );
+        }
+
+        function getRemoteDepictRef() {
+            // 先extraOpt，后默认reportTemplateId
+            var depictRef = (options.extraOpt.depictRef || []).slice();
+            depictRef.push(options.persistentReportTemplateId + '.json');
+            return depictRef;
+        };
+
+    };
+
+    /**
+     * 窗口改变重新计算大小
+     * resize不能再触发rendered
+     *
+     * @public
+     */
+    LAYOUT_PAGE_CLASS.resize = function () {
+        diFactory.forEachEntity(
+            'COMPONENT',
+            function (def, ins, id) {
+                ins.resize && ins.resize();
+            }
+        );
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 $namespace('di.shared.ui');
 
 (function () {
@@ -92074,4 +118174,18 @@ $namespace('di.product.display.ui');
 // 依赖连接
 xui.XProject.doLink();
 // 项目初始化最后执行的内容
+=======
+/**
+ * project link
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * @file:    项目结尾文件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui.XProject
+ */
+
+// 依赖连接
+xui.XProject.doLink();
+// 项目初始化最后执行的内容
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 xui.XProject.doEnd()

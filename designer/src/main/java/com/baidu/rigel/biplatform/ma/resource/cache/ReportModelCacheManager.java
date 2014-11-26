@@ -25,7 +25,9 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
 import com.baidu.rigel.biplatform.ma.report.query.ReportRuntimeModel;
 import com.baidu.rigel.biplatform.ma.report.service.ReportDesignModelService;
 import com.baidu.rigel.biplatform.ma.report.utils.ContextManager;
+import com.baidu.rigel.biplatform.ma.rt.Context;
 import com.baidu.rigel.biplatform.ma.rt.ExtendAreaContext;
+import com.baidu.rigel.biplatform.ma.rt.utils.RuntimeEvnUtil;
 
 /**
  * 
@@ -250,6 +252,48 @@ public class ReportModelCacheManager {
 			return new ExtendAreaContext();
 		}
 		return (ExtendAreaContext) cacheManagerForReource.getFromCache(String.valueOf(key));
+    }
+    
+    /**
+     * 更新全局上下文
+     * @param areaId 区域id
+     * @param context 区域上下文
+     */
+    public void updateContext(String reportId, Context context) {
+            int key = genContextKey(reportId);
+            cacheManagerForReource.setToCache(String.valueOf(key), context);
+    }
+
+    /**
+     * 全局context的id
+     * @param reportId
+     * @return int
+     */
+    private int genContextKey(String reportId) {
+        int key = new StringBuilder()
+                .append(reportId)
+                .append("_^-^_")
+                .append(ContextManager.getSessionId())
+                .append("_^-^_")
+                .append(ContextManager.getProductLine())
+                .toString().hashCode();
+        return key;
+    }
+    
+    /**
+     * 
+     * 依据报表id获取全局上下文
+     * @param reportId 全局id
+     * @return Context
+     * 
+     */
+    public Context getContext(String reportId) {
+            int key = genContextKey(reportId);
+        if (cacheManagerForReource.getFromCache(String.valueOf(key)) == null) {
+            ReportDesignModel designModel = this.getReportModel(reportId);
+            return RuntimeEvnUtil.initRuntimeEvn(designModel, null).getContext();
+        }
+        return (Context) cacheManagerForReource.getFromCache(String.valueOf(key));
     }
     
 }

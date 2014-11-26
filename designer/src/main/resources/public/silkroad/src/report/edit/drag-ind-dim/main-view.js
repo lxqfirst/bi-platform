@@ -1,7 +1,11 @@
 /**
  * @file 对左边的数据可进行拖拽操作，
  * 右边的组件可接收在组件编辑模块（canvas/edit-comp-view.js）中定义
+<<<<<<< HEAD
  * @author 赵晓强(longze_xq@163.com)
+=======
+ * @author 赵晓强(v_zhaoxiaoqiang)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @date 2014-7-31
  */
 define([

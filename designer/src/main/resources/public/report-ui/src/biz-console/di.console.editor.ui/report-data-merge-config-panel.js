@@ -4,10 +4,14 @@
  *
  * @file:    设置报表数据合并方式,不合并,行合并,列合并
 <<<<<<< HEAD
+<<<<<<< HEAD
  * @author:  chenxiaoming01(chenxiaoming01)
 =======
  * @author:  xiaoming.chen(xiaoming.chen)
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * @author:  xiaoming.chen(xiaoming.chen)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @depend:  xui, xutil
  */
 $namespace('di.console.editor.ui');

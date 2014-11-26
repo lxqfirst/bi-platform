@@ -54,6 +54,7 @@ class TableQueryTransHandler extends QueryRequestTransHandler {
     @Override
     QueryAction transRequest(QueryRequest request) {
         QueryAction action = new QueryAction();
+        action.setReportId(request.getReportId());
         // 数据源
         DataSourceInfo dataSource = request.getDataSourceInfo();
         action.setDataSource(dataSource);
@@ -72,7 +73,8 @@ class TableQueryTransHandler extends QueryRequestTransHandler {
         // TODO 排序轴 排序支持
         LinkedHashMap<Item, OrderType> orders = Maps.newLinkedHashMap();
         action.setOrders(orders);
-        
+        // modify by jiangychao 设置查询策略
+        action.setQueryStrategy(request.getQueryStrategy());
         return action;
     }
     

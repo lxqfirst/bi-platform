@@ -60,7 +60,7 @@ abstract class AbsQueryResultBuilder {
         if (isCanBuildResult(action.getQueryStrategy())) {
             return innerBuild(action, model);
         } else if (this.nextBuilder != null) {
-            nextBuilder.build(action, model);
+            return nextBuilder.build(action, model);
         }
         throw new IllegalArgumentException("未知错误");
     }

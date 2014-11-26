@@ -1,6 +1,10 @@
 /**
  * @file 设置报表cube的view
+<<<<<<< HEAD
  * @author 赵晓强(longze_xq@163.com)
+=======
+ * @author 赵晓强(v_zhaoxiaoqiang)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @date: 2014-7-17
  */
 define(['url', 'data-sources/list/main-model'], function (Url, DataSourcesModel) {

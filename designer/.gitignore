@@ -8,3 +8,7 @@
 .doc
 .docx
 .checkstyle
+/build_no_deploy.sh
+/build.sh
+/designer (1).iml
+/designer.iml

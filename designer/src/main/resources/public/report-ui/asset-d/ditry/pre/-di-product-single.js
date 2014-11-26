@@ -18501,6 +18501,7 @@ $namespace('di.shared.model');
 })();
 
 
+<<<<<<< HEAD
 /**
  * di.shared.adapter.GeneralAdapterMethod
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -18577,6 +18578,84 @@ $namespace('di.shared.adapter');
 
 })();
 
+=======
+/**
+ * di.shared.adapter.GeneralAdapterMethod
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    通用的默认适配器
+ *           一般在di.config.Dict中使用adapterMethods来引用此中方法，
+ *           拷贝到目标对象中
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    var UTIL = di.helper.Util;
+    var extend = xutil.object.extend;
+
+    /**
+     * 通用的适配器方法
+     */
+    $namespace().GeneralAdapterMethod = {
+        ecuiCreate: ecuiCreate,
+        ecuiDispose: ecuiDispose,
+        xuiCreate: xuiCreate,
+        xuiDispose: xuiDispose
+    };
+
+    /**
+     * 创建ecui控件
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @return {Object} 创建的实例
+     */
+    function ecuiCreate(def, options) {
+        return UTIL.ecuiCreate(def.clz, def.el, null, options);
+    }
+
+    /**
+     * 释放ecui控件
+     *
+     * @public
+     * @this {Object} 控件
+     */
+    function ecuiDispose() {
+        UTIL.ecuiDispose(this);
+    }
+
+    /**
+     * 创建xui-ui控件
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @return {Object} 创建的实例
+     */
+    function xuiCreate(def, options) {
+        return new def.clz(options);
+    }
+
+    /**
+     * 释放xui-ui控件
+     *
+     * @public
+     * @this {Object} 控件
+     */
+    function xuiDispose() {
+        this.dispose && this.dispose();
+    }
+    
+    // ...
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.InteractEntity
@@ -19571,6 +19650,7 @@ Button - 定义按钮的基本操作。
         setText = dom.setText,
         setDefault = util.setDefault,
 
+<<<<<<< HEAD
         inheritsControl = core.inherits,
 
         UI_CONTROL = ui.Control,
@@ -23768,6 +23848,1218 @@ _eFill       - 用于控制中部宽度的单元格
             }
         }
     };
+=======
+/**
+ * ecui.ui.OlapTable
+ * Copyright 2013 Baidu Inc. All rights reserved
+ *
+ * @file:   多维分析表格
+ *         （行列锁定，跨多行，垮多列，树状表头等）
+ * @author: sushuang(sushuang)
+ */
+
+ (function() {
+    
+    var core = ecui;
+    var dom = core.dom;
+    var array = core.array;
+    var ui = core.ui;
+    var string = core.string;
+    var util = core.util;
+
+    var $fastCreate = core.$fastCreate;
+    var inheritsControl = core.inherits;
+    var triggerEvent = core.triggerEvent;
+    var disposeControl = core.dispose;
+    var createDom = dom.create;
+    var addClass = dom.addClass;
+    var setStyle = dom.setStyle;
+    var removeClass = dom.removeClass;
+    var getMouseX = core.getMouseX;
+    var toNumber = util.toNumber;
+    var getParent = dom.getParent;
+    var getStyle = dom.getStyle;
+    var sliceByte = string.sliceByte;
+    var moveElements = dom.moveElements;
+    var getAttribute = dom.getAttribute;
+    var getPosition = dom.getPosition;
+    var encodeHTML = string.encodeHTML;
+    var remove = array.remove;
+    var getView = util.getView;
+    var extend = util.extend;
+    var repaint = core.repaint;
+    var attachEvent = util.attachEvent;
+    var detachEvent = util.detachEvent;
+    var pushArray = Array.prototype.push;
+    // 引用了外部库
+    var formatNumber = xutil.number.formatNumber;
+
+    var MATH = Math;
+    var MIN = MATH.min;
+    var WINDOW = window;
+
+    var UI_CONTROL = ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+    var UI_LOCKED_TABLE = ui.SlowLockedTable;
+    var UI_LOCKED_TABLE_CLASS = UI_LOCKED_TABLE.prototype;
+
+    /**
+     * OLAP 表主类
+     *
+     * @class
+     * @extends {ecui.ui.LockedTable}
+     */
+    var UI_OLAP_TABLE = ui.OlapTable =
+        inheritsControl(
+            UI_LOCKED_TABLE,
+            'ui-table',
+            function(el, options) {
+                this.$setOptions(options);
+                this.$renderHTML(el);
+            }
+        );
+    var UI_OLAP_TABLE_CLASS = UI_OLAP_TABLE.prototype;
+
+    var UI_OLAP_TABLE_CELL_CLASS = (
+            UI_OLAP_TABLE_CLASS.Cell = inheritsControl(
+                UI_LOCKED_TABLE_CLASS.Cell
+            )
+        ).prototype;
+
+    var UI_TABLE_HCELL_CLASS = UI_OLAP_TABLE_CLASS.HCell.prototype;
+
+    /**
+     * 表格输入非法时的信息
+     *
+     * @type {string}
+     * @private
+     */
+    var INVALID_TEXT = '数据错误';
+    /**
+     * 树节点缩进单位宽度
+     *
+     * @type {number}
+     * @private
+     */
+    var TREE_INDENT = 15;
+
+    //--------------------------------------------------
+    // 条件格式
+    //--------------------------------------------------
+
+    /**
+     * 得到条件格式样式
+     *
+     * @private
+     * @param {Object} condFmtDef 条件格式定义
+     * @param {string} ctrlCssBase 控件的css base
+     * @return {Object} css和style
+     */
+    function getCondFmt(condFmtDef, ctrlCssBase) {
+        var ret = { 
+            text: { css: [], style: [] },
+            outer: { css: [], style: [] },
+            left: { css: [], style: [] },
+            right: { css: [], style: [] }
+        };
+
+        if (!condFmtDef) { return null; }
+
+        // 箭头
+        if (condFmtDef.arr) {
+            ret.right.css.push(
+                ctrlCssBase + '-condfmt-arr',
+                ctrlCssBase + '-condfmt-arr-' + condFmtDef.arr
+            );
+        }
+        
+        // 背景色
+        if (condFmtDef.bg) {
+            if (condFmtDef.bg.indexOf('#') >= 0) {
+                ret.outer.style.push('background-color:' + condFmtDef.bg + ';');
+            }
+            else {
+                ret.outer.css.push(ctrlCssBase + '-condfmt-bg-' + condFmtDef.bg);
+            }
+        }
+
+        // 文字颜色
+        if (condFmtDef.tx) {
+            if (condFmtDef.tx.indexOf('#') >= 0) {
+                ret.text.style.push('color:' + condFmtDef.tx + ';');
+            }
+            else {
+                ret.text.css.push(ctrlCssBase + '-condfmt-tx-' + condFmtDef.tx);
+            }
+        }
+
+        // 文字加粗
+        if (condFmtDef.wt) {
+            ret.text.style.push('font-weight:bold;');
+        }
+
+        return ret;
+    }
+
+    //--------------------------------------------------
+    // UI_OLAP_TABLE 方法
+    //--------------------------------------------------
+
+    /**
+     * @override
+     */
+    UI_OLAP_TABLE_CLASS.init = function() {
+        UI_OLAP_TABLE.superClass.init.call(this);
+        this.$initRowChecked();
+    };
+
+    /**
+     * 设置参数
+     * 
+     * @protected
+     * @param {Object} options 参数
+     * @param {Array.<Object>} options.datasource 主体数据
+     *      条件格式：每个节点中有：{Object} style字段。参见getCondFmt。
+     * @param {Array.<Object>} options.colFields 上表头（不仅是内容区域，包括了左表头）
+     * @param {Array.<Object>} options.colDefine 列定义（不仅是内容区域，包括了左表头）
+     *      排序：每个节点中有：{string} orderby字段，值可为：'asc', 'desc', 'none'（默认为空，不排序）
+     *      宽度：每个节点中有：{number} width字段。可不指定
+     * @param {Array.<Object>} options.rowHeadFields 左表头
+     *      缩进：每个节点有{number} indent字段，值为0, 1, 2, 3 （默认为空，不缩进）
+     *      链接下钻：每个节点有{boolean} drillByLink字段
+     *      expand/collapse（加减号）：每个节点有{boolean} expand字段，
+     *          true表示可以expand（显示加号）
+     *          false表示可以collapse（显示减号）
+     * @param {Array.<Object>} options.rowDefine 行定义
+     * @param {string} options.emptyHTML 数据为空时的显示字符
+     * @param {number=} options.rowHCellCut 行头指定长度，文字过长截断成“...”，用title提示
+     * @param {number=} options.cCellCut 内容区指定长度，文字过长截断成“...”，用title提示
+     * @param {number=} options.hCellCut 表头区指定长度，文字过长截断成“...”，用title提示
+     * @param {boolean=} options.rowCheckMode 是否启用行选中模式，
+     *      'SELECT'（单选）, 'CHECK'（多选）, 空（默认）
+     * @param {Array=} options.rowChecked 初始化行选中
+     * @param {Array=} options.rowCheckMax 选择条数的上限
+     * @param {Array=} options.rowCheckMin 选择条数的下限
+     * @param {string=} options.defaultCCellAlign 默认的内容区的align，
+     *      默认为left，可为right, left, center
+     * @param {boolean} options.vScroll 是否使用纵向滚动条（默认false）
+     * @param {boolean} options.hScroll 是否使用横向滚动条（默认true）
+     */
+    UI_OLAP_TABLE_CLASS.$setOptions = function(options) {
+        this._sEmptyHTML = options.emptyHTML;
+
+        this._aData = options.datasource || [];
+        this._aColFields = options.colFields || [];
+        this._aColDefine = options.colDefine || [];
+        this._aRowHeadFields = options.rowHeadFields || [];
+        this._aRowDefine = options.rowDefine || [];
+
+        // 行选择记录
+        this._oRowCheck = {
+            rowCheckMode: options.rowCheckMode,
+            rowChecked: options.rowChecked || [],
+            rowCheckMax: options.rowCheckMax || Number.MAX_VALUE,
+            rowCheckMin: options.rowCheckMin || Number.MIN_VALUE,
+            rowCheckCount: 0
+        };
+        // 如果行内有selected标志，优先
+        for (var i = 0, o; o = this._aRowDefine[i]; i ++) {
+            o.selected && this._oRowCheck.rowChecked.push(i);
+        }
+
+        // 文字过长截断
+        this._oCut = {
+            ROWHCELL: options.rowHCellCut,
+            CCELL: options.cCellCut,
+            HCELL: options.hCellCut
+        };
+
+        // 样式
+        this._oStyle = {
+            defaultCCellAlign: options.defaultCCellAlign
+        };
+
+        // this.$validate();
+
+        this._nLeftLock = options.leftLock = 
+            this._bInvalid 
+                ? 0 
+                : (
+                    this._aRowHeadFields.length
+                        ? this._aRowHeadFields[0].length : 0
+                );
+
+        this._nRightLock = options.rightLock = 0;
+
+        options.vScroll == null && (options.vScroll = false);
+        options.hScroll == null && (options.hScroll = true);
+    };
+
+    /**
+     * 校验输入数据
+     * 
+     * @protected
+     */
+    UI_OLAP_TABLE_CLASS.$validate = function() {
+        this._bInvalid = false;
+        
+        var colCount = validateLength.call(this, this._aColFields);
+        var rowHeadColCount = validateLength.call(this, this._aRowHeadFields);
+        var dataCount = validateLength.call(this, this._aData);
+
+        if (this._aColDefine.length != colCount) {
+            this._bInvalid = true;
+        }
+        if (rowHeadColCount + dataCount != colCount) {
+            this._bInvalid = true;
+        } 
+        if (this._aRowHeadFields.length != this._aData.length) {
+            this._bInvalid = true;
+        }
+    };
+
+    /**
+     * 校验二维数组宽高是否合法（含盖计算colspan和rowspan）
+     * 
+     * @private
+     * @this {ui.OlapTable} 控件本身
+     * @return {number} length
+     */
+    function validateLength(matrix) {
+        // // TODO 
+        // // 同时colspan和rowspan
+        // var baseCount = 0; // 每行的应该长度
+        // var rowMaxArr = []; // 每列因rowspan而到达的高度
+        // var colCount;
+
+        // for (var i = 0, line; i < matrix.length; i ++) {
+        //     line = matrix[i];
+
+        //     if (!line) {
+        //         this._bInvalid = true;
+        //         return baseCount;
+        //     } 
+
+        //     colCount = 0;
+        //     itemJ = 0;
+        //     for (var j = 0, item; ; j ++) {
+        //         item = line[itemJ ++];
+        //         rowMaxArr[colCount] == null && (rowMaxArr[colCount] = -1);
+
+        //         if (rowMaxArr[colCount] >= i) {
+        //             colCount ++;
+        //             continue;
+        //         }
+        //         else {
+        //             if (item === Object(item)) {
+        //                 if (item.rowspan > 1) {
+        //                     rowMaxArr[colCount] = i + item.rowspan - 1;
+        //                 }
+        //                 else if (item.colspan > 1) {
+        //                     colCount += item.colspan;
+        //                     rowMaxArr[colCount] = i;
+        //                 }
+        //             }
+        //             else {
+        //                 colCount ++;
+        //                 rowMaxArr[colCount] = i;
+        //             }
+        //         }
+        //     }
+
+        //     if (!baseCount) {
+        //         baseCount = colCount;
+        //     }
+        //     else if (baseCount != colCount) {
+        //         this._bInvalid = true;
+        //         return baseCount;
+        //     }
+        // }
+        // return baseCount;
+    };
+
+    /**
+     * 设置数据并渲染表格
+     *
+     * @public
+     * @param {string} options 参数，参见setOptions
+     */
+    UI_OLAP_TABLE_CLASS.setData = function(options) {
+
+        // ===========================
+        // var ttt = new Date();
+
+        // ===========================
+        // var ddd = new Date();
+
+        detachEvent(WINDOW, 'resize', repaint);
+
+        
+        // ===================== ch 1200
+        this.$disposeInner();
+
+        // console.log('=================== olap-table setData start] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+        
+        var el = this.getOuter();
+        el.innerHTML = '';
+        this.$setBody(el);
+
+        // console.log('=================== olap-table setData 1] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+
+        this.$resize();
+
+        // console.log('=================== olap-table setData 2] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+        
+        // ==================== ch 518
+        UI_OLAP_TABLE.client.call(
+            this, 
+            el, 
+            extend(
+                { uid: this._sUID, primary: this._sPrimary }, 
+                options
+            )
+        );
+        this._bCreated = false;
+
+        // console.log('=================== olap-table setData 3 (into)] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+
+        // =================== ch 370
+        this.cache(true, true);
+
+        // console.log('=================== olap-table setData 4] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+        
+        // =================== ch 1102
+        this.init();
+
+        // console.log('=================== olap-table setData 51] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+        // this.$resize();
+
+        this.$bindCellLink();
+
+        attachEvent(WINDOW, 'resize', repaint);
+
+        // console.log('=================== olap-table setData 6] ' + ((new Date()).getTime() - ddd));
+        // ddd = new Date();
+
+        // 为优化而去掉
+        // this.resize();
+
+        // =================== ch resize：318 （里面会进入在locked-table.$setSize, 用了315）
+        // console.log('=================== olap-table setData last] ' + ((new Date()).getTime() - ddd));
+
+        // console.log('=================== olap-table setData total] ' + ((new Date()).getTime() - ttt));
+    };
+
+    /**
+     * 析构内部
+     * 
+     * @protected
+     */
+    UI_OLAP_TABLE_CLASS.$disposeInner = function() {
+        var disposeFunc = this.$dispose;
+        this.$dispose = new Function();
+        disposeControl(this);
+        this.$dispose = disposeFunc;
+    }    
+
+    /**
+     * 渲染HTML
+     * 
+     * @protected
+     * @param {HTMLElement} el 控件容器
+     */
+    UI_OLAP_TABLE_CLASS.$renderHTML = function(el) {
+
+        // =================================
+        // var ttt = new Date();
+        // var ddd = new Date();
+
+        var type = this.getTypes()[0];
+        var datasource = this._aData || [];
+        var colFields = this._aColFields || [];
+        var colDefine = this._aColDefine || [];
+        var rowHeadFields = this._aRowHeadFields || [];
+        var rowDefine = this._aRowDefine || [];
+        var leftLock = this._nLeftLock;
+        var html = [];
+        var i;
+        var j;
+        var line;
+        var wrap;
+
+        setStyle(el, 'width', 'auto');
+        setStyle(el, 'display', 'block');
+        html.push('<table>');
+
+        // 非法情况
+        if (this._bInvalid) {
+            html.push('<thead><tr><th class="' + type +'-hcell-empty">&nbsp;</th></tr></thead>');
+            html.push('<tbody><tr><td>' + INVALID_TEXT + '</td></tr></tbody>');
+        }
+
+        // 正常情况
+        else {
+            // 上表头
+            html.push('<thead>');
+            if (!colFields.length) {
+                html.push('<tr><th class="' + type + '-hcell-empty">&nbsp;</th></tr>');
+            }
+            else {
+                for (i = 0; line = colFields[i]; i ++) {
+                    html.push('<tr>');
+                    for (j = 0; j < line.length; j ++) {
+                        if (isPlaceholder(wrap = line[j])) {
+                            continue;
+                        }
+                        this.$renderHCell(
+                            html,
+                            // 目前只有最底层才传colField
+                            i == colFields.length - 1 ? colDefine[j] : null,
+                            wrap,
+                            j < this._nLeftLock ? j : (j - this._nLeftLock),
+                            i
+                        );
+                    }
+                    html.push('</tr>');
+                }
+            }
+            html.push('</thead>');
+
+            // 表内容
+            html.push('<tbody>');
+            if (this._bInvalid || !datasource.length) {
+                html.push(
+                    '<tr>',
+                        '<td class="', type, '-cell-empty" align="middle" colspan="',
+                            colFields.length, '">',
+                            this._sEmptyHTML,
+                        '</td>',
+                    '</tr>'
+                );
+            }
+            else {
+                for (i = 0; line = datasource[i]; i ++) {
+                    html.push('<tr class="'+ type +'-row">')
+                    // 左表头
+                    if (leftLock) {
+                        for (j = 0; j < rowHeadFields[i].length; j ++) {
+                            if (isPlaceholder(wrap = rowHeadFields[i][j])) {
+                                continue;
+                            }
+                            this.$renderRowHCell(
+                                html,
+                                colDefine[j], 
+                                wrap,
+                                j,
+                                i
+                            );
+                        }
+                    }
+                    // 内容
+                    for (j = 0; j < line.length; j ++) {
+                        wrap = line[j];
+                        this.$renderCell(
+                            html, 
+                            colDefine[leftLock + j], 
+                            rowDefine[i],
+                            wrap,
+                            j, 
+                            i
+                        );
+                    }
+                    html.push('</tr>')
+                }
+            }
+        }
+
+        html.push('</tbody></table>');
+
+        // ==========================以上所有循环push ch 144
+        // console.log('=================== olap-table html.push] ' + html.length + ' ' + ((new Date()).getTime() - ddd));
+
+        // ====================================
+        // ddd = new Date();
+
+        html = html.join('');
+
+        // console.log('=================== olap-table html.join("")] ' + html.length + ' ' + ((new Date()).getTime() - ddd));
+
+        // ====================================
+        // ddd = new Date();
+        
+        // ============================= ch 293 （分批加载来优化）
+        el.innerHTML = html;
+
+        // console.log('=================== olap-table renderHTML el.innerHTLM=...] ' + ((new Date()).getTime() - ddd));
+
+        // console.log('=================== olap-table renderHTML total] ' + ((new Date()).getTime() - ttt));
+        // ddd = new Date();
+
+        return el;
+    };
+
+    /**
+     * 渲染上方表头节点
+     *
+     * @protected
+     */
+    UI_OLAP_TABLE_CLASS.$renderHCell = function(
+        // 只有最底层有colField
+        html, colDefItem, wrap, x, y
+    ) {
+        var type = this.getType();
+        var classStr = [type + '-hcell'];
+        var styleStr = [];
+        var attrStr = [];
+        var span = [];
+        var innerStr;
+
+        wrap = objWrap(wrap);
+
+        span.push(wrap.colspan ? ' colspan="' + wrap.colspan + '" ' : '');
+        span.push(wrap.rowspan ? ' rowspan="' + wrap.rowspan + '" ' : '');
+
+        if (colDefItem && colDefItem.width) {
+            styleStr.push('width:' + colDefItem.width + 'px;');
+        }
+        if (colDefItem && colDefItem.orderby) {
+            classStr.push(type + '-hcell-sort-' + colDefItem.orderby);
+            attrStr.push('data-orderby="' + colDefItem.orderby + '"');
+        }
+        attrStr.push('data-cell-pos="' + x + '-' + y + '"');
+        innerStr = this.$renderCellInner('HCELL', null, wrap, attrStr, classStr, styleStr);
+        html.push(
+            '<th ', 
+                span.join(' '), ' ',
+                attrStr.join(' '), ' ',
+                ' class="', classStr.join(' '), 
+                '" style="', styleStr.join(' '), 
+            '">', 
+                innerStr, 
+            '</th>'
+        );
+    }; 
+
+    /**
+     * 渲染左侧表头节点
+     *
+     * @protected
+     */
+    UI_OLAP_TABLE_CLASS.$renderRowHCell = function(html, colDefItem, wrap, x, y) {
+        var type = this.getType();
+        var classStr = [type + '-rowhcell'];
+        var styleStr = [];
+        var attrStr = [];
+        var span = [];
+        var innerStr;
+
+        wrap = objWrap(wrap);
+
+        span.push(wrap.colspan ? ' colspan="' + wrap.colspan + '" ' : '');
+        span.push(wrap.rowspan ? ' rowspan="' + wrap.rowspan + '" ' : '');
+
+        if (colDefItem.width) {
+            styleStr.push('width:' + colDefItem.width + 'px;');
+            // styleStr.push('min-width:' + colDefItem.width + 'px;');
+            // styleStr.push('max-width:' + colDefItem.width + 'px;');
+        }
+        attrStr.push('data-cell-pos="' + x + '-' + y + '"');
+        attrStr.push('data-row-h="1"'); // 左表头的标志
+        innerStr = this.$renderCellInner('ROWHCELL', null, wrap, attrStr, classStr, styleStr);
+
+        html.push(
+            '<td ', 
+                span.join(' '), ' ', 
+                attrStr.join(' '), ' ',
+                ' style="', styleStr.join(' '), 
+                '" class="', classStr.join(' '), 
+            '">',
+                innerStr, 
+            '</td>'
+        );
+    };
+
+    /**
+     * 渲染内容节点
+     * 
+     * @protected
+     */
+    UI_OLAP_TABLE_CLASS.$renderCell = function(html, colDefItem, rowDefItem, wrap, x, y) {
+        var type = this.getType();
+        var classStr = [type + '-ccell'];
+        var styleStr = [];
+        var attrStr = [];
+        var innerStr;
+
+        wrap = objWrap(wrap);
+
+        var align = colDefItem.align || this._oStyle.defaultCCellAlign;
+        if (align) {
+            classStr.push(type + '-cell-align-' + align);
+        }
+        attrStr.push('data-cell-pos="' + x + '-' + y + '"');
+        attrStr.push('data-content="1"'); // 内容节点的标志
+
+        innerStr = this.$renderCellInner(
+            'CCELL',
+            colDefItem,
+            wrap, 
+            attrStr,
+            classStr, 
+            styleStr
+        );
+
+        html.push(
+            '<td ', 
+                attrStr.join(' '), ' ',
+                ' style="', styleStr.join(' '), 
+                '" class="', classStr.join(' '), 
+            '">',
+                innerStr, 
+            '</td>'
+        );
+    };
+
+    /**
+     * 节点内部结构
+     *
+     * @private
+     * @param {string} cellType 为'ROWHCELL', 'HCELL', 'CCELL'
+     * @param {Object=} defItem 列定义
+     * @param {Object} wrap 节点数据
+     * @param {Array} attrStr 父节点属性集合
+     * @param {Array} classStr 父节点css class集合
+     * @param {Array} styleStr 父节点css style集合
+     * @return {string} 节点内部html
+     */
+    UI_OLAP_TABLE_CLASS.$renderCellInner = function(
+        cellType, defItem, wrap, attrStr, classStr, styleStr
+    ) {
+        var indentStyle = '';
+        var clz = '';
+        var type = this.getType();
+        var value = getWrapValue.call(this, cellType, wrap, defItem && defItem.format);
+        var prompt = value.prompt;
+        value = value.value;
+
+        if (prompt) {
+            attrStr.push('title="' + prompt + '"');
+        }
+
+        if (wrap.indent) {
+            // margin-left会用来判断indent的点击事件，所以结构不能变
+            attrStr.push('data-indent="' + wrap.indent + '"');
+            indentStyle = 'margin-left:' + TREE_INDENT * wrap.indent + 'px;';
+        }
+
+        if (wrap.drillByLink) {
+            attrStr.push('data-cell-link="true"');
+            value = '<a href="#" class="' + type + '-cell-link" data-cell-link-drill-a="1">' + value + '</a>';
+        } 
+        else if (defItem && defItem.linkBridge) {
+            attrStr.push('data-cell-link="true"');
+            value = '<a href="#" class="' + type + '-cell-link" data-cell-link-bridge-a="1">' + value + '</a>';
+        }
+
+        // 条件格式
+        var condFmt = getCondFmt(wrap.style, type);
+        if (condFmt) {
+            value = (
+                    condFmt.left.css.length > 0 || condFmt.left.style.length > 0
+                        ? '<span class="' + condFmt.left.css.join(' ') 
+                            + '" style="' + condFmt.left.style.join(' ') + '">' + '</span>'
+                        : ''
+                )
+                + (
+                    condFmt.text.css.length > 0 || condFmt.text.style.length > 0
+                        ? '<span class="' + condFmt.text.css.join(' ')
+                            + '" style="' + condFmt.text.style.join(' ') + '">' + value + '</span>'
+                        : value
+                )
+                + (
+                    condFmt.right.css.length > 0 || condFmt.right.style.length > 0
+                        ? '<span class="' + condFmt.right.css.join(' ') 
+                            + '" style="' + condFmt.right.style.join(' ') + '">' + '</span>'
+                        : ''
+                );
+
+            if (condFmt.outer.css.length > 0 || condFmt.outer.style.length > 0) {
+                classStr.push.apply(classStr, condFmt.outer.css);
+                styleStr.push.apply(styleStr, condFmt.outer.style);
+            }
+        }
+
+        if (wrap.expand != null) {
+            attrStr.push(
+                'data-e-c="' + (!wrap.expand ? 'expanded' : 'collapsed') + '"'
+            );
+            clz = type + '-e-c-icon ' + type
+                + (!wrap.expand ? '-expanded-icon ' : '-collapsed-icon ');
+            value = [
+                '<div style="' + indentStyle + ' text-align:left;" class="'
+                    + type + '-tree-item">',
+                    '<div class="' + clz + '"></div>',
+                    value,
+                '</div>',
+            ].join('');
+        }
+        else if (indentStyle) {
+            value = '<div style="' + indentStyle 
+                + 'text-align:left;">' + value + '</div>';
+        }
+
+        return value;
+    };
+
+    /**
+     * table生产完毕以后执行，触发sizechange事件
+     *
+     */
+    UI_OLAP_TABLE_CLASS.$ready = function() {
+        triggerEvent(this, 'sizechange');
+    };
+
+    /**
+     * 浏览器resize时调整横滚的位置
+     *
+     * @override
+     */
+    UI_OLAP_TABLE_CLASS.$resize = function() {
+        var me = this;
+        UI_LOCKED_TABLE_CLASS.$resize.call(this);
+        if (!this._bResizeTimeout) {
+            this._bResizeTimeout = true;
+            setTimeout(
+                function() {
+                    me._bResizeTimeout = false;
+                    triggerEvent(me, 'sizechange');
+                    me.$pagescroll();
+                },
+                100
+            );
+        }
+    };
+
+    /**
+     * 绑定cell link
+     *
+     * @private
+     */
+    UI_OLAP_TABLE_CLASS.$bindCellLink = function() {
+        var me = this;
+        var tds = this.getOuter().getElementsByTagName('td');
+        for (
+            var i = 0, tdEl, aEls, aEl, o, j; 
+            tdEl = tds[i]; 
+            i ++
+        ) {
+            if (tdEl.getAttribute('data-cell-link')) {
+                aEls = tdEl.getElementsByTagName('a');
+
+                o = getCellPosition(tdEl);
+                for (j = 0; aEl = aEls[j]; j ++) {
+                    if (aEl.getAttribute('data-cell-link-drill-a')) {
+                        aEl.onclick = (function(wrap) {
+                            return function() {
+                                !me._bDisabled 
+                                    && triggerEvent(
+                                        me, 
+                                        'celllinkdrill', 
+                                        null, 
+                                        [wrap]
+                                    );
+                                return false;
+                            }
+                        })(this._aRowHeadFields[o.y][o.x]);
+                    }
+                    else if (aEl.getAttribute('data-cell-link-bridge-a')) {
+                        aEl.onclick = (function(colDefItem, rowDefItem) {
+                            return function() {
+                                !me._bDisabled 
+                                    && triggerEvent(
+                                        me, 
+                                        'celllinkbridge', 
+                                        null, 
+                                        [colDefItem, rowDefItem]
+                                    );
+                                return false;
+                            }
+                        })(
+                            this._aColDefine[this._nLeftLock + o.x], 
+                            this._aRowDefine[o.y]
+                        );
+                    }
+                }
+            }
+        }
+    };
+
+    /**
+     * 点击某个cell的api
+     *
+     * @public
+     * @param {number} rowIndex 内容行序号，从0开始
+     * @param {number} colIndex 内容列序号，从0开始
+     */    
+    // UI_OLAP_TABLE_CLASS.clickContentCell = function(rowIndex, colIndex) {
+    //     var cell = this.getContentCell(rowIndex, colIndex);
+    //     cell && cell.$handleCellClick();
+    // };
+
+    /**
+     * 获取内容区单元格控件。
+     *
+     * @public
+     * @param {number} rowIndex 内容行序号，从0开始
+     * @param {number} colIndex 内容列序号，从0开始
+     * @return {ecui.ui.Table.Cell} 单元格控件
+     */
+    UI_OLAP_TABLE_CLASS.getContentCell = function(rowIndex, colIndex) {
+        rowIndex = this._aRows[rowIndex];
+        return rowIndex && rowIndex.getCell(
+            (this._nLeftLock || 0) + colIndex
+        ) || null;
+    };
+
+    /**
+     * 得到当前状态数据
+     *
+     * @public
+     * @return {Object} 当前状态数据
+     */
+    UI_OLAP_TABLE_CLASS.getValue = function() {
+        var rowChecked = [];
+        var rows = this._aRows || [];
+        for (var i = 0, row; i < rows.length; i ++) {
+            if ((row = rows[i]) && row._bRowChecked) {
+                rowChecked.push({ value: this._aRowDefine[i], index: i });
+            }
+        }
+        return {
+            rowChecked: rowChecked,
+            rowDefine: (this._aRowDefine || []).slice(),
+            colDefine: (this._aColDefine || []).slice()
+            // 其他的value，后续随功能添加
+        }
+    };
+
+    /**
+     * 得到内容区域的row控件
+     *
+     * @protected
+     */
+    UI_OLAP_TABLE_CLASS.$getContentRow = function(rowIndex) {
+        // LockedTable失去了对内容row的引用，所以用这种不太好看的方法找到
+        var row;
+        var cell;
+        return (row = this._aRows[rowIndex])
+            && (cell = row.getCell(this._nLeftLock || 0))
+            && cell.getParent()
+            || null;
+    };
+
+    /**
+     * 设置内容行选中
+     *
+     * @private
+     */
+    UI_OLAP_TABLE_CLASS.$initRowChecked = function() {
+        var rowCheck = this._oRowCheck;
+        for (
+            var i = 0, rowCtrl; 
+            i < (rowCheck.rowChecked || []).length; 
+            i ++
+        ) {
+            // LockedTable失去了对内容row的引用，所以用这种不太好看的方法找到
+            if (rowCtrl = this.$getContentRow(rowCheck.rowChecked[i])) {
+                this.$setRowChecked(rowCtrl, true);
+            }
+        }
+    };
+
+    /**
+     * 设置内容行选中
+     *
+     * @private
+     */
+    UI_OLAP_TABLE_CLASS.$setRowChecked = function(rowCtrl, checked) {
+        var type = this.getType();
+        var rowCheck = this._oRowCheck;
+
+        var rowCheckMode = this._oRowCheck.rowCheckMode;
+        // 多选
+        if (rowCheckMode == 'CHECK') {
+            if (checked
+                && !rowCtrl._bRowChecked
+                && rowCheck.rowCheckCount < rowCheck.rowCheckMax
+            ) {
+                rowCtrl._bRowChecked = true;
+                addClass(rowCtrl.getMain(), type + '-row-checked');
+                rowCheck.rowCheckCount ++;
+                return true;
+            }
+
+            if (!checked 
+                && rowCtrl._bRowChecked
+                && rowCheck.rowCheckCount > rowCheck.rowCheckMin
+            ) {
+                rowCtrl._bRowChecked = false;
+                removeClass(rowCtrl.getMain(), type + '-row-checked');
+                rowCheck.rowCheckCount --;
+                return true;
+            }
+        }
+        // 单选
+        else if (rowCheckMode == 'SELECT') {
+            var rows = this._aRows || [];
+            for (var i = 0, row, cell; i < rows.length; i ++) {
+                if ((row = rows[i]) && row._bRowChecked) {
+                    row._bRowChecked = false;
+                    removeClass(row.getMain(), type + '-row-selected');
+                }
+            }
+            rowCtrl._bRowChecked = true;
+            addClass(rowCtrl.getMain(), type + '-row-selected');
+            rowCheck.rowCheckCount = 1;
+        }
+
+        return false;
+    };
+
+    /**
+     * 内容行是否选中
+     *
+     * @private
+     */
+    UI_OLAP_TABLE_CLASS.$isRowChecked = function(rowCtrl) {
+        return !!rowCtrl._bRowChecked;
+    };
+
+    /**
+     * 让表格的横滚始终悬浮在页面视窗低端
+     * 
+     * @param {ecui.ui.CustomTable} con
+     */
+    function setFloatHScroll(con) {
+        var el;
+
+        el = con._eBrowser ? con._eBrowser : con._uHScrollbar.getOuter();
+        el.style.top = MIN(
+            getView().bottom - getPosition(con.getOuter()).top 
+                - el.offsetHeight,
+            con.getHeight() - el.offsetHeight
+        ) + 'px';
+
+        setStyle(el, 'zIndex', 1);
+    }
+
+    /**
+     * 得到格式化的值
+     *
+     * @private
+     * @param {string} cellType 为'ROWHCELL', 'HCELL', 'CCELL'
+     * @param {Object} wrap 数据元素
+     * @param {Object=} format 格式
+     * @return {Object} value和prompt
+     */
+    function getWrapValue(cellType, wrap, format) {
+        var value = wrap.str
+            // 以str优先，如果没有则取v字段
+            ? wrap.str
+            : String(
+                wrap.v == null 
+                    ? ' - '
+                    : format
+                        ? formatNumber(wrap.v, format, void 0, void 0, true)
+                        : wrap.v
+            );
+        var prompt;
+        var cut = this._oCut[cellType];
+        if (cut) {
+            prompt = value;
+            value = sliceByte(value, cut, 'gbk');
+            if (value.length < prompt.length) {
+                value += '...';
+            }
+            else {
+                prompt = null;
+            }
+        }
+        return { 
+            value: encodeHTML(value), 
+            prompt: prompt && encodeHTML(prompt) 
+        };
+    }
+
+    /**
+     * 如果wrap不是对象，包装成对象
+     *
+     * @private 
+     * @param {*} wrap 数据元素
+     */
+    function objWrap(wrap) {
+        if (wrap !== Object(wrap)) {
+            wrap = { v: wrap };
+        }
+        return wrap;
+    }    
+
+    /**
+     * 得到cell坐标
+     * 
+     * @protected
+     * @return {Object} 形如：{x: 4, y: 5}
+     */    
+    function getCellPosition(el) {
+        var pos = el.getAttribute('data-cell-pos');
+        if (pos) {
+            pos = pos.split('-');
+            return { x: toNumber(pos[0]), y: toNumber(pos[1]) };
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * 判断是否placeholder（空对象为placeholder）
+     */
+    function isPlaceholder(o) {
+        if (o !== Object(o)) {
+            return false;
+        }
+        for (var i in o) {
+            return false;
+        }
+        return true;
+    }
+
+    //--------------------------------------------------
+    // UI_OLAP_TABLE_HCELL 方法
+    //--------------------------------------------------
+
+    UI_TABLE_HCELL_CLASS.$click = function () {
+        var orderby;
+        var tableCtrl = this.getParent();
+
+        UI_CONTROL_CLASS.$click(this);
+
+        if (orderby = this.getOuter().getAttribute('data-orderby')) {
+            var pos = getCellPosition(this.getOuter());
+            triggerEvent(
+                tableCtrl, 
+                'sort', 
+                null, 
+                [tableCtrl._aColDefine[(tableCtrl._nLeftLock || 0) + pos.x]]
+            );
+        }
+    };
+
+    //--------------------------------------------------
+    // UI_OLAP_TABLE_CELL 方法
+    //--------------------------------------------------
+
+    /**
+     * 点击事件
+     * 
+     * @event
+     * @protected
+     */
+    UI_OLAP_TABLE_CELL_CLASS.$click = function(event) {
+        UI_OLAP_TABLE_CLASS.Cell.superClass.$click.call(this, event);
+
+        // 链接则不走handleCellClick
+        if (!event.target 
+            || !(
+                event.target.getAttribute('data-cell-link-drill-a')
+                || event.target.getAttribute('data-cell-link-bridge-a')
+            )
+        ) {
+            this.$handleCellClick();
+        }
+    };
+
+    /**
+     * 处理cell点击事件
+     * 
+     * @protected
+     */    
+    UI_OLAP_TABLE_CELL_CLASS.$handleCellClick = function() {
+        var el = this.getOuter();
+        var tableCtrl = this.getParent().getParent();
+        var ec;
+
+        // 左表头节点
+        if (el.getAttribute('data-row-h') && (ec = el.getAttribute('data-e-c'))) {
+            if (getMouseX(this) <= 
+                    toNumber(getStyle(el.firstChild, 'marginLeft')) 
+                    + toNumber(getStyle(el.firstChild, 'paddingLeft'))
+            ) {
+                var pos;
+                var cellWrap;
+                var rowWrap;
+                if (pos = getCellPosition(this.getOuter())) {
+                    cellWrap = tableCtrl._aRowHeadFields[pos.y][pos.x];
+                    rowWrap = tableCtrl._aRowDefine[pos.y];
+                }
+                triggerEvent(
+                    tableCtrl,
+                    (ec == 'expanded' ? 'collapse' : 'expand'), 
+                    null,
+                    [cellWrap, rowWrap]
+                );
+            }
+        }
+
+        // 如果是内容节点
+        if (el.getAttribute('data-content')) {
+            var rowDefItem;
+            if (pos = getCellPosition(this.getOuter())) {
+                rowDefItem = tableCtrl._aRowDefine[pos.y];
+            }
+            // 暂全部为line选中
+            triggerEvent(tableCtrl, 'rowclick', null, [rowDefItem]);
+
+            var rowCtrl = this.getParent();
+
+            var rowCheckMode = tableCtrl._oRowCheck.rowCheckMode;
+            if (rowCheckMode) {
+                var rowChecked = tableCtrl.$isRowChecked(rowCtrl);
+                var eventName;
+
+                if (rowCheckMode == 'SELECT') {
+                    tableCtrl.$setRowChecked(rowCtrl, true);
+                    eventName = 'rowselect';
+                }
+                else if (rowCheckMode == 'CHECK') {
+                    if (rowChecked && tableCtrl.$setRowChecked(rowCtrl, false)) {
+                        eventName = 'rowuncheck';
+                    }
+                    else if (!rowChecked && tableCtrl.$setRowChecked(rowCtrl, true)) {
+                        eventName = 'rowcheck';
+                    }
+                }
+
+                var callback = function (checked) {
+                    tableCtrl.$setRowChecked(rowCtrl, checked);
+                }
+
+                eventName && triggerEvent(
+                    tableCtrl,
+                    eventName,
+                    null,
+                    [rowDefItem, callback]
+                );
+            }
+        }
+    };
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  }) ();
 /*
 Item/Items - 定义选项操作相关的基本操作。
@@ -23786,6 +25078,7 @@ Item/Items - 定义选项操作相关的基本操作。
 
         undefined,
 
+<<<<<<< HEAD
         indexOf = array.indexOf,
         remove = array.remove,
         children = dom.children,
@@ -23794,7 +25087,115 @@ Item/Items - 定义选项操作相关的基本操作。
         trim = string.trim,
         blank = util.blank,
         callSuper = util.callSuper,
+=======
+/**
+ * di.shared.adapter.EcuiSelectVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    IstCalendar的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
 
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    var DICT = di.config.Dict;
+    var isArray = xutil.lang.isArray;
+
+    /**
+     * ecui Select的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().EcuiSelectVUIAdapter = function (def, options) {
+        return {
+            setData: setData,
+            getValue: getValue
+        };
+    };
+
+    /**
+     * 设置初始化数据
+     * 
+     * @public
+     * @param {Object} data 数据
+     * @param {Array.<Object>} data.datasource 数据集
+     *      每个节点：
+     *          {string} text
+     *          {string} value
+     * @param {Array.<string>} data.value 初始选中
+     */
+    function setData (data) {
+        data = data || {};
+        var datasource = data.datasource || [];
+            
+        // 清除
+        this.setValue(
+            getType.call(this) == 'ui-multi-select' ? [] : null
+        );
+        while(this.remove(0)) {}
+
+        // 添加
+        for (var i = 0, o; o = datasource[i]; i++) {
+            var txt = String(o.text != null ? o.text : '');
+            this.add(
+                txt, 
+                null,
+                { value: o.value, prompt: txt }
+            );
+        }
+
+        // 设置默认选中
+        var value = data.value;
+        value = (
+                getType.call(this) == 'ui-multi-select'
+                    ? value
+                    : (value && value[0])
+            )
+            || (datasource[0] && datasource[0].value);
+        value != null && this.setValue(value);
+    }
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    function getValue() {
+        var v;
+        var type = getType.call(this);
+        if (type == 'ui-select') {
+            var sel = this.getSelected();
+            v = sel ? sel.getValue() : null;
+        }
+        else {
+            v = this.getValue();
+        }
+        return v == null 
+            ? [] 
+            : isArray(v) 
+                ? v
+                : [v];
+    }
+
+    function getType() {
+        return this.getTypes().join(' ').indexOf('ui-multi-select') >= 0
+            ? 'ui-multi-select'
+            : 'ui-select';
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
         $fastCreate = core.$fastCreate,
         getOptions = core.getOptions,
         inheritsControl = core.inherits,
@@ -25294,6 +26695,174 @@ $namespace('di.shared.model');
 
 })();
 
+=======
+/**
+ * di.shared.model.DIFormModel
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 表单模型组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var wrapArrayParam = xutil.url.wrapArrayParam;
+    var extend = xutil.object.extend;
+    var logError = UTIL.logError;
+    var getUID = xutil.uid.getUID;
+    var XDATASOURCE = xui.XDatasource;
+
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    /**
+     * DI 表单模型组件
+     *
+     * @class
+     * @extends xui.XDatasource
+     * @param {Function=} options.commonParamGetter      
+     */
+    var DI_FORM_MODEL = 
+            $namespace().DIFormModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var DI_FORM_MODEL_CLASS = 
+            DI_FORM_MODEL.prototype;
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        /**
+         * 得到公用的请求参数
+         *
+         * @type {Function}
+         * @private
+         */
+        this._fCommonParamGetter = options.commonParamGetter
+    }
+
+    /**
+     * @override
+     */
+    DI_FORM_MODEL_CLASS.init = function () {};
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_FORM_MODEL_CLASS.url = new XDATASOURCE.Set(
+        {
+            DATA: URL.fn('FORM_DATA'),
+            ASYNC_DATA: URL.fn('FORM_ASYNC_DATA')
+        }
+    );    
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_FORM_MODEL_CLASS.businessKey = new XDATASOURCE.Set(
+        {
+            DATA: 'DI_FORM_MODEL_DATA_' + getUID(),
+            ASYNC_DATA: 'DI_FORM_MODEL_ASYNC_DATA_' + getUID()
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_FORM_MODEL_CLASS.complete = new XDATASOURCE.Set(
+        {
+            DATA: doComplete,
+            ASYNC_DATA: doComplete
+        }
+    );
+
+    function doComplete(ejsonObj) {
+        // 换reportTemplateId（后台生成了副本，所以约定更换为副本的id）
+        // FIXME 
+        // 换成非嵌入的实现方式
+        this._fCommonParamGetter.update(ejsonObj.data);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_FORM_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            DATA: function (options) {
+                return this._fCommonParamGetter(options.args.param); 
+            },
+            ASYNC_DATA: function (options) {
+                return this._fCommonParamGetter(options.args.param);
+            }
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_FORM_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            DATA: function (data, ejsonObj, options) {
+                this._oInitData = (data || {}).params || {};
+                return data;
+            },
+            ASYNC_DATA: function (data, ejsonObj, options) {
+                return (data || {}).params || {};
+            }
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_FORM_MODEL_CLASS.error = new XDATASOURCE.Set(
+        {
+            DATA: function (status, ejsonObj, options) {
+                // TODO
+            },
+            ASYNC_DATA: function (status, ejsonObj, options) {
+                // TODO
+            }
+        }
+    );
+
+    /** 
+     * 得到初始化数据
+     *
+     * @public
+     * @return {Object} 初始化数据
+     */
+    DI_FORM_MODEL_CLASS.getInitData = function () {
+        return this._oInitData;
+    };    
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.DIForm
@@ -26523,7 +28092,11 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  *
  * @file:    IST风格的日历
  *          （支持单日历时间段选择，周月季选择）
+<<<<<<< HEAD
  * @author:  sushuang(sushuang)
+=======
+ * @author:  sushuang(sushuang) 
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  *          (
  *              从Pulse版本的ecui中拷贝而来
  *              (pl-calendar.js by cxl(chenxinle))，
@@ -27442,6 +29015,16 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
 })();
 
 
+<<<<<<< HEAD
+/**
+ * di.shared.adapter.IstCalendarVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    IstCalendar的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+=======
 /**
  * di.shared.adapter.IstCalendarVUIAdapter
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -27481,6 +29064,962 @@ $namespace('di.shared.adapter');
         };
     };
 
+    /**
+     * 创建
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @param {string} options.start 开始时间，
+     *                      绝对值（如2012-12-12）
+     *                      或相对于系统时间的偏移（如-5d）
+     * @param {string} options.end 结束时间，格式同上。如果和range同时存在，则end优先
+     * @param {string} options.range 区间，相对于start的偏移（如-4d）
+     * @param {string} options.defaultTime 默认时间
+     * @return {Object} 创建的实例
+     */
+    function create(def, options) {
+        var now = GLOBAL_MODEL().getDateModel().now();
+
+        var opt = {};
+
+        opt.now = now.getTime();
+
+        var defTime = parseTimeUnitDef(options.defaultTime, [now, now]) || {};
+        opt.date = defTime.start || new Date();
+        opt.dateEnd = defTime.end;
+
+        var range = parseTimeUnitDef(options.range, [now, now]);
+        if (range) {
+            opt.start = range.start;
+            opt.end = range.end;
+        }
+
+        // 其他选项
+        assign(opt, options, ['mode', 'viewMode', 'shiftBtnDisabled']);
+
+        return ecuiCreate(def.clz, def.el, null, opt);
+    }
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    function getValue() {
+        var start = dateToString(this.getDate());
+
+        if (this.getMode() == 'RANGE') {
+            return {
+                start: start,
+                end: dateToString(this.getDateEnd())
+            };
+        }
+        else {
+            return {
+                start: start,
+                end: start
+            }
+        }
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+$namespace('di.shared.adapter');
+
+<<<<<<< HEAD
+(function() {
+    
+    var UTIL = di.helper.Util;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var dateToString = xutil.date.dateToString;
+    var parseTimeUnitDef = UTIL.parseTimeUnitDef;
+    var assign = xutil.object.assign;
+    var GLOBAL_MODEL;
+=======
+/**
+ * data tree
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * path:    data-tree.js
+ * desc:    数据树
+ *          在普通树控件的基础上进行扩展
+ * author:  cxl(chenxinle)
+ * date:    2012/03/12
+ */
+(function () {
+    var core = ecui,
+        array = core.array,
+        ui = core.ui,
+        array = core.array,
+        dom = core.dom,
+        string = core.string,
+        util = core.util,
+
+        $fastCreate = core.$fastCreate,
+        getMouseX = core.getMouseX,
+        inheritsControl = core.inherits,
+        getOptions = core.getOptions,
+        disposeControl = core.dispose,
+        triggerEvent = core.triggerEvent,
+        extend = util.extend,
+        indexOf = array.indexOf,
+        extend = util.extend,
+        toNumber = util.toNumber,
+        getStyle = dom.getStyle,
+        first = dom.first,
+        insertAfter = dom.insertAfter,
+        trim = string.trim,
+        blank = util.blank,
+
+        UI_CONTROL = ui.Control,
+        UI_CONTROL_CLASS = UI_CONTROL.prototype,
+        UI_TREE_VIEW = ui.TreeView,
+        UI_TREE_VIEW_CLASS = UI_TREE_VIEW.prototype,
+
+        UI_DATA_TREE = ui.DataTree = 
+        inheritsControl(
+            UI_TREE_VIEW,
+            'ui-data-tree',
+            function (el, options) {
+                options.expandSelected = options.expandSelected === true;
+
+                if (first(el) && 'divlabel'.indexOf(first(el).tagName.toLowerCase()) >= 0) {
+                    extend(options, getOptions(first(el)));
+                }
+
+                if (options.value) {
+                    options.value += '';
+                }
+
+                options.resizable = false;
+            },
+            function (el, options) {
+                this._aSelected = [];
+                this._sValue = options.value;
+                this._bHideRoot = options.hideRoot === true; //是否隐藏根节点
+                this._bSelectAble = options.selectable !== false;
+                this._bMultiSelect = options.multi === true;
+                this._bAsyn = options.asyn;
+                this._bIsLeaf = options.isLeaf;
+                if (options.asyn && !options.isLeaf && this._aChildren.length <= 0) {
+                    this.add('Loadding', null);
+                    this.collapse();
+                    this._bNeedAsyn = true;                        
+                }
+            }
+        ),
+        
+        UI_DATA_TREE_CLASS = UI_DATA_TREE.prototype;
+
+    function UI_DATA_TREE_VIEW_FLUSH(control) {
+        control.setClass(
+            control.getPrimary() + (control._aChildren.length ? control._bCollapsed ? '-collapsed' : '-expanded' : '')
+        );
+    }
+
+    UI_DATA_TREE_CLASS.init = function () {
+        UI_TREE_VIEW_CLASS.init.call(this);
+
+        if (this._bHideRoot && this == this.getRoot()) {
+            this.hide();
+            this.expand();
+        }
+    }
+
+    UI_DATA_TREE_CLASS.$setParent = function (parent) {
+        var root = this.getRoot(),
+            selected = root._aSelected,
+            o = this.getParent(), i;
+
+        // 如果当前节点被选中，需要先释放选中
+        if ((i = indexOf(selected, this)) >= 0) {
+            root.$setSelected(this, false);
+        }
+
+        if (this !== root) {
+            remove(o._aChildren, this);
+            UI_DATA_TREE_VIEW_FLUSH(o);
+        }
+
+        UI_CONTROL_CLASS.$setParent.call(this, parent);
+
+        // 将子树区域显示在主元素之后
+        if (this._eChildren) {
+            insertAfter(this._eChildren, this.getOuter());
+        }
+    }
+
+    UI_DATA_TREE_CLASS.getValue = function () {
+        return this._sValue;
+    }
+
+    UI_DATA_TREE_CLASS.getText = function () {
+        return trim(this.getContent().replace(/<[^>]+>/g, ''));
+    }
+
+    UI_DATA_TREE_CLASS.getSelected = function () {
+        if (this == this.getRoot()) {
+            return this._aSelected.slice();
+        }
+    }
+
+    UI_DATA_TREE_CLASS.getSelectedValues = function () {
+        var res = [], i, item;
+        if (this == this.getRoot()) {
+            for (i = 0; item = this._aSelected[i]; i++) {
+                res.push(item.getValue());
+            }
+            return this._bMultiSelect ? res : res[0];
+        }
+    }
+
+    UI_DATA_TREE_CLASS.setValues = function (values) {
+        var item;
+        if (indexOf(values, this._sValue) >= 0) {
+            this.getRoot().$setSelected(this, true);
+            item = this;
+            while((item = item.getParent()) && item instanceof UI_TREE_VIEW) {
+                if (item.isCollapsed()) {
+                    item.expand()
+                }
+            }
+        }
+        for (var i = 0, item; item = this._aChildren[i]; i++) {
+            item.setValues(values);
+        }
+    }
+
+    UI_DATA_TREE_CLASS.getItemByValue = function (value) {
+        var res = null;
+
+        if (this._sValue == value) {
+            res = this;
+        }
+        for (var i = 0, item; (item = this._aChildren[i]) && res == null; i++) {
+            res = item.getItemByValue(value);
+        }
+        return res;
+    }
+
+    UI_DATA_TREE_CLASS.load = function (datasource) {
+        var i, item, text;
+
+        for (i = 0; item = this._aChildren[i]; i++) {
+            disposeControl(item);
+        }
+        this._aChildren = [];
+        this._eChildren.innerHTML = '';
+
+        for (i = 0; item = datasource[i]; i++) {
+            text = item.text;
+            item = extend({asyn: this._bAsyn}, item);
+            delete item.text;
+            this.add(text, null, item).init();
+        }
+    }
+
+    UI_DATA_TREE_CLASS.$expand = function (item) {
+        var superObj = item.getRoot();
+        if (item._bNeedAsyn) {
+            triggerEvent(superObj, 'load', null, [item.getValue(), function (data) {item.load(data)}]);
+            item._bNeedAsyn = false;
+        }
+    }
+
+    UI_DATA_TREE_CLASS.$click = function (event) {
+        if (event.getControl() == this) {
+            UI_CONTROL_CLASS.$click.call(this, event);
+
+            if (getMouseX(this) <= toNumber(getStyle(this.getBody(), 'paddingLeft'))) {
+                this.clickEC();
+            }
+            else {
+                this.clickItem();
+            }
+        }
+    }
+
+    // 为QA自动化测试而暴露的api
+    UI_DATA_TREE_CLASS.clickEC = function () {
+        var e;
+        this[e = this.isCollapsed() ? 'expand' : 'collapse']();
+        triggerEvent(this.getRoot(), e, null, [this]);
+    }
+
+    // 为QA自动化测试而暴露的api
+    UI_DATA_TREE_CLASS.clickItem = function () {
+        var added = null;
+        if (indexOf(this.getRoot()._aSelected, this) >= 0) {
+            if (this._bMultiSelect) {
+                added = false;    
+            }
+        }
+        else {
+            added = true;
+        }
+        this.getRoot().setSelected(this);
+        triggerEvent(this.getRoot(), 'select', null, [this, added == true])
+        if (added !== null) {
+            triggerEvent(this.getRoot(), 'change', null, [this.getValue(), added]);
+        }
+    }
+
+    UI_DATA_TREE_CLASS.getSelectedText = function () {
+        var res = [], i, item;
+        if (this == this.getRoot()) {
+            for (i = 0; item = this._aSelected[i]; i++) {
+                res.push(item.getText());
+            }
+            return res.join(',');
+        }
+    }
+
+    UI_DATA_TREE_CLASS.setSelectAble = function (enable) {
+        var root = this.getRoot(), i;
+
+        if (!this.enable && (i = indexOf(root._aSelected, this)) >= 0) {
+            root.$setSelected(this, false);
+        }
+        this._bSelectAble = enable;
+    }
+
+    UI_DATA_TREE_CLASS.$setSelected = function (node, flag) {
+        var selected, i;
+        if (this == this.getRoot()) {
+            selected = this._aSelected;
+            i = indexOf(selected, node);
+            if (flag === true) {
+                if (i < 0) {
+                    selected.push(node);
+                    node.alterClass('+selected');
+                }
+            }
+            else if (flag === false) {
+                if (i >= 0) {
+                    selected.splice(i, 1);
+                    node.alterClass('-selected');
+                }
+            }
+        }
+    }
+
+    UI_DATA_TREE_CLASS.clearSelected = function () {
+        var selected, i, item;
+        
+        if (this == this.getRoot()) {
+            selected = this._aSelected;
+            while(item = selected[0]) {
+                this.$setSelected(item, false);
+            }
+        }
+    }
+
+    UI_DATA_TREE_CLASS.setSelected = function (node, force) {
+        var selected, i;
+
+        if (this == this.getRoot() && node._bSelectAble) {
+            selected = this._aSelected;                    
+            i = indexOf(selected, this);
+            if ((i = indexOf(selected, node)) >= 0) {
+                if (!force && this._bMultiSelect) {
+                    this.$setSelected(node, false);
+                }
+            }
+            else {
+                if (!this._bMultiSelect && selected.length >= 1) {
+                    this.$setSelected(selected[0], false);
+                }
+                this.$setSelected(node, true);
+            }
+
+            if (node && this._bExpandSelected) {
+                node.expand();
+            }
+        }
+    };
+
+    UI_DATA_TREE_CLASS.$setSize = blank;
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    $link(function() {
+        GLOBAL_MODEL = di.shared.model.GlobalModel;
+    });
+=======
+/**
+ * input tree
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * path:    input-tree.js
+ * desc:    树层级输入框
+ * author:  cxl(chenxinle)
+ * date:    2012/03/12
+ */
+(function () {
+    var core = ecui,
+        array = core.array,
+        dom = core.dom,
+        ui = core.ui,
+        util = core.util,
+        string = core.string,
+
+        $fastCreate = core.$fastCreate,
+        setFocused = core.setFocused,
+        disposeControl = core.dispose,
+        createDom = dom.create,
+        addClass = dom.addClass,
+        children = dom.children,
+        encodeHTML = string.encodeHTML,
+        moveElements = dom.moveElements,
+        getPosition  = dom.getPosition,
+        inheritsControl = core.inherits,
+        getView = util.getView,
+        extend = util.extend,
+        blank = util.blank,
+        triggerEvent = core.triggerEvent,
+
+        UI_CONTROL = ui.Control,
+        UI_CONTROL_CLASS = UI_CONTROL.prototype,
+        UI_BUTTON = ui.Button,
+        UI_BUTTON_CLASS = UI_BUTTON.prototype,
+        UI_INPUT_CONTROL = ui.InputControl,
+        UI_INPUT_CONTROL_CLASS = UI_INPUT_CONTROL.prototype;
+
+        var UI_INPUT_TREE = ui.InputTree = 
+        inheritsControl(
+            UI_INPUT_CONTROL,
+            'ui-input-tree',
+            function (el, options) {
+                var type = this.getTypes()[0],
+                    o = createDom();
+                
+                o.innerHTML = '<div class="'+ type +'-layer" ' 
+                    + ' style="position:absolute;display:none; z-index:65535; height:230px; width:250px">'
+                    + '<div class="'
+                    + UI_DATA_TREE.types[0] +'"></div></div>';
+
+                o = o.firstChild;
+
+                moveElements(el, o.lastChild, true);
+                options._eLayer = document.body.appendChild(o);
+                
+                el.innerHTML = ''
+                    + '<span class="'+ type +'-text"></span>'
+                    + '<span class="'+ type +'-cancel"></span>' 
+                    + '<span class="'+ type +'-button"></span>'
+                    + '<input type="hidden name="'+ (options.name || '') +'" />';
+
+                options.hidden = true;
+                if (options.value) {
+                    options.value += '';
+                }
+            },
+            function (el, options) {
+                var childs;
+                
+                if (options.value) {
+                    UI_INPUT_CONTROL_CLASS.setValue.call(this, options.value);
+                }
+
+                childs = children(el);
+
+                this._eText = childs[0];
+                this._uCancel = $fastCreate(this.Cancel, childs[1], this);
+                this._uLayer = $fastCreate(this.Layer, options._eLayer, this, {asyn : options.asyn});
+                options._eLayer = null;
+                delete options._eLayer;
+
+                if (options.hideCancel === true) {
+                    this._bHideCancel = true;
+                    this._uCancel.$hide();
+                }
+            }
+        ),
+
+        UI_INPUT_TREE_CLASS = UI_INPUT_TREE.prototype,
+
+        UI_INPUT_TREE_LAYER = UI_INPUT_TREE_CLASS.Layer = 
+        inheritsControl(
+            UI_CONTROL,
+            'ui-input-tree-layer',
+            null,
+            function (el, options) {
+                el.style.position = 'absolute';
+                // 改为在setData中创建
+                // this._uTree = $fastCreate(this.Tree, el.firstChild, this, {collapsed:true, asyn: options.asyn});
+            }
+        ),
+        UI_INPUT_TREE_LAYER_CLASS = UI_INPUT_TREE_LAYER.prototype,
+        
+        UI_DATA_TREE = ui.DataTree,
+        
+        UI_INPUT_TREE_CANCEL_CLASS = (UI_INPUT_TREE_CLASS.Cancel = inheritsControl(UI_CONTROL)).prototype,
+        UI_INPUT_TREE_LAYER_TREE_CLASS = (UI_INPUT_TREE_LAYER_CLASS.Tree = inheritsControl(UI_DATA_TREE)).prototype;
+
+    function UI_INPUT_TREE_FLUSH(con) {
+        if (con.getValue() == '') {
+            con._uCancel.hide();
+        }
+        else if (!con._bHideCancel) {
+            con._uCancel.show();
+        }
+    }
+
+    //////////////////////////
+    /**
+     * 设置初始值
+     *
+     * @public
+     * @param {Object} data 数据
+     * @param {Object} data.root 初始树根
+     *      每个节点内容为：
+     *          {string} text
+     *          {string} value
+     *          {boolean} isLeaf
+     * @param {string} data.selected 初始选中
+     */
+    UI_INPUT_TREE_CLASS.setData = function (data, options) {
+        options = options || {};
+
+        if (!data || !data.root) {
+            return;
+        }
+
+        var html = [];
+
+        function travelTree(node, isRoot) {
+            var children = node.children || [];
+
+            if (children.length == 0) {
+                html.push(
+                    '<div ecui="value:', encodeHTML(String(node.value)), ';isLeaf:', !!node.isLeaf, '">',
+                         encodeHTML(node.text),
+                    '</div>'
+                );
+            }
+            else {
+                html.push(
+                    '<div>',
+                        '<label ecui="value:', encodeHTML(String(node.value)), ';isLeaf:', !!node.isLeaf, '">',
+                             encodeHTML(node.text),
+                        '</label>'
+                );
+                for (var i = 0, child; child = children[i]; i ++) {
+                    travelTree(child);
+                }
+                html.push('</div>');
+            }
+        }
+
+        travelTree(data.root);
+
+        var layer = this._uLayer;
+        var o = layer.getBody();
+        o.innerHTML = html.join('');
+        addClass(o.firstChild, UI_DATA_TREE.types[0]);
+        
+        layer._uTree = $fastCreate(
+            layer.Tree, 
+            o.firstChild,
+            layer, 
+            extend(
+                { 
+                    collapsed: true, 
+                    value: String(data.root.value),
+                    isLeaf: data.root.isLeaf
+                }, 
+                options
+            )
+        );
+
+        layer._uTree.init();
+        
+        if (data.selected != null ) {
+            this.setValue(String(data.selected));
+        }
+    }
+
+    UI_INPUT_TREE_CLASS.$activate = function () {
+        this._uLayer.show();
+    }
+    UI_INPUT_TREE_CLASS.getValue = function () {
+    
+        var text = this._eText.innerHTML;
+        var value = this._eInput.value;
+        return {
+            text: text,
+            value: value
+        }
+    }
+
+    UI_INPUT_TREE_CLASS.init = function () {
+        var value = this.getValue();
+
+        this.setValue(value);
+        this._uLayer.init();
+        UI_INPUT_CONTROL_CLASS.init.call(this);
+    }
+
+    UI_INPUT_TREE_CLASS.$setText = function (value) {
+        if (value && value.length > 15) {
+            value = value.substring(0, 15) + '...';
+        }
+        this._eText.innerHTML = value;
+    }
+
+    UI_INPUT_TREE_CLASS.setValue = function (value) {
+        var tree = this._uLayer._uTree;
+        if (!tree) { return; }
+
+        if ('[object Object]' == Object.prototype.toString.call(value)) {
+            UI_INPUT_CONTROL_CLASS.setValue.call(this, value.value);
+            tree.clearSelected();
+            tree.setValues([value.value]);
+            this.$setText(tree.getSelectedText());
+            UI_INPUT_TREE_FLUSH(this);
+        }
+        else {
+            //转化为字符串
+            value = value + '';
+            UI_INPUT_CONTROL_CLASS.setValue.call(this, value);
+            tree.clearSelected();
+            tree.setValues([value]);
+            this.$setText(tree.getSelectedText());
+            UI_INPUT_TREE_FLUSH(this);
+        }
+    }
+
+    UI_INPUT_TREE_CLASS.clear = function () {
+        var tree = this._uLayer._uTree;
+
+        tree.clearSelected();
+        UI_INPUT_CONTROL_CLASS.setValue.call(this, '');
+        this.$setText('');
+        UI_INPUT_TREE_FLUSH(this);
+    }
+
+    /**
+     * 重新收起input-tree,清理用户操作痕迹
+     * @public
+     */
+    UI_INPUT_TREE_CLASS.clearState = function() {
+        var tree = this._uLayer._uTree;
+        collapseTree(tree);
+
+        function collapseTree(tree) {
+            tree.collapse();
+            var children = tree.getChildren();
+            if (children && children.length) {
+                for (var i = 0; i < children.length; i++) {
+                    collapseTree(children[i]);
+                }
+            }
+        };
+    };
+
+    /**
+     * 根据value获取树中的节点
+     * @public
+     * @param {string} value 
+     */
+    UI_INPUT_TREE_CLASS.getTreeNodeByValue = function(value) {
+        return this._uLayer.getTreeNodeByValue(value);
+    };
+
+    /**
+     * 设置输入文本框的值
+     * @public
+     * @param {string} text
+     */
+    UI_INPUT_TREE_CLASS.setText = function(text) {
+        this.$setText(text);
+    };
+
+    UI_INPUT_TREE_CLASS.expand = function (value, callback) {
+        var me = this;
+
+        this._uLayer.expand(value, function () {
+            callback.call(me);
+        });
+    }
+
+    UI_INPUT_TREE_CLASS.selectParent = function (value) {
+        var node = this._uLayer.getTreeNodeByValue(value);
+
+        if (node != node.getRoot()) {
+            node = node.getParent();
+        }
+        
+        this.setValue(node.getValue());
+    }
+
+    UI_INPUT_TREE_LAYER_CLASS.init = function () {
+        this._uTree && this._uTree.init();
+        UI_CONTROL_CLASS.init.call(this);
+    }
+
+    UI_INPUT_TREE_LAYER_CLASS.$blur = function () {
+        this.hide();
+    }
+
+    UI_INPUT_TREE_LAYER_CLASS.expand = function (value, callback) {
+        var tree = this._uTree,
+            node = tree.getItemByValue(value);
+        if (node) {
+            node.expand();
+            tree.onexpand(node, callback);
+        }
+    }
+
+    UI_INPUT_TREE_LAYER_CLASS.getTreeNodeByValue = function (value) {
+        return this._uTree.getItemByValue(value);
+    }
+
+    UI_INPUT_TREE_LAYER_CLASS.show = function () {
+        var par = this.getParent(), pos, o, view;
+
+        UI_CONTROL_CLASS.show.call(this);
+
+        if (par) {
+            pos = getPosition(par.getOuter());
+            view = getView();
+            o = pos.top;
+            /*
+            if (o + par.getHeight() + this.getHeight() > view.bottom) {
+                if (o - view.top > this.getHeight()) {
+                    pos.top = o - this.getHeight();
+                }
+            }
+            else {
+                pos.top = o + par.getHeight();
+            }
+            */
+
+            pos.top = o + par.getHeight();
+
+            o = pos.left;
+            if (o + this.getWidth() > view.right) {
+                pos.left = o + par.getWidth() - this.getWidth();
+            }
+            else {
+                pos.left = o;
+            }
+            this.setPosition(pos.left, pos.top);
+            setFocused(this);
+        }
+    }
+
+    UI_INPUT_TREE_CANCEL_CLASS.$click = function () {
+        var par = this.getParent();
+        UI_CONTROL_CLASS.$click.call(this);
+
+        par.$setText('');
+        UI_INPUT_CONTROL_CLASS.setValue.call(par, '');
+        par._uLayer._uTree.clearSelected();
+        UI_INPUT_TREE_FLUSH(par);
+    }
+
+    UI_INPUT_TREE_CANCEL_CLASS.$activate = UI_BUTTON_CLASS.$activate;
+
+    UI_INPUT_TREE_LAYER_TREE_CLASS.onselect = function (con, added) {
+        var superObj = this.getParent().getParent();
+        UI_INPUT_CONTROL_CLASS.setValue.call(superObj, con.getValue());
+        superObj.$setText(con.getText());
+        UI_INPUT_TREE_FLUSH(superObj);
+        this.getParent().hide();
+    }
+
+    UI_INPUT_TREE_LAYER_TREE_CLASS.onexpand = function (item, callback) {
+        var superObj = this.getParent().getParent(),
+            callback = callback || blank;
+        
+        var layer =  superObj._uLayer.getOuter(),
+            scrollHeight = layer.scrollTop;
+        var setScroll = function() {
+           layer.scrollTop = scrollHeight ;
+           layer = null;
+        }
+        if (item._bNeedAsyn) {
+            triggerEvent(superObj, 'loadtree', null, [item.getValue(), function (data) {
+                item.load(data); 
+                callback.call(null);
+                setScroll();
+            }]);
+            item._bNeedAsyn = false;
+        }
+        else {
+            callback.call(null);
+            setScroll();
+        }
+    }
+
+    UI_INPUT_TREE_LAYER_TREE_CLASS.load = function (datasource) {
+        var i, item, text;
+
+        for (i = 0; item = this._aChildren[i]; i++) {
+            disposeControl(item);
+        }
+        this._aChildren = [];
+        this._eChildren.innerHTML = '';
+
+        if (!datasource || datasource.length <= 0) {
+            this.setClass(this.getPrimary());
+            return;
+        }
+
+        for (i = 0; item = datasource[i]; i++) {
+            text = item.text;
+            item = extend({asyn: this._bAsyn}, item);
+            delete item.text;
+            this.add(text, null, item).init();
+        }
+        
+    }
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+    /**
+     * IstCalendar的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().IstCalendarVUIAdapter = function(def, options) {
+        return {
+            create: create,
+            getValue: getValue
+        };
+    };
+=======
+/**
+ * di.shared.adapter.EcuiInputTreeVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    ecui input-tree的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+
+$namespace('di.shared.adapter');
+
+(function() {
+
+    var ecuiCreate = di.helper.Util.ecuiCreate;
+    var dateToString = xutil.date.dateToString;
+    var isArray = xutil.lang.isArray;
+    var DICT = di.config.Dict;
+
+    /**
+     * ecui input tree的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().EcuiInputTreeVUIAdapter = function(def, options) {
+        return {
+            create: create,
+            setData: setData,
+            getValue: getValue
+        };
+    };
+
+    /**
+     * 创建
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @return {Object} 创建的实例
+     */
+    function create(def, options) {
+        // 控件初始化所须
+        options.hideCancel = true;
+        options.asyn = true;
+
+        var ctrl = ecuiCreate(def.clz, def.el, null, options);
+
+        ctrl.$di('registerEventAgent', 'async');
+
+        // 挂接事件
+        ctrl.onloadtree = function (value, func) {
+            /**
+             * 异步加载统一的事件
+             *
+             * @event
+             */
+            ctrl.$di(
+                'dispatchEvent',
+                'async',
+                [
+                    value,
+                    function (data) {
+                        func((data.datasource || {}).children || []);
+                    }
+                ]
+            );
+        }
+
+        // 赋予全局浮层id，用于自动化测试的dom定位
+        ctrl._uLayer.getOuter().setAttribute(DICT.TEST_ATTR, def.id);
+
+        return ctrl;
+    }
+
+    /**
+     * 设置初始化数据
+     * 
+     * @public
+     * @param {Object} data 数据
+     */
+    function setData(data) {
+        if (!data) {
+            return;
+        }
+
+        this.setData(
+            { 
+                root: data.datasource,
+                selected: isArray(data.value) 
+                    ? data.value[0] 
+                    : (data.value || (data.datasource || {}).value)
+            }, 
+            { 
+                hideCancel: data.hideCancel == null 
+                    ? true : data.hideCancel, 
+                asyn: data.asyn == null 
+                    ? true : data.asyn
+            }
+        );
+    }
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    function getValue() {
+        var v = this.getValue();
+        return v ? [v.value] : [];
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
     /**
      * 创建
      *
@@ -28890,7 +31429,60 @@ $namespace('di.shared.adapter');
 
     var UI_H_BUTTON_CLASS = UI_H_BUTTON.prototype;
 
+=======
+/**
+ * ecui.ui.HButton
+ * Copyright 2013 Baidu Inc. All rights reserved
+ *
+ * @file:   可定制皮肤的左右结构的button
+ * @author: sushuang(sushuang)
+ */
+
+ (function () {
+    
+    var inheritsControl = ecui.inherits;
+    var UI_BUTTON = ecui.ui.Button;
+    var moveElements = ecui.dom.moveElements;
+    var createDom = ecui.dom.create;
+    var addClass = ecui.dom.addClass;
+
+    /**
+     * 可定制皮肤的左右结构的button
+     *
+     * @class
+     * @param {Object} options 选项
+     * @param {string} options.skin 皮肤（的css类）
+     * @param {string} options.text 按钮上的文字
+     */
+    var UI_H_BUTTON = ecui.ui.HButton =
+        inheritsControl(
+            UI_BUTTON,
+            null,
+            function (el, options) {
+                if (options.skin) {
+                    addClass(el, options.skin);
+                    options.primary = options.skin;
+                }
+            },
+            function (el, options) {
+                var type = this.getType();
+
+                var o = createDom(type + '-text', '', 'span');
+                this.$setBody(o);
+                moveElements(el, o, true);
+
+                el.appendChild(createDom(type + '-inner', ''));
+                el.firstChild.appendChild(createDom(type + '-left', '', 'span'));
+                el.firstChild.appendChild(o);
+                el.firstChild.appendChild(createDom(type + '-right', '', 'span'));
+            }
+        );
+
+    var UI_H_BUTTON_CLASS = UI_H_BUTTON.prototype;
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  }) ();
+<<<<<<< HEAD
 /**
  * di.shared.model.DITableModel
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -29308,6 +31900,425 @@ $namespace('di.shared.model');
 
 })();
 
+=======
+/**
+ * di.shared.model.DITableModel
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 表模型组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var wrapArrayParam = xutil.url.wrapArrayParam;
+    var extend = xutil.object.extend;
+    var logError = UTIL.logError;
+    var getUID = xutil.uid.getUID;
+    var XDATASOURCE = xui.XDatasource;
+
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    /**
+     * DI 表模型组件
+     *
+     * @class
+     * @extends xui.XDatasource
+     * @param {Function=} options.commonParamGetter      
+     */
+    var DI_TABLE_MODEL = 
+            $namespace().DITableModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var DI_TABLE_MODEL_CLASS = 
+            DI_TABLE_MODEL.prototype;
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        /**
+         * 得到公用的请求参数
+         *
+         * @type {Function}
+         * @private
+         */
+        this._fCommonParamGetter = options.commonParamGetter;
+    }
+
+    /**
+     * @override
+     */
+    DI_TABLE_MODEL_CLASS.init = function () {};
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_TABLE_MODEL_CLASS.url = new XDATASOURCE.Set(
+        {
+            DATA: URL.fn('OLAP_TABLE_DATA'),
+            DRILL: URL.fn('OLAP_TABLE_DRILL'),
+            LINK_DRILL: URL.fn('OLAP_TABLE_LINK_DRILL'),
+            SORT: URL.fn('OLAP_TABLE_SORT'),
+            CHECK: URL.fn('OLAP_TABLE_CHECK'),
+            SELECT: URL.fn('OLAP_TABLE_SELECT'),
+            OFFLINE_DOWNLOAD: URL.fn('OLAP_TABLE_OFFLINE_DOWNLOAD')
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_TABLE_MODEL_CLASS.businessKey = new XDATASOURCE.Set(
+        {
+            DATA: 'DI_TABLE_MODEL_DATA_' + getUID(),
+            DRILL: 'DI_TABLE_MODEL_DRILL_' + getUID(),
+            LINK_DRILL: 'DI_TABLE_MODEL_LINK_DRILL_' + getUID(),
+            SORT: 'DI_TABLE_MODEL_SORT_' + getUID(),
+            CHECK: 'DI_TABLE_MODEL_CHECK_' + getUID(),
+            SELECT: 'DI_TABLE_MODEL_SELECT_' + getUID(),
+            OFFLINE_DOWNLOAD: 'DI_TABLE_OFFLINE_DOWNLOAD_' + getUID()
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_TABLE_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            DATA: function (options) {
+                return this._fCommonParamGetter(options.args.param);
+            },
+            DRILL: function (options) {
+                return createLinkDrillParam.call(this, options);
+            },
+            LINK_DRILL: function (options) {
+                return createLinkDrillParam.call(this, options);
+            },
+            SORT: function (options) {
+                var param = options.args.param;
+                return this._fCommonParamGetter(
+                    {
+                        uniqueName: param.uniqueName,
+                        sortType: param.currentSort
+                    }
+                );
+            },
+            CHECK: function (options) {
+                return this._fCommonParamGetter(
+                    { uniqueName: options.args.param.uniqueName }
+                );
+            },
+            SELECT: function (options) {
+                return this._fCommonParamGetter(
+                    { uniqueName: options.args.param.uniqueName }
+                );
+            },
+            OFFLINE_DOWNLOAD: function (options) {
+                return this._fCommonParamGetter(
+                    { mailTo: options.args.param.email }
+                );
+            }
+        }
+    );
+
+    /**
+     * 创建链接式下钻参数
+     *
+     * @private
+     */
+    function createLinkDrillParam(options) {
+        var param = options.args.param;
+        var paramObj = {};
+        
+        paramObj['uniqueName'] = param.uniqueName;
+        paramObj['lineUniqueName'] = param.lineUniqueName;
+
+        paramObj['action'] = param.action;
+        // FIXME
+        // 现在先写死，不存在上表头下钻
+        paramObj['drillAxisName'] = 'ROW';
+        
+        return this._fCommonParamGetter(paramObj);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_TABLE_MODEL_CLASS.complete = new XDATASOURCE.Set(
+        {
+            DATA: doComplete,
+            DRILL: doComplete,
+            LINK_DRILL: doComplete,
+            SORT: doComplete,
+            SELECT: doComplete,
+            CHECK: doComplete,
+            OFFLINE_DOWNLOAD: doComplete
+        }
+    );
+
+    function doComplete(ejsonObj) {
+        // 换reportTemplateId（后台生成了副本，所以约定更换为副本的id）
+        // FIXME 
+        // 换成非嵌入的实现方式
+        this._fCommonParamGetter.update(ejsonObj.data);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_TABLE_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            DATA: doParse,
+            DRILL: doParse,
+            LINK_DRILL: doParse,
+            SORT: doParse,
+            CHECK: function (data) { return data; },
+            SELECT: function (data) { return data; }
+        }
+    );
+
+    /**
+     * 解析后台数据
+     * 
+     * @private
+     */
+    function doParse(data, ejsonObj, options) {
+        try {
+            var retData = {};
+            var tableData = retData.tableData = data['pivottable'];
+
+            // 控件数据
+            tableData.datasource = tableData.dataSourceRowBased;
+
+            var i;
+            var j;
+            var o;
+            var colspan;
+            var headLength;
+
+            // 控件列定义(colDefine)构造
+            var firstLine = tableData['colFields'][0];
+            var rawColDefine = tableData.colDefine;
+            var colDefine = [];
+            for (i = 0; i < firstLine.length; i ++) {
+                o = firstLine[i];
+                if (!o) { continue; }
+                colspan = o.colspan || 1;
+                for (j = 0; j < colspan; j ++) {
+                    colDefine.push({ width:1 });
+                }
+            }
+            headLength = colDefine.length - rawColDefine.length;
+            for (i = 0; i < rawColDefine.length; i ++) {
+                extend(colDefine[i + headLength], rawColDefine[i]);
+            }
+            tableData.colDefine = colDefine;
+
+            // 由于之前不合适的接口制定：colspan和rowspan没有占位，导致坐标对不齐，
+            // 这引来了很多处理上的麻烦（前后台都麻烦）。
+            // 但是后台暂时没精力改了（因为有一定牵连）。
+            // 所以这里对colFields和rowHeadFields强制加上占位，使其对其。
+            fixColFields(tableData, headLength);
+            fixRowHeadFields(tableData, headLength);
+
+            // 排序
+            var sortType; 
+            var sortKeyMap = { // 前后台接口映射
+                ASC: 'asc',
+                DESC: 'desc',
+                NONE: 'none'
+            }
+            for (i = 0; i < colDefine.length; i ++) {
+                if (sortType = colDefine[i].currentSort) {
+                    colDefine[i].orderby = sortKeyMap[sortType];
+                }
+            }
+
+            // 行选中
+            retData.tableData.rowCheckMax = data['rowCheckMax'];
+            retData.tableData.rowCheckMin = data['rowCheckMin'];
+
+            // 面包屑
+            var breadcrumb = data['mainDimNodes'] || [];
+            if (breadcrumb) {
+                for (i = 0; o = breadcrumb[i]; i ++) {
+                    o.text = o['showName'];
+                    o.value = i;
+                    o.url = null;
+                    if (i == breadcrumb.length - 1) {
+                        o.disabled = true;
+                    }
+                    if (i == 0) {
+                        o.isFirst = true;
+                    }
+                }
+            }
+            retData.breadcrumbData = {
+                datasource: breadcrumb,
+                maxShow: 5,
+                hidePosPercent: 0.5
+            }
+
+            retData.pageInfo = {
+                totalRecordCount: data['totalSize'],
+                currRecordCount: data['currentSize']
+            }
+
+            // retData.tableDataOverlap = getDataOverlap(
+            //     tableData, 
+            //     options.args.viewStateWrap
+            // );
+
+            this._oData = retData;
+            
+            return retData;
+        }
+        catch (e) {
+            logError(e);
+            this.$goError();
+        }
+    }
+
+    /**
+     * @public
+     */
+    DI_TABLE_MODEL_CLASS.getData = function () {
+        return this._oData;
+    };
+
+    /**
+     * 得到保存的状态，用于覆盖
+     *
+     * @protected
+     */
+    // function getDataOverlap(tableData, viewStateWrap) {
+    //     if (!tableData || !viewStateWrap) { return; }
+
+    //     var dataOverlap = {};
+
+    //     // 行选择
+    //     var rowCheckedMap = viewStateWrap.rowCheckedMap;
+    //     if (rowCheckedMap) {
+    //         var rowChecked = [];
+    //         for (var i = 0, rhd; rhd = tableData.rowDefine[i]; i ++) {
+    //             (rhd.uniqueName in rowCheckedMap) && rowChecked.push(i);
+    //         }
+
+    //         dataOverlap.rowChecked = rowChecked;
+    //     }
+
+    //     return dataOverlap;
+    // };
+
+    /**
+     * 对colFields进行占位补齐，使用空对象{}进行标志。
+     * 约定的法则：
+     *      只有左上角第一行有rowspan（前面得到了headLength），
+     *      其他地方不考虑rowspan，
+     *      并且呈树状展开
+     * 
+     * @private
+     */
+    function fixColFields(tableData, headLength) {
+        var i;
+        var j;
+        var k;
+        var o;
+        var line;
+        var rawLine;
+        var colspan;
+        var colFields = [];
+
+        for (i = 0; rawLine = tableData.colFields[i]; i ++) {
+            colFields.push(line = []);
+            if (i > 0) {
+                // 左上角区域，后台只给第一行，后面的加占位
+                for (k = 0; k < headLength; k ++) {
+                    line.push({});
+                }
+            }
+            for (j = 0; j < rawLine.length; j ++) {
+                line.push(o = rawLine[j]);
+                colspan = (o || {}).colspan || 1;
+                for (k = 1; k < colspan; k ++) {
+                    // 占位
+                    line.push({});
+                }
+            }
+        }
+        tableData.colFields = colFields;
+    }
+
+    /**
+     * 对rowHeadFields进行占位补齐，使用空对象{}进行标志。
+     * 约定的法则：
+     *      不存在colspan，
+     *      只有rowspan，
+     *      并且呈树状展开
+     *
+     * @private
+     */
+    function fixRowHeadFields(tableData, headLength) {
+        var i;
+        var j;
+        var line;
+        var rawLine;
+        var rowHeadFields = [];
+
+        for (i = 0; rawLine = tableData.rowHeadFields[i]; i ++) {
+            rowHeadFields.push(line = []);
+            // 前面补齐
+            for (j = 0; j < headLength - rawLine.length; j ++) {
+                line.push({});
+            }
+            for (j = 0; j < rawLine.length; j ++) {
+                line.push(rawLine[j]);
+            }
+        }
+        tableData.rowHeadFields = rowHeadFields;
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_TABLE_MODEL_CLASS.error = new XDATASOURCE.Set(
+        {
+            DATA: function (status, ejsonObj, options) {
+                this._oTableData = {};
+                this._oBreadcrumbData = {};
+            }
+            // TODO
+        }
+    );
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.DITable
@@ -29979,6 +32990,7 @@ $namespace('di.shared.ui');
     };
 
 })();
+<<<<<<< HEAD
 /**
  * di.shared.model.DIChartModel
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -30277,6 +33289,306 @@ $namespace('di.shared.model');
 
 })();
 
+=======
+/**
+ * di.shared.model.DIChartModel
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 图模型组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function() {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var wrapArrayParam = xutil.url.wrapArrayParam;
+    var logError = UTIL.logError;
+    var getUID = xutil.uid.getUID;
+    var XDATASOURCE = xui.XDatasource;
+
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    /**
+     * DI 图模型组件
+     *
+     * @class
+     * @extends xui.XDatasource
+     * @param {Function=} options.commonParamGetter      
+     */
+    var DI_CHART_MODEL = 
+            $namespace().DIChartModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var DI_CHART_MODEL_CLASS = 
+            DI_CHART_MODEL.prototype;
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        /**
+         * 得到公用的请求参数
+         *
+         * @type {Function}
+         * @private
+         */
+        this._fCommonParamGetter = options.commonParamGetter;
+        /**
+         * 图后台返回的原始数据
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oRawChartData = {};
+        /**
+         * 图前台显示的数据
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oChartData = {};
+    }
+
+    /**
+     * @override
+     */
+    DI_CHART_MODEL_CLASS.init = function() {};
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_CHART_MODEL_CLASS.url = new XDATASOURCE.Set(
+        {
+            DATA: URL.fn('OLAP_CHART_DATA'),
+            X_DATA: URL.fn('OLAP_CHART_X_DATA'),
+            S_DATA: URL.fn('OLAP_CHART_S_DATA'),
+            S_ADD_DATA: URL.fn('OLAP_CHART_S_ADD_DATA'),
+            S_REMOVE_DATA: URL.fn('OLAP_CHART_S_REMOVE_DATA'),
+            OFFLINE_DOWNLOAD: URL.fn('OLAP_CHART_OFFLINE_DOWNLOAD')
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_CHART_MODEL_CLASS.businessKey = new XDATASOURCE.Set(
+        {
+            DATA: 'DI_CHART_MODEL_DATA_' + getUID(),
+            X_DATA: 'DI_CHART_MODEL_X_DATA_' + getUID(),
+            S_DATA: 'DI_CHART_MODEL_S_DATA_' + getUID(),
+            S_ADD_DATA: 'DI_CHART_MODEL_S_ADD_DATA_' + getUID(),
+            S_REMOVE_DATA: 'DI_CHART_MODEL_S_REMOVE_DATA_' + getUID(),
+            OFFLINE_DOWNLOAD: 'DI_CHART_OFFLINE_DOWNLOAD_' + getUID()
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_CHART_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            DATA: doParam,
+            X_DATA: doParam,
+            S_DATA: doParam,
+            S_ADD_DATA: doParam,
+            S_REMOVE_DATA: doParam,
+            OFFLINE_DOWNLOAD: function (options) {
+                return this._fCommonParamGetter(
+                    { mainTo: options.args.param.email }
+                );
+            }
+        }
+    );
+    function doParam(options) {
+        var param = options.args.param;
+        
+        if (param.uniqueName) {
+            // FIXME
+            // 兼容老代码，现在还有用吗？
+            param.dimTags = param.uniqueName;
+            delete param.uniqueName;
+        }
+
+        if (param.uniqueNames) {
+            // @deprecated
+            // 兼容老报表，新报表中直接用argHandler中的dimTagsList即可
+            param.dimTagsList = param.uniqueNames;
+            delete param.uniqueNames;
+        }
+
+        return this._fCommonParamGetter(param);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_CHART_MODEL_CLASS.complete = new XDATASOURCE.Set(
+        {
+            DATA: doComplete,
+            X_DATA: doComplete,
+            S_DATA: doComplete,
+            S_ADD_DATA: doComplete,
+            S_REMOVE_DATA: doComplete,
+            OFFLINE_DOWNLOAD: doComplete
+        }
+    );
+
+    function doComplete(ejsonObj) {
+        // 换reportTemplateId（后台生成了副本，所以约定更换为副本的id）
+        // FIXME 
+        // 换成非嵌入的实现方式
+        this._fCommonParamGetter.update(ejsonObj.data);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_CHART_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            DATA: doParse,
+            X_DATA: doParse,
+            S_DATA: doParse,
+            S_ADD_DATA: doParse,
+            S_REMOVE_DATA: doParse
+        }
+    );
+
+    /**
+     * 图数据解析
+     *
+     * @private
+     */
+    function doParse(data, ejsonObj, options) {
+        try {
+            var rawData = this._oRawChartData = data['reportChart'];
+
+            // 解析图后台返回数据
+            var chartData = {};
+
+            // FIXME
+            // 暂时所有datetime类型了都作date类型
+            if (rawData.xAxisType == 'datetime') {
+                rawData.xAxisType = 'date';
+            }
+
+            chartData.chartType = 'line';
+            chartData.series = rawData.seriesData;
+
+            // 横轴
+            chartData.xAxis = [
+                {
+                    type: rawData.xAxisType,
+                    data: rawData.xAxisCategories
+                }
+            ];
+
+            // 多y轴的处理
+            // 兼容老代码：如果没有多轴的情况，就不进行轴设置
+            var yNameMap = {};
+            var k;
+            var ser;
+            for (k = 0; ser = chartData.series[k]; k ++) {
+                yNameMap[ser.yAxisName] = 1;
+            }
+            k = 0;
+
+            // y轴
+            chartData.yAxis = [];
+            if (rawData.yAxises) {
+                for (var i = 0, ya; ya = rawData.yAxises[i]; i ++) {
+                    // rawData.yAxises中的y轴可能比实际series中使用的y轴多，
+                    // 所以只有实际使用的，才会被设置
+                    if (yNameMap[ya.name]) {
+                        chartData.yAxis.push(
+                            {
+                                // 数值的格式化
+                                format: ya.format,
+                                // 轴上的文字
+                                title: ya.unitName ? { text: ya.unitName } : null
+                            }
+                        );
+                        // 记录index
+                        yNameMap[ya.name] = i;
+                    }
+                }
+            }
+
+            // 对series设置y轴的index
+            var yAxisNum = 0;
+            for (k in yNameMap) { yAxisNum ++; }
+            if (yAxisNum > 1) {
+                for (k = 0; ser = chartData.series[k]; k ++) {
+                    ser.yAxisIndex = yNameMap[ser.yAxisName];
+                }
+            }
+
+            this._oChartData = chartData;                    
+        }
+        catch (e) {
+            logError(e);
+            this.$goError();
+        }
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_CHART_MODEL_CLASS.error = new XDATASOURCE.Set(
+        {
+            DATA: doError,
+            X_DATA: doError,
+            S_DATA: doError,
+            S_ADD_DATA: doError,
+            S_REMOVE_DATA: doError
+        }
+    );
+
+    /**
+     * 数据错误处理
+     *
+     * @private
+     */
+    function doError(status, ejsonObj, options) {    
+        this._oRawChartData = {};
+        this._oChartData = {};
+    }
+
+    /**
+     * 得到图数据
+     *
+     * @public
+     * @return {Object} 图数据
+     */
+    DI_CHART_MODEL_CLASS.getChartData = function() {
+        return this._oChartData;
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.DIChart
@@ -56727,6 +60039,17 @@ extend(Highcharts, {
 });
 }());
 
+<<<<<<< HEAD
+/**
+ * xui.ui.HChart  
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    基于highcharts的js图
+ *           (最早源自pl-charts.js by cxl(chenxinle))
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, highcharts
+ */
+=======
 /**
  * xui.ui.HChart  
  * Copyright 2012 Baidu Inc. All rights reserved.
@@ -56739,6 +60062,1423 @@ extend(Highcharts, {
 
 (function () {
 
+    var ieVersion = xutil.dom.ieVersion;
+    var addClass = xutil.dom.addClass;
+    var removeClass = xutil.dom.removeClass;
+    var inheritsObject = xutil.object.inheritsObject;
+    var formatNumber = xutil.number.formatNumber;
+    var getQuarterBegin = xutil.date.getQuarterBegin;
+    var dateToString = xutil.date.dateToString;
+    var stringToDate = xutil.date.stringToDate;
+    var getQuarter = xutil.date.getQuarter;
+    var getWeekend = xutil.date.getWeekend;
+    var getWorkday = xutil.date.getWorkday;
+    var getQuarterBegin = xutil.date.getQuarterBegin;
+    var encodeHTML = xutil.string.encodeHTML;
+    var extend = xutil.object.extend;
+    var bind = xutil.fn.bind;
+    var XOBJECT = xui.XObject;
+
+    /**
+     * 基于highcharts的JS图
+     *
+     * @class
+     * @extends {xui.ui.Control}
+     */
+    var UI_H_CHART = xui.ui.HChart = 
+        inheritsObject(
+            XOBJECT,
+            function (options) {
+                var el = options.el;
+                this._sType = 'xui-h-chart';
+                addClass(el, this._sType);
+
+                options.resizable = false;
+                Highcharts.setOptions(this.CHART_OPTIONS);
+
+                var type = this._sType;
+                el.innerHTML = [
+                    '<div class="' + type + '-header">',
+                        '<div class="' + type + '-legend"></div>',
+                    '</div>',
+                    '<div class="' + type + '-content"></div>'
+                ].join('');
+
+                this._eLegend = el.childNodes[0].firstChild;
+                this._eContent = el.childNodes[1];
+            }
+        );
+    var UI_H_CHART_CLASS = UI_H_CHART.prototype;
+
+    /** 
+     * highcharts的默认配置
+     *
+     * @type {Object}
+     * @protected
+     */
+    UI_H_CHART_CLASS.CHART_OPTIONS = {
+        colors: [
+            '#50bfc6', 
+            '#e9693c', 
+            '#0ca961', 
+            '#f6ab1a', 
+            '#88d915', 
+            '#0380ea', 
+            '#3c2dc9', 
+            '#8e45e9', 
+            '#f44dce', 
+            '#e21d3d',
+            '#56b3c9', 
+            '#e26237', 
+            '#08a267', 
+            '#faa616', 
+            '#85d111', 
+            '#0887e1', 
+            '#3927c3', 
+            '#894aec', 
+            '#fa46c9', 
+            '#e7193a'
+        ],
+        global: { useUTC: false }
+    };
+
+    /** 
+     * 周显示
+     *
+     * @type {Array}
+     * @private
+     */
+    var STR_WEEKDAY = [
+        '周日', '周一', '周二', '周三', '周四', '周五', '周六'
+    ];
+
+    /**
+     * 一天的毫秒数
+     */
+    var DAY_MILL = 1000 * 60 * 60 * 24;
+
+    /**
+     * 全局margin
+     */
+    var CHART_MARGIN_RIGHT = 35;
+
+    /**
+     * 扩展的rangeSelector类型（及其转换方法）
+     * 其中新定义了by属性，
+     * 如果值为'max'则意为窗口右界会设为最大值
+     * 如果值为'current'则意为窗口右界不动（默认）
+     *
+     * @type {Object}
+     * @protected
+     */
+    UI_H_CHART_CLASS.EXT_RANGE_SELECTOR_TYPE = {
+        thisMonth: function (btn) {
+            btn.type = function (options) {
+                var now = new Date(options.newMax);
+                return {
+                    newMin: new Date(
+                            now.getFullYear(), 
+                            now.getMonth(), 
+                            1
+                        ).getTime()
+                }
+            };
+        },
+        thisQuarter: function (btn) {
+            btn.type = function (options) {
+                return {
+                    newMin: getQuarterBegin(
+                            new Date(options.newMax)
+                        ).getTime()
+                }
+            };
+        },
+        thisYear: function (btn) {
+            btn.type = function (options) {
+                var now = new Date(options.newMax);
+                return {
+                    newMin: new Date(now.getFullYear(), 0, 1).getTime()
+                }
+            };
+        },
+        // highcharts提供的month算不准，所以新做xMonth。
+        // xMonth中，当btn.count == 1时，和thisMonth等价
+        xMonth: function (btn) {
+            btn.type = function (options) {
+                var now = new Date(options.newMax);
+                return {
+                    newMin: new Date(
+                            now.getFullYear(), 
+                            now.getMonth() - btn.count + 1,
+                            1
+                        ).getTime()
+                }
+            };
+        },
+        // xQuarter中，当btn.count == 1时，和thisQuarter等价
+        xQuarter: function (btn) {
+            btn.type = function (options) {
+                var quarterBegin = getQuarterBegin(new Date(options.newMax));
+                quarterBegin.setMonth(
+                    quarterBegin.getMonth() - (btn.count - 1) * 3
+                );
+                return {
+                    newMin: quarterBegin.getTime()
+                }
+            };
+        }
+    };
+
+    /** 
+     * 轴格式解析
+     *
+     * @type {Object}
+     * @protected
+     */
+    var efmt = UI_H_CHART_CLASS.EXT_AXIS_FORMAT = {};
+
+    /**
+     * date 轴格式
+     */
+    efmt.date = {
+        parse: function (dateStr) {
+            return dateStr != null
+                ? stringToDate(dateStr, 'yyyy-MM-dd').getTime()
+                : void 0;
+        },
+        format: function (timestamp) {
+            return dateToString(new Date(timestamp), 'yyyy-MM-dd');
+        },
+        formatTooltip: function (timestamp) {
+            var date = new Date(timestamp);
+            return dateToString(date, 'yyyy-MM-dd') 
+                + ' (' + STR_WEEKDAY[date.getDay()] + ')';
+        },
+        inputFormat: '%Y-%m-%d',
+        minRange: 2 * 24 * 60 * 60 * 1000
+    };
+
+    /**
+     * week 轴格式
+     */
+    efmt.week = {
+        parse: efmt.date.parse,
+        format: function (timestamp, options) {
+            var date = new Date(timestamp);
+            var range = (options || {}).range;
+
+            return dateToString(
+                    fixByDateRange(getWorkday(date), range), 
+                    'yyyy-MM-dd'
+                ) 
+                + '<br>' 
+                + dateToString(
+                    fixByDateRange(getWeekend(date), range), 
+                    'yyyy-MM-dd'
+                );
+        },
+        formatTooltip: function (timestamp, options) {
+            var date = new Date(timestamp);
+            var range = (options || {}).range;
+            var workday = fixByDateRange(getWorkday(date), range);
+            var weekend = fixByDateRange(getWeekend(date), range);
+            return dateToString(workday, 'yyyy-MM-dd') 
+                + ' (' + STR_WEEKDAY[workday.getDay()] + ')'
+                + ' ~ ' 
+                + dateToString(weekend, 'yyyy-MM-dd')
+                + ' (' + STR_WEEKDAY[weekend.getDay()] + ')';
+        },
+        formatNavigator: function (timestamp, options) {
+            var range = (options || {}).range;
+            return dateToString(
+                fixByDateRange(getWorkday(new Date(timestamp)), range), 
+                'yyyy-MM-dd'
+            );
+        },
+        inputFormat: '%Y-%m-%d',
+        minRange: 2 * 7 * 24 * 60 * 60 * 1000
+    };
+
+    /**
+     * month 轴格式
+     */
+    efmt.month = {
+        parse: function (dateStr) {
+            return dateStr != null 
+                ? stringToDate(dateStr, 'yyyy-MM').getTime()
+                : void 0;
+        },
+        format: function (timestamp) {
+            return dateToString(new Date(timestamp), 'yyyy-MM');
+        },
+        inputFormat: '%Y-%m',
+        minRange: 2 * 31 * 24 * 60 * 60 * 1000
+    };
+
+    /**
+     * quarter 轴格式
+     */
+    efmt.quarter = {
+        parse: parseQuarter,
+        format: function (timestamp) {
+            var date = new Date(timestamp);
+            return String(
+                date.getFullYear() + '-Q' + getQuarter(date)
+            );
+        },
+        inputFormat: '%Y-%q',
+        minRange: 2 * 3 * 31 * 24 * 60 * 60 * 1000
+    };
+
+    /**
+     * year 轴格式
+     */
+    efmt.year = {
+        parse: function (dateStr) {
+            return dateStr != null 
+                ? new Date(
+                    parseInt(dateStr, 10), 0, 1
+                ).getTime()
+                : void 0;
+        },
+        format: function (timestamp) {
+            return new Date(timestamp).getFullYear();
+        },
+        inputFormat: '%Y',
+        minRange: 2 * 366 * 24 * 60 * 60 * 1000
+    };
+
+    /**
+     * 解析季度
+     */
+    function parseQuarter(dateStr) {
+        if (dateStr == null) {
+            return null;
+        }
+        var par = [0, 0, 3, 6, 9];
+        dateStr = dateStr.split('-Q');
+        return new Date(
+            parseInt(dateStr[0], 10), 
+            par[parseInt(dateStr[1], 10)], 
+            1
+        ).getTime();
+    }
+
+    /**
+     * 初始化
+     */
+    UI_H_CHART_CLASS.init = function () {
+    };
+
+    /**
+     * 设置数据
+     *
+     * @public
+     * @param {Object} dataWrap 数据
+     * @param {boolean=} isSilent 是否静默（不渲染），缺省则为false
+     */
+    UI_H_CHART_CLASS.setData = function (dataWrap, isSilent) {
+        dataWrap = dataWrap || {};
+
+        // this._sChartType = fixChartType(dataWrap.chartType, 'line');
+        this._bSeriesHasValue = null;
+        this._nWidth = dataWrap.width;
+        this._nHeight = dataWrap.height;
+        /**
+         * x轴定义
+         * 例如：
+         *  xAxis: [
+         *      {
+         *          type: 'quarter', // 或'category', 'date', 'month'等，参见EXT_AXIS_FORMAT
+         *          data: ['2012-Q1', '2012-Q2']
+         *      }
+         *  ];
+         */
+        this._aXAxis = dataWrap.xAxis || [];
+        /**
+         * y轴定义
+         * 例如：
+         *  xAxis: [
+         *      {
+         *          format: 'I,III.DD%', // 显示格式
+         *          title: '我是y轴上的描述文字'
+         *      }
+         *  ];
+         */
+        this._aYAxis = dataWrap.yAxis || [];   
+        /**
+         * 系列数据
+         * 例如：
+         *  series: [
+         *      {
+         *          name: '我是系列1',
+         *          data: [1234.1234, 12344.333, 57655]
+         *      },
+         *      {
+         *          name: '我是系列2',
+         *          data: [566.1234, 565, 9987]
+         *      }
+         *  ];
+         */
+        this._aSeries = dataWrap.series || [];
+        /**
+         * 用户自定义rangeselector的按钮
+         * 例如：
+         *  rangeSelector: {
+         *      byAxisType: {
+         *          date: {
+         *              buttons: [
+         *                  { type: 'thisMonth', text: '本月', by: 'max' },
+         *                  { type: 'all', text: '全部' }
+         *              ],
+         *              selected: 0
+         *          }
+         *      }
+         *  }
+         */
+        this._oRangeSelector = dataWrap.rangeSelector;
+        /**
+         * 用户自定义legend的模式（外观+行为）
+         * 例如：
+         *  legend: { 
+         *      xMode: 'pl' // PL模式的legend。缺省则使用默认模式。
+         *  }
+         */
+        this._oLegend = dataWrap.legend || {};
+        /**
+         * 数据为空时的html
+         */
+        this._sEmptyHTML = dataWrap.emptyHTML || '数据为空';
+             
+        !isSilent && this.render();
+    };
+
+    /**
+     * 设置数据
+     *
+     * @protected
+     */
+    UI_H_CHART_CLASS.$setupSeries = function (options) {
+        var series = [];
+        var xAxis = this._aXAxis[0];
+
+        for (var i = 0, ser, serDef; serDef = this._aSeries[i]; i ++) {
+            ser = { data: [] };
+            ser.name = serDef.name || '';
+            ser.yAxis = serDef.yAxisIndex || 0;
+            ser.color = serDef.color || void 0;
+            ser.format = serDef.format || void 0;
+            ser.type = fixChartType(serDef.type);
+            serDef.id !== null && (ser.id = serDef.id);
+
+            if (xAxis.type in this.EXT_AXIS_FORMAT && !this._bHasPie) {
+                // 依据扩展时间类型，对series进行调整，使用[x, y]格式
+                ser.data = [];
+                for (var j = 0; j < serDef.data.length; j ++) {
+                    var val = this.EXT_AXIS_FORMAT[xAxis.type].parse(xAxis.data[j]);
+                    ser.data.push([val, serDef.data[j]]);
+                }
+            }
+            else {
+                ser.data = serDef.data;
+            }
+
+            series.push(ser);
+        }
+
+        // 目前对饼图的处理：不允许在混合图形中出现饼图（有各种冲突不太好弄）
+        // 所以series中只允许有一个饼图。
+        if (this._bHasPie) {
+            for (var k = 0, kser; kser = series[k]; ) {
+                kser.type !== 'pie'
+                    ? series.splice(k, 1)
+                    : k ++;
+            }
+            // 只保留第一个
+            series.length > 1 && series.splice(1, series.length - 1);
+        }
+        options.series = series;
+    }
+    
+    /**
+     * 设置提示浮层
+     *
+     * @protected
+     */
+    UI_H_CHART_CLASS.$setupTooptip = function (options) {
+        // x轴类型
+        var xAxis = this._aXAxis[0];
+        var type = xAxis.type; 
+        var callback = xAxis.tipCallback;
+        var aSeries = this._aSeries;
+        var needShowYAxisName = this._aYAxis.length > 1;
+
+        var fmt = this.EXT_AXIS_FORMAT[xAxis.type];
+        fmt = fmt 
+            && (fmt.formatTooltip || fmt.format) 
+            || function (o) { return o };
+
+        // 饼图
+        if (this._bHasPie) {
+            options.tooltip = {
+                formatter: callback || function () {
+                    var xKey = this.series.chart.xAxis[0].categories[this.point.x];
+                    return [
+                        '<b>', xKey, '</b><br />',
+                        '<b>', this.series.name,  '</b>: ',
+                        formatNumber(
+                            this.y, 
+                            this.series.options.format, 
+                            null, 
+                            null, 
+                            true
+                        ),
+                        ' (',
+                        formatNumber(this.percentage, 'I,III.DD%'),
+                        ')'
+                    ].join('');
+                },
+                useHTML: false,
+                shared: false//,
+                // borderColor: "#11A4F2"
+            };
+        } 
+
+        // 其他图
+        else {
+            options.tooltip = {
+                useHTML: false,
+                shared: true,
+                borderColor: '#11A4F2',
+
+                formatter: callback || function () {
+                    var htmlArr = [];
+                    htmlArr.push(
+                        '<span style="color:#4770A7;line-height:20px;font-size:13px;font-weight:bold;font-family:\"微软雅黑\",Arial">',
+                            fmt(this.x, { range: xAxis.range }),
+                        '</span><br />'
+                    );
+
+                    for (var i = 0, o; o = this.points[i]; i ++) {
+                        sFormat = aSeries[i].format;
+                        if (o.series.name != null) {
+                            var yOpt = o.series.yAxis.options;
+                            needShowYAxisName && htmlArr.push(
+                                '<span style="color:', yOpt.lineColor, '">',
+                                    yOpt.index == 0 ? '[左轴] ' : '[右轴] ',
+                                '</span>'
+                            );
+                            htmlArr.push(
+                                '<span style="color:' + o.series.color + ';font-size:12px;font-weight:bold">',
+                                o.series.name + ': ',
+                                '</span>',
+                                '<span style="text-align:right;color:#000;font-size:12px;font-family:Arial">',
+                                sFormat != null ? formatNumber(o.y, sFormat, null, null, true) : o.y,
+                                '</span>'
+                            );
+                        }
+                        if (i < this.points.length - 1) {
+                            htmlArr.push('<br>');
+                        }
+                    }
+                    return htmlArr.join('');
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置x轴
+     *
+     * @private
+     */
+    UI_H_CHART_CLASS.$setupXAxis = function (options) {
+        var me = this;
+        var axisList = [];
+
+        for (
+            var axisIndex = 0, xAxisDef, fmt, data; 
+            xAxisDef = this._aXAxis[axisIndex]; 
+            axisIndex ++
+        ) {
+            data = xAxisDef.data;
+
+            // range
+            if ((fmt = this.EXT_AXIS_FORMAT[xAxisDef.type]) 
+                && data 
+                && data.length > 0
+                && xAxisDef.range
+            ) {
+                xAxisDef.range = [
+                    xAxisDef.range[0] ? fmt.parse(xAxisDef.range[0]) : null,
+                    xAxisDef.range[1] ? fmt.parse(xAxisDef.range[1]) : null
+                ];
+            }
+
+            var xAxis = {
+                gridLineWidth: 0,
+                gridLineColor: '#DBDBDB',
+                tickPosition: 'inside',
+                tickLength: 5,
+                // startOnTick不要设为true，
+                // 因为highstock-1.1.5的bug，true则navigator会
+                // 算不准起始点，且拖动后范围越来越大。
+                // 暂没空跟这个bug了
+                startOnTick: false,
+                lineColor: xAxisDef.color || '#8CA5C9',
+                lineWidth: 2,
+                endOnTick: false,
+                maxPadding: 0.002,
+                minRange: (this.EXT_AXIS_FORMAT[xAxisDef.type] || {}).minRange,
+                tickPositioner: (function (
+                            me, axisType, isExtAxisType, useYearMonthAdjust
+                        ) {
+                        return function (min, max) {
+                            return tickPositioner.call(
+                                this, me, axisType, isExtAxisType, 
+                                useYearMonthAdjust, min, max
+                            );
+                        }
+                    })(
+                        me, 
+                        xAxisDef.type, 
+                        xAxisDef.type in this.EXT_AXIS_FORMAT, 
+                        xAxisDef.useYearMonthAdjust
+                    ),                
+                tickPixelInterval: xAxisDef.tickPixelInterval != null 
+                    ? xAxisDef.tickPixelInterval
+                    : void 0,
+                title: this._aXAxis[axisIndex].title != null
+                    ? {
+                        enabled: true,
+                        text: this._aXAxis[axisIndex].title,
+                        align: 'high',
+                        rotation: 0,
+                        tickInterval: 1,
+                        offset: 0,
+                        y: -12,
+                        x: 10
+                    }
+                    : void 0,
+                labels: { 
+                    overflow: void 0,
+                    formatter: (function (extFormat, xAxisDef) {
+                            return function () {
+                                var fun = extFormat[xAxisDef.type];
+                                return fun 
+                                    ? fun.format.call(
+                                        null, 
+                                        this.value, 
+                                        { range: xAxisDef.range }
+                                    )
+                                    : this.value;
+                            }
+                        })(this.EXT_AXIS_FORMAT, xAxisDef),
+                    style: {
+                        fontFamily: 'Arial,Serif,Times', 
+                        fontSize: '12px', 
+                        color: '#6B6B6B'
+                    }
+                }
+            };
+
+            if (data 
+                && (
+                    !(this._aXAxis[axisIndex].type in this.EXT_AXIS_FORMAT)
+                    || this._bHasPie
+                )
+            ) {
+                xAxis.categories = data;
+            }
+
+            if (this._aXAxis[axisIndex].plotLines != null) {
+                xAxis.plotLines = [];
+
+                for (
+                    var i = 0, o, before, after; 
+                    o = this._aXAxis[axisIndex].plotLines[i]; 
+                    i ++
+                ) {
+                    if (o.value != null) {
+                        o.value = this.EXT_AXIS_FORMAT[
+                            this._aXAxis[axisIndex].type
+                        ].parse(o.value);
+                        xAxis.plotLines.push(o);
+                    } 
+
+                    else if (
+                        o.valueBefore != null || o.valueAfter != null
+                    ) {
+
+                        before = o.valueBefore != null 
+                            ? o.valueBefore : o.valueAfter;
+                        after = o.valueAfter != null 
+                            ? o.valueAfter : o.valueBefore;
+
+                        o.value = Math.round(
+                            (
+                                this.EXT_AXIS_FORMAT[
+                                    this._aXAxis[axisIndex].type
+                                ].parse(before)
+                                + this.EXT_AXIS_FORMAT[
+                                    this._aXAxis[axisIndex].type
+                                ].parse(after)
+                            ) / 2
+                        );
+                        xAxis.plotLines.push(o);
+                    }
+                }
+            }
+
+            axisList.push(xAxis);
+        }
+
+        options.xAxis = !axisList.length 
+            ? void 0 
+            : (axisList.length > 1 ? axisList : axisList[0]);
+    }
+
+    /**
+     * 设置y轴
+     * 支持多轴
+     *
+     * @private
+     */
+    UI_H_CHART_CLASS.$setupYAxis = function (options) {
+        var yas = []
+        var align = ['right', 'left'];
+        var opposite = [false, true];
+        var labelOffset = [-7, 5];
+        var lineColors = ['#6F8B9E', '#86C1C9'];
+        var defaultLineColor = '#8CA5C9';
+        var titleOffset = [30, -17];
+        var isDoubleYAxis = this._aYAxis.length > 1;
+
+        for (var i = 0, yAxisDef, o; yAxisDef = this._aYAxis[i]; i++) {
+            o = {
+                gridLineWidth: 1,
+                gridLineColor: '#DBDBDB',                
+                lineColor: !isDoubleYAxis 
+                    ? (yAxisDef.color || defaultLineColor)
+                    : lineColors[i % 2],
+                lineWidth: 2,
+                tickPosition: 'inside',
+                tickmarkPlacement: 'on',
+                labels: {
+                    align: align[i % 2],
+                    x: labelOffset[i % 2],
+                    style: {
+                        fontFamily: 'Arial,Serif,Times', 
+                        fontSize: '11px', 
+                        color: '#6B6B6B'
+                    },
+                    formatter: yAxisDef.format
+                        ? (typeof yAxisDef.format == 'string'
+                            ? (function (formatStr) {
+                                return function () { 
+                                    return formatNumber(this.value, formatStr, null, null, true) 
+                                }
+                            })(yAxisDef.format)
+                            : yAxisDef.format
+                        )
+                        : void 0
+                },
+                opposite: opposite[i % 2],
+                title: (yAxisDef.title != null && this.$seriesHasValue())
+                    ? extend(
+                        {
+                            enabled: true,
+                            align: 'high',
+                            rotation: 0,
+                            x: titleOffset[i % 2],
+                            y: -10
+                        },
+                        yAxisDef.title
+                    )
+                    : void 0
+            };
+
+            // if (this._sChartType == 'bar') {
+            //     o.tickPixelInterval = 210;        
+            //     o.min = yAxisDef.min; // 暂不允许负值
+            // }
+
+            yas.push(o);
+        }
+
+        options.yAxis = !yas.length 
+            ? {} 
+            : (yas.length > 1 ? yas : yas[0]);
+    };
+
+    /**
+     * 序列上有值
+     *
+     * @private
+     */
+    UI_H_CHART_CLASS.$seriesHasValue = function () {
+        if (this._bSeriesHasValue != null) {
+            //取缓存
+            return this._bSeriesHasValue;
+        }
+
+        for (var i = 0, ser; i < this._aSeries.length; i ++) {
+            if ((ser = this._aSeries[i]) && ser.data && ser.data.length) {
+                var lineHasValue = false;
+                for (var j = 0; j < ser.data.length; j ++) {
+                    if (ser.data[j] != null) {
+                        lineHasValue = true;
+                    }
+                }
+                if (lineHasValue) {
+                    return this._bSeriesHasValue = true;
+                }
+            }
+        }
+        return this._bSeriesHasValue = false;
+    }
+
+    /**
+     * 设置点
+     *
+     * @protected
+     */
+    UI_H_CHART_CLASS.$setupPlotOptions = function (options) {
+        // if (this._sChartType == 'bar') {
+        //     options.plotOptions = {
+        //         bar: {
+        //             minPointLength: 2,
+        //             borderWidth: 0,
+        //             dataLabels: {
+        //                 enabled: true,
+        //                 color: '#4770A7',
+        //                 style: {
+        //                     fontWeight: 'bold', 
+        //                     fontFamily: 'Arial', 
+        //                     fontSize: '14px'
+        //                 },
+        //                 formatter: function () {
+        //                     if (this.point.config[3] != null) {
+        //                         return this.point.config[3]; 
+        //                     } 
+        //                     else {
+        //                         return '';
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        // }
+        var plotOptions = options.plotOptions = options.plotOptions || {};
+        var seriesOpt = plotOptions.series = plotOptions.series || {};
+        var columnOpt = plotOptions.column = plotOptions.column || {};
+        var pieOpt = plotOptions.pie = plotOptions.pie || {};
+
+        if (!ieVersion) {
+            columnOpt.shadow = true;
+            columnOpt.borderWidth = 1;
+        }
+
+        var useStack = false;
+        for (var i = 0, serDef; serDef = this._aSeries[i]; i ++) {
+            serDef.stack && (useStack = true);
+        }
+        useStack && (seriesOpt.stacking = 'normal');
+
+        // 饼图的特定设置
+        this._bHasPie && extend(
+            pieOpt, 
+            {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    color: '#000000',
+                    connectorColor: '#000000',
+                    // FIXME
+                    formatter: function () {
+                        // return "asdf";
+                        var xKey = this.series.chart.xAxis[0].categories[this.point.x];
+                        return '<b>' + xKey + '</b>' + ': ' + formatNumber(
+                            this.y, 
+                            this.series.options.format, 
+                            null, 
+                            null, 
+                            true
+                        );
+                    }
+                }
+            }
+        );
+    }
+
+    /**
+     * 设置图例
+     *
+     * @protected
+     */
+    UI_H_CHART_CLASS.$setupLegend = function (options) {
+        // 饼图不使用legend
+        if (this._bHasPie) {
+            options.legend = { enabled: false };
+        }
+        // pl模式的legend
+        else if (this._oLegend.xMode == 'pl') {
+            var type = this._sType;
+            var colors = this.CHART_OPTIONS.colors;
+
+            this._eLegend.style.marginRight = CHART_MARGIN_RIGHT + 'px';
+
+            // 初始化自定义legend
+            for (var i = 0, o, ser, color; ser = this._aSeries[i]; i ++) {
+                o = document.createElement('span');
+                addClass(o, type + '-legend-item');
+                color = ser.color || colors[i % colors.length];
+                o.style.backgroundColor = color;
+                o.setAttribute('rel', color);
+                o.innerHTML = encodeHTML(ser.name)
+                    + '<span class="' + type + '-legend-item-icon"></span>';
+                this._eLegend.appendChild(o);
+
+                // 点击事件
+                o.onclick = bind(this.$handleLegendClick, this, i, o);
+            }
+
+            // 不使用默认legend
+            options.legend = { enabled: false };
+        }
+        // 默认的legend模式
+        else {
+            options.legend = {
+                enabled: true,
+                align: 'center',
+                borderColor: '#FFF',
+                verticalAlign: 'top',
+                margin: 15
+            };
+        }
+    }
+
+    /**
+     * 图列点击事件处理
+     *
+     * @protected
+     */
+    UI_H_CHART_CLASS.$handleLegendClick = function (index, el) {
+        var visibleCount = 0;
+        var type = this._sType;
+        
+        this.$foreachSeries(function (ser, index) {
+            if (ser && ser.visible) { visibleCount ++; }
+        });
+        
+        // 在highcharts中顺序是一致的，所以可以用index取
+        var serie = this._oChart.series[index];
+        if (!serie) { return; }
+        
+        if (serie.visible) {
+            if (visibleCount <= 1) {
+                return;
+            }
+            else {
+                serie.hide();
+                addClass(el, type + '-legend-item-hidden');
+                el.style.background = '#B9B9B9';
+            }
+        }
+        else {
+            serie.show();
+            removeClass(el, type + '-legend-item-hidden');
+            el.style.background = el.getAttribute('rel');
+        }
+    };
+
+    /**
+     * 设置区域选择
+     * @protected
+     */
+    UI_H_CHART_CLASS.$setupZoom = function (options) {
+        var xAxis = this._aXAxis[0];
+        var axisType = xAxis.type;
+
+        options.chart = options.chart || {};
+        options.navigator = options.navigator || {};
+
+        // 是否使用zoom和navigator
+        if (axisType in this.EXT_AXIS_FORMAT && !this._bHasPie) {
+            options.navigator.enabled = true;
+            options.scrollbar = { enabled: true };
+            options.chart.zoomType = 'x';
+            setupRangeSelector.call(this, options, true);
+        } 
+        else {
+            options.navigator.enabled = false;
+            options.chart.zoomType = '';
+            options.scrollbar = { enabled: false };
+            setupRangeSelector.call(this, options, false);
+        } 
+        
+        // navigator初始化
+        if (options.navigator.enabled) {
+            options.navigator.height = 30;
+            options.navigator.series = { 
+                dataGrouping: { smoothed: false } 
+            };
+            var fmt = this.EXT_AXIS_FORMAT[xAxis.type];
+            fmt = fmt && fmt.formatNavigator || fmt.format;
+            options.navigator.xAxis = { 
+                labels: {
+                    formatter: function () {
+                        return fmt
+                            ? fmt.call(null, this.value, { range: xAxis.range })
+                            : this.value;
+                    },
+                    style: { fontFamily: 'Arial', fontSize: '11px' }
+                }
+            };
+        }
+    }
+
+    /**
+     * 设置区域选择按钮
+     *
+     * @private
+     */
+    function setupRangeSelector(options, enabled) {
+        var buttons;
+        var selected;
+        var axisType = this._aXAxis[0].type;
+        
+        // 禁用rangeselector的情况
+        if (!enabled) {
+            options.rangeSelector = { enabled: false };
+            return;
+        }
+
+        var rSele = this._oRangeSelector;
+        var rSeleDef = rSele
+            && (rSele.byAxisType
+                // 取axisType对应的buttons定义
+                ? rSele.byAxisType[axisType]
+                // 如果没有，则取通用的buttons定义
+                : rSele
+            );
+            
+        // 有自定义rangeSelector按钮，则取自定义
+        if (rSeleDef) {
+            buttons = [];
+            for (var i = 0, btn, extFn; i < rSeleDef.buttons.length; i ++) {
+                buttons.push(btn = extend({}, rSeleDef.buttons[i]));
+                // 扩展类型的处理
+                if (extFn = this.EXT_RANGE_SELECTOR_TYPE[btn.type]) {
+                    extFn(btn);
+                }
+            }
+            selected = rSeleDef.selected;
+        }
+        // 未自定义rangeSelector按钮，则取默认配置
+        else {
+            if (axisType == 'date') {
+                buttons = [
+                    { type: 'month', count: 1, text: '1月' }, 
+                    { type: 'month', count: 3, text: '3月' }, 
+                    { type: 'month', count: 6, text: '6月' }, 
+                    { type: 'year', count: 1, text: '1年' },
+                    { type: 'all', text: '全部' }
+                ];
+                selected = 4;
+            } 
+            else if (axisType == 'month') {
+                buttons = [
+                    { type: 'month', count: 6, text: '6月' }, 
+                    { type: 'year', count: 1, text: '1年' },
+                    { type: 'all', text: '全部' }
+                ];
+                selected = 2;
+            }
+            else {
+                buttons = [{ type: 'all', text: '全部' }];
+                selected = 0;
+            }
+        }
+
+        options.rangeSelector = {
+            enabled: true,
+            buttons: buttons,
+            selected: selected,
+            buttonTheme: {
+                fill: 'none',
+                stroke: 'none',
+                style: { 
+                    color: '#282828', 
+                    fontFamily: '微软雅黑, Arial' 
+                },
+                states: {
+                    hover: { 
+                        fill: 'white', 
+                        stroke: '#50bfc6'
+                    },
+                    select: { 
+                        fill: '#d7ebf6', 
+                        stroke: '#50bfc6'
+                    }
+                }
+            },
+            inputEnabled: true,
+            inputDateFormat: this.EXT_AXIS_FORMAT[axisType].inputFormat,
+            inputEditDateFormat: this.EXT_AXIS_FORMAT[axisType].inputFormat,
+            inputStyle: {
+                color: '#3784b7',
+                fontWeight: 'bold'
+            },
+            labelStyle: {
+                color: '#b0b0b0',
+                fontWeight: 'bold'
+            }
+        };
+    }
+
+    /**
+     * 自定义的x轴刻度排布。
+     *  尤其对时间类型的窗口进行适配。
+     * 默认的刻度排布处理间隔不能准确。
+     *
+     * @private
+     */
+    function tickPositioner(
+        control, axisType, isExtAxisType, useYearMonthAdjust, min, max
+    ) {
+        var axis = this;
+        var tickPositions = [];
+
+        // 取第一个series进行刻度
+        var firstSeries = axis.series[0];
+        if( !firstSeries) {
+            return [min, max];
+        }
+
+        var ordinalPositions = firstSeries.processedXData;
+
+        // 取得当前窗口
+        var tmin;
+        var tmax;
+        var winIndexStart;
+        var winIndexEnd;
+        var winIndexLength;
+        for (
+            var i = 0, item, len = ordinalPositions.length;
+            i < len; 
+            i ++
+        ) {
+            item = ordinalPositions[i];
+            if(item == null) { continue; }
+
+            if (item >= min 
+                && (item - min < tmin || typeof tmin == 'undefined')
+            ) { 
+                winIndexStart = i; 
+                tmin = item - min; 
+            }
+            if (item <= max 
+                && (max - item < tmax || typeof tmax == 'undefined')
+            ) { 
+                winIndexEnd = i; 
+                tmax = max - item; 
+            }
+        }
+        if (typeof winIndexEnd == 'undefined' 
+            || typeof winIndexStart == 'undefined'
+        ) { 
+            return [min, max]; 
+        }
+        winIndexLength = winIndexEnd - winIndexStart + 1;
+
+        // 计算tick的数量和间隔（各种特例处理）
+        if (useYearMonthAdjust 
+            && axisType == 'date' 
+            && (winIndexLength == 365 || winIndexLength == 366)
+        ) {
+            // 一年全部日数据的特殊处理
+            // 这段代码，如果要tick和datasource对上，
+            // 必须是精度到天级别的数据源
+            // 月从0开始
+            var month30 = { '4': 1, '6': 1, '9': 1, '11': 1 }; 
+            var d = new Date(ordinalPositions[winIndexEnd]);
+            
+            var date = d.getDate();
+            var month = d.getMonth();
+            var year = d.getFullYear();
+
+            while (true) {
+                if (month + 1 == 2 && date >= 29) {
+                    d = new Date(year, month, 29);
+                    if(d.getMonth() + 1 != 2) {
+                        d = new Date(year, month, 28);
+                    }
+                } 
+                else if (month + 1 in month30 && date >= 31) {
+                    d = new Date(year, month, 30);
+                } 
+                else {
+                    d = new Date(year, month, date);
+                }
+                if (d.getTime() < ordinalPositions[winIndexStart]) {
+                    break;
+                }
+                tickPositions.splice(0, 0, d.getTime()); 
+                (month <= 0) ? (( month = 11) && (year --)) : (month --);
+            }
+        } 
+        else {
+            // 默认情况
+            var splitNumber = control._aXAxis[0].splitNumber == null 
+                    ? (isExtAxisType ? 5 : winIndexLength)
+                    : control._aXAxis[0].splitNumber;
+            var indexInterval = Math.ceil(winIndexLength / splitNumber);
+
+            for (i = winIndexEnd; i >= winIndexStart; i -= indexInterval) {
+                tickPositions.splice(0, 0, ordinalPositions[i]);
+            }
+        }
+
+        return tickPositions;
+    };
+
+    function fixByDateRange(date, range) {
+        if (!range || !date) { return date; }
+        var timestamp = date.getTime();
+        if (timestamp < range[0]) {
+            return new Date(range[0]);
+        }
+        else if (range[1] < timestamp) {
+            return new Date(range[1]);
+        }
+        return date;
+    }
+
+    function fixChartType(rawType, defaultType) {
+        if (rawType == 'bar') {
+            // 与ecom标准一致化
+            return 'column';
+        }
+        return rawType || defaultType || 'line';
+    }
+
+    /**
+     * 排序Tooltip
+     *
+     * @private
+     * @param {Array} points 待排序的点列表
+     * @returns {Array} 排序后的点列表
+     */
+    UI_H_CHART_CLASS.sortPoints = function (points) {
+        if (!points) { return null; }
+
+        var newPoints = [];
+        
+        for (var i = 0, l = points.length; i < l; i++) {
+            newPoints.push(points[i]);
+        }
+        
+        return newPoints.sort(
+            function (pa, pb) {
+                if (!pa) { return -1; }
+                if (!pb) { return 1; }
+                
+                if (pa.y > pb.y) { return -1; }
+                else if (pa.y < pb.y) { return 1; }
+                else { return 0; }
+            }
+        );
+    };
+
+    /**
+     * 遍历数据series
+     * 因为_oChart.series中也包含有flag和navigator的series，
+     * 所以用_aSeries来定位具体的数据series，
+     * 同时使用_aSeries.length和_oChart.series[i]，因为后者真包含前者，并且顺序对应
+     *
+     * @protected
+     */
+    UI_H_CHART_CLASS.$foreachSeries = function (callback) {
+        for(var i = 0, len = this._aSeries.length; i < len; i ++) {
+            callback(this._oChart.series[i], i);
+        }
+    };
+
+    /**
+     * 重新渲染图表
+     *
+     * @public
+     */
+    UI_H_CHART_CLASS.render = function () {
+        this.$disposeChart();
+
+        if (!this._aSeries || this._aSeries.length == 0) {
+            this._eContent.innerHTML = '' 
+                + '<div class="' + this._sType + '-empty">' 
+                    + this._sEmptyHTML 
+                + '</div>';
+            return;
+        }
+
+        this.$createChart(this.$initOptions()) ;
+    };
+
+    /**
+     * 创建图表
+     *
+     * @public
+     */
+    UI_H_CHART_CLASS.$createChart = function (options) {
+        if (this._aXAxis[0].type in this.EXT_AXIS_FORMAT && !this._bHasPie) {
+            // 扩展时间类型，使用stockchart完成
+            this._oChart = new Highcharts.StockChart(options);
+        }
+        else {
+            this._oChart = new Highcharts.Chart(options);
+        }
+    };
+
+    /**
+     * 构建图表参数
+     *
+     * @private
+     */
+    UI_H_CHART_CLASS.$initOptions = function () {
+        var options = {
+            chart: {
+                // type: this._sChartType,
+                renderTo: this._eContent,
+                zoomType: 'x',
+                width: this._nWidth,
+                height: this._nHeight
+            },
+            credits: { enabled: false },
+            title: { text: '' }
+        };
+        if (this._aYAxis.length > 0) {
+            options.chart.marginRight = CHART_MARGIN_RIGHT;
+        }
+
+        // 特殊判断：是否有饼图
+        this._bHasPie = false;
+        for (var i = 0, ser; ser = this._aSeries[i]; i ++) {
+            if (fixChartType(ser.type) == 'pie') {
+                this._bHasPie = true;
+            }
+        }
+
+        this.$setupSeries(options);
+        this.$setupPlotOptions(options);
+        this.$setupXAxis(options);
+        this.$setupYAxis(options);
+        this.$setupTooptip(options);
+        this.$setupLegend(options);
+        this.$setupZoom(options);
+        
+        return options;
+    };
+
+    /**
+     * 销毁图表
+     *
+     * @private
+     */
+    UI_H_CHART_CLASS.$disposeChart = function () {
+        if (this._oChart) {
+            this._oChart.destroy();
+            this._oChart = null;
+        }
+        this._eContent && (this._eContent.innerHTML = '');
+        this._eLegend && (this._eLegend.innerHTML = '');
+    };
+
+    /**
+     * @override
+     */
+    UI_H_CHART_CLASS.dispose = function () {
+        this.$disposeChart();
+        UI_H_CHART.superClass.dispose.call(this);
+    };
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+(function () {
+=======
+/**
+ * di.shared.adapter.HChartVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    HChart的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    var UTIL = di.helper.Util;
+    var parseTimeUnitDef = UTIL.parseTimeUnitDef;
+    var formatTime = UTIL.formatTime;
+    var dateToString = xutil.date.dateToString;
+    var GLOBAL_MODEL;
+
+    $link(function() {
+        GLOBAL_MODEL = di.shared.model.GlobalModel;
+    });
+
+    /**
+     * IstCalendar的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().HChartVUIAdapter = function(def, options) {
+        return {
+            setData: setData
+        };
+    };
+
+    /**
+     * 设置数据
+     *
+     * @public
+     */
+    function setData(data) {
+        var now = GLOBAL_MODEL().getDateModel().now();
+
+        if (data.weekViewRange) {
+            var range = parseTimeUnitDef(data.weekViewRange, [now, now]);
+
+            if (range) {
+                var fmt = 'yyyy-MM-dd';
+                range[0] = range.start ? dateToString(range.start, fmt) : null;
+                range[1] = range.end ? dateToString(range.end, fmt) : null;
+
+                for (
+                    var i = 0, xAxisDef; 
+                    xAxisDef = (data.xAxis || [])[i]; 
+                    i ++
+                ) {
+                    xAxisDef.range = range;
+                }
+            }
+        }
+
+        this.setData(data);
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
     var ieVersion = xutil.dom.ieVersion;
     var addClass = xutil.dom.addClass;
     var removeClass = xutil.dom.removeClass;
@@ -58351,6 +63091,209 @@ $namespace('di.shared.model');
 
 })();
 
+=======
+/**
+ * di.shared.model.DIPlaneTableModel
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    DI 平面表模型组件
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var wrapArrayParam = xutil.url.wrapArrayParam;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var logError = UTIL.logError;
+    var getUID = xutil.uid.getUID;
+    var XDATASOURCE = xui.XDatasource;
+
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    /**
+     * DI 表模型组件
+     *
+     * @class
+     * @extends xui.XDatasource
+     * @param {Function=} options.commonParamGetter      
+     */
+    var DI_PLANE_TABLE_MODEL = 
+            $namespace().DIPlaneTableModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var DI_PLANE_TABLE_MODEL_CLASS = 
+            DI_PLANE_TABLE_MODEL.prototype;
+
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        /**
+         * 得到公用的请求参数
+         *
+         * @type {Function}
+         * @private
+         */
+        this._fCommonParamGetter = options.commonParamGetter;
+    }
+
+    /**
+     * @override
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.init = function () {};
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.url = new XDATASOURCE.Set(
+        {
+            DATA: URL.fn('PLANE_TABLE_DATA'),
+            CHECK: URL.fn('PLANE_TABLE_CHECK'),
+            SELECT: URL.fn('PLANE_TABLE_SELECT'),
+            OFFLINE_DOWNLOAD: URL.fn('PLANE_TABLE_OFFLINE_DOWNLOAD')
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.businessKey = new XDATASOURCE.Set(
+        {
+            DATA: 'DI_PLANE_TABLE_MODEL_DATA_' + getUID(),
+            CHECK: 'DI_PLANE_TABLE_MODEL_CHECK_' + getUID(),
+            SELECT: 'DI_PLANE_TABLE_MODEL_SELECT_' + getUID(),
+            OFFLINE_DOWNLOAD: 'DI_TABLE_OFFLINE_DOWNLOAD_' + getUID()
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            DATA: function (options) {
+                return this._fCommonParamGetter(options.args.param);
+            },
+            CHECK: function (options) {
+                return this._fCommonParamGetter(
+                    // TODO
+                    // 参数名未定
+                    { uniqueName: options.args.param.uniqueName }
+                );
+            },
+            SELECT: function (options) {
+                return this._fCommonParamGetter(
+                    // TODO
+                    // 参数名未定
+                    { uniqueName: options.args.param.uniqueName }
+                );
+            },
+            OFFLINE_DOWNLOAD: function (options) {
+                return this._fCommonParamGetter(
+                    // TODO
+                    // 参数名未定
+                    { mailTo: options.args.param.email }
+                );
+            }
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.complete = new XDATASOURCE.Set(
+        {
+            DATA: doComplete,
+            DRILL: doComplete,
+            LINK_DRILL: doComplete,
+            SELECT: doComplete,
+            CHECK: doComplete,
+            OFFLINE_DOWNLOAD: doComplete
+        }
+    );
+
+    function doComplete(ejsonObj) {
+        // 换reportTemplateId（后台生成了副本，所以约定更换为副本的id）
+        // FIXME 
+        // 换成非嵌入的实现方式
+        this._fCommonParamGetter.update(ejsonObj.data);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            DATA: doParse,
+            CHECK: function (data) { return data; },
+            SELECT: function (data) { return data; }
+        }
+    );
+
+    /**
+     * 解析后台数据
+     * 
+     * @private
+     */
+    function doParse(data, ejsonObj, options) {
+        try {
+            var retData = {
+                tableData: {
+                    head: data.head,
+                    data: data.data
+                },
+                pageInfo: data.pageInfo,
+                actualSql: data.actualSql
+            };
+            return retData;
+        }
+        catch (e) {
+            logError(e);
+            this.$goError();
+        }
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    DI_PLANE_TABLE_MODEL_CLASS.error = new XDATASOURCE.Set(
+        {
+            DATA: function (status, ejsonObj, options) {
+                this._oTableData = {};
+                this._oBreadcrumbData = {};
+            }
+            // TODO
+        }
+    );
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.DIPlaneTable
@@ -58965,6 +63908,7 @@ $namespace('di.shared.ui');
     };
 
 })();
+<<<<<<< HEAD
 /**
  * custom-table.js
  * Copyright 2012 Baidu Inc. All rights reserved *
@@ -59971,7 +64915,1025 @@ $namespace('di.shared.ui');
         }
     };
 
+=======
+/**
+ * custom-table.js
+ * Copyright 2012 Baidu Inc. All rights reserved *
+ * desc: 工作台项目定制的table控件，提供的功能包括表头锁定和列锁定、行选中、排序、使用render方法填充和刷新表格；表格支持跨行跨列,最多跨两行
+ * author: hades(denghongqi)
+ */
+
+ (function () {
+    var core = ecui,
+        dom = core.dom,
+        array = core.array,
+        ui = core.ui,
+        string = core.string,
+        util = core.util,
+
+        $fastCreate = core.$fastCreate,
+        inheritsControl = core.inherits,
+        triggerEvent = core.triggerEvent,
+        disposeControl = core.dispose,
+        $disposeControl = core.$dispose,
+        createDom = dom.create,
+        first = dom.first,
+        last = dom.last,
+        children = dom.children,
+        addClass = dom.addClass,
+        setStyle = dom.setStyle,
+        setText = dom.setText,
+        getText = dom.getText,
+        removeClass = dom.removeClass,
+        toNumber = util.toNumber,
+        getParent = dom.getParent,
+        moveElements = dom.moveElements,
+        getAttribute = dom.getAttribute,
+        getPosition = dom.getPosition,
+        encodeHTML = xutil.string.encodeHTML,
+        remove = array.remove,
+        getView = util.getView,
+        extend = util.extend,
+        repaint = core.repaint,
+        attachEvent = util.attachEvent,
+        detachEvent = util.detachEvent,
+
+        // 引入了外部库
+        formatNumber = xutil.number.formatNumber;
+
+        MATH = Math,
+        MIN = MATH.min,
+        WINDOW = window,
+
+        UI_LOCKED_TABLE = ui.SlowLockedTable,
+        UI_LOCKED_TABLE_CLASS = UI_LOCKED_TABLE.prototype;
+
+    var UI_CUSTOM_TABLE = ui.CustomTable =
+        inheritsControl(
+            UI_LOCKED_TABLE,
+            'ui-table',
+            function(el, options) {
+                this._oOptions = options;
+                this._aHeader = options.header;
+                this._sSortby = options.sortby;
+                this._sOrderby = options.orderby;
+                if (!options.datasource) {
+                    this._nLeftLock = options.leftLock || 0;
+                    this._nRightLock = options.rightLock || 0;
+                }
+
+                var type = this.getTypes()[0];
+
+                // 行选择记录
+                this._oRowCheck = {
+                    rowCheckMode: options.rowCheckMode,
+                    rowChecked: options.rowChecked || [],
+                    rowCheckMax: options.rowCheckMax || Number.MAX_VALUE,
+                    rowCheckMin: options.rowCheckMin || Number.MIN_VALUE,
+                    rowCheckCount: 0
+                };
+                // 如果行内有selected标志，优先
+                for (var i = 0, o; o = (options.datasource || [])[i]; i ++) {
+                    o.selected && this._oRowCheck.rowChecked.push(i);
+                }
+
+                var html = [];
+                html.push('<table><thead>');
+
+                options.leftLock = options.leftLock || 0;
+                options.rightLock = options.rightLock || 0;
+                var lockedTotal = options.leftLock + options.rightLock;
+
+                if (!options.datasource) {
+                    setStyle(el, 'width', '100%');
+                }
+                else {
+                    setStyle(el, 'width', 'auto');
+                    setStyle(el, 'display', 'block');
+                }
+
+                if (!options.datasource) {
+                    html.push('<tr>');
+                    var i;
+                    for (var i = 0; i <= lockedTotal; i++) {
+                        html.push('<th></th>');
+                    }
+                    html.push('</tr>');
+                }
+                else {
+                    //表头目前只支持跨两行
+                    if ('[object Array]' == Object.prototype.toString.call(options.fields[0])) {
+                        var flag = 0;    
+                        var i;
+                        for (i = 0; i < options.fields.length; i++) {
+                            var o = options.fields[i];
+                            html.push(createHeadRow(o, this, options.fields));
+                        }
+                        this._aColumns = [];
+                        for (var i = 0, o; o = options.fields[0][i]; i++) {
+                            if (o.colspan) {
+                                for (var j = 0; j < o.colspan; j++) {
+                                    this._aColumns.push(extend({}, options.fields[1][flag++]));
+                                }
+                            }
+                            else {
+                                this._aColumns.push(extend({}, o));
+                            }
+                        }
+                    }
+                    else {
+                        html.push(createHeadRow(options.fields, this));
+                        this._aColumns = copyArray(options.fields);
+                    }
+                }
+
+                html.push('</thead><tbody>');
+
+                if(!options.datasource)  {
+                    html.push('<tr>');
+                    var i;
+                    html.push('<td></td>');
+                    html.push('</tr>');
+                    options.leftLock = 0;
+                    options.rightLock = 0;
+                }
+                else {
+                    this._aData = options.datasource;
+
+                    if (!this._aData.length) {
+                        html.push('<tr>');
+                        html.push(
+                            '<td class="' + type + '-empty-cell'
+                            + '" align="middle" colspan="'
+                            + this._aColumns.length
+                            + '">'
+                        );
+                        html.push(
+                            options.errorMsg 
+                            ? options.errorMsg
+                            : '暂无数据，请稍后再试'
+                        );
+                        html.push('</td>');
+                        html.push('</tr>');
+                    }
+                    else {
+                        var i;
+                        for (i = 0; i < options.datasource.length; i++) {
+                            var item = options.datasource[i];
+                            html.push('<tr>');
+                            var j;
+                            for (j = 0; j < this._aColumns.length; j++) {
+                                var o = this._aColumns[j];
+                                html.push('<td data-content="1" data-cell-pos="' + j + '-' + i + '" class="ui-table-ccell"');
+
+                                o.align && html.push(
+                                    ' align="' + o.align + '"'
+                                );
+
+                                html.push('>');
+
+                                var content = o.content || o.field;
+
+                                if (typeof content == 'function') {
+                                    var e = content.call(null, item, i);
+                                    if (Object.prototype.toString.call(e) == '[object String]') {
+                                        /*
+                                        if (o.autoEllipsis) {
+                                            html.push('<span title="');
+                                            html.push()
+                                        }
+                                        */
+                                        if (o.maxlength 
+                                            && e
+                                            && e.length > o.maxlength
+                                        ) {
+                                            html.push('<span class="');
+                                            html.push(type + '-cell-limited"');
+                                            html.push(' title="' + e + '">');
+                                            html.push(encodeHTML(e.substring(0, o.maxlength)));
+                                            html.push('...');
+                                            html.push('</span>');
+                                        }
+                                        else {
+                                            html.push(e);
+                                        }
+                                    }
+                                    else {
+                                        var div = createDom();
+                                        div.appendChild(e);
+                                        html.push(div.innerHTML);
+                                    }
+                                }
+                                else {
+                                    if (o.checkbox) {
+                                        html.push('<input type="checkbox"');
+                                        html.push(
+                                            ' class="' + type + '-checkbox"'
+                                        );
+                                        html.push(
+                                            ' data-rownum="' + i + '"'
+                                        );
+                                        html.push(' />');
+                                    }
+                                    else {
+                                        var vc = item[content];
+                                        if (o.format) {
+                                            vc = formatNumber(vc, o.format, void 0, void 0, true);
+                                        }
+                                        if (o.maxlength 
+                                            && vc
+                                            && vc.length > o.maxlength
+                                        ) {
+                                            html.push('<span class="');
+                                            html.push(type + '-cell-limited"');
+                                            html.push(' title="' + encodeHTML(vc) + '">');
+                                            html.push(encodeHTML(vc.substring(0, o.maxlength)));
+                                            html.push('...');
+                                            html.push('</span>');
+                                        }
+                                        else {
+                                            html.push(encodeHTML(vc));
+                                        }
+                                    }
+
+                                    if (o.detail) {
+                                        html.push('<span ecui="type:tip;asyn:true;id:');
+                                        html.push('tip-' + item[o.idField] + '"');
+                                    }
+                                }
+
+                                html.push('</td>');
+                            }
+                            html.push('</tr>');
+                        }
+                    }
+                }
+
+                html.push('</tbody></table>');
+
+                el.innerHTML = html.join('');
+
+                return el;
+            },
+            function(el, options) {
+                //ecui.init(el);
+                if (options.fields && options.datasource) {
+                    initEmbedControlEvent(options.fields, options.datasource);
+                }
+
+                this.$bindCheckbox();
+                return el;
+            }
+        ),
+        UI_CUSTOM_TABLE_CLASS = UI_CUSTOM_TABLE.prototype,
+
+        UI_CUSTOM_TABLE_CELL_CLASS = (
+            UI_CUSTOM_TABLE_CLASS.Cell = inheritsControl(
+                UI_LOCKED_TABLE_CLASS.Cell,
+                null,
+                function (el, options) {
+                    options.primary = 'ui-table-cell';
+                }
+            )
+        ).prototype,
+
+        DELEGATE_EVENTS = ['click', 'mouseup', 'mousedown'],
+
+        // 默认处理函数
+        DEFAULT_EVENTS = {
+            
+            'click th.ui-table-hcell-sort': function (event, control) {
+                var field = this.getAttribute('data-field'),
+                    orderby;
+
+                if (this.className.indexOf('-sort-desc') >= 0) {
+                    orderby = 'asc';
+                }
+                else if (this.className.indexOf('-sort-asc') >= 0) {
+                    orderby = 'desc'
+                }
+                else {
+                    orderby = this.getAttribute('data-orderby') || 'desc';
+                }
+
+                triggerEvent(control, 'sort', null, [field, orderby]);
+            },
+            'click input.ui-table-checkbox-all': function (event, control) {
+                control.$refreshCheckbox(this.checked);
+            },
+            'click input.ui-table-checkbox': function (event, control) {
+                control.$refreshCheckbox();
+            }
+        };      
+
+    /** 
+     * 生成表头的一行
+     * 
+     * @param {Array} headrow 一行表头的数据
+     * @param {ecui.ui.CustomTable} con
+     * @param {Array} opt_head 所有的表头数据
+     * @return {string} html片段
+     */
+    function createHeadRow(headrow, con, opt_head) {
+        var type = con.getTypes()[0];
+
+        var html = [];
+        html.push('<tr>');
+
+        var flag = 0;
+        var i = 0;
+        for (i = 0; i < headrow.length; i++) {
+            var o = headrow[i];
+            html.push('<th ');
+            html.push('data-field="');
+
+            if (Object.prototype.toString.call(o.field) == '[object String]') {
+                html.push(o.field);
+            }
+
+            if (o.width) {
+                html.push(
+                    '" style="width:' + o.width + 'px;'
+                    + 'min-width:' + o.width + 'px'
+                );
+            }
+
+            if (o.rowspan) {
+                html.push(
+                    '" rowspan="' + o.rowspan
+                );
+            }
+            if (o.colspan) {
+                html.push(
+                    '" colspan="' + o.colspan
+                );
+
+                var j;
+                var width = 0;
+                for (j = flag; j < flag + o.colspan; j++) {
+                    width += opt_head[1][j].width;
+                }
+
+                html.push(
+                    '" width="' + width
+                );
+
+                flag += o.colspan;
+            }
+            if (o.sortable) {
+                html.push(
+                    '" class="' + type + '-hcell-sort'
+                );
+                if (o.field && o.field == con._sSortby) {
+                    html.push(
+                        ' ' + type + '-hcell-sort-' + con._sOrderby
+                    );
+                }
+                if (o.order) {
+                    html.push(
+                        '" data-orderby="' + o.order
+                    );
+                }
+            }
+            html.push('">');
+
+            if (o.title) {
+                html.push(o.title);
+            }
+
+            if (o.checkbox) {
+                html.push(
+                    '<input type="checkbox" class="'
+                    + type + '-checkbox-all"'
+                    + ' />'
+                );
+            }
+
+            if (o.tip && o.tip.length) {
+                html.push('<span ecui="type:tip; id:tip-');
+                html.push(o.field);
+                html.push('; message:');
+                html.push(o.tip);
+                html.push('"></span>');
+            }
+
+            html.push('</th>');
+        }
+        html.push('</tr>');
+
+        return html.join('');
+    }
+
+    /**
+     * 帮顶表格内部子控件的事件
+     *
+     * @param {Array} header 表头数据
+     * @param {Array} datasource 表格数据
+     */
+    function initEmbedControlEvent(header, datasource) {
+        var i = 0;
+        for (i = 0; i < datasource.length; i++) {
+            var item = datasource[i];
+            for (var j = 0; j < header.length; j++) {
+                var o = header[j];
+                if (o.detail) {
+                    var controlId = 'tip-' + item[o.idField];
+                    if (ecui.get(controlId)) {
+                        ecui.get(controlId).onloadData = (function (item, o) {
+                            return function (handler) {
+                                o.loadData(item, handler);
+                            }
+                        }) (item, o);
+                    }
+                }
+            }
+        }
+    }
+
+    UI_CUSTOM_TABLE_CLASS.getData = function () {
+        return this._aData;
+    };
+
+    UI_CUSTOM_TABLE_CLASS.$createHeadRow = function (headrow) {
+        var type = this.getTypes()[0];
+
+        var tr = createDom('', '', 'tr');
+
+        for (var i = 0, o; o = headrow[i]; i++) {
+            var th = createDom('', '', 'th');
+            tr.appendChild(th);
+            o.title && setText(th, o.title);
+            if (o.tip && o.tip.length) {
+                var tipEl = createDom('', '', 'span');
+                tipEl.innerHTML = '';
+                tipEl.setAttribute(
+                    'ecui', 
+                    'type:tip; id:' + o.field + '-tip; message:' + o.tip
+                );
+                th.appendChild(tipEl);
+                ecui.init(tipEl);
+            }
+            //o.width && setStyle(th, 'width', o.width + 'px');
+            //o.width && th.setAttribute('width', o.width + 'px');
+            o.width && setStyle(th, 'minWidth', o.width + 'px');
+
+            o.field && th.setAttribute('data-field', o.field);
+
+            o.rowspan && th.setAttribute('rowSpan', o.rowspan);
+            o.colspan && th.setAttribute('colSpan', o.colspan);
+
+            if (o.sortable) {
+                addClass(th, type + '-hcell-sort');
+
+                if (o.field && o.field == this._sSortby) {
+                    addClass(th, type + '-hcell-sort-' + this._sOrderby);
+                }
+            }
+
+            if (o.checkbox) {
+                var checkboxAll = createDom('', '', 'input');
+                checkboxAll.setAttribute('type', 'checkbox');
+                addClass(checkboxAll, type + '-checkbox-all');
+                th.appendChild(checkboxAll);
+            }
+        }
+
+        return tr;
+    };
+
+    /**
+     * 得到表格的列配置
+     * @public
+     *
+     * @return {Array} 表格的列配置
+     */
+    UI_CUSTOM_TABLE_CLASS.getFields = function() {
+        return this._aColumns;
+    };
+
+    /**
+     * 重新生成表格
+     * @public
+     *
+     * @param {Array} fields 表格的列配置
+     * @param {Array} datasource 表格数据
+     * @param {Object} sortinfo 排序信息
+     * @param {Object} options 初始化选项
+     * @param {string} errorMsg 表格为空或出错时展示的内容
+     */
+    UI_CUSTOM_TABLE_CLASS.render = function(
+        fields, datasource, sortinfo, options, errorMsg
+    ) {
+        var options = extend({}, options);
+        options = extend(options, this._oOptions);
+        options.leftLock = this._nLeftLock;
+        options.rightLock = this._nRightLock;
+        options.fields = fields;
+        options.datasource = datasource || [];
+        var sortinfo = sortinfo || {};
+        options.sortby = sortinfo.sortby;
+        options.orderby = sortinfo.orderby;
+        options.errorMsg = errorMsg;
+
+        if (!datasource.length) {
+            options.leftLock = 0;
+            options.rightLock = 0;
+        }
+
+        this.$refresh(options);
+    };
+
+    /**
+     * 获取表格当前所有行单选框的引用
+     * @private
+     */
+    UI_CUSTOM_TABLE_CLASS.$bindCheckbox = function () {
+        var inputs = this.getBody().getElementsByTagName('input'),
+            i, item, type = this.getTypes()[0];
+
+        this._aCheckboxs = [];
+        this._eCheckboxAll = null;
+
+        for (i = 0; item = inputs[i]; i++) {
+            if (item.type == 'checkbox' 
+                    && item.className.indexOf(type + '-checkbox-all') >= 0
+            ) {
+                this._eCheckboxAll = item;
+            }
+            else if (item.type == 'checkbox' && item.className.indexOf(type + '-checkbox') >= 0) {
+                this._aCheckboxs.push(item);
+            }
+        }
+    };
+
+    /**
+     * 刷新表格的行单选框
+     * @private
+     *
+     * @param {Boolean} checked 全选/全不选 如果忽略此参数则根据当前表格的实际选择情况来设置“全选”的勾选状态
+     */
+    UI_CUSTOM_TABLE_CLASS.$refreshCheckbox = function (checked) {
+        var i, item, newChecked = true, tr;
+
+        for (i = 0; item = this._aCheckboxs[i]; i++) {
+            tr = item.parentNode.parentNode;
+            if (checked !== undefined) {
+                item.checked = checked;
+            }
+            else {
+                newChecked = item.checked && newChecked;
+            }
+
+            if (item.checked && this._bCheckedHighlight) {
+                tr.className += ' highlight';
+            }
+            else if (this._bCheckedHighlight) {
+                tr.className = tr.className.replace(/\s+highlight/g, '');
+            }
+        }
+
+        if (this._eCheckboxAll) {
+            this._eCheckboxAll.checked = checked !== undefined ? checked : newChecked;
+        }
+    };
+
+    /**
+     * table生产完毕以后执行，触发sizechange事件
+     *
+     */
+    UI_CUSTOM_TABLE_CLASS.$ready = function() {
+        triggerEvent(this, 'sizechange');
+    };
+
+
+    /**
+     * 浏览器resize时调整横滚的位置
+     *
+     * @override
+     */
+    UI_CUSTOM_TABLE_CLASS.$resize = function() {
+        var me = this;
+        UI_LOCKED_TABLE_CLASS.$resize.call(this);
+        triggerEvent(this, 'sizechange');
+        setTimeout(
+            function() {
+                me.$pagescroll();
+            },
+            500
+        );
+    };
+
+    /**
+     * 页面滚动时保持表头和横滚浮在视窗上
+     *
+     * @override
+     */
+    UI_CUSTOM_TABLE_CLASS.$pagescroll = function() {
+        UI_LOCKED_TABLE_CLASS.$pagescroll.call(this);
+
+        if (this._uHScrollbar) {
+            // 因为是在iframe中引用的，所以DI中不提供这个功能
+            // setFloatHScroll(this);
+        }
+    };
+
+    UI_CUSTOM_TABLE_CLASS.getSelection = function () {
+        if (!this._aCheckboxs || !this._aCheckboxs.length) {
+            return [];
+        }
+
+        var res = [];
+
+        for (var i = 0, o; o = this._aCheckboxs[i++]; ) {
+            if (o.checked) {
+                var index = getAttribute(o, 'data-rownum') - 0;
+                res.push(extend({}, this._aData[index]));
+            }
+        }
+        return res;
+    };
+
+    /**
+     * @override
+     */
+    UI_CUSTOM_TABLE_CLASS.init = function () {
+        var i, item, ele = this.getOuter(),
+            control = this;
+
+        UI_LOCKED_TABLE_CLASS.init.call(this);
+
+        // 添加控件全局的事件监听
+        // 只支持click mousedown mouseup
+        if (!this.eventAdded) {
+            for (i = 0; item = DELEGATE_EVENTS[i]; i++) {
+                attachEvent(ele, item, (function (name) {
+                    return function (event) {
+                        var e = event || window.event;
+                        e.targetElement = e.target || e.srcElement;
+                        control.$fireEventHandler(name, e);
+                    }
+                })(item));
+            }
+            this.eventAdded = true;
+        }
+
+        // 行选中
+        this.$initRowChecked();
+    };
+
+    /**
+     * 触发表格events中定义的事件
+     * @private
+     *
+     * @param {String} eventType 事件类型
+     * @param {Event} nativeEvent 原生事件参数
+     */
+    UI_CUSTOM_TABLE_CLASS.$fireEventHandler = function (eventType, nativeEvent) {
+        var events = getHandlerByType(this.events, eventType),
+            i, item, target = nativeEvent.targetElement, selector;
+
+        for (i = 0; item = events[i]; i++) {
+            if (checkElementBySelector(target, item.selector)) {
+                item.handler.call(target, nativeEvent, this);
+            }
+        }
+    }
+
+    UI_CUSTOM_TABLE_CLASS.$refresh = function (options) {
+        detachEvent(WINDOW, 'resize', repaint);
+
+        this.$disposeInner();
+
+        var el = this.getOuter();
+        el.innerHTML = '';
+        this.$setBody(el);
+        this.$resize();
+
+        // FIXME
+        // 这种方式有个问题：必须要求getOuter的父节点此时有width，
+        // 否则的话，上一步resize()后导致没宽度
+        // 后续改！=====================================
+
+        UI_CUSTOM_TABLE.client.call(
+            this, 
+            el, 
+            extend(
+                { uid: this._sUID, primary: this._sPrimary }, 
+                options
+            )
+        );
+        this._bCreated = false;
+        this.cache(true, true);
+        UI_LOCKED_TABLE_CLASS.init.call(this);
+
+        this.init();
+        // TODO
+        // this.$bindCellLink();
+
+        attachEvent(WINDOW, 'resize', repaint);
+    };
+
+    /**
+     * 析构内部
+     * 
+     * @protected
+     */
+    UI_CUSTOM_TABLE_CLASS.$disposeInner = function() {
+        var disposeFunc = this.$dispose;
+        this.$dispose = new Function();
+        disposeControl(this);
+        this.$dispose = disposeFunc;
+    };
+
+    /**
+     * 得到内容区域的row控件
+     *
+     * @protected
+     */
+    UI_CUSTOM_TABLE_CLASS.$getContentRow = function(rowIndex) {
+        // LockedTable失去了对内容row的引用，所以用这种不太好看的方法找到
+        var row;
+        var cell;
+        return (row = this._aRows[rowIndex])
+            && (cell = row.getCell(this._nLeftLock || 0))
+            && cell.getParent()
+            || null;
+    };
+
+    /**
+     * 设置内容行选中
+     *
+     * @private
+     */
+    UI_CUSTOM_TABLE_CLASS.$initRowChecked = function() {
+        var rowCheck = this._oRowCheck;
+        for (
+            var i = 0, rowCtrl; 
+            i < (rowCheck.rowChecked || []).length; 
+            i ++
+        ) {
+            // LockedTable失去了对内容row的引用，所以用这种不太好看的方法找到
+            if (rowCtrl = this.$getContentRow(rowCheck.rowChecked[i])) {
+                this.$setRowChecked(rowCtrl, true);
+            }
+        }
+    };    
+
+    /**
+     * 设置内容行选中
+     *
+     * @private
+     */
+    UI_CUSTOM_TABLE_CLASS.$setRowChecked = function(rowCtrl, checked) {
+        var type = this.getType();
+        var rowCheck = this._oRowCheck;
+
+        var rowCheckMode = this._oRowCheck.rowCheckMode;
+        // 多选
+        if (rowCheckMode == 'CHECK') {
+            if (checked
+                && !rowCtrl._bRowChecked
+                && rowCheck.rowCheckCount < rowCheck.rowCheckMax
+            ) {
+                rowCtrl._bRowChecked = true;
+                addClass(rowCtrl.getMain(), type + '-row-checked');
+                rowCheck.rowCheckCount ++;
+                return true;
+            }
+
+            if (!checked 
+                && rowCtrl._bRowChecked
+                && rowCheck.rowCheckCount > rowCheck.rowCheckMin
+            ) {
+                rowCtrl._bRowChecked = false;
+                removeClass(rowCtrl.getMain(), type + '-row-checked');
+                rowCheck.rowCheckCount --;
+                return true;
+            }
+        }
+        // 单选
+        else if (rowCheckMode == 'SELECT') {
+            var rows = this._aRows || [];
+            for (var i = 0, row, cell; i < rows.length; i ++) {
+                if ((row = rows[i]) && row._bRowChecked) {
+                    row._bRowChecked = false;
+                    removeClass(row.getMain(), type + '-row-selected');
+                }
+            }
+            rowCtrl._bRowChecked = true;
+            addClass(rowCtrl.getMain(), type + '-row-selected');
+            rowCheck.rowCheckCount = 1;
+        }
+
+        return false;
+    };
+
+    /**
+     * 内容行是否选中
+     *
+     * @private
+     */
+    UI_CUSTOM_TABLE_CLASS.$isRowChecked = function(rowCtrl) {
+        return !!rowCtrl._bRowChecked;
+    };
+
+    /**
+     * 得到当前状态数据
+     *
+     * @public
+     * @return {Object} 当前状态数据
+     */
+    UI_CUSTOM_TABLE_CLASS.getValue = function() {
+        var rowChecked = [];
+        var rows = this._aRows || [];
+        for (var i = 0, row; i < rows.length; i ++) {
+            if ((row = rows[i]) && row._bRowChecked) {
+                rowChecked.push({ value: this._aData[i], index: i });
+            }
+        }
+        return {
+            rowChecked: rowChecked,
+            data: (this._aData || []).slice()
+        }
+    };
+
+    /**
+     * 让表格的横滚始终悬浮在页面视窗低端
+     * 
+     * @param {ecui.ui.CustomTable} con
+     */
+    function setFloatHScroll(con) {
+        var el;
+
+        el = con._eBrowser ? con._eBrowser : con._uHScrollbar.getOuter();
+        el.style.top = MIN(
+            getView().bottom - getPosition(con.getOuter()).top - el.offsetHeight,
+            con.getHeight() - el.offsetHeight
+        ) + 'px';
+
+        setStyle(el, 'zIndex', 1);
+    }
+
+    function getHandlerByType(events, type) {
+        var handlers = [], item;
+
+        events = extend({}, events);
+        events = extend(events, DEFAULT_EVENTS);
+
+        for (var key in events) {
+            item = {handler: events[key]};
+            key = key.split(/\s+/);
+            if (key[0] == type) {
+                item.selector = key[1];
+                handlers.push(item);
+            }
+        }
+
+        return handlers;
+    }
+
+    function checkElementBySelector(ele, selector) {
+        var tagName, value, type, res = true;
+
+        if (!ele && !selector) {
+            return false;
+        }
+
+        selector.replace(/^([^.#]*)([.#]?)(.*)$/, function ($0, $1, $2, $3) {
+            tagName = $1;
+            type = $2;
+            value = $3;
+        });
+
+        if (tagName && ele.tagName.toLowerCase() != tagName) {
+            res = false;
+        }
+
+        if (type == '.' && !new RegExp('(^|\\s+)' + value + '(\\s+|$)').test(ele.className)) {
+            res = false;
+        }
+
+        if (type == '#' && ele.id != value) {
+            res = false;
+        }
+
+        return res;
+    }
+    
+    function copyArray(data) {
+        var res = [];
+        for (var i = 0, o; o = data[i++]; ) {
+            res.push(extend({}, o));
+        }
+        return res;
+    }
+
+    /**
+     * 得到cell坐标
+     * 
+     * @protected
+     * @return {Object} 形如：{x: 4, y: 5}
+     */    
+    function getCellPosition(el) {
+        var pos = el.getAttribute('data-cell-pos');
+        if (pos) {
+            pos = pos.split('-');
+            return { x: toNumber(pos[0]), y: toNumber(pos[1]) };
+        }
+        else {
+            return null;
+        }
+    } 
+
+   //--------------------------------------------------
+    // UI_TABLE_CELL 方法
+    //--------------------------------------------------
+
+    /**
+     * 点击事件
+     * 
+     * @event
+     * @protected
+     */
+    UI_CUSTOM_TABLE_CELL_CLASS.$click = function(event) {
+        UI_CUSTOM_TABLE_CLASS.Cell.superClass.$click.call(this, event);
+
+        // 链接则不走handleCellClick
+        if (!event.target 
+            || !(
+                event.target.getAttribute('data-cell-link-drill-a')
+                || event.target.getAttribute('data-cell-link-bridge-a')
+            )
+        ) {
+            this.$handleCellClick();
+        }
+    };
+
+    /**
+     * 处理cell点击事件
+     * 
+     * @protected
+     */    
+    UI_CUSTOM_TABLE_CELL_CLASS.$handleCellClick = function() {
+        var el = this.getOuter();
+        var tableCtrl = this.getParent().getParent();
+        var ec;
+
+        // 如果是内容节点
+        if (el.getAttribute('data-content')) {
+            var rowDefItem;
+            if (pos = getCellPosition(this.getOuter())) {
+                rowDefItem = tableCtrl._aData[pos.y];
+            }
+            // 暂全部为line选中
+            triggerEvent(tableCtrl, 'rowclick', null, [rowDefItem]);
+
+            var rowCtrl = this.getParent();
+
+            var rowCheckMode = tableCtrl._oRowCheck.rowCheckMode;
+            if (rowCheckMode) {
+                var rowChecked = tableCtrl.$isRowChecked(rowCtrl);
+                var eventName;
+
+                if (rowCheckMode == 'SELECT') {
+                    tableCtrl.$setRowChecked(rowCtrl, true);
+                    eventName = 'rowselect';
+                }
+                else if (rowCheckMode == 'CHECK') {
+                    if (rowChecked && tableCtrl.$setRowChecked(rowCtrl, false)) {
+                        eventName = 'rowuncheck';
+                    }
+                    else if (!rowChecked && tableCtrl.$setRowChecked(rowCtrl, true)) {
+                        eventName = 'rowcheck';
+                    }
+                }
+
+                var callback = function (checked) {
+                    tableCtrl.$setRowChecked(rowCtrl, checked);
+                }
+
+                eventName && triggerEvent(
+                    tableCtrl,
+                    eventName,
+                    null,
+                    [rowDefItem, callback]
+                );
+            }
+        }
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  })();
+<<<<<<< HEAD
+/**
+ * di.shared.adapter.EcuiCustomTableVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    ecui提供的平面表控件的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+=======
 /**
  * di.shared.adapter.EcuiCustomTableVUIAdapter
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -60002,6 +65964,121 @@ $namespace('di.shared.adapter');
             // getValue: getValue
         };
     };
+
+    /**
+     * 设置数据
+     *
+     * @public
+     */
+    function setData(data) {
+        var head = data.head || [];
+        var tdata = data.data || [];
+        var sortInfo = {};
+        var i;
+        var o;
+
+        for (i = 0; o = head[i]; i ++) {
+            if (o.orderby) {
+                o.sortable = true;
+                if (o.orderby == 'ASC' || o.orderby == 'DESC') {
+                    sortInfo.sortby = o.field;
+                    sortInfo.orderby = o.orderby.toLowerCase();
+                }
+            }
+        }
+
+        var options = assign({}, data, ['leftLock', 'rightLock', 'errorMsg']);
+
+        this.render(
+            head, tdata, sortInfo, options, LANG.EMPTY_TEXT
+        );
+    }
+
+    // /**
+    //  * 取数据
+    //  */
+    // function getValue() {
+    //     // TODO
+    // }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+$namespace('di.shared.adapter');
+
+(function() {
+
+<<<<<<< HEAD
+    var LANG = di.config.Lang;
+    var assign = xutil.object.assign;
+    
+    /**
+     * ecui提供的平面表控件的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().EcuiCustomTableVUIAdapter = function(def, options) {
+        return {
+            setData: setData//,
+            // getValue: getValue
+        };
+    };
+=======
+/**
+ * di.shared.adapter.EcuiPagerVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    ecui提供的Pager控件的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    /**
+     * ecui提供的Pager控件的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().EcuiPagerVUIAdapter = function(def, options) {
+        return {
+            setData: setData,
+            getValue: getValue
+        };
+    };
+
+    /**
+     * 设置数据
+     *
+     * @public
+     */
+    function setData(data) {
+        this.render(
+            data.currentPage,
+            data.totalRecordCount,
+            String(data.pageSize)
+        );
+    }
+
+    /**
+     * 取数据
+     */
+    function getValue() {
+        // TODO
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
     /**
      * 设置数据
@@ -62261,6 +68338,7 @@ _eInput - 多选项的INPUT对象
 
     })();
 
+<<<<<<< HEAD
 /**
  * di.shared.adapter.CalendarPlusVUIAdapter
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -62425,6 +68503,172 @@ $namespace('di.shared.adapter');
 
 })();
 
+=======
+/**
+ * di.shared.adapter.CalendarPlusVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    CalendarPlus的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    var UTIL = di.helper.Util;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var detachEvent = ecui.util.detachEvent;
+    var attachEvent = ecui.util.attachEvent;
+    var disposeControl = ecui.dispose;
+    var repaint = ecui.repaint;
+    var parseTimeUnitDef = UTIL.parseTimeUnitDef;
+    var formatTime = UTIL.formatTime;
+    var CALENDAR_PLUS;
+    var GLOBAL_MODEL;
+
+    $link(function() {
+        CALENDAR_PLUS = ecui.ui.CalendarPlus;
+        GLOBAL_MODEL = di.shared.model.GlobalModel;
+    });
+
+    /**
+     * CalendarPlus的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().CalendarPlusVUIAdapter = function(def, options) {
+        return {
+            create: create,
+            setData: setData,
+            getValue: getValue
+        };
+    };
+
+    /**
+     * 创建
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @param {Object} options.granularities 粒度，
+     *      'D', 'W', 'M', 'Q', 'Y'
+     *          每项的配置，含有：
+     *          options.start 开始时间，绝对值（如2012-12-12）或相对当前时间的值（如-5d）
+     *          options.end 结束时间，格式同上
+     * @return {Object} 创建的实例
+     */
+    function create(def, options) {
+        return ecuiCreate(CALENDAR_PLUS, def.el, null, prepareData(options));
+    }
+
+    /**
+     * 设置数据
+     *
+     * @public
+     */
+    function setData(data) {
+        this.setData(prepareData(data));
+        // detachEvent(window, 'resize', repaint);
+
+        // var disposeFunc = this.$dispose;
+        // this.$dispose = new Function();
+        // disposeControl(this);
+        // this.$dispose = disposeFunc;
+
+        // var el = this.getOuter();
+        // el.innerHTML = '';
+        // this.$setBody(el);
+        // this.$resize();
+        // CALENDAR_PLUS.client.call(this, el, prepareData(data));
+        // this._bCreated = false;
+        // this.cache(true, true);
+        // this.init();
+
+        // attachEvent(window, 'resize', repaint);
+    }
+
+    /**
+     * 准备数据
+     *
+     * @private
+     */
+    function prepareData(options) {
+        var now = GLOBAL_MODEL().getDateModel().now();
+
+        var defUnit = {
+                defaultTime: ['0d'],
+                range: ['-1Y', '0d']
+            };
+        var granularities = options.granularities
+            // 缺省的granularity
+            || { D: defUnit, W: defUnit, M: defUnit, Q: defUnit };
+
+        var opt = {
+            types: [],
+            range: {},
+            defaults: {}
+        };
+
+        var timeMap = {
+            D: 'day', W: 'week', M: 'month', Q: 'quarter', Y: 'year'
+        };
+
+        var range;
+        for (var gran in granularities) {
+            opt.types.push(gran);
+
+            range = granularities[gran];
+            
+            opt.defaults[timeMap[gran]] = formatObjTime(
+                parseTimeUnitDef(range.defaultTime, [now, now]),
+                gran
+            ).start;
+            opt.range[timeMap[gran]] = formatObjTime(
+                parseTimeUnitDef(range.range, [now, now]) || {},
+                gran
+            );
+        }
+
+        return opt;
+    }
+
+    /**
+     * 格式化时间
+     * 
+     * @private
+     */    
+    function formatObjTime(obj, granularity) {
+        for (var key in obj) {
+            obj[key] = formatTime(obj[key], granularity);
+        }
+        return obj;
+    }
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    function getValue() {
+        var wrap = this.getDate();
+        return {
+            start: wrap.date,
+            end: wrap.date,
+            granularity: wrap.type
+        };
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.FoldPanel
@@ -62643,9 +68887,318 @@ $namespace('di.shared.ui');
 Suggest - 定义模拟下拉框行为的基本操作。
 下拉框控件，继承自输入控件，实现了选项组接口，扩展了原生 SelectElement 的功能，允许指定下拉选项框的最大选项数量，在屏幕显示不下的时候，会自动显示在下拉框的上方。在没有选项时，下拉选项框有一个选项的高度。下拉框控件允许使用键盘与滚轮操作，在下拉选项框打开时，可以通过回车键或鼠标点击选择，上下键选择选项的当前条目，在关闭下拉选项框后，只要拥有焦点，就可以通过滚轮上下选择选项。
 
+<<<<<<< HEAD
 下拉框控件直接HTML初始化的例子:
+=======
+/**
+ * di.shared.adapter.EcuiSuggestVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    ecui suggest的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
 
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    var extend = xutil.object.extend;
+    var ecuiCreate = di.helper.Util.ecuiCreate;
+
+    /**
+     * ecui suggest的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @param {string} options.valueType 提交时值的类型，可为
+     *      'TEXT'：则getValue取到的值是text（默认）
+     *      'VALUE'：则getValue取到的是value
+     * @return {Object} vui adapter实例
+     */
+    $namespace().EcuiSuggestVUIAdapter = function(def, options) {
+        return {
+            create: create,
+            getValue: getValueFunc[options.valueType || 'TEXT']
+        };
+    };
+
+    /**
+     * 创建
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @return {Object} 创建的实例
+     */
+    function create(def, options) {
+        var ctrl = ecuiCreate(def.clz, def.el, null, options);
+
+        ctrl.$di('registerEventAgent', 'async');
+        
+        // 挂接事件
+        ctrl.onquery = function (value) {
+            /**
+             * 异步加载统一的事件
+             *
+             * @event
+             */
+            ctrl.$di(
+                'dispatchEvent',
+                'async',
+                [
+                    (value || {}).text,
+                    function (data) {
+                        ctrl.update(data.datasource || []);
+                    }
+                ]
+            );
+        }
+
+        return ctrl;
+    }    
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {string} 数据
+     */
+    var getValueFunc = {
+        TEXT: function () {
+            return (this.getValue() || {}).text || '';
+        },
+        VALUE: function () {
+            return (this.getValue() || {}).value || '';
+        }
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
 <div ecui="type:suggest;">
+=======
+/**
+ * input
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ * 
+ * path:    count-input.js
+ * desc:    带计数的文本输入框(input与textarea)
+ * author:  cxl(chenxinle)
+ *          modified by sushuang(sushuang) 
+ * date:    2012/03/12
+ */
+(function () {
+
+    var core = ecui,
+        dom = core.dom,
+        string = core.string,
+        ui = core.ui,
+        util = core.util,
+
+        attachEvent = util.attachEvent,
+        createDom = dom.create,
+        addClass = dom.addClass,
+        removeClass = dom.removeClass,
+        removeDom = dom.remove,
+        insertAfter = dom.insertAfter,
+        trim = string.trim,
+        setFocused = core.setFocused,
+        blank = util.blank,
+        triggerEvent = core.triggerEvent,
+        inheritsControl = core.inherits,
+        getByteLength = string.getByteLength,
+
+        UI_CONTROL = ui.Control,
+        UI_CONTROL_CLASS = UI_CONTROL.prototype,
+        UI_INPUT_CONTROL = ui.InputControl,
+        UI_INPUT_CONTROL_CLASS = UI_INPUT_CONTROL.prototype,
+
+
+        UI_INPUT = ui.Input = inheritsControl(
+            UI_INPUT_CONTROL,
+            'ui-input',
+            function (el, options) {
+                options.resizable = false;
+                this._bPromptDisabled = options.promptDisabled == null 
+                    ? true : options.promptDisabled;
+            },
+            function (el, options) {
+                var o, type = this.getType();
+                
+                this.getInput().style.border = '';
+
+                if(options.maxLength){
+                    this._sMaxLength = options.maxLength;
+                }
+
+                if (options.tip) {
+                    o = createDom(type + '-tip', 'display:none');
+                    o.innerHTML = options.tip;
+                    this.getBody().appendChild(o);
+                    this._eTip = o;
+                    attachEvent(this._eTip, 'keypressdown', UI_INPUT_TIP_HANDLER);
+                }
+            }
+        ),
+        UI_INPUT_CLASS = UI_INPUT.prototype,
+
+        UI_TEXTAREA = ui.Textarea = inheritsControl(
+            UI_INPUT,
+            'ui-textarea',
+            function (el, options) {
+                options.inputType = 'textarea';
+                this._bCountDisabled = options.countDisabled;
+            }
+        ),
+        UI_TEXTAREA_CLASS = UI_TEXTAREA.prototype;
+
+    var COUNT_NORMAL_TPL = '还可以输入$字',
+        COUNT_OVERFLOW_TPL = '已经超过$字',
+        CHAR_SET = 'gbk';
+
+    function UI_INPUT_TIP_HANDLER(event) {
+        var e = event || window.event,
+            con;
+        e = e.target || e.srcElement;
+        con = e.parentNode.getControl();
+        con.getInput().focus();
+    }
+
+    function UI_INPUT_TIP_DISPLAY(con, show) {
+        if (con._eTip) {
+            con._eTip.style.display = show ? '' : 'none';
+        }
+    }
+
+    UI_INPUT_CLASS.$keydown = function () {
+        UI_INPUT_TIP_DISPLAY(this, false);
+    };
+
+    UI_INPUT_CLASS.$keyup = function () {
+        if (!this.getValue()) {
+            UI_INPUT_TIP_DISPLAY(this, true);
+        }        
+    };
+
+    UI_INPUT_CLASS.$change = function () {
+        this.$updateCount();
+    };
+
+    UI_INPUT_CLASS.$updateCount = function () {
+        var value = this.getValue(),
+            type = this.getType(),
+            byteLength,
+            remain;
+        
+        if (this._sMaxLength && this._eCount){
+            byteLength = getByteLength(value, CHAR_SET);
+
+            if (byteLength > this._sMaxLength){
+                remain = [
+                    '<span class="', type, '-count-overflow">',
+                        Math.ceil((byteLength - this._sMaxLength) / 2),
+                    '</span>'
+                ].join('');
+                this._eCount.innerHTML = COUNT_OVERFLOW_TPL.replace('$', remain);
+            }
+            else {
+                remain = [
+                    '<span class="', type, '-count-normal">',
+                        Math.floor((this._sMaxLength - byteLength) / 2),
+                    '</span>'
+                ].join('');
+                this._eCount.innerHTML = COUNT_NORMAL_TPL.replace('$', remain);
+            }
+        }
+    };
+
+    UI_INPUT_CLASS.$blur = function () {
+        UI_CONTROL_CLASS.$blur.call(this);
+        if (!this.getValue()) {
+            UI_INPUT_TIP_DISPLAY(this, true);
+        }
+    };
+
+    UI_INPUT_CLASS.$focus = function () {
+        UI_CONTROL_CLASS.$focus.call(this);
+        UI_INPUT_TIP_DISPLAY(this, false);
+    };
+
+    UI_INPUT_CLASS.$setSize = blank;
+
+    UI_INPUT_CLASS.setValue = function (value) {
+        UI_INPUT_CONTROL_CLASS.setValue.call(this, value);
+        UI_INPUT_TIP_DISPLAY(this, value ? false : true);
+        this.$updateCount();
+    };
+
+    UI_INPUT_CLASS.init = function () {
+        if (!this.getValue()) {
+            UI_INPUT_TIP_DISPLAY(this, true);
+        }
+        var type = this.getType();
+        if (!this._bPromptDisabled) {
+            if (!this._eBar) {
+                this._eBar = createDom(type + '-bar');
+                insertAfter(this._eBar, this.getOuter());
+            }
+            this._eBar.appendChild(
+                this._ePrompt = createDom(type + '-prompt')
+            );
+        }
+        UI_INPUT_CONTROL_CLASS.init.call(this);
+    };
+
+    /**
+     * 显示错误
+     *
+     * @public
+     * @param {boolean} error true则显示错误，false则还原
+     * @prompt {string} 提示信息
+     */
+    UI_INPUT_CLASS.setErrorView = function (error, prompt) {
+        if (error) {
+            addClass(this.getOuter(), this.getType() + '-error');
+        } 
+        else {
+            removeClass(this.getOuter(), this.getType() + '-error');
+        }
+        if (this._ePrompt) {
+            this._ePrompt.innerHTML = prompt == null ? '' : prompt
+        }
+    };
+
+    UI_TEXTAREA_CLASS.init = function () {
+        var type = this.getType();
+        if (this._sMaxLength && !this._bCountDisabled) {
+            if (!this._eBar) {
+                this._eBar = createDom(type + '-bar');
+                insertAfter(this._eBar, this.getOuter());
+            }            
+            this._eBar.appendChild(
+                this._eCount = createDom(type + '-count')
+            );
+            this.$updateCount();
+        }
+        UI_TEXTAREA.superClass.init.call(this);
+    };
+
+    UI_TEXTAREA_CLASS.$dispose = function () {
+        this._eBar && removeDom(this._eBar);
+        this._eBar = null;
+        this._eCount = null;
+        this._ePrompt = null;
+
+        UI_TEXTAREA.superClass.$dispose.call(this);
+    }
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 </div>
 
@@ -64749,6 +71302,7 @@ $namespace('di.shared.ui');
     };
 
 })();
+<<<<<<< HEAD
 /**
  * di.shared.model.OlapMetaConfigModel
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -65417,6 +71971,676 @@ $namespace('di.shared.model');
 
 })();
 
+=======
+/**
+ * di.shared.model.OlapMetaConfigModel
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    元数据选择Model
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil
+ */
+
+$namespace('di.shared.model');
+
+(function () {
+    
+    //------------------------------------------
+    // 引用
+    //------------------------------------------
+
+    var FORMATTER = di.helper.Formatter;
+    var DICT = di.config.Dict;
+    var LANG = di.config.Lang;
+    var URL = di.config.URL;
+    var UTIL = di.helper.Util;
+    var inheritsObject = xutil.object.inheritsObject;
+    var q = xutil.dom.q;
+    var g = xutil.dom.g;
+    var bind = xutil.fn.bind;
+    var isArray = xutil.lang.isArray;
+    var extend = xutil.object.extend;
+    var assign = xutil.object.assign;
+    var parse = baidu.json.parse;
+    var logError = UTIL.logError;
+    var getUID = xutil.uid.getUID;
+    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    var XDATASOURCE = xui.XDatasource;
+
+    //------------------------------------------
+    // 类型声明
+    //------------------------------------------
+
+    /**
+     * 元数据选择Model
+     *
+     * @class
+     * @extends xui.XDatasource
+     * @param {Object} options
+     * @param {Object} options.reportType
+     * @param {Function=} options.commonParamGetter    
+     */
+    var OLAP_META_CONFIG_MODEL = 
+            $namespace().OlapMetaConfigModel = 
+            inheritsObject(XDATASOURCE, constructor);
+    var OLAP_META_CONFIG_MODEL_CLASS = 
+            OLAP_META_CONFIG_MODEL.prototype;
+  
+    //------------------------------------------
+    // 方法
+    //------------------------------------------
+
+    /**
+     * 构造方法
+     *
+     * @private
+     * @param {Object} options 参数
+     */
+    function constructor(options) {
+        /**
+         * 类型，TABLE 或者 CHART
+         *
+         * @type {string}
+         * @private
+         */
+        this._sReportType = options.reportType || 'RTPL_OLAP_TABLE';
+        /**
+         * 得到公用的请求参数
+         *
+         * @type {Function}
+         * @private
+         */
+        this._fCommonParamGetter = options.commonParamGetter;
+        /**
+         * 指标列表
+         *
+         * @type {xutil.LinkedHashMap}
+         * @private
+         */
+        this._oIndList = new LINKED_HASH_MAP(null, 'uniqName');
+        /**
+         * 维度列表
+         * 
+         * @type {xutil.LinkedHashMap}
+         * @private
+         */
+        this._oDimList = new LINKED_HASH_MAP(null, 'uniqName');
+        /**
+         * selLine包装
+         * key为selLine唯一名，value是selLine的list
+         * 
+         * @type {xutil.LinkedHashMap}
+         * @private
+         */
+        this._oSelLineWrap = new LINKED_HASH_MAP(null, 'k', 'l');
+        /**
+         * 元数据状态
+         * dimMetas: {}
+         * indMetas: {}
+         *      {Array.<string>} validMetaNames
+         *      {Array.<string>} selectedMetaNames
+         *
+         * @type {Object}
+         * @private
+         */
+        this._oStatusWrap = {};
+        /**
+         * 图的系列组属性
+         *
+         * @private
+         */
+        this._oSeriesCfg = {};
+    }
+
+    /**
+     * @override
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.init = function () {};
+
+    var URL_MAP = {
+        RTPL_OLAP_TABLE: {
+            DATA: URL.fn('META_CONDITION_IND_DIM_TABLE'),
+            SELECT: URL.fn('META_CONDITION_SELECT_TABLE'),
+            LIST_SELECT: URL.fn('META_CONDITION_LIST_SELECT_TABLE')
+        },
+        RTPL_OLAP_CHART: {
+            DATA: URL.fn('META_CONDITION_IND_DIM_CHART'),
+            SELECT: URL.fn('META_CONDITION_SELECT_CHART'),
+            LIST_SELECT: URL.fn('META_CONDITION_LIST_SELECT_CHART')
+        }
+    };    
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.url = function (options) {
+        return URL_MAP[this._sReportType][options.datasourceId]();
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.businessKey = new XDATASOURCE.Set(
+        {
+            DATA: 'OLAP_META_CONFIG_MODEL_DATA_' + getUID(),
+            SELECT: 'OLAP_META_CONFIG_MODEL_SELECT_' + getUID()
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.complete = new XDATASOURCE.Set(
+        {
+            DATA: doComplete,
+            SELECT: doComplete
+        }
+    );
+
+    function doComplete(ejsonObj) {
+        // 换reportTemplateId（后台生成了副本，所以约定更换为副本的id）
+        // FIXME 
+        // 换成非嵌入的实现方式
+        this._fCommonParamGetter.update(ejsonObj.data);
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.param = new XDATASOURCE.Set(
+        {
+            DATA: function (options) { 
+                return this._fCommonParamGetter(options.args.param);
+            },
+            SELECT: function (options) {
+                var changeWrap = options.args.changeWrap;
+                var paramArr = [];
+
+                var param = {
+                    from: changeWrap.from,
+                    to: changeWrap.to,
+                    toPosition: changeWrap.toPosition != null 
+                        ? changeWrap.toPosition : -1,
+                    needShowCalcInds: options.args.needShowCalcInds,
+                    uniqNameList: []
+                };
+
+                param.uniqNameList.push.apply(
+                    param.uniqNameList,
+                    changeWrap.uniqNameList
+                );
+
+                return this._fCommonParamGetter(param);
+            }, 
+            LIST_SELECT: function (options) {
+                return this._fCommonParamGetter(options.args);
+            }
+        }
+    );
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.parse = new XDATASOURCE.Set(
+        {
+            DATA: function (data, ejsonObj, options) {
+                try {
+                    var me = this;
+
+                    this.$clean();
+                    
+                    // 指标维度元数据
+                    var metaData = data['metaData'];
+                    this._oIndList.appendAll(metaData['inds']);
+                    this._oDimList.appendAll(metaData['dims']);
+
+                    // 设置指标还是维度标记
+                    setIndDimClazz.call(this, this._oIndList, 'IND');
+                    setIndDimClazz.call(this, this._oDimList, 'DIM');
+
+                    // 图的series属性（左右轴，图类型等）
+                    this._oSeriesCfg = {};
+                    var seriesTypes = data['seriesTypes'] || {};
+                    for (var serName in seriesTypes) {
+                        this._oSeriesCfg[serName] = {
+                            type: seriesTypes[serName]
+                            // TODO
+                            // 左右轴
+                        };
+                    }
+
+                    // selLine处理
+                    for (
+                        var i = 0, key, list; 
+                        key = data['index4Selected'][i]; 
+                        i ++
+                    ) {
+                        this._oSelLineWrap.addLast(
+                            {
+                                k: key,
+                                l: list = new LINKED_HASH_MAP(
+                                    data['selected'][key], 
+                                    'uniqName'
+                                )
+                            }
+                        );
+                        setIndDimClazz.call(this, list);
+                    }
+
+                    // 选中、禁用等状态
+                    doMerge.call(this, data);
+                }
+                catch (e) {
+                    logError(e);
+                    this.$goError();
+                }
+            },
+
+            SELECT: function (data, ejsonObj, options) {
+                try {
+                    // 选中、禁用等状态
+                    doMerge.call(this, data);
+
+                    // 提交成功才更新本地selected的Model数据
+                    this.$updateSelected(options.args.changeWrap);
+                }
+                catch (e) {
+                    logError(e);
+                    this.$goError();
+                }
+            }
+        }
+    );
+
+    /**
+     * 对selected和meta进行融合
+     * 
+     * @private
+     */
+    function doMerge(data) {
+
+        // 用selected中的status来覆盖进meta
+        if (this._oStatusWrap = data['metaStatusData']) {
+            // 处理、融合
+            mergeStatus.call(
+                this, 
+                this._oStatusWrap.indMetas, 
+                this._oIndList
+            );
+            mergeStatus.call(
+                this, 
+                this._oStatusWrap.dimMetas, 
+                this._oDimList
+            );
+        }
+
+        // 用meta中的其余信息（如fixed、align等）覆盖回selected
+        var indList = this._oIndList;
+        var dimList = this._oDimList;
+        this._oSelLineWrap.foreach(
+            function (selLineName, selLine, index) {
+                selLine.foreach(function (key, item, idx) {
+                    var o;
+                    if ((o = indList.get(key))
+                        || (o = dimList.get(key))
+                    ) {
+                        extend(item, o);
+                    }
+                });
+            }
+        );
+    }
+
+    /**
+     * @override
+     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.error = new XDATASOURCE.Set(
+        {
+            DATA: function (status, ejsonObj, options) {
+                this._oIndList.clean();
+                this._oDimList.clean();
+                this._oSelLineWrap.clean();
+                this._oStatusWrap = {};
+            }
+        }
+    );
+
+    OLAP_META_CONFIG_MODEL_CLASS.$clean = function() {
+        this._oIndList.cleanWithoutDefaultAttr();
+        this._oDimList.cleanWithoutDefaultAttr();
+        this._oSelLineWrap.cleanWithoutDefaultAttr();
+        this._oStatusWrap = {};
+        this._oSeriesCfg = {};
+    };
+
+    /**
+     * 补充设置指标维度标志，根据字典
+     *
+     * @private
+     */
+    function setIndDimClazz(list, flag) {
+        var me = this;
+        list.foreach(
+            function (key, o) {
+                if (flag) {
+                    o.clazz = flag;
+                }
+                else if (me._oIndList.containsKey(o.uniqName)) {
+                    o.clazz = 'IND';
+                }
+                else if (me._oDimList.containsKey(o.uniqName)) {
+                    o.clazz = 'DIM';
+                }
+            }
+        );        
+    }
+
+    /**
+     * 融合status
+     *
+     * @private
+     */
+    function mergeStatus(statusWrap, baseList) {
+        // 先全设为disabled
+        baseList.foreach(
+            function (k, item, index) {
+                item.status = DICT.META_STATUS.DISABLED;
+            }
+        );
+
+        if (!statusWrap) { return; }
+
+        var validMetaNames = statusWrap.validMetaNames;
+        !validMetaNames 
+            && (validMetaNames = statusWrap.validMetaNames = []);
+
+        var selectedMetaNames = statusWrap.selectedMetaNames;
+        !selectedMetaNames 
+            && (selectedMetaNames = statusWrap.selectedMetaNames = []);
+
+        // 用后台返回的normal和selected列表设置状态
+        // 因为visible设定的影响，后台返回的项有可能含有baseList里不存在的（小明说灰常难改），
+        // 所以在这里去除不存在的
+        var i;
+        var o;
+        var item;
+        for (i = 0; i < validMetaNames.length;) {
+            if (item = baseList.get(validMetaNames[i])) {
+                item.status = DICT.META_STATUS.NORMAL;
+                i ++;
+            }
+            else {
+                validMetaNames.splice(i, 1);
+            }
+        }
+        for (i = 0; i < selectedMetaNames.length;) {
+            if (item = baseList.get(selectedMetaNames[i])) {
+                item.status = DICT.META_STATUS.SELECTED;
+                i ++;
+            }
+            else {
+                selectedMetaNames.splice(i, 1);
+            }
+        }
+
+        // 接口定的有点乱，控件需要的其实是disabled列表
+        var disabledMetaNames = statusWrap.disabledMetaNames = [];
+        baseList.foreach(
+            function (k, item, index) {
+                if (item.status == DICT.META_STATUS.DISABLED) {
+                    disabledMetaNames.push(k);
+                }
+            }
+        );
+    }
+
+    /**
+     * 得到selLine包装
+     *
+     * @public
+     * @return {xutil.LinkedHashMap} selLine
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.getSelLineWrap = function () {
+        return this._oSelLineWrap;
+    };
+
+    /**
+     * 得到指标维度列表
+     *
+     * @public
+     * @return {Object} 指标维度列表
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.getIndDim = function () {
+        return {
+            indList: this._oIndList,
+            dimList: this._oDimList
+        };
+    };
+
+    /**
+     * 得到指标维度最新状态
+     *
+     * @public
+     * @return {Object} 指标维度最新状态
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.getUpdateData = function () {
+        return this._oStatusWrap;
+    };
+
+    /**
+     * 得到图的系列租设置信息
+     *
+     * @public
+     * @return {Object} 指标维度最新状态
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.getSeriesCfg = function () {
+        return this._oSeriesCfg;
+    };
+
+    /**
+     * 根据uniqName得到项
+     * 
+     * @public
+     * @param {string} uniqName
+     * @return {Object} metaItem
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.getMetaItem = function (uniqName) {  
+        var item = this._oIndList.get(uniqName);
+        if (!item) {
+            item = this._oDimList.get(uniqName);
+        }
+        return item;
+    };
+
+    /**
+     * 得到选择变化信息
+     * 
+     * @public
+     * @param {Object} selLineWrap key为行列名，value为行列选中列表 
+     * @return {Object} 返回值的key为from, to, toPosition
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.diffSelected = function (selLineWrap) {
+        var srcList;
+        var removeList; 
+        var addList;
+        var changeWrap = { uniqNameList: [] };
+
+        for (var name in selLineWrap) {
+            srcList = this._oSelLineWrap.get(name);
+            diffLineSelected.call(
+                this, 
+                name, 
+                selLineWrap[name], 
+                srcList, 
+                changeWrap
+            );
+        }
+
+        return changeWrap;
+    };
+
+    /**
+     * 得到某行选择变化信息
+     * 只支持三种可能：某项此行间换位值，拖离此行，拖进此行
+     * （这些处理过于复杂，后端也重复实现了这些复杂逻辑，这
+     *  源于定的from-to接口，合理的方式是重构，
+     *  不使用from-to方式的接口，而是传当前状态）
+     * 
+     * @private
+     * @param {string} lineName
+     * @param {Array.<string>} currLine
+     * @param {xutil.LinkedHashMap} srcList 
+     * @param {Object} result
+     */
+    function diffLineSelected(lineName, currLine, srcList, result) {
+        // 在此行间换位置的情况，检查出拖动的节点
+        if (currLine.length == srcList.size()) {
+            var diffKeySrc;
+            var diffIndex;
+            var tarIndexCurr;
+            var tarIndexSrc;
+            var tarKeySrc;
+            srcList.foreach(
+                function (key, value, index) {
+                    if (diffIndex == null) {
+                        if (key != currLine[index]) { 
+                            // 出现了第一个不一样的值
+                            diffKeySrc = key; 
+                            diffIndex = index;
+                        }
+                    }
+                    else {
+                        if (diffKeySrc == currLine[index]) {
+                            tarIndexCurr = index;
+                        }
+                        if (currLine[diffIndex] == key) {
+                            tarIndexSrc = index;
+                            tarKeySrc = key;
+                        }
+                    }
+                }
+            );
+            if (diffIndex != null) {
+                result.from = lineName;
+                result.to = lineName;
+                result.fromLineData = currLine;
+                result.toLineData = currLine;
+                if (tarIndexSrc > tarIndexCurr) {
+                    result.uniqName = tarKeySrc;
+                    result.toPosition = diffIndex;
+                }
+                else {
+                    result.uniqName = diffKeySrc;
+                    result.toPosition = tarIndexCurr;
+                }
+                result.uniqNameList.push(result.uniqName);
+            }
+        }
+        // 拖进此行的情况
+        else if (currLine.length > srcList.size()) {
+            for (var i = 0, name; i < currLine.length; i ++) {
+                name = currLine[i];
+                if (!srcList.containsKey(name)) {
+                    result.uniqName = name
+                    result.uniqNameList.splice(0, 1, name);
+                    result.to = lineName;
+                    result.toLineData = currLine;
+                    if (result.toPosition == null) {
+                        result.toPosition = i;
+                    }
+                }
+            }
+        }
+        // 拖离此行的情况（删除或者拖到别的行）
+        else if (currLine.length < srcList.size()) {
+            srcList.foreach(
+                function (name, value, index) {
+                    if (currLine[index] != name) {
+                        result.uniqName = name
+                        result.uniqNameList.push(name);
+                        result.from = lineName;
+                        result.fromLineData = currLine;
+                        return false;
+                    }
+                }
+            );
+        }
+        // FIXME
+        // 临时处理，FIXME，后续改和后台的接口
+        result.uniqNameList.splice(1, result.uniqNameList.length - 1);
+    };
+
+    /**
+     * 设置条件选择变化
+     * 
+     * @protected
+     * @param {Object} changeWrap
+     * @param {Array.<string>} changeWrap.uniqNameList
+     * @param {string} changeWrap.from
+     * @param {string} changeWrap.to
+     * @param {number} changeWrap.toPosition
+     */
+    OLAP_META_CONFIG_MODEL_CLASS.$updateSelected = function (changeWrap) {
+        var fromList = changeWrap.from != changeWrap.to
+                ? this._oSelLineWrap.get(changeWrap.from)
+                : null;
+        var toList = this._oSelLineWrap.get(changeWrap.to);
+
+        var fromLineData = changeWrap.fromLineData;
+        var toLineData = changeWrap.toLineData;
+        var i = 0;
+        var uniqName;
+
+        if (fromList) {
+            fromList.cleanWithoutDefaultAttr();
+            for (i = 0; i < fromLineData.length; i ++) {
+                uniqName = fromLineData[i];
+                fromList.addLast(this.getMetaItem(uniqName));
+            }
+        }
+
+        if (toList) {
+            toList.cleanWithoutDefaultAttr();
+            for (i = 0; i < toLineData.length; i ++) {
+                uniqName = toLineData[i];
+                toList.addLast(this.getMetaItem(uniqName));
+            }
+        }
+
+        //----------------------------------
+        // ONLY FOR TESTING. TO BE DELETED.
+        // console.log(changeWrap);
+        // console.log('      uniqNameList= ' + changeWrap.uniqNameList);
+        // console.log('      from= ' + changeWrap.from);
+        // console.log('      fromLineData= ' + changeWrap.fromLineData);
+        // console.log('      to= ' + changeWrap.to);
+        // console.log('      toLineData= ' + changeWrap.toLineData);
+        // console.log('      toPosition= ' + changeWrap.toPosition);
+        // this._oSelLineWrap.foreach(function (k, item, index) {
+        //     console.log('LINE NAME::: ' + k);
+        //     item.foreach(function (kk, oo, ii) {
+        //         var arr = [];
+        //         arr.push(kk);
+        //         console.log('          ' + arr.join('  '));
+        //     });
+        // });
+    };
+
+    //------------------------------------------------
+    // 拖拽规则
+    //------------------------------------------------
+
+    
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * di.shared.ui.OlapMetaConfig
@@ -65981,6 +73205,16 @@ $namespace('di.shared.vui');
     };
 
 })();
+<<<<<<< HEAD
+/**
+ * di.shared.adapter.MetaConfigVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    元数据选择控件的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+=======
 /**
  * di.shared.adapter.MetaConfigVUIAdapter
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -65991,6 +73225,228 @@ $namespace('di.shared.vui');
  */
 
 $namespace('di.shared.adapter');
+
+(function () {
+
+    var dateToString = xutil.date.dateToString;
+    var isArray = xutil.lang.isArray;
+    var DICT = di.config.Dict;
+    var markParamMode;
+
+    $link(function () {
+        markParamMode = di.shared.model.CommonParamFactory.markParamMode;
+    });
+
+    /**
+     * 元数据选择控件的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().MetaConfigVUIAdapter = function (def, options) {
+        var clzKey = def.clzKey;
+
+        return {
+            create: CREATE_METHOD[clzKey],
+            setData: SET_DATA_METHOD[clzKey],
+            updateData: UPDATE_DATA_METHOD[clzKey],
+            getValue: GET_VALUE_METHOD[clzKey]
+        };
+    };
+
+    /**
+     * 创建
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @param {string} options.start 开始时间，
+     *                      绝对值（如2012-12-12）
+     *                      或相对于系统时间的偏移（如-5d）
+     * @param {string} options.end 结束时间，格式同上。如果和range同时存在，则end优先
+     * @param {string} options.range 区间，相对于start的偏移（如-4d）
+     * @param {string} options.defaultTime 默认时间
+     * @return {Object} 创建的实例
+     */
+    var CREATE_METHOD = {
+        OLAP_META_DRAGGER: create4Dragger,
+        OLAP_META_IND_SELECT: create4Select,
+        OLAP_META_IND_MULTI_SELECT: create4Select
+    };
+
+    function create4Dragger(def, options) {
+        var ins = new def.clz(options)            
+        ins.$di('registerEventAgent', 'change');
+
+        ins.attach(
+            'sellinechange', 
+            function (wrap) {
+                ins.$di('dispatchEvent', 'change', [wrap]);
+            }
+        );
+        return ins;
+    }
+
+    function create4Select(def, options) {
+        var ins = new def.clz(options);
+        ins.$di('registerEventAgent', 'change');
+
+        ins.attach(
+            'change', 
+            function (wrap) {
+                // 标志用JSON传输
+                markParamMode(wrap, 'JSON');
+                ins.$di('dispatchEvent', 'change', [wrap]);
+            }
+        );
+        return ins;
+    }
+
+    /**
+     * 设置初始化数据
+     * 
+     * @public
+     * @param {Object} data 数据
+     */
+    var SET_DATA_METHOD = {
+        OLAP_META_DRAGGER: setDataMethod,
+        OLAP_META_IND_SELECT: setDataMethod,
+        OLAP_META_IND_MULTI_SELECT: setDataMethod
+    };
+
+    function setDataMethod(data) {
+        this.setData(data);
+    }
+
+    /**
+     * 更新当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    var UPDATE_DATA_METHOD = {
+        OLAP_META_DRAGGER: function (data) {
+            this.refreshStatus(data);
+        },
+        OLAP_META_IND_SELECT: function (data) {
+            // do nothing
+        },
+        OLAP_META_IND_MULTI_SELECT: function (data) {
+            // do nothing
+        }
+    };
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    var GET_VALUE_METHOD = {
+        OLAP_META_DRAGGER: function (data) {
+            return this.getValue();
+        },
+        OLAP_META_IND_SELECT: function (data) {
+            var val = this.getValue();
+            markParamMode(val, 'JSON');
+            return val;
+        },
+        OLAP_META_IND_MULTI_SELECT: function (data) {
+            var val = this.getValue();
+            markParamMode(val, 'JSON');
+            return val;
+        }
+    };
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+$namespace('di.shared.adapter');
+=======
+/**
+ * ecui.ui.SwitchButton
+ * Copyright 2013 Baidu Inc. All rights reserved
+ *
+ * @file:   可切换状态的button
+ * @author: sushuang(sushuang)
+ */
+
+ (function () {
+    
+    var inheritsControl = ecui.inherits;
+    var UI_H_BUTTON = ecui.ui.HButton;
+    var moveElements = ecui.dom.moveElements;
+    var createDom = ecui.dom.create;
+    var triggerEvent = ecui.triggerEvent;
+    var addClass = ecui.dom.addClass;
+    var extend = ecui.util.extend;
+
+    /**
+     * 可切换状态的button
+     *
+     * @class
+     * @extends {ecui.ui.Control}
+     * @param {Array.<Object>} statusList
+     *      内部元素为 text ... value ...
+     * @param {number} status
+     */
+    var UI_SWITCH_BUTTON = ecui.ui.SwitchButton =
+        inheritsControl(
+            UI_H_BUTTON,
+            null,
+            null,
+            function (el, options) {
+                var type = this.getType();
+                this._aStatusList = options.statusList || [];
+                var index;
+                for (var i = 0, o; o = this._aStatusList[i]; i ++) {
+                    if (o.value == options.status) {
+                        index = i;
+                        break;
+                    }
+                }
+                this.$switchStatus(index);
+            }
+        );
+
+    var UI_SWITCH_BUTTON_CLASS = UI_SWITCH_BUTTON.prototype;
+
+    UI_SWITCH_BUTTON_CLASS.$click = function () {
+        UI_SWITCH_BUTTON.superClass.$click.apply(this, arguments);
+        this.$switchStatus();
+        triggerEvent(this, 'change');
+    };
+
+    UI_SWITCH_BUTTON_CLASS.$switchStatus = function (index) {
+        var statusList = this._aStatusList;
+        if (statusList.length == 0) {
+            return;
+        }
+
+        var nextIndex = index != null 
+            ? index
+            : (
+                this._nIndex == null
+                ? 0
+                : (this._nIndex + 1) % statusList.length
+            );
+        this._nIndex = nextIndex;
+
+        this.setText(statusList[this._nIndex].text);
+    };
+
+    UI_SWITCH_BUTTON_CLASS.getValue = function () {
+        return this._aStatusList[this._nIndex].value;
+    };
+
+ }) ();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 (function () {
 
@@ -66590,6 +74046,7 @@ $namespace('di.shared.adapter');
     };
 
 }) ();
+<<<<<<< HEAD
 /**
  * @file 可拖放的items
  * @author hades(denghongqi)
@@ -67158,6 +74615,576 @@ $namespace('di.shared.adapter');
         }
         return index;
     };
+=======
+/**
+ * @file 可拖放的items
+ * @author hades(denghongqi)
+ */
+
+(function() {
+    var core = ecui;
+    var ui = core.ui;
+    var dom = core.dom;
+    var array = core.array;
+    var util = core.util;
+
+    var UI_CONTROL = ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+    var UI_ITEMS = ui.Items;
+    var UI_ITEM = ui.Item;
+    var UI_ITEM_CLASS = UI_ITEM.prototype;
+
+    ui.DroppableList = core.inherits(
+        UI_CONTROL,
+        'ui-droppable-list',
+        function(el, options) {
+        },
+        function(el, options) {
+            this._sName = options.name;
+            options.targets = options.targets ||'';
+            this._aTargetIds = options.targets.split(',') || [];
+            options.source = options.source || '';
+            this._aSourceIds = options.source.split(',') || [];
+            this._bConfigBtn = options.configBtn;
+            this.$setBody(el);
+            this.$initItems();
+        }
+    );
+
+    var UI_DROPPABLE_LIST = ui.DroppableList;
+    var UI_DROPPABLE_LIST_CLASS = UI_DROPPABLE_LIST.prototype;
+
+    util.extend(UI_DROPPABLE_LIST_CLASS, UI_ITEMS);
+
+    UI_DROPPABLE_LIST_CLASS.$alterItems = util.blank;
+
+    /**
+     * 禁用$setSize
+     * @override
+     */
+    UI_DROPPABLE_LIST_CLASS.$setSize = util.blank;
+
+    UI_DROPPABLE_LIST_CLASS.add = function (item, index, options) {
+        options = options;
+        options.configBtn = this._bConfigBtn;
+        return UI_ITEMS.add.call(this, item, index, options);
+    };
+
+    /**
+     * 要写dispose
+     * @protected
+     */
+    UI_DROPPABLE_LIST_CLASS.$dispose = function() {
+        delete UI_ITEMS[this.getUID()];
+        this.getOuter().innerHTML = '';
+        util.callSuper(this, '$dispose');
+    };
+
+    /**
+     * @override
+     */
+    UI_DROPPABLE_LIST_CLASS.$mouseover = function() {
+        UI_CONTROL_CLASS.$mouseover.call(this);
+    };
+
+    /**
+     * 当有可drop元素经过时触发
+     * @param {ecui.Event} event
+     * @param {ecui.ui.Control} 可drop的控件
+     */
+    UI_DROPPABLE_LIST_CLASS.$dragover = function(event, control) {
+        if (this._cPlacehold) {
+            this.remove(this._cPlacehold);
+        }
+
+        var index = getInsertIndex(this, event);
+
+        // 校验是否可以drop
+        if (core.triggerEvent(
+                this,
+                'checkdroppable',
+                null, 
+                [control.getWrap(), index, this._sName]
+            ) === false
+        ) {
+            this._cPlacehold = null;
+            return;
+        }
+
+        var o = dom.create('ui-droppable-list-placehold');
+        this.getBody().appendChild(o);
+        this._cPlacehold = this.add(o, index, {placehold : true});
+        this._cPlacehold.setSize(control.getWidth(), control.getHeight());
+    };
+
+    /**
+     * 可拖拽元素移出时触发
+     * @param {ecui.Event} event
+     * @param {ecui.ui.Control} control 可drop的控件
+     */
+    UI_DROPPABLE_LIST_CLASS.$dragout = function(event, control) {
+        if (!this._cPlacehold) {
+            return ;
+        }
+        this.remove(this._cPlacehold);
+        this._cPlacehold = null;
+    };
+
+    /**
+     * 可拖拽控件drop时触发
+     * @param {ecui.Event} event
+     * @param {ecui.ui.Control} kedrop的控件
+     */
+    UI_DROPPABLE_LIST_CLASS.$drop = function(event, control, listOfCon) {
+        if (!this._cPlacehold) {
+            return false; 
+        }
+
+        var index = getInsertIndex(this, event);
+        if (this._cPlacehold) {
+            this.remove(this._cPlacehold);
+        }
+
+        this._cNewAdd = this.addByItem(control, index);
+
+        //this._cNewAdd.setSize(control.getWidth(), control.getHeight());
+
+        if (this == listOfCon && control._nOriginIndex == index) {
+            return;
+        }
+
+        for (var i = 0, con; i < this._aSourceIds.length; i++) {
+            con = core.get(this._aSourceIds[i]);
+            if (con && con.getClazz() == control.getClazz()) {
+                core.triggerEvent(
+                    con, 
+                    'change', 
+                    null, 
+                    [
+                        control.getWrap(), 
+                        index, 
+                        this._sName, 
+                        control._nOriginIndex, 
+                        control._sOriginParName
+                    ]
+                );
+            }
+        }        
+    };
+
+    /**
+     * 可拖拽控件throw时触发
+     * @param {ecui.Event} event
+     * @param {ecui.ui.Control} kedrop的控件
+     */
+    UI_DROPPABLE_LIST_CLASS.$throw = function(event, control, listOfCon) {
+        for (var i = 0, con; i < this._aSourceIds.length; i++) {
+            con = core.get(this._aSourceIds[i]);
+            if (con && con.getClazz() == control.getClazz()) {
+                core.triggerEvent(
+                    con, 
+                    'change', 
+                    null,
+                    [
+                        control.getWrap(), 
+                        null, 
+                        this._sName,
+                        control._nOriginIndex, 
+                        control._sOriginParName
+                    ]
+                );
+            }
+        }        
+    };
+
+    /**
+     * 得到item个数
+     *
+     * @public
+     * @return {number} item个数
+     */
+    UI_DROPPABLE_LIST_CLASS.count = function() {
+        return UI_ITEMS[this.getUID()].length;
+    }
+
+    /**
+     * 是否包含此item
+     *
+     * @public
+     * @param {Item} item
+     * @return {boolean} 是否包含
+     */
+    UI_DROPPABLE_LIST_CLASS.contains = function(item) {
+        return array.indexOf(UI_ITEMS[this.getUID()], item) >= 0;
+    }
+
+    /**
+     * 添加一个item
+     * @public
+     * @param {Object} data
+     * @param {string} data.value
+     * @param {string} data.text
+     * @param {string} data.clazz
+     * @param {boolean=} data.fixed
+     * @param {string=} data.align
+     * @param {number=} opt_index
+     */
+    UI_DROPPABLE_LIST_CLASS.addItem = function(data, opt_index) {
+        var el = dom.create();
+        el.innerHTML = data.text;
+        this.getOuter().appendChild(el);
+        this.add(el, opt_index, data);
+    };
+
+    /**
+     * 增加target控件
+     * @param {string} id
+     */
+    UI_DROPPABLE_LIST_CLASS.addTarget = function(id) {
+        this._aTargetIds.push(id);
+    };
+
+    /**
+     * 移除一个item
+     * @public
+     * @param {string} value
+     */
+    UI_DROPPABLE_LIST_CLASS.removeItem = function(value) {
+        this.remove(this.getItemByValue(value));
+    };
+
+    /**
+     * 根绝value获取item控件
+     * @public
+     * @param {string} value
+     * @return {ecui.ui.Control}
+     */
+    UI_DROPPABLE_LIST_CLASS.getItemByValue = function(value) {
+        var list = this.getItems();
+        for (var i = 0; i < list.length; i++) {
+            if (value == list[i].getValue()) {
+                return list[i];
+            }
+        }
+
+        return null;
+    };
+
+    /**
+     * 获取drop控件容纳的子控件的值
+     * @public
+     * @return {Array}
+     */
+    UI_DROPPABLE_LIST_CLASS.getValue = function() {
+        var list = this.getItems();
+        var res = [];
+        for (var i = 0; i < list.length; i++) {
+            res.push(list[i].getValue());
+        }
+
+        return res;
+    };    
+
+    /**
+     * 获取drop控件容纳的子控件的数据
+     * @public
+     * @return {Array}
+     */
+    UI_DROPPABLE_LIST_CLASS.getWrap = function() {
+        var list = this.getItems();
+        var res = [];
+        for (var i = 0; i < list.length; i++) {
+            res.push(list[i].getWrap());
+        }
+
+        return res;
+    };
+
+    /**
+     * 根据一个节点的内容，复制，添加节点
+     * 
+     * @public
+     * @param {Item} 原节点
+     * @param {number} 目标位置
+     * @return {Item} 添加得到的结果
+     */
+    UI_DROPPABLE_LIST_CLASS.addByItem = function(srcCtrl, index) {
+        var o = dom.create();
+        o.innerHTML = srcCtrl.getText();
+        this.getBody().appendChild(o);
+
+        return this.add(o, index, srcCtrl.getWrap());
+    };
+
+
+    UI_DROPPABLE_LIST_CLASS.Item = core.inherits(
+        UI_ITEM,
+        null,
+        function(el, options) {
+            options.userSelect = false;
+            this._sText = el.innerHTML;
+            if (!options.placehold && options.configBtn) {
+                var o = dom.create('ui-droppable-list-item-icon');
+                el.appendChild(o);
+            }
+        },
+        function(el, options) {
+            this._sValue = options.value;
+            this._sClazz = options.clazz;
+            this._bFixed = options.fixed;
+            this._sAlign = options.align;
+            this._sCalcColumnRefInd = options.calcColumnRefInd;
+            if (this._sClazz == 'DIM') {
+                dom.addClass(el, 'ui-droppable-list-item-dim');
+            }
+            else if (this._sClazz == 'IND') {
+                dom.addClass(el, 'ui-droppable-list-item-ind');
+            }
+            if (!options.placehold && options.configBtn) {
+                this._cIcon = core.$fastCreate(this.Icon, dom.last(el), this, {});
+            }
+        }
+    );
+    var UI_DROPPABLE_LIST_ITEM = UI_DROPPABLE_LIST_CLASS.Item;
+    var UI_DROPPABLE_LIST_ITEM_CLASS = UI_DROPPABLE_LIST_ITEM.prototype;
+
+    /**
+     * 设置item子控件的值
+     * @public
+     * @param {string} value
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.setValue = function(value) {
+        this._sValue = value;
+    };
+
+    /**
+     * 获取item的值
+     * @public
+     * @return {string}
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.getValue = function() {
+        return this._sValue;
+    };
+
+    /**
+     * 获取item的文本
+     * @public
+     * @return {string}
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.getText = function() {
+        return this._sText;
+    };
+
+    /**
+     * 获取item子控件的clazz
+     * @public
+     * @return {string}
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.getClazz = function() {
+        return this._sClazz;
+    };
+
+    /**
+     * 获取item子控件的数据封装
+     * @public
+     * @return {string}
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.getWrap = function() {
+        return {
+            value : this._sValue,
+            text : this._sText,
+            clazz : this._sClazz,
+            fixed: this._bFixed,
+            align: this._sAlign,
+            calcColumnRefInd: this._sCalcColumnRefInd
+        };
+    };
+
+    /**
+     * 控件激活时触发拖动
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.$activate = function(event) {
+        UI_CONTROL_CLASS.$activate.call(this, event);
+
+        var par = this.getParent();
+        var originIndex = array.indexOf(UI_ITEMS[par.getUID()], this);
+
+        if (core.triggerEvent(
+                par, 
+                'checkdraggable', 
+                null, 
+                [
+                    this.getWrap(), 
+                    originIndex, 
+                    par._sName
+                ]
+            ) !== false
+        ) {
+            this._sOriginParName = par._sName; // 拖拽之前的行名
+            this._nOriginIndex = originIndex; // 拖拽之前的index
+            core.drag(this, event);
+        }
+    };
+
+    /**
+     * 开始拖拽时触发
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.$dragstart = function(event) {
+    };
+
+    /**
+     * 拖拽中触发
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.$dragmove = function(event) {
+        this._bDragging = true;
+
+        var par = this.getParent();
+        var conArr = [];
+        conArr.push(par);
+        for (var i = 0; i < par._aTargetIds.length; i++) {
+            if (core.get(par._aTargetIds[i])) {
+                conArr.push(core.get(par._aTargetIds[i]));
+            }
+        }
+
+        var el = this.getOuter();
+        var targetCon;
+        var targetEl;
+        for (var i = 0; i < conArr.length; i++) {
+            if (intersect(el, conArr[i].getOuter())) {
+                targetCon = conArr[i];
+                targetEl = targetCon.getOuter();
+                break;
+            }
+        }
+
+        if (par._cCurDrop && targetCon != par._cCurDrop) {
+            core.triggerEvent (par._cCurDrop, 'dragout', event, [this]);
+        }
+        par._cCurDrop = targetCon;
+
+        if (!targetEl) {
+            return ;
+        }
+        core.triggerEvent(targetCon, 'dragover', event, [this]);
+    };
+
+    /**
+     * 拖拽结束时触发
+     * （此方法要保证能重复执行两遍，因为ecui拖拽到窗口外的问题未修）
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.$dragend = function(event) {
+        var par = this.getParent();
+
+        if (!par) { return; }
+
+        if (!par._cCurDrop) {
+            if (
+                event.pageX >= dom.getPosition(par.getOuter()).left
+                && event.pageX <= dom.getPosition(par.getOuter()).left + par.getWidth()
+                && event.pageY >= dom.getPosition(par.getOuter()).top
+                && event.pageY <= dom.getPosition(par.getOuter()).top + par.getHeight()
+            ) {
+                par._cCurDrop = par;
+            }
+        }
+        par.remove(this);
+        if (par._cCurDrop) {
+            if (core.triggerEvent(par._cCurDrop, 'drop', event, [this, par]) == false) {
+                // drop失败时（例如drop被禁止时），重新加入节点
+                par.addByItem(this, this._nOriginIndex);           
+            }
+        }
+        else {
+            core.triggerEvent(par, 'throw', event, [this, par]);
+        }
+        par._cCurDrop = null;
+        this._bDragging = false;
+        this._nOriginIndex = null;
+
+        core.triggerEvent(par, 'deactivate', event);
+        core.triggerEvent(par, 'blur', event);
+    };
+
+    /**
+     * item上的点击按钮
+     */
+    UI_DROPPABLE_LIST_ITEM_CLASS.Icon = core.inherits(
+        UI_CONTROL,
+        'ui-droppable-list-item-icon',
+        null,
+        null
+    );
+    var UI_DROPPABLE_LIST_ITEM_ICON = UI_DROPPABLE_LIST_ITEM_CLASS.Icon;
+    var UI_DROPPABLE_LIST_ITEM_ICON_CLASS = UI_DROPPABLE_LIST_ITEM_ICON.prototype;
+
+    /**
+     * 按钮的click事件
+     */
+    UI_DROPPABLE_LIST_ITEM_ICON_CLASS.$click = function(event) {
+        UI_CONTROL_CLASS.$click.call(this);
+        var item = this.getParent();
+        var itemData = item.getWrap();
+        core.triggerEvent(item.getParent(), 'itemclick', event, [itemData]);
+
+        event.stopPropagation();
+    };
+
+    /**
+     * 阻止按钮activate事件的冒泡
+     */
+    UI_DROPPABLE_LIST_ITEM_ICON_CLASS.$activate = function(event) {
+        UI_CONTROL_CLASS.$activate.call(this);
+
+        event.stopPropagation();
+    };
+
+    /**
+     * 判断两个元素是否相交
+     * @param {HTML element} element1 要检查的元素
+     * @param {HTML element} element2 要检查的元素
+     * @return {boolean} 检查两个元素是否相交的结果
+     */
+    function intersect(element1, element2) {
+        var pos1 = ecui.dom.getPosition(element1);
+        var pos2 = ecui.dom.getPosition(element2);
+
+        var maxLeft = Math.max(pos1.left, pos2.left);
+        var minRight = Math.min(
+            pos1.left + element1.offsetWidth, 
+            pos2.left + element2.offsetWidth
+        );
+        var maxTop = Math.max(pos1.top, pos2.top);
+        var minBottom = Math.min(
+            pos1.top + element1.offsetHeight,
+            pos2.top + element2.offsetHeight
+        );
+
+        return maxLeft <= minRight && maxTop <= minBottom;
+    };
+
+    /**
+     * 计算拖拽子控件插入的index
+     * @param {ecui.ui.Items} control
+     * @param {ecui.Event} event
+     */
+    function getInsertIndex(control, event) {
+        var list = control.getItems();
+        var index;
+        for (index = 0; index < list.length; index++) {
+            var item = list[index];
+            var el = item.getOuter();
+            if (
+                event.pageX <= dom.getPosition(el).left + item.getWidth()
+                && event.pageY <= dom.getPosition(el).top + item.getHeight()
+                && !item._bDragging
+            ) {
+                return index;
+            }
+        }
+        return index;
+    };
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 }) ();
 /**
  * di.shared.model.DimSelectModel  
@@ -68983,6 +77010,7 @@ $namespace('di.shared.vui');
     };
 
 })();
+<<<<<<< HEAD
 /**
  * ecui.ui.Breadcrumb
  * Copyright 2013 Baidu Inc. All rights reserved
@@ -69157,6 +77185,182 @@ $namespace('di.shared.vui');
         this.getBody().innerHTML = '';
     };
 
+=======
+/**
+ * ecui.ui.Breadcrumb
+ * Copyright 2013 Baidu Inc. All rights reserved
+ *
+ * @file:   面包屑导航
+ * @author: sushuang(sushuang)
+ */
+
+ (function() {
+    
+    var core = ecui;
+    var ui = core.ui;
+    var inheritsControl = core.inherits;
+    var triggerEvent = core.triggerEvent;
+    var disposeControl = core.dispose;
+    var UI_CONTROL = ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+
+    /**
+     * 面包屑导航
+     *
+     * @class
+     * @extends {ecui.ui.Control}
+     */
+    var UI_BREADCRUMB = ui.Breadcrumb =
+        inheritsControl(
+            UI_CONTROL,
+            'ui-breadcrumb',
+            null,
+            function(el, options) {
+                this.$setOptions(options);
+            }
+        );
+    var UI_BREADCRUMB_CLASS = UI_BREADCRUMB.prototype;
+
+    //--------------------------------------------------
+    // UI_BREADCRUMB 方法
+    //--------------------------------------------------
+
+    UI_BREADCRUMB_CLASS.$setSize = new Function();
+    
+    /**
+     * 设置参数
+     * 
+     * @protected
+     * @param {Object} options 参数
+     * @parma {number=} options.maxShow 最大显示几项，
+     *      如果超出，则中部会为'...'。如果不传此参数全显示。
+     * @param {number=} options.hidePosPercent 如果设定了maxShow后，
+     *      此参数决定了，如果超出后，那部分会使用“...”来隐藏。
+     *      此参数是0到1之前的小数，默认为0.5，表示50%处隐藏。
+     * @param {Array.<Object>} options.datasource 主体数据
+     *      其中数组每项含有属性：
+     *          {string} text 显示文字
+     *          {number} value 值
+     *          {boolean} disabled 是否可以点击
+     *          {string=} url 值，可缺省，如果使用url，
+     *              则不会触发change事件
+     */
+    UI_BREADCRUMB_CLASS.$setOptions = function(options) {
+        this._oOptions = options || {};
+        this._aDatasource = this._oOptions.datasource || [];
+    };
+
+    /**
+     * 设置数据并渲染
+     *
+     * @public
+     * @param {string} data 参数，参见setOptions
+     */
+    UI_BREADCRUMB_CLASS.setData = function(data) {
+        this.$setOptions(data);
+
+        this.$disposeInner();
+
+        this.$renderHTML();
+
+        this.$bindEvent();
+    };
+
+    /**
+     * 渲染HTML
+     *
+     * @protected
+     */
+    UI_BREADCRUMB_CLASS.$renderHTML = function() {
+        var type = this.getType();
+        var html = [];
+
+        // 是否过长，中间需要隐藏
+        var hidePos = this.$calculateHide();
+
+        // 渲染
+        var hidePushed = false;
+        for (var i = 0, item, url; item = this._aDatasource[i]; i ++) {
+            url = item.url || '#';
+            if (i >= hidePos.start && i <= hidePos.end) {
+                if (!hidePushed) {
+                    html.push('<span class="' + type + '-hide-item">...<span>');
+                    hidePushed = true;
+                }
+            }
+            else if (item.disabled) {
+                html.push('<span class="' + type + '-text-item">' + item.text + '<span>');
+            }
+            else {
+                html.push(
+                    '<a href="' + url + '" class="' + type + '-link-item" data-breadcrumb-index="' + i +'">' + item.text + '</a>'
+                );
+            }
+        }
+        var sepHTML = '<span class="' + type + '-sep">&gt;</span>';
+        this.getBody().innerHTML = html.join(sepHTML);
+    };
+
+    /**
+     * 计算隐藏的起止
+     *
+     * @protected
+     */
+    UI_BREADCRUMB_CLASS.$calculateHide = function() {
+        var hidePos = {};
+        var maxShow = this._oOptions.maxShow;
+        var dataLength = this._aDatasource.length;
+
+        if (dataLength > maxShow) {
+            if (maxShow == 1) {
+                hidePos.start = 0;
+                hidePos.end = dataLength - 2;
+            }
+            else if (maxShow > 1) {
+                var per = this._oOptions.hidePosPercent;
+                if (per == null || per < 0 || per > 1) {
+                    per = 0.5;
+                }
+                var anchor = Math.floor((maxShow - 1) * per);
+                hidePos.start = anchor;
+                hidePos.end = dataLength - (maxShow - anchor) - 1;
+            }
+        }
+
+        return hidePos;
+    };
+
+    /**
+     * 事件绑定
+     *
+     * @protected
+     */
+    UI_BREADCRUMB_CLASS.$bindEvent = function() {
+        var me = this;
+        var aEls = this.getBody().getElementsByTagName('a');
+        for (var i = 0, aEl; aEl = aEls[i]; i ++) {
+            if (aEl.getAttribute('data-breadcrumb-index') && aEl.href != '#') {
+                aEl.onclick = function() {
+                    if (!me._bDisabled) {
+                        var ii = this.getAttribute('data-breadcrumb-index');
+                        triggerEvent(me, 'change', null, [me._aDatasource[ii]]);
+                    }
+                    return false;
+                }
+            }
+        }
+    };
+
+    /**
+     * 析构内部
+     * 
+     * @protected
+     */
+    UI_BREADCRUMB_CLASS.$disposeInner = function() {
+        this.getBody().innerHTML = '';
+    };
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  }) ();
 /**
  * di.shared.vui.TextLabel
@@ -69445,6 +77649,7 @@ $namespace('di.shared.vui');
 XCalendarMDView / XCalendarMWView - 日历的月日/月周视图
 日历视图控件，继承自基础控件，不包含年/月/日的快速选择与切换，如果需要实现这些功能，请将下拉框(选择月份)、输入框(输入年份)等组合使用建立新的控件或直接在页面上布局并调用接口。
 
+<<<<<<< HEAD
 属性
 _nYear      - 年份
 _nMonth     - 月份(0-11)
@@ -71237,6 +79442,905 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
     }
 
 })();
+=======
+/**
+ * ecui.ui.XCalendarLayer
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    富日历的日历层，
+ *           支持日、周、月、季不同粒度时间选择，
+ *           支持单选、多选、范围选
+ * @author:  sushuang(sushuang)
+ * @depend:  ecui
+ */
+
+(function () {
+
+    var core = ecui;
+    var array = core.array;
+    var dom = core.dom;
+    var ui = core.ui;
+    var string = core.string;
+    var util = core.util;
+    var cutil = ui.XCalendarUtil;
+
+    var DATE = Date;
+    var REGEXP = RegExp;
+    var DOCUMENT = document;
+    var objProtoToString = Object.prototype.toString;
+
+    var pushArray = array.push;
+    var children = dom.children;
+    var createDom = dom.create;
+    var getParent = dom.getParent;
+    var getPosition = dom.getPosition;
+    var moveElements = dom.moveElements;
+    var setText = dom.setText;
+    var addClass = dom.addClass;
+    var formatDate = string.formatDate;
+    var getView = util.getView;
+    var encodeHTML = string.encodeHTML;
+    var compareDate = cutil.compareDate;
+    var date2Arr = cutil.date2Arr;
+    var arr2Date = cutil.arr2Date;
+    var getWorkday = cutil.getWorkday;
+    var minDate = cutil.minDate;
+    var maxDate = cutil.maxDate;
+    var isDate = cutil.isDate;
+    var isArray = cutil.isArray;
+    var isString = cutil.isString;
+    var isNumber = cutil.isNumber;
+    var cloneADate = cutil.cloneADate;
+    var setSltValue = cutil.setSltValue;
+    var getSltValue = cutil.getSltValue;
+    var getWeekInfo = cutil.getWeekInfo;
+    var getQuarter = cutil.getQuarter;
+    var initSlt = cutil.initSlt;
+
+    var $fastCreate = core.$fastCreate;
+    var inheritsControl = core.inherits;
+    var triggerEvent = core.triggerEvent;
+    var setFocused = core.setFocused;
+
+    var UI_CONTROL = ui.Control;
+    var UI_CONTROL_CLASS = UI_CONTROL.prototype;
+    var UI_BUTTON = ui.Button;
+    var UI_BUTTON_CLASS = UI_BUTTON.prototype;
+    var UI_INPUT_CONTROL = ui.InputControl;
+    var UI_INPUT_CONTROL_CLASS = UI_INPUT_CONTROL.prototype;
+    var UI_SELECT = ui.Select;
+    var UI_X_CALENDAR_MD_VIEW = ui.XCalendarMDView;
+    var UI_X_CALENDAR_MW_VIEW = ui.XCalendarMWView;
+    var UI_X_CALENDAR_YM_VIEW = ui.XCalendarYMView;
+    var UI_X_CALENDAR_YQ_VIEW = ui.XCalendarYQView;
+
+
+    /**
+     * 富日历的日历层
+     * 
+     * @param {Object} options 参数
+     * @param {(string|Date|number|Array)=} options.date 初始时间，缺省则为new Date()
+     *          可为表示时间的string：格式为：（以下时间字符串都用此格式）
+     *              2012-12-12 （对应时间粒度：D）
+     *              2012-12-12 （对应时间粒度：W, 对应当周第一天）
+     *              2012-12    （对应时间粒度：M）
+     *              2012-Q1    （对应时间粒度：Q）
+     *          也可为时间对象,
+     *          也可为时间戳。
+     *          如果selMode为：
+     *              SINGLE      date型如2012-12-12或相应Date对象；
+     *              MULTIPLE    date型如[2012-12-12, 2012-03-04, 2012-11-15, ...]或相应Date对象数组；
+     *              RANGE       date型如[2012-03-04, 2012-11-15]或者相应Date对象数组，数组长为2，第一元素表示范围开始，第二元素表示范围结束。
+     * @param {Object} options.range
+     * @param {(string|number|Date)=} options.range.offsetBase 如果范围设定使用偏移方式的话（如'+1d'），此参数为偏移的基础，缺省则为new Date()
+     *          可为时间字符串、时间对象、时间戳
+     * @param {(string|number|Date)=} options.range.start 当前时间戳（用于传来系统时间）
+     *          可为时间字符串、时间对象、时间戳、偏移表达式（型如'+1d', '-2M', '+4y'）
+     * @param {(string|number|Date)=} options.range.end 当前时间戳（用于传来系统时间）
+     *          可为时间字符串、时间对象、时间戳、偏移表达式（型如'+1d', '-2M', '+4y'）
+     * @param {Array.<Object>=} options.selModeList 要使用的选择类型，值为'SINGLE', 'MULTIPLE', 'RANGE'中的一个或几个，缺省则全开启
+     *          每项为：{ text: 'xxxxxx', value: 'SINGLE', prompt: '这是说明提示,可忽略' }，其中value和selMode对应
+     * @param {string=} options.selMode 初始选择类型，值可为：'SINGLE', 'MULTIPLE', 'RANGE'，缺省则取'SINGLE'
+     * @param {Object=} options.model 当前数据对象，如果不传入则自己创建。传入，则可多个实例共享model（参见render方法）
+     * @class
+     */
+    var UI_X_CALENDAR_LAYER = ui.XCalendarLayer = 
+        inheritsControl(
+            UI_CONTROL,
+            'ui-x-calendar-layer',
+            null,
+            function (el, options) {
+                createModel.call(this, el, options);
+                createView.call(this, el, options);
+            }
+        );
+
+    var UI_X_CALENDAR_LAYER_CLASS = UI_X_CALENDAR_LAYER.prototype;
+    var UI_X_CALENDAR_LAYER_STEP_BUTTON_CLASS = (UI_X_CALENDAR_LAYER_CLASS.StepButton = inheritsControl(UI_BUTTON, null)).prototype;
+    var UI_X_CALENDAR_LAYER_SELECT_CLASS = (UI_X_CALENDAR_LAYER_CLASS.Select = inheritsControl(UI_SELECT, null)).prototype;
+    UI_X_CALENDAR_LAYER_MD_VIEW_CLASS = (UI_X_CALENDAR_LAYER_CLASS.MDView = inheritsControl(UI_X_CALENDAR_MD_VIEW, null)).prototype;
+    UI_X_CALENDAR_LAYER_MW_VIEW_CLASS = (UI_X_CALENDAR_LAYER_CLASS.MWView = inheritsControl(UI_X_CALENDAR_MW_VIEW, null)).prototype;
+    UI_X_CALENDAR_LAYER_YM_VIEW_CLASS = (UI_X_CALENDAR_LAYER_CLASS.YMView = inheritsControl(UI_X_CALENDAR_YM_VIEW, null)).prototype;
+    UI_X_CALENDAR_LAYER_YQ_VIEW_CLASS = (UI_X_CALENDAR_LAYER_CLASS.YQView = inheritsControl(UI_X_CALENDAR_YQ_VIEW, null)).prototype;
+
+    UI_X_CALENDAR_LAYER_SELECT_CLASS.Options = inheritsControl(
+        UI_X_CALENDAR_LAYER_SELECT_CLASS.Options, 
+        null, 
+        null, 
+        function(el, options) {
+            addClass(el, 'ui-x-calendar-layer-select-options'); 
+        }
+    );
+
+    UI_X_CALENDAR_LAYER_SEL_MODE_CLASS = (UI_X_CALENDAR_LAYER_CLASS.SelMode = 
+        inheritsControl(UI_CONTROL, 'ui-x-calendar-layer-selmode')
+    ).prototype;
+
+    /**
+     * 数据Model，存储当前时间、时间范围等
+     *
+     * @class
+     * @param {Object} options 参数参见setDatasource方法
+     */
+    var UI_X_CALENDAR_MODEL = UI_X_CALENDAR_LAYER_CLASS.Model = modelConstructor;
+    var UI_X_CALENDAR_MODEL_CLASS = UI_X_CALENDAR_MODEL.prototype;
+
+    // 默认值
+    UI_X_CALENDAR_MODEL_CLASS.DEFAULT = {
+        selMode: 'SINGLE',
+        timeType: 'D',
+        selModeList: [
+            { text: '单选', value: 'SINGLE', prompt: '单项选择' },
+            { text: '范围多选', value: 'RANGE', prompt: '范围选择，点击一下选择开始值，再点击一下选择结束值' },
+            { text: '任意多选', value: 'MULTIPLE', prompt: '可以选择离散的多项' }
+        ]
+    };
+
+    var DATE_REG = /^(\d+)(\-(\d+)(\-(\d+))?)?$/;
+    var QUARTER_REG = /^(\d+)\-Q(\d)/;
+
+    //----------------------------------------------------
+    // 工具方法
+    //----------------------------------------------------
+
+    function parseRange(start, end, offsetBase, cellTimeType) {
+        var res = {};
+        var o = res.offsetBase = parseInputDate(offsetBase || new Date());
+
+        o = [o.getFullYear(), o.getMonth(), o.getDate()];
+        var p = {y: 0, m: 1, d: 2};
+        var t;
+
+        if (/^([-+]?)(\d+)([ymd])$/.test((start || '').toLowerCase())) {
+            t = o.slice();
+            if (!REGEXP.$1 || REGEXP.$1 == '+') {
+                t[p[REGEXP.$3]] += parseInt(REGEXP.$2, 10);
+            }
+            else {
+                t[p[REGEXP.$3]] -= parseInt(REGEXP.$2, 10);
+            }
+            res.start = new Date(t[0], t[1], t[2]);
+        }
+        else {
+            res.start = parseInputDate(start);
+        }
+
+        if (/^([-+]?)(\d+)([yMd])$/.test((end || '').toLowerCase())) {
+            t = o.slice();
+            if (!REGEXP.$1 || REGEXP.$1 == '+') {
+                t[p[REGEXP.$3]] += parseInt(REGEXP.$2, 10);
+            }
+            else {
+                t[p[REGEXP.$3]] -= parseInt(REGEXP.$2, 10);
+            }
+            res.end = new Date(t[0], t[1], t[2]);
+        }
+        else {
+            res.end = parseInputDate(end);
+        }
+
+        if (res.start && res.end && compareDate(res.start, res.end, cellTimeType) > 0) {
+            var tmp = res.end;
+            res.end = res.start;
+            res.start = tmp;
+        }
+
+        return res ? res : {};
+    }
+
+    function parseInputDate(input) {
+        var ret;
+
+        if (input == null) {
+            ret = null;
+        }
+        else if (isArray(input)) {
+            ret = [];
+            for (var i = 0; i < input.length; i ++) {
+                ret.push(parseInputDate(input[i]));
+            }
+        }
+        else if (isDate(input)) {
+            ret = input;
+        }
+        else if (isString(input)) {
+            ret = parseDateStr(input);
+        }
+        else if (isNumber(input)){
+            ret = new Date(input);
+        }
+
+        return ret;
+    }
+
+    function parseDateStr(dateStr) {
+        if (DATE_REG.test(dateStr)) {
+            return new Date(REGEXP.$1, (REGEXP.$3 || 1) - 1, REGEXP.$5 || 1);
+        }
+        else if (QUARTER_REG.test(dateStr)) {
+            var par = [0, 0, 3, 6, 9];
+            return new Date(REGEXP.$1, par[REGEXP.$2], 1);
+        }
+        
+        return null;
+    };
+
+    function goViewStep(base, step, timeType) {
+        step = Number(step);
+        base = arr2Date(base, true);
+        if (timeType == 'D' || timeType == 'W') {
+            base.setMonth(base.getMonth() + step);
+        }
+        else if (timeType == 'M' || timeType == 'Q') {
+            base.setFullYear(base.getFullYear() + step);
+        }
+        return base;
+    }
+
+    function goCellStep(base, step, timeType) {
+        base = arr2Date(base, true);
+        step = Number(step);
+        if (timeType == 'D') {
+            base.setDate(base.getDate() + step);
+        }
+        else if (timeType == 'W') {
+            base.setDate(base.getDate() + step * 7);
+        }
+        else if (timeType == 'M') {
+            base.setMonth(base.getMonth() + step);
+        }
+        else if (timeType == 'Q') {
+            base.setMonth(base.getMonth() + step * 3);
+        }
+        return base;
+    }
+
+    //----------------------------------------------------
+    // 构造方法
+    //----------------------------------------------------
+
+    function createModel(el, options) {
+        if (options.model) {
+            // model可以外部传入
+            this._oModel = options.model;
+        }
+        else {
+            // 设默认值
+            var dft = this._oModel.DEFAULT;
+            if (!options.selMode) {
+                options.selMode = dft.selMode;
+            }
+            if (!options.timeType) {
+                options.timeType = dft.timeType;
+            }
+            if (!options.selModeList) {
+                options.selModeList = dft.selModeList;
+            }
+            this._oModel = new this.Model(options);
+        }
+    }
+
+    function createView(el, options) {
+        var type = this.getTypes()[0];
+        var me = this;
+        var html = [];
+        var stepBtnClass = this.StepButton;
+        var selectClass = this.Select;
+
+        var model = this._oModel;
+        var timeType = model.getTimeType();
+        var aDate = model.getDate();
+        var range = model.getRange();
+        var hasMonthSlt = timeType == 'D' || timeType == 'W';
+
+        var timeTypeDef = {
+                D: { clz: this.MDView, st: '-md-view', btns: '-buttons-md' },
+                W: { clz: this.MWView, st: '-md-view', btns: '-buttons-md' },
+                M: { clz: this.YMView, st: '-ym-view', btns: '-buttons-ym' },
+                Q: { clz: this.YQView, st: '-yq-view', btns: '-buttons-yq' }
+            }[timeType];
+
+        var o;
+        var i;
+
+        html.push('<div class="'+ type +'-buttons ' + type + timeTypeDef.btns + ' ">');
+
+        // 后退按钮
+        html.push('<div class="'+ type +'-btn-prv'+ UI_BUTTON.TYPES +'"></div>');
+
+        // 年下拉框
+        html.push('<select class="'+ type +'-slt-year'+ UI_SELECT.TYPES +'">');
+        html.push('</select>');
+
+        // 月下拉框
+        if (hasMonthSlt) {
+            html.push('<select class="' + type + '-slt-month' + UI_SELECT.TYPES + '">');
+            for (i = 1; i <= 12; i++) {
+                html.push('<option value="' + i +'">'+ (i < 10 ? '0' : '') + i + '</option>');
+            }
+            html.push('</select>');
+        }
+
+        // 前进按钮
+        html.push('<div class="' + type + '-btn-nxt' + UI_BUTTON.TYPES + '"></div>');
+        
+        html.push('</div>');
+
+        // selMode 选择区
+        html.push('<div class="' + type + '-selmode"></div>');
+
+        // 日历面板
+        html.push('<div class="' + type + timeTypeDef.st + ' ' + timeTypeDef.clz.TYPES + '"></div>');
+
+        el.innerHTML = html.join('');
+        el = children(el);
+
+        o = children(el[0]);
+        i = 0;
+        
+        this._uPrvBtn = $fastCreate(stepBtnClass, o[i ++], this);
+        this._uPrvBtn._nStep = -1;
+
+        this._uYearSlt = $fastCreate(selectClass, o[i ++], this);
+
+        if (hasMonthSlt) {
+            this._uMonthSlt = $fastCreate(selectClass, o[i ++], this);
+        }
+
+        this._uNxtBtn = $fastCreate(stepBtnClass, o[i ++], this);
+        this._uNxtBtn._nStep = 1;
+
+        this._uSelMode = $fastCreate(this.SelMode, el[1], this);
+
+        this._uCalView = $fastCreate(
+            timeTypeDef.clz, el[2], this, { model: model }
+        );
+
+        this._uCalView.onchange = function (aDate) {
+            /**
+             * @event
+             */
+            triggerEvent(me, 'change', null, [aDate]);
+        };
+        this._uCalView.ondateclick = function (aDate) {
+            /**
+             * @event
+             */
+            triggerEvent(me, 'dateclick', null, [aDate]);
+        };
+
+        this.render();
+    }
+
+    UI_X_CALENDAR_LAYER_CLASS.$setSize = new Function();
+
+    UI_X_CALENDAR_LAYER_CLASS.setDatasource = function (datasource, silent) {
+        this._oModel.setDatasource(datasource);
+        !silent && this.render();
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.$flushCalView = function (force) {
+        var timeType = this._oModel.getTimeType();
+        var calView = this._uCalView;
+        var d = [];
+        (o = Number(getSltValue(this._uYearSlt))) && d.push(o);
+        (o = Number(getSltValue(this._uMonthSlt))) && d.push(o - 1);
+
+        calView.setView(d);
+    };
+
+    /** 
+     * 渲染
+     *
+     * @public
+     * @param {Object} opt
+     * @param {Date} viewDate 决定面板显示的日期
+     * @param {boolean} remainSlt 是否不重新绘制日期选择下拉框（默认false）
+     * @param {boolean} remainSelMode 是否不重绘selMode选择区（默认false）
+     * @param {boolean} remainTimeView 是否保留当前view（默认false）
+     */  
+    UI_X_CALENDAR_LAYER_CLASS.render = function (opt) {
+        opt = opt || {};
+        var model = this.getModel();
+
+        !opt.remainSlt && this.$resetSltDatasource();
+        !opt.remainSelMode && this.$resetSelModeCtrl();
+        
+        if (!opt.remainTimeView) {
+            var aDate = this._oModel.getDate();
+            var viewDate = opt.viewDate 
+                // 默认取最后一个选中日期作为当前要显示的面板
+                || aDate[aDate.length - 1]
+                || (
+                    opt = new Date(), 
+                    opt.setFullYear(
+                        Math.min(
+                            Math.max(model._nYearRangeStart, opt.getFullYear()), 
+                            model._nYearRangeEnd
+                        )
+                    ),
+                    opt
+                );
+
+            // 设置monthSlt, yearSlt
+            setSltValue(this._uYearSlt, viewDate.getFullYear());
+            setSltValue(this._uMonthSlt, viewDate.getMonth() + 1);
+            this.$resetStepBtn();
+        }
+
+        this.$flushCalView();
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.$resetSelModeCtrl = function () {
+        var type = this.getTypes()[0];
+        var uSelMode = this._uSelMode;
+        var outer = uSelMode.getOuter();
+        var model = this.getModel();
+        var aSelModeList = model.getSelModeList();
+        var selMode = model.getSelMode();
+
+        // 清除
+        outer.innerHTML = '';
+
+        if (!aSelModeList || !aSelModeList.length) {
+            outer.style.display = 'none';
+        }
+        else {
+            outer.style.display = '';
+        }
+
+        // 添加
+        var html = [];
+        var i;
+        var o;
+        var checked;
+        var prompt;
+        for (i = 0; o = aSelModeList[i]; i ++) {
+            prompt = o.prompt ? (' title="' + encodeHTML(o.prompt) + '" ') : '';
+            checked = o.value == selMode ? ' checked="checked" ' : '';
+            html.push(
+                '<input ' + prompt + ' type="radio" name="' + type + '-selmode-radio-' + this.getUID() 
+                + '" class="' + type + '-selmode-radio" ' + checked 
+                + ' data-selmode="' + o.value + '"/>'
+            );
+            html.push('<span ' + prompt + ' class="' + type + '-selmode-text">' + encodeHTML(o.text) + '</span>');
+        }
+        outer.innerHTML = html.join('');
+
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.$resetSltDatasource = function () {
+        var range = this._oModel.getRange();
+        var yearSlt = this._uYearSlt;
+        var model = this.getModel();
+        if (!yearSlt) { return; }
+
+        var yearBase = (range.offsetBase || new Date()).getFullYear();
+        var yearRangeStart = range.start 
+            ? range.start.getFullYear() : (yearBase - 5);
+        var yearRangeEnd = range.end 
+            ? range.end.getFullYear() : (yearBase + 5);
+
+        var oldValue = Number(getSltValue(yearSlt));
+        var newValue;
+
+        // 清除
+        yearSlt.setValue(null);
+        while(yearSlt.remove(0)) {}
+
+        // 添加
+        for (var i = yearRangeStart; i <= yearRangeEnd; i++) {
+            yearSlt.add(String(i), null, { value: Number(i) });
+            i == oldValue && (newValue = i);
+        }
+
+        model._nYearRangeStart = yearRangeStart;
+        model._nYearRangeEnd = yearRangeEnd;
+
+        yearSlt.setValue(newValue != null ? newValue : yearRangeStart);
+        this.$resetStepBtn();
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.$resetStepBtn = function () {
+        var yearSltValue = Number(getSltValue(this._uYearSlt));
+        var monthSltValue = Number(getSltValue(this._uMonthSlt));
+        var model = this.getModel();
+        var timeType = model.getTimeType();
+
+        // 只考虑yearSlt是否够显示即可
+        var d = [yearSltValue, monthSltValue - 1];
+        d = goViewStep(d, 1, timeType);
+        this._uNxtBtn[
+            d.getFullYear() > model._nYearRangeEnd ? 'disable' : 'enable'
+        ]();
+
+        d = [yearSltValue, monthSltValue - 1];
+        d = goViewStep(d, -1, timeType);
+        this._uPrvBtn[
+            d.getFullYear() < model._nYearRangeStart ? 'disable' : 'enable'
+        ]();
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.getDate = function () {
+        return this._oModel.getDate();
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.getModel = function () {
+        return this._oModel;
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.getValue = UI_X_CALENDAR_LAYER_CLASS.getDate;
+
+    UI_X_CALENDAR_LAYER_CLASS.getTimeType = function () {
+        return this._oModel.getTimeType();
+    };
+
+    UI_X_CALENDAR_LAYER_CLASS.init = function () {
+        this._uMonthSlt && this._uMonthSlt.init();
+        this._uYearSlt && this._uYearSlt.init();
+        this._uCalView.init();
+        UI_X_CALENDAR_LAYER.superClass.init.call(this);
+    };
+
+    //----------------------------------------------------
+    // 下拉选择年月
+    //----------------------------------------------------
+
+    UI_X_CALENDAR_LAYER_SELECT_CLASS.onchange = function () {
+        var par = this.getParent()
+        par.$resetStepBtn();
+        par.$flushCalView();
+    };
+
+    //----------------------------------------------------
+    // 前进后退 button
+    //----------------------------------------------------
+
+    UI_X_CALENDAR_LAYER_STEP_BUTTON_CLASS.onclick = function () {
+        var layer = this.getParent();
+        var yearSlt = layer._uYearSlt;
+        var monthSlt = layer._uMonthSlt;
+        var d = [
+            Number(getSltValue(yearSlt)), 
+            Number((getSltValue(monthSlt) || 1) - 1), 
+            1
+        ];
+
+        d = goViewStep(d, this._nStep, layer.getModel().getTimeType());
+        setSltValue(yearSlt, d.getFullYear());
+        setSltValue(monthSlt, d.getMonth() + 1);
+        layer.$resetStepBtn();
+        layer.$flushCalView();
+    };
+
+    //----------------------------------------------------
+    // selmode 选择
+    //----------------------------------------------------
+
+    UI_X_CALENDAR_LAYER_SEL_MODE_CLASS.onclick = function (event) {
+        var par = this.getParent();
+        var target = event.target;
+        if (target.tagName == 'INPUT') {
+            var model = par.getModel()
+            model.setDatasource({ selMode: target.getAttribute('data-selmode') });
+            par.$flushCalView();
+            /**
+             * @event
+             */
+            triggerEvent(par, 'change', null, [model.getDate()]);
+        }
+    };
+
+    //----------------------------------------------------
+    // Calendar Model
+    //----------------------------------------------------
+
+    function modelConstructor(options) {
+        this._aDate = [];
+        this._aDefaultDate = [];
+        this._oRange = {};
+        this._aHoverDate = [];
+
+        this.setDatasource(options);
+    };
+
+    /**
+     * 设置model数据
+     * 
+     * @public
+     * @param {Object} datasource 设置
+     * @param {string} datasource.selMode
+     * @param {Array.<Object>} datasource.selModeList 
+     * @param {string} datasource.timeType
+     * @param {Object} datasource.range
+     * @param {Date|string} datasource.range.start
+     * @param {Date|string} datasource.range.end
+     * @param {Date|string} datasource.range.offsetBase
+     * @param {Date|string|Array} datasource.date 当前选中
+     */
+    UI_X_CALENDAR_MODEL_CLASS.setDatasource = function (datasource) {
+        datasource = datasource || {};
+
+        // 设置forbidEmpty
+        if (datasource.forbidEmpty != null) {
+            this._bForbidEmpty = datasource.forbidEmpty || false;
+        }
+
+        // 设置timeType
+        if (datasource.timeType) {
+            this._sTimeType = datasource.timeType;
+            // 周模式下，使用日的日历表示，所以cellTimeType和timeType不同
+            // 这是个坑，以后删改代码时可能会踩
+            this._sCellTimeType = datasource.cellTimeType;
+            if (this._sCellTimeType == 'W') {
+                this._sCellTimeType = 'D';
+            }
+        }
+
+        // 设置selModelList
+        var selModeListChange;
+        if (datasource.selModeList) {
+            selModeListChange = this._aSelModeList = datasource.selModeList;
+        }
+
+        // 设置selMode (在传入selMode或者selModeList改变时)
+        var newSelMode;
+        if ((newSelMode = datasource.selMode) || selModeListChange) {
+            // 改变selMode时，会做相应转化
+            var oldSelMode = this._sSelMode;
+            this._sSelMode = newSelMode || selModeListChange[0].value;
+            this.$switchSelMode(oldSelMode, newSelMode);
+        }
+
+        // 设置range
+        var range = datasource.range;
+        if (range) {
+            this._oRange = parseRange(
+                range.start, 
+                range.end, 
+                range.offsetBase, 
+                this._sCellTimeType
+            );
+            this.$clipByRange(this._aDate);
+        }
+
+        // 设置defaultDate
+        var aDefaultDate = datasource.defaultDate;
+        if (aDefaultDate) {
+            this._aDefaultDate = this.$parseADate(aDefaultDate);
+        }
+
+        // 设置_aDate
+        var aDate = datasource.date;
+        if (aDate) {
+            this._aDate = this.$parseADate(aDate);
+        }
+        
+        // 如果禁止为空
+        if (this._bForbidEmpty && !this._aDate.length) {
+            this._aDate = cloneADate(this._aDefaultDate);
+        }
+
+        // 规整
+        if (this._sSelMode == 'SINGLE') {
+            this._aDate = this._aDate.slice(0, 1);
+        }
+        else if (this._sSelMode == 'RANGE') {
+            this._aDate = this._aDate.slice(0, 2);
+        }
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.$parseADate = function (aDate) {
+        var aDate = parseInputDate(aDate) || [];
+        if (!isArray(aDate)) {
+            aDate = [aDate];
+        }
+
+        if (this._sSelMode == 'RANGE' 
+            && aDate[0]
+            && aDate[1] 
+            && compareDate(aDate[0], aDate[1], this._sCellTimeType) > 0
+        ) {
+            var tmp = aDate[1];
+            aDate[1] = aDate[0];
+            aDate[0] = tmp;
+        }
+        this.$clipByRange(aDate);
+
+        return aDate;
+    };    
+
+    UI_X_CALENDAR_MODEL_CLASS.getDate = function () {
+        return this._aDate;
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.getDefaultDate = function () {
+        return this._aDefaultDate;
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.getTimeType = function () {
+        return this._sTimeType;
+    };
+    
+    UI_X_CALENDAR_MODEL_CLASS.goStep = function (step) {
+        for (var i = 0, d; i < this._aDate.length; i ++) {
+            if (d = this._aDate[i]) {
+                this._aDate[i] = goCellStep(d, step, this._sTimeType);
+            }
+        }
+    };    
+
+    UI_X_CALENDAR_MODEL_CLASS.getHoverDate = function (selMode) {
+        return this._aHoverDate || [];
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.getSelMode = function () {
+        return this._sSelMode;
+    };    
+
+    UI_X_CALENDAR_MODEL_CLASS.getSelModeList = function () {
+        return this._aSelModeList;
+    };    
+
+    UI_X_CALENDAR_MODEL_CLASS.getRange = function () {
+        return this._oRange;
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.$clipByRange = function (aDate) {
+        var range = this.getRange();
+        var timeType = this._sTimeType;
+
+        for (var i = 0, date; i < aDate.length; ) {
+            if ((date = aDate[i])
+                && (!range.start || compareDate(date, range.start, timeType) >= 0)
+                && (!range.end || compareDate(range.end, date, timeType) >= 0)
+            ) {
+                i ++;
+            }
+            else {
+                this._sSelMode == 'RANGE'
+                    // range模式下如果不在范围内则全清空
+                    ? (aDate = [])
+                    : aDate.splice(i, 1);
+            }
+        }
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.testEdge = function (step) {
+        var timeType = this._sTimeType;
+        var aDate = this.getDate().slice();
+        var range = this.getRange();
+        var m;
+
+        var lowerBound = range.start;
+        var upperBound = range.end;
+
+        if (!lowerBound) {
+            lowerBound = [this._nYearRangeStart, 0, 1];
+        }
+        if (!upperBound) {
+            upperBound = [this._nYearRangeEnd, 11, 31];
+        }
+
+        if (!aDate.length) {
+            return false;
+        }
+
+        if (step < 0 && lowerBound) {
+            m = minDate.apply(null, [timeType].concat(aDate));
+
+            return compareDate(
+                goCellStep(m, step, timeType),
+                lowerBound,
+                timeType
+            ) >= 0;
+        }   
+        else if (step > 0 && upperBound) {
+            m = maxDate.apply(null, [timeType].concat(aDate));
+
+            return compareDate(
+                goCellStep(m, step, timeType),
+                upperBound,
+                timeType
+            ) <= 0;
+        }
+        else {
+            return true;
+        }
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.udateDateByClick = function (thisClick) {
+        var modelDate = this.getDate();
+        var selMode = this.getSelMode();
+        var hasChange = true;
+        var timeType = this._sTimeType;
+
+        if (selMode == 'RANGE') {
+            modelDate[0] && !modelDate[1]
+                // 只选了上界的情况
+                ? (modelDate[1] = thisClick)
+                // 未选或者已全选的情况
+                : (modelDate = [thisClick])
+        }
+        else if (selMode == 'SINGLE') {
+            modelDate[0] && compareDate(modelDate[0], thisClick, timeType) == 0 
+                ? (hasChange = false)
+                : (modelDate[0] = thisClick);
+        }
+        else if (selMode == 'MULTIPLE') {
+            var del = false;
+            for (var i = 0, o; o = modelDate[i]; ) {
+                if (compareDate(o, thisClick, timeType) == 0) {
+                    modelDate.splice(i, 1);
+                    del = true;
+                }
+                else {
+                    i ++;
+                }
+            }
+            !del && modelDate.push(thisClick);
+        }
+
+        // 更新model
+        this.setDatasource({ date: modelDate });
+
+        return hasChange;
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.updateHoverDate = function (refDate, isHover) {
+        var dateArr = [];
+        var modelDate = this.getDate();
+
+        if (!isHover) {
+            this._aHoverDate = [];
+        }
+        else {
+            if (this._sSelMode == 'RANGE' && modelDate[0] && !modelDate[1]) {
+                if (compareDate(modelDate[0], refDate, this._sTimeType) > 0) {
+                    dateArr = [refDate, modelDate[0]];
+                }
+                else {
+                    dateArr = [modelDate[0], refDate];
+                }
+            }
+            else {
+                dateArr = [refDate];
+            }   
+            this._aHoverDate = dateArr;
+        }
+    };
+
+    UI_X_CALENDAR_MODEL_CLASS.$switchSelMode = function (oldSelMode, newSelMode) {
+        if (oldSelMode == newSelMode || oldSelMode == null || newSelMode == null) {
+            return;
+        }
+        else {
+            this._aDate = [];
+        }
+    }
+
+})();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * ecui.ui.XCalendar
@@ -72004,6 +81108,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
 })();
 
 
+<<<<<<< HEAD
 /**
  * di.shared.adapter.XCalendarVUIAdapter
  * Copyright 2013 Baidu Inc. All rights reserved.
@@ -72178,6 +81283,182 @@ $namespace('di.shared.adapter');
 
 })();
 
+=======
+/**
+ * di.shared.adapter.XCalendarVUIAdapter
+ * Copyright 2013 Baidu Inc. All rights reserved.
+ *
+ * @file:    CalendarPlus的适配器
+ * @author:  sushuang(sushuang)
+ * @depend:  xui, xutil, ecui
+ */
+
+$namespace('di.shared.adapter');
+
+(function() {
+    
+    var UTIL = di.helper.Util;
+    var ecuiCreate = UTIL.ecuiCreate;
+    var ecuiDispose = UTIL.ecuiDispose;
+    var detachEvent = ecui.util.detachEvent;
+    var attachEvent = ecui.util.attachEvent;
+    var disposeControl = ecui.dispose;
+    var repaint = ecui.repaint;
+    var parseTimeDef = UTIL.parseTimeDef;
+    var parseTimeUnitDef = UTIL.parseTimeUnitDef;
+    var formatTime = UTIL.formatTime;
+    var assign = xutil.object.assign;
+    var clone = xutil.object.clone;
+    var X_CALENDAR;
+    var GLOBAL_MODEL;
+
+    $link(function() {
+        X_CALENDAR = ecui.ui.XCalendar;
+        GLOBAL_MODEL = di.shared.model.GlobalModel;
+    });
+
+    /**
+     * XCalendar的适配器
+     *
+     * @public
+     * @param {Object} def vui的定义
+     * @param {Object} options vui实例创建参数
+     * @return {Object} vui adapter实例
+     */
+    $namespace().XCalendarVUIAdapter = function(def, options) {
+        return {
+            create: create,
+            setData: setData,
+            getValue: getValue
+        };
+    };
+
+    /**
+     * 创建
+     *
+     * @public
+     * @param {Object} def vui定义
+     * @param {Object} options 初始化参数
+     * @param {Object} options.granularities 粒度，
+     *      'D', 'W', 'M', 'Q', 'Y'
+     *          每项的配置，含有：
+     *          options.start 开始时间，绝对值（如2012-12-12）或相对当前时间的值（如-5d）
+     *          options.end 结束时间，格式同上
+     * @return {Object} 创建的实例
+     */
+    function create(def, options) {
+        return ecuiCreate(X_CALENDAR, def.el, null, prepareInitData(options));
+    }
+
+    /**
+     * 设置数据
+     *
+     * @public
+     */
+    function setData(data) {
+        this.setDatasource(prepareSetData(data));
+    }
+
+    /**
+     * 准备数据
+     *
+     * @private
+     */
+    function prepareInitData(options) {
+        var opt = assign(
+            {}, 
+            options, 
+            [   
+                'viewMode', 
+                'headText', 
+                'rangeLinkStr', 
+                'weekLinkStr', 
+                'blankText', 
+                'forbidEmpty'
+            ]
+        );
+        opt.timeTypeList = [];
+        return opt;
+    }
+
+    /**
+     * 准备数据
+     *
+     * @private
+     */
+    function prepareSetData(options) {
+        var now = GLOBAL_MODEL().getDateModel().now();
+        var opt = clone(options);
+        var timeTypeOpt = options.timeTypeOpt;
+        var timeType;
+        var o;
+        var i;
+        var dArr;
+        var unit;
+        var offsetBase;
+        opt.timeTypeOpt = opt.timeTypeOpt || {};
+
+        for (timeType in timeTypeOpt) {
+            o = opt.timeTypeOpt[timeType] = timeTypeOpt[timeType];
+            dArr = parseTimeDef(o.date, [now, now]);
+
+            // FIXME
+            // 这里对于任意散选的情况，只支持了start，也就是只能这么配：
+            // [[-1D], [-4D], ...] 而不能 [[-5D, -1D], [-9W, -6D], ...]
+            if (dArr.length > 1) {
+                o.date = [];
+                for (i = 0; unit = dArr[i]; i ++) {
+                    o.date.push(formatObjTime(unit, timeType).start);
+                }
+            }
+            else {
+                unit = formatObjTime(dArr[0],timeType);
+                o.date = unit.end ? [unit.start, unit.end] : [unit.start];
+            }
+            o.range = formatObjTime(
+                parseTimeUnitDef(o.range, [now, now]) || {},
+                timeType
+            );
+            o.range.offsetBase = now;
+        }
+
+        return opt;
+    }
+
+    /**
+     * 格式化时间
+     * 
+     * @private
+     */    
+    function formatObjTime(obj, timeType) {
+        for (var key in obj) {
+            obj[key] = formatTime(obj[key], timeType);
+        }
+        return obj;
+    }
+
+    /**
+     * 获得当前选中数据
+     *
+     * @public
+     * @this {Object} 目标实例
+     * @return {Object} 数据
+     */
+    function getValue() {
+        // TODO
+        // 现在后台还不支持多选，只支持单选和范围选择
+        var aDate = this.getValue();
+        var timeType = this.getTimeType();
+        return {
+            start: formatTime(aDate[0], timeType),
+            end: formatTime(aDate[1] || aDate[0], timeType),
+            granularity: timeType
+        };
+    }
+
+})();
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * project link

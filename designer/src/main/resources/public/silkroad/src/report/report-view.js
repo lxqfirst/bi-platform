@@ -1,6 +1,10 @@
 ﻿/**
  * @file 报表的公共功能 - view
+<<<<<<< HEAD
  * @author 赵晓强(longze_xq@163.com)
+=======
+ * @author 赵晓强(v_zhaoxiaoqiang)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @date 2014-10-10
  */
 define([

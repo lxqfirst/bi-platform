@@ -1,6 +1,10 @@
 /**
  * @file: 维度组管理
+<<<<<<< HEAD
  * @author 赵晓强(longze_xq@163.com)
+=======
+ * @author 赵晓强(v_zhaoxiaoqiang)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @date 2014-10-22
  */
 define(['url'], function (Url) {

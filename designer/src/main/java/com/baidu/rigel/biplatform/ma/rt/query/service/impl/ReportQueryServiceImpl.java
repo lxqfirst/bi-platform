@@ -24,6 +24,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.baidu.rigel.biplatform.ac.exception.MiniCubeQueryException;
 import com.baidu.rigel.biplatform.ac.query.MiniCubeConnection;
@@ -44,6 +45,7 @@ import com.baidu.rigel.biplatform.ma.rt.query.service.ReportQueryService;
  * @author david.wang
  * @version 1.0.0.1
  */
+@Service("reportQueryService")
 public class ReportQueryServiceImpl  implements ReportQueryService {
    
     /**

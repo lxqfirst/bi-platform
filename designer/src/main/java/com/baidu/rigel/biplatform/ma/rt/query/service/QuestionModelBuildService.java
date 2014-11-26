@@ -33,6 +33,6 @@ public interface QuestionModelBuildService {
      * @param action query action
      * @return 问题模型
      */
-    QuestionModel buildQuestionModel (QueryAction action);
+    public QuestionModel buildQuestionModel (QueryAction action);
     
 }

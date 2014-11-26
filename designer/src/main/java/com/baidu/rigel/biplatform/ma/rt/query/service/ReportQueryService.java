@@ -34,6 +34,6 @@ public interface ReportQueryService {
      * @return 查询结果
      * @throws QueryException 异常
      */
-    QueryResult query(QueryRequest request) throws QueryException;
+    public QueryResult query(QueryRequest request) throws QueryException;
     
 }

@@ -333,6 +333,7 @@ public class QueryUtils {
     public static Cube getCubeWithExtendArea(ReportDesignModel reportModel, ExtendArea area)
             throws QueryModelBuildException {
         Cube oriCube = getCubeFromReportModel(reportModel, area);
+        String areaId = area.getCubeId();
         Map<String, List<Dimension>> filterDims = collectFilterDim(reportModel);
         MiniCube cube = new MiniCube(area.getCubeId());
         LogicModel logicModel = area.getLogicModel();

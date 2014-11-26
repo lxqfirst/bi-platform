@@ -2796,6 +2796,7 @@ div.ui-float-menu-children div.ui-float-menu-children div.ui-float-menu {
 }
 .ui-input-error, .ui-textarea-error {
     border: 1px solid #DD4B39;
+<<<<<<< HEAD
 }
 ul,input,div,span{
     margin: 0;
@@ -3171,6 +3172,383 @@ li {
     height: 0px;
 }
 
+=======
+}
+ul,input,div,span{
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none
+}
+
+.ui-reportSave-save {
+    position: relative;
+    font-family: arial, "宋体";
+    font-size: 12px;
+    z-index: 99
+}
+
+/*报讯-保存按钮*/
+.ui-reportSave-save-saveButton {
+    width: 80px;
+    height: 25px;
+    line-height: 25px;
+    background: #0083D7;
+    text-align: center;
+    color: #FFFFFF;
+    cursor: pointer;
+    -ms-border-top-left-radius: 2px;
+    border-top-left-radius: 2px;
+    -ms-border-radius: 2px;
+    border-radius: 2px
+}
+.ui-reportSave-save-saveButton-hover {
+    background: #4E9AE0
+}
+
+/*保存-ul选项*/
+.ui-reportSave-save-operateButtons {
+    width: 140px;
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 25px;
+    left: -1px;
+    background: white;
+    z-index: 199
+}
+
+/*保存-ul中li*/
+.ui-reportSave-save-operateButtons li {
+    padding-left: 10px;
+    height: 25px;
+    line-height: 25px;
+    cursor: pointer
+}
+
+/*保存-ul中li伪类*/
+.ui-reportSave-save-operateButtons li:hover {
+    background: #1889d2;
+    color: #FFFFFF
+}
+
+
+.ui-reportSave-tab {
+    height: 27px;
+    font-family: arial, "宋体";
+    font-size: 12px;
+    
+}
+
+.ui-reportSave-tab-tabNormal {
+    float: left;
+    position: relative;
+    height: 27px;
+    margin-right: 5px;
+    padding: 0 30px;
+    -moz-border-top-left-radius: 5px;
+    -o-border-top-left-radius: 5px;
+    -ms-border-top-left-radius: 5px;
+    -moz-border-top-right-radius: 5px;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    -o-border-top-right-radius: 5px;
+    -ms-border-top-right-radius: 5px;
+    line-height: 27px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #E3E1DD
+}
+
+.ui-reportSave-tab-close {
+    float: right;
+    position: absolute;
+    text-decoration: none;
+    height: 18px;
+    width: 18px;
+    line-height: 18px;
+    top: 0px;
+    right: 0px;
+    color: #333;
+    font-size: 18px;
+    font-family: arial, "宋体"
+}
+
+.ui-reportSave-tab-close:hover {
+    color: white;      
+    font-weight:bold;      
+    /* font-size:22px; */
+    border: 1px solid rgb(252, 244, 244);
+    height: 18px;
+    width: 18px;
+    line-height: 18px;
+    border-radius: 50%;
+    background: rgb(223, 149, 134);
+}
+
+.ui-reportSave-tab-tabFocus {
+    background: -moz-linear-gradient(#5581E5, #4770C7);
+    background: -webkit-linear-gradient(#5581E5, #4770C7);
+    background: -o-linear-gradient(#5581E5, #4770C7);
+    background: -ms-linear-gradient(#5581E5, #4770C7);
+    background: linear-gradient(#5581E5, #4770C7);
+    background: progid:DXImageTransform.Microsoft.gradient(startColorstr='#5581E5', endColorstr='#4770C7',GradientType=0 );
+    background-color: #5076DD;
+    color: #fff
+}
+
+.ui-reportSave-tab-close-focus {
+    color: #fff
+}
+
+.ui-reportSave-save-dialog-form-item {
+    height: 35px;
+    margin-bottom: 5px;
+}
+.ui-reportSave-save-dialog-form-item label {
+    float: left;
+    width: 65px;
+    height: 25px;
+    line-height: 25px;
+    font-weight: bold;
+    padding-right: 10px;
+    text-align: right;
+    font-size: 14px
+}
+.ui-reportSave-save-dialog-form-item input {
+    float: left;
+    width: 248px;
+    height: 25px;
+    line-height: 25px;
+    border: 1px #4791ff solid
+}
+.ui-reportSave-save-dialog-form-error {
+    height: 15px;
+    margin-bottom: 5px;
+    line-height: 15px;
+    padding-left: 75px;
+    color: red;
+}
+
+.ui-form-body div{
+    font-family: arial, "宋体";
+    font-size: 12px;
+}
+
+.xui-e-chart {
+    width: 100%;
+    height: 100%;
+    position:relative;
+    background:#FFF;
+    /*zIndex设置特别针对IE8, 不然浮层会被charts遮盖...*/
+    z-index:0;
+}
+.xui-e-chart-header {
+    width:100%;
+}
+.xui-e-chart-title {
+    font-weight:bold;
+    line-height:22px;
+    float:left;
+}
+.xui-e-chart-legend {
+    padding:0px 70px;
+    font-size: 12px;
+    font-family: '微软雅黑', Arial;
+}
+.xui-e-chart-legend-item {
+    display:inline-block;
+    position:relative;
+    margin:0 5px 5px 0;
+    line-height:22px;
+    padding:0 20px 0 5px;
+    cursor:pointer;
+    color:#FFF;
+    font-weight:bold;
+    *display:inline;
+    *zoom:1;
+}
+.xui-e-chart-legend-item-icon {
+    display:block;
+    height:15px;
+    width:10px;
+    position:absolute;
+    top:4px;
+    right:5px;
+    background:url(img/icon.png) -32px -385px;
+}
+.xui-e-chart-legend-item.hidden .ui-charts-legend-item-icon {
+    background-position:-42px -385px;
+}
+.xui-e-chart-content {
+    height:100%;
+}
+.xui-e-chart-empty {
+    width: 99%;
+    height: 98%;
+    text-align: center;
+    border: 1px solid #DDD;
+    font-size: 12px;
+    color: #999;
+}
+.zoom-buttons {}
+.zoom-buttons span {
+    float: left;
+    padding: 2px 6px;
+    cursor: pointer;
+    border: 1px solid white;
+    font-family: 微 软 雅 黑, Arial;
+    font-size: 12px;
+    color: #282828;
+    fill: #282828;
+}
+.zoom-buttons span:hover {
+    border: 1px solid #50BFC6;
+}
+.zoom-buttons .zoom-button-focus {
+    border: 1px solid #50BFC6;
+    background-color: #D7EBF6
+}
+.zoom-dateRange {
+    float: right
+}
+.zoom-dateRange span {
+    color: #B0B0B0;
+    font-weight: bold;
+}
+.zoom-dateRange input {
+    width: 80px; height: 16px; border: 1px solid silver; margin-left: 5px; margin-right: 5px; text-align: center; color: #3784B7; font-weight: bold;
+}
+/**
+ * di.css
+ * Copyright 2012 Baidu Inc. All rights reserved.
+ *
+ * @file:    data insight 公用（包括console和product等公用）
+ * @author:  xxx(xxx)
+ */
+
+/**
+ * 标记且功能性css，在console会起标记作用
+ */
+.di-o_o-body {
+    position: relative;
+    padding: 10px;
+    font-size: 12px;
+    min-height: 200px;
+}
+.di-o_o-block {
+    position: relative;
+    margin: 0 10px 20px 0;
+    border-radius: 3px;
+}
+.di-o_o-line {
+    position: relative;
+    /*margin: 5px 0 5px 0;*/
+}
+.di-o_o-item {
+    vertical-align: middle;
+    display: inline-block;
+    margin-right: 5px;
+    *display: inline;
+    *zoom: 1;
+}
+.di-o_o-space-l1 {
+    margin-left: 20px;
+}
+.di-o_o-hide {
+    display: none;
+}
+
+/**
+ * 业务相关
+ */
+.cond-block {
+    border: 1px solid #8CCA54;
+}
+.cond-block .di-o_o-item {
+    margin: 0 5px;
+}
+.vu-table {
+    height: 500px;
+}
+
+/**
+ * 全局提示
+ */
+.global-prompt {
+    margin: 200px auto;
+    z-index: 999;
+    padding: 5px 10px;
+    color: #333;
+    background: #F9EDBE;
+    font-family: "微软雅黑", Serif;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #F0C36D;
+    border-radius: 4px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -o-border-radius: 4px;
+    -ms-border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    -o-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    -ms-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.global-prompt-waiting {
+    width: 24px; 
+    height: 24px; 
+    background: url('img/waiting.gif') 0px 0px no-repeat; 
+    overflow: hidden; 
+    float: left;
+}
+.global-prompt-waiting-text {
+    margin-left: 34px; 
+    height: 24px; 
+    line-height: 24px;
+    font-family: "微软雅黑", Serif;
+    font-size: 14px;
+    font-weight: bold;
+}
+.global-smile-face {
+    width: 44px;
+    height: 43px;
+    background-image: url(img/iconbizbg.png);
+    background-position: -44px -120px;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: middle;
+}
+.global-sad-face {
+    width: 44px;
+    height: 43px;
+    background-image: url(img/iconbizbg.png);
+    background-position: 0 -120px;
+    background-repeat: no-repeat;
+    overflow: hidden;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    vertical-align: middle;
+}
+
+/**
+ * 清除浮动
+ */
+.clear {
+    clear: both;
+    overflow: hidden;
+    height: 0px;
+}
+
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 /**
  * di-ui.css
  * Copyright 2012 Baidu Inc. All rights reserved.

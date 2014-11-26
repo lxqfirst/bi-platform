@@ -3177,7 +3177,14 @@ li {
  *
  * @file:    data insight 公用（包括console和product等公用）
  *           data insight UI
+<<<<<<< HEAD
  * @author:  xxx(xxx
+=======
+ * @author:  xxx(xxx)
+ */
+
+/**
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * Dim Select Panel
  */
 .di-dim-select-tree {

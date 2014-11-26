@@ -66,8 +66,9 @@ public class OlapElementQueryUtils {
 		Stream<? extends OlapElement> stream = collection.parallelStream().filter(dim -> {
 			return dim.getId().equals(id);
 		});
-		if (stream.count() == 1) {
-			return (OlapElement) stream.toArray()[0];
+		Object [] objects = stream.toArray();
+		if (objects.length == 1) {
+		    return (OlapElement) objects[0];
 		}
 		return null;
 	}

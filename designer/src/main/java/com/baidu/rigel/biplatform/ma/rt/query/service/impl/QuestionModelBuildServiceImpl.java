@@ -20,6 +20,9 @@ package com.baidu.rigel.biplatform.ma.rt.query.service.impl;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+
 import com.baidu.rigel.biplatform.ac.query.model.QuestionModel;
 import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
 import com.baidu.rigel.biplatform.ma.rt.query.service.QuestionModelBuildService;
@@ -30,8 +33,12 @@ import com.baidu.rigel.biplatform.ma.rt.utils.QueryUtils;
  * @author david.wang
  * @version 1.0.0.1
  */
+@Service("questionModelBuildService")
 public class QuestionModelBuildServiceImpl implements QuestionModelBuildService {
-    
+    /**
+     * 日志
+     */
+    private Logger logger = Logger.getLogger(QuestionModelBuildServiceImpl.class);
     /**
      * 
      * QuestionModelBuildServiceImpl
@@ -60,7 +67,8 @@ public class QuestionModelBuildServiceImpl implements QuestionModelBuildService 
             }
             return questionModel;
         } catch (Exception e) {
-            
+            e.printStackTrace();
+            logger.error(e);
             throw new RuntimeException("构建问题模型出错，请检查查询条件");
         }
     }

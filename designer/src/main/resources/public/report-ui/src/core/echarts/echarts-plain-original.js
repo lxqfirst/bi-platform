@@ -3116,6 +3116,7 @@ return G_vmlCanvasManager;
 /**
  * zrender: 公共辅助函数
  *
+<<<<<<< HEAD
  * @author Kener (@Kener-林峰, linzhifengone：深度克隆
  * merge：合并源对象的属性到目标对象
  * getContext：获取一个自由使用的canvas 2D context，使用原生方法，如isPointInPath，measureText等
@@ -3613,6 +3614,507 @@ define('zrender/mixin/Eventful',['require'],function (require) {
  */
 define(
     'zl/event',['require','../mixin/Eventful'],function(require) {
+=======
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * clone：深度克隆
+ * merge：合并源对象的属性到目标对象
+ * getContext：获取一个自由使用的canvas 2D context，使用原生方法，如isPointInPath，measureText等
+ */
+define(
+    'zrender/tool/util',['require','../dep/excanvas'],function(require) {
+        // 用于处理merge时无法遍历Date等对象的问题
+        var BUILTIN_OBJECT = {
+            '[object Function]': 1,
+            '[object RegExp]': 1,
+            '[object Date]': 1,
+            '[object Error]': 1,
+            '[object CanvasGradient]': 1
+        };
+
+        /**
+         * 对一个object进行深度拷贝
+         *
+         * @param {Any} source 需要进行拷贝的对象
+         * @return {Any} 拷贝后的新对象
+         */
+        function clone(source) {
+            if (typeof source == 'object' && source !== null) {
+                var result = source;
+                if (source instanceof Array) {
+                    result = [];
+                    for (var i = 0, len = source.length; i < len; i++) {
+                        result[i] = clone(source[i]);
+                    }
+                }
+                else if (!BUILTIN_OBJECT[Object.prototype.toString.call(source)]) {
+                    result = {};
+                    for (var key in source) {
+                        if (source.hasOwnProperty(key)) {
+                            result[key] = clone(source[key]);
+                        }
+                    }
+                }
+
+                return result;
+            }
+
+            return source;
+        }
+
+        function mergeItem(target, source, key, overwrite) {
+            if (source.hasOwnProperty(key)) {
+                if (typeof target[key] == 'object'
+                    && !BUILTIN_OBJECT[ Object.prototype.toString.call(target[key]) ]
+                ) {
+                    // 如果需要递归覆盖，就递归调用merge
+                    merge(
+                        target[key],
+                        source[key],
+                        overwrite
+                    );
+                }
+                else if (overwrite || !(key in target)) {
+                    // 否则只处理overwrite为true，或者在目标对象中没有此属性的情况
+                    target[key] = source[key];
+                }
+            }
+        }
+
+        /**
+         * 合并源对象的属性到目标对象
+         * modify from Tangram
+         * @param {*} target 目标对象
+         * @param {*} source 源对象
+         * @param {boolean} overwrite 是否覆盖
+         */
+        function merge(target, source, overwrite) {
+            for (var i in source) {
+                mergeItem(target, source, i, overwrite);
+            }
+            
+            return target;
+        }
+
+        var _ctx;
+
+        function getContext() {
+            if (!_ctx) {
+                require('../dep/excanvas');
+                /* jshint ignore:start */
+                if (G_vmlCanvasManager) {
+                    var _div = document.createElement('div');
+                    _div.style.position = 'absolute';
+                    _div.style.top = '-1000px';
+                    document.body.appendChild(_div);
+
+                    _ctx = G_vmlCanvasManager.initElement(_div)
+                               .getContext('2d');
+                }
+                else {
+                    _ctx = document.createElement('canvas').getContext('2d');
+                }
+                /* jshint ignore:end */
+            }
+            return _ctx;
+        }
+
+        var _canvas;
+        var _pixelCtx;
+        var _width;
+        var _height;
+        var _offsetX = 0;
+        var _offsetY = 0;
+
+        /**
+         * 获取像素拾取专用的上下文
+         * @return {Object} 上下文
+         */
+        function getPixelContext() {
+            if (!_pixelCtx) {
+                _canvas = document.createElement('canvas');
+                _width = _canvas.width;
+                _height = _canvas.height;
+                _pixelCtx = _canvas.getContext('2d');
+            }
+            return _pixelCtx;
+        }
+
+        /**
+         * 如果坐标处在_canvas外部，改变_canvas的大小
+         * @param {number} x : 横坐标
+         * @param {number} y : 纵坐标
+         * 注意 修改canvas的大小 需要重新设置translate
+         */
+        function adjustCanvasSize(x, y) {
+            // 每次加的长度
+            var _v = 100;
+            var _flag;
+
+            if (x + _offsetX > _width) {
+                _width = x + _offsetX + _v;
+                _canvas.width = _width;
+                _flag = true;
+            }
+
+            if (y + _offsetY > _height) {
+                _height = y + _offsetY + _v;
+                _canvas.height = _height;
+                _flag = true;
+            }
+
+            if (x < -_offsetX) {
+                _offsetX = Math.ceil(-x / _v) * _v;
+                _width += _offsetX;
+                _canvas.width = _width;
+                _flag = true;
+            }
+
+            if (y < -_offsetY) {
+                _offsetY = Math.ceil(-y / _v) * _v;
+                _height += _offsetY;
+                _canvas.height = _height;
+                _flag = true;
+            }
+
+            if (_flag) {
+                _pixelCtx.translate(_offsetX, _offsetY);
+            }
+        }
+
+        /**
+         * 获取像素canvas的偏移量
+         * @return {Object} 偏移量
+         */
+        function getPixelOffset() {
+            return {
+                x : _offsetX,
+                y : _offsetY
+            };
+        }
+
+        /**
+         * 查询数组中元素的index
+         */
+        function indexOf(array, value) {
+            if (array.indexOf) {
+                return array.indexOf(value);
+            }
+            for (var i = 0, len = array.length; i < len; i++) {
+                if (array[i] === value) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        /**
+         * 构造类继承关系
+         * 
+         * @param {Function} clazz 源类
+         * @param {Function} baseClazz 基类
+         */
+        function inherits(clazz, baseClazz) {
+            var clazzPrototype = clazz.prototype;
+            function F() {}
+            F.prototype = baseClazz.prototype;
+            clazz.prototype = new F();
+
+            for (var prop in clazzPrototype) {
+                clazz.prototype[prop] = clazzPrototype[prop];
+            }
+            clazz.constructor = clazz;
+        }
+
+        return {
+            inherits: inherits,
+            clone : clone,
+            merge : merge,
+            getContext : getContext,
+            getPixelContext : getPixelContext,
+            getPixelOffset : getPixelOffset,
+            adjustCanvasSize : adjustCanvasSize,
+            indexOf : indexOf
+        };
+    }
+);
+
+/**
+ * 事件扩展
+ * @module zrender/mixin/Eventful
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *         pissang (https://www.github.com/pissang)
+ */
+define('zrender/mixin/Eventful',['require'],function (require) {
+
+    /**
+     * 事件分发器
+     * @alias module:zrender/mixin/Eventful
+     * @constructor
+     */
+    var Eventful = function () {
+        this._handlers = {};
+    };
+    /**
+     * 单次触发绑定，dispatch后销毁
+     * 
+     * @param {string} event 事件名
+     * @param {Function} handler 响应函数
+     * @param {Object} context
+     */
+    Eventful.prototype.one = function (event, handler, context) {
+        var _h = this._handlers;
+
+        if (!handler || !event) {
+            return this;
+        }
+
+        if (!_h[event]) {
+            _h[event] = [];
+        }
+
+        _h[event].push({
+            h : handler,
+            one : true,
+            ctx: context || this
+        });
+
+        return this;
+    };
+
+    /**
+     * 绑定事件
+     * @param {string} event 事件名
+     * @param {Function} handler 事件处理函数
+     * @param {Object} context
+     */
+    Eventful.prototype.bind = function (event, handler, context) {
+        var _h = this._handlers;
+
+        if (!handler || !event) {
+            return this;
+        }
+
+        if (!_h[event]) {
+            _h[event] = [];
+        }
+
+        _h[event].push({
+            h : handler,
+            one : false,
+            ctx: context || this
+        });
+
+        return this;
+    };
+
+    /**
+     * 解绑事件
+     * @param {string} event 事件名
+     * @param {Function} [handler] 事件处理函数
+     */
+    Eventful.prototype.unbind = function (event, handler) {
+        var _h = this._handlers;
+
+        if (!event) {
+            this._handlers = {};
+            return this;
+        }
+
+        if (handler) {
+            if (_h[event]) {
+                var newList = [];
+                for (var i = 0, l = _h[event].length; i < l; i++) {
+                    if (_h[event][i]['h'] != handler) {
+                        newList.push(_h[event][i]);
+                    }
+                }
+                _h[event] = newList;
+            }
+
+            if (_h[event] && _h[event].length === 0) {
+                delete _h[event];
+            }
+        }
+        else {
+            delete _h[event];
+        }
+
+        return this;
+    };
+
+    /**
+     * 事件分发
+     * 
+     * @param {string} type 事件类型
+     */
+    Eventful.prototype.dispatch = function (type) {
+        if (this._handlers[type]) {
+            var args = arguments;
+            var argLen = args.length;
+
+            if (argLen > 3) {
+                args = Array.prototype.slice.call(args, 1);
+            }
+            
+            var _h = this._handlers[type];
+            var len = _h.length;
+            for (var i = 0; i < len;) {
+                // Optimize advise from backbone
+                switch (argLen) {
+                    case 1:
+                        _h[i]['h'].call(_h[i]['ctx']);
+                        break;
+                    case 2:
+                        _h[i]['h'].call(_h[i]['ctx'], args[1]);
+                        break;
+                    case 3:
+                        _h[i]['h'].call(_h[i]['ctx'], args[1], args[2]);
+                        break;
+                    default:
+                        // have more than 2 given arguments
+                        _h[i]['h'].apply(_h[i]['ctx'], args);
+                        break;
+                }
+                
+                if (_h[i]['one']) {
+                    _h.splice(i, 1);
+                    len--;
+                }
+                else {
+                    i++;
+                }
+            }
+        }
+
+        return this;
+    };
+
+    /**
+     * 带有context的事件分发, 最后一个参数是事件回调的context
+     * @param {string} type 事件类型
+     */
+    Eventful.prototype.dispatchWithContext = function (type) {
+        if (this._handlers[type]) {
+            var args = arguments;
+            var argLen = args.length;
+
+            if (argLen > 4) {
+                args = Array.prototype.slice.call(args, 1, args.length - 1);
+            }
+            var ctx = args[args.length - 1];
+
+            var _h = this._handlers[type];
+            var len = _h.length;
+            for (var i = 0; i < len;) {
+                // Optimize advise from backbone
+                switch (argLen) {
+                    case 1:
+                        _h[i]['h'].call(ctx);
+                        break;
+                    case 2:
+                        _h[i]['h'].call(ctx, args[1]);
+                        break;
+                    case 3:
+                        _h[i]['h'].call(ctx, args[1], args[2]);
+                        break;
+                    default:
+                        // have more than 2 given arguments
+                        _h[i]['h'].apply(ctx, args);
+                        break;
+                }
+                
+                if (_h[i]['one']) {
+                    _h.splice(i, 1);
+                    len--;
+                }
+                else {
+                    i++;
+                }
+            }
+        }
+
+        return this;
+    };
+
+    // 对象可以通过 onxxxx 绑定事件
+    /**
+     * @event module:zrender/mixin/Eventful#onclick
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#onmouseover
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#onmouseout
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#onmousemove
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#onmousewheel
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#onmousedown
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#onmouseup
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#ondragstart
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#ondragend
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#ondragenter
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#ondragleave
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#ondragover
+     * @type {Function}
+     * @default null
+     */
+    /**
+     * @event module:zrender/mixin/Eventful#ondrop
+     * @type {Function}
+     * @default null
+     */
+    
+    return Eventful;
+});
+
+/**
+ * 事件辅助类
+ * @module zrender/tool/event
+ * @author Kener (@Kener-林峰, linzhifeng)
+ */
+define(
+    'zrender/tool/event',['require','../mixin/Eventful'],function(require) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         
 
@@ -3765,6 +4267,7 @@ define('zrender/tool/env',[],function() {
     return detect(navigator.userAgent);
 });
 <<<<<<< HEAD
+<<<<<<< HEAD
 /**
  * zrender: shape仓库
  *
@@ -3878,6 +4381,110 @@ define('zrender/config',[],function () {
 
         // 是否异常捕获
         catchBrushException: false,
+=======
+define('zrender/config',[],function () {
+    /**
+     * config默认配置项
+     * @exports zrender/config
+     * @author Kener (@Kener-林峰, linzhifeng)
+     */
+    var config = {
+        /**
+         * @namespace module:zrender/config.EVENT
+         */
+        EVENT : {
+            /**
+             * 窗口大小变化
+             * @type {string}
+             */
+            RESIZE : 'resize',
+            /**
+             * 鼠标按钮被（手指）按下，事件对象是：目标图形元素或空
+             * @type {string}
+             */
+            CLICK : 'click',
+            /**
+             * 双击事件
+             * @type {string}
+             */
+            DBLCLICK : 'dblclick',
+            /**
+             * 鼠标滚轮变化，事件对象是：目标图形元素或空
+             * @type {string}
+             */
+            MOUSEWHEEL : 'mousewheel',
+            /**
+             * 鼠标（手指）被移动，事件对象是：目标图形元素或空
+             * @type {string}
+             */
+            MOUSEMOVE : 'mousemove',
+            /**
+             * 鼠标移到某图形元素之上，事件对象是：目标图形元素
+             * @type {string}
+             */
+            MOUSEOVER : 'mouseover',
+            /**
+             * 鼠标从某图形元素移开，事件对象是：目标图形元素
+             * @type {string}
+             */
+            MOUSEOUT : 'mouseout',
+            /**
+             * 鼠标按钮（手指）被按下，事件对象是：目标图形元素或空
+             * @type {string}
+             */
+            MOUSEDOWN : 'mousedown',
+            /**
+             * 鼠标按键（手指）被松开，事件对象是：目标图形元素或空
+             * @type {string}
+             */
+            MOUSEUP : 'mouseup',
+            /**
+             * 全局离开，MOUSEOUT触发比较频繁，一次离开优化绑定
+             * @type {string}
+             */
+            GLOBALOUT : 'globalout',    // 
+
+            // 一次成功元素拖拽的行为事件过程是：
+            // dragstart > dragenter > dragover [> dragleave] > drop > dragend
+            /**
+             * 开始拖拽时触发，事件对象是：被拖拽图形元素
+             * @type {string}
+             */
+            DRAGSTART : 'dragstart',
+            /**
+             * 拖拽完毕时触发（在drop之后触发），事件对象是：被拖拽图形元素
+             * @type {string}
+             */
+            DRAGEND : 'dragend',
+            /**
+             * 拖拽图形元素进入目标图形元素时触发，事件对象是：目标图形元素
+             * @type {string}
+             */
+            DRAGENTER : 'dragenter',
+            /**
+             * 拖拽图形元素在目标图形元素上移动时触发，事件对象是：目标图形元素
+             * @type {string}
+             */
+            DRAGOVER : 'dragover',
+            /**
+             * 拖拽图形元素离开目标图形元素时触发，事件对象是：目标图形元素
+             * @type {string}
+             */
+            DRAGLEAVE : 'dragleave',
+            /**
+             * 拖拽图形元素放在目标图形元素内时触发，事件对象是：目标图形元素
+             * @type {string}
+             */
+            DROP : 'drop',
+            /**
+             * touch end - start < delay is click
+             * @type {number}
+             */
+            touchClickDelay : 300
+        },
+
+        // 是否异常捕获
+        catchBrushException: false,
 
         /**
          * debug日志选项：catchBrushException为true下有效
@@ -3894,8 +4501,49 @@ define('zrender/config',[],function () {
 define(
     'zrender/tool/log',['require','../config'],function (require) {
         var config = require('../config');
->>>>>>> refs/heads/branch_1.1.0
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+        /**
+<<<<<<< HEAD
+         * debug日志选项：catchBrushException为true下有效
+         * 0 : 不生成debug数据，发布用
+         * 1 : 异常抛出，调试用
+         * 2 : 控制台输出，调试用
+=======
+         * @exports zrender/tool/log
+         * @author Kener (@Kener-林峰, linzhifeng)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+         */
+<<<<<<< HEAD
+        debugMode: 0
+    };
+    return config;
+});
+
+
+define(
+    'zrender/tool/log',['require','../config'],function (require) {
+        var config = require('../config');
+>>>>>>> refs/heads/branch_1.1.0
+=======
+        return function() {
+            if (config.debugMode === 0) {
+                return;
+            }
+            else if (config.debugMode == 1) {
+                for (var k in arguments) {
+                    throw new Error(arguments[k]);
+                }
+            }
+            else if (config.debugMode > 1) {
+                for (var k in arguments) {
+                    console.log(arguments[k]);
+                }
+            }
+        };
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
         /**
          * @exports zrender/tool/log
          * @author Kener (@Kener-林峰, linzhifeng)
@@ -3913,7 +4561,16 @@ define(
                     console.log(arguments[k]);
                 }
             }
+=======
+        /* for debug
+        return function(mes) {
+            document.getElementById('wrong-message').innerHTML =
+                mes + ' ' + (new Date() - 0)
+                + '<br/>' 
+                + document.getElementById('wrong-message').innerHTML;
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         };
+<<<<<<< HEAD
 
         /* for debug
         return function(mes) {
@@ -3922,6 +4579,8 @@ define(
                 + '<br/>' 
                 + document.getElementById('wrong-message').innerHTML;
         };
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         */
     }
 );
@@ -3931,6 +4590,7 @@ define(
  *
  * @author errorrik (errorrik@gmail.com)
  */
+<<<<<<< HEAD
 <<<<<<< HEAD
 defirender/tool/vector',[],function() {
         var ArrayCtor
@@ -3951,6 +4611,22 @@ define(
     'zrender/tool/vector',[],function () {
         var ArrayCtor = typeof Float32Array === 'undefined'
 >>>>>>> refs/heads/branch_1.1.0
+=======
+
+define(
+    'zrender/tool/guid',[],function() {
+        var idStart = 0x0907;
+
+        return function () {
+            return 'zrender__' + (idStart++);
+        };
+    }
+);
+
+define(
+    'zrender/tool/vector',[],function () {
+        var ArrayCtor = typeof Float32Array === 'undefined'
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             ? Array
             : Float32Array;
         /**
@@ -4206,9 +4882,15 @@ define(
         vector.dist = vector.distance;
         vector.distSquare = vector.distanceSquare;
 
+        vector.length = vector.len;
+        vector.lengthSquare = vector.lenSquare;
+        vector.dist = vector.distance;
+        vector.distSquare = vector.distanceSquare;
+
         return vector;
     }
 );
+<<<<<<< HEAD
 <<<<<<< HEAD
 /**
  * zrender: 公共辅助函数
@@ -5209,10 +5891,15 @@ define(
  * code from mat2d in http://glmatrix.define(
     'zrender/tool/matrix',[],function() {
 =======
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 define(
     'zrender/tool/matrix',[],function () {
+<<<<<<< HEAD
 >>>>>>> refs/heads/branch_1.1.0
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         var ArrayCtor = typeof Float32Array === 'undefined'
             ? Array
@@ -5391,7 +6078,12 @@ define(
  *         errorrik (errorrik@gmail.com)
  */
 
+<<<<<<< HEAD
 de'zrender/Handler',['require','./config','./tool/env','./tool/event','./tool/util','./tool/vector','./tool/matrix','./mixin/Eventful'],function (require) {
+=======
+define(
+    'zrender/Handler',['require','./config','./tool/env','./tool/event','./tool/util','./tool/vector','./tool/matrix','./mixin/Eventful'],function (require) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         
 
@@ -6835,6 +7527,7 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
  *         pissang (https://www.github.com/pissang)
  *
 <<<<<<< HEAD
+<<<<<<< HEAD
  * getColor：获取色板颜色
  * customPalette : 自定义调色板
 lette : 重置调色板
@@ -7943,6 +8636,1082 @@ define('zrender/mixin/Transformable',['require','../tool/matrix','../tool/vector
  */
 define('zrender/tool/color',['require','../tool/util'],function(
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * isInside：是否在区域内部
+ * isOutside：是否在区域外部
+ * getTextWidth：测算单行文本宽度
+ */
+define(
+    'zrender/tool/area',['require','./util','./curve'],function (require) {
+
+        
+
+        var util = require('./util');
+        var curve = require('./curve');
+
+        var _ctx;
+        
+        var _textWidthCache = {};
+        var _textHeightCache = {};
+        var _textWidthCacheCounter = 0;
+        var _textHeightCacheCounter = 0;
+        var TEXT_CACHE_MAX = 5000;
+            
+        var PI2 = Math.PI * 2;
+
+        function normalizeRadian(angle) {
+            angle %= PI2;
+            if (angle < 0) {
+                angle += PI2;
+            }
+            return angle;
+        }
+        /**
+         * 包含判断
+         *
+         * @param {Object} shape : 图形
+         * @param {Object} area ： 目标区域
+         * @param {number} x ： 横坐标
+         * @param {number} y ： 纵坐标
+         */
+        function isInside(shape, area, x, y) {
+            if (!area || !shape) {
+                // 无参数或不支持类型
+                return false;
+            }
+            var zoneType = shape.type;
+
+            _ctx = _ctx || util.getContext();
+
+            // 未实现或不可用时(excanvas不支持)则数学运算，主要是line，brokenLine，ring
+            var _mathReturn = _mathMethod(shape, area, x, y);
+            if (typeof _mathReturn != 'undefined') {
+                return _mathReturn;
+            }
+
+            if (shape.buildPath && _ctx.isPointInPath) {
+                return _buildPathMethod(shape, _ctx, area, x, y);
+            }
+
+            // 上面的方法都行不通时
+            switch (zoneType) {
+                case 'heart': // 心形---------10 // Todo，不精确
+                case 'droplet':// 水滴----------11 // Todo，不精确
+                case 'ellipse': // Todo，不精确
+                    return true;
+                // 旋轮曲线  不准确
+                case 'trochoid':
+                    var _r = area.location == 'out'
+                            ? area.r1 + area.r2 + area.d
+                            : area.r1 - area.r2 + area.d;
+                    return isInsideCircle(area, x, y, _r);
+                // 玫瑰线 不准确
+                case 'rose' :
+                    return isInsideCircle(area, x, y, area.maxr);
+                // 路径，椭圆，曲线等-----------------13
+                default:
+                    return false;   // Todo，暂不支持
+            }
+        }
+
+        /**
+         * 用数学方法判断，三个方法中最快，但是支持的shape少
+         *
+         * @param {Object} shape : 图形
+         * @param {Object} area ：目标区域
+         * @param {number} x ： 横坐标
+         * @param {number} y ： 纵坐标
+         * @return {boolean=} true表示坐标处在图形中
+         */
+        function _mathMethod(shape, area, x, y) {
+            var zoneType = shape.type;
+            // 在矩形内则部分图形需要进一步判断
+            switch (zoneType) {
+                // 贝塞尔曲线
+                case 'bezier-curve':
+                    if (typeof(area.cpX2) === 'undefined') {
+                        return isInsideQuadraticStroke(
+                            area.xStart, area.yStart,
+                            area.cpX1, area.cpY1, 
+                            area.xEnd, area.yEnd,
+                            area.lineWidth, x, y
+                        );
+                    }
+                    return isInsideCubicStroke(
+                        area.xStart, area.yStart,
+                        area.cpX1, area.cpY1, 
+                        area.cpX2, area.cpY2, 
+                        area.xEnd, area.yEnd,
+                        area.lineWidth, x, y
+                    );
+                // 线
+                case 'line':
+                    return isInsideLine(
+                        area.xStart, area.yStart,
+                        area.xEnd, area.yEnd,
+                        area.lineWidth, x, y
+                    );
+                // 折线
+                case 'broken-line':
+                    return isInsideBrokenLine(
+                        area.pointList, area.lineWidth, x, y
+                    );
+                // 圆环
+                case 'ring':
+                    return isInsideRing(
+                        area.x, area.y, area.r0, area.r, x, y
+                    );
+                // 圆形
+                case 'circle':
+                    return isInsideCircle(
+                        area.x, area.y, area.r, x, y
+                    );
+                // 扇形
+                case 'sector':
+                    return isInsideSector(area, x, y);
+                // 多边形
+                case 'path':
+                    return isInsidePath(
+                        area.pathArray, Math.max(area.lineWidth, 5),
+                        area.brushType, x, y
+                    );
+                case 'polygon':
+                case 'star':
+                case 'isogon':
+                    return isInsidePolygon(area.pointList, x, y);
+                // 文本
+                case 'text':
+                    var rect =  area.__rect || shape.getRect(area);
+                    return isInsideRect(
+                        rect.x, rect.y, rect.width, rect.height, x, y
+                    );
+                // 矩形
+                case 'rectangle':
+                // 图片
+                case 'image':
+                    return isInsideRect(
+                        area.x, area.y, area.width, area.height, x, y
+                    );
+            }
+        }
+
+        /**
+         * 通过buildPath方法来判断，三个方法中较快，但是不支持线条类型的shape，
+         * 而且excanvas不支持isPointInPath方法
+         *
+         * @param {Object} shape ： shape
+         * @param {Object} context : 上下文
+         * @param {Object} area ：目标区域
+         * @param {number} x ： 横坐标
+         * @param {number} y ： 纵坐标
+         * @return {boolean} true表示坐标处在图形中
+         */
+        function _buildPathMethod(shape, context, area, x, y) {
+            // 图形类实现路径创建了则用类的path
+            context.beginPath();
+            shape.buildPath(context, area);
+            context.closePath();
+            return context.isPointInPath(x, y);
+        }
+
+        /**
+         * !isInside
+         */
+        function isOutside(shape, area, x, y) {
+            return !isInside(shape, area, x, y);
+        }
+
+        /**
+         * 线段包含判断
+         * @param  {number}  x0
+         * @param  {number}  y0
+         * @param  {number}  x1
+         * @param  {number}  y1
+         * @param  {number}  lineWidth
+         * @param  {number}  x
+         * @param  {number}  y
+         * @return {boolean}
+         */
+        function isInsideLine(x0, y0, x1, y1, lineWidth, x, y) {
+            if (lineWidth === 0) {
+                return false;
+            }
+            var _l = Math.max(lineWidth, 5);
+            var _a = 0;
+            var _b = x0;
+            // Quick reject
+            if (
+                (y > y0 + _l && y > y1 + _l)
+                || (y < y0 - _l && y < y1 - _l)
+                || (x > x0 + _l && x > x1 + _l)
+                || (x < x0 - _l && x < x1 - _l)
+            ) {
+                return false;
+            }
+
+            if (x0 !== x1) {
+                _a = (y0 - y1) / (x0 - x1);
+                _b = (x0 * y1 - x1 * y0) / (x0 - x1) ;
+            }
+            else {
+                return Math.abs(x - x0) <= _l / 2;
+            }
+            var tmp = _a * x - y + _b;
+            var _s = tmp * tmp / (_a * _a + 1);
+            return _s <= _l / 2 * _l / 2;
+        }
+
+        /**
+         * 三次贝塞尔曲线描边包含判断
+         * @param  {number}  x0
+         * @param  {number}  y0
+         * @param  {number}  x1
+         * @param  {number}  y1
+         * @param  {number}  x2
+         * @param  {number}  y2
+         * @param  {number}  x3
+         * @param  {number}  y3
+         * @param  {number}  lineWidth
+         * @param  {number}  x
+         * @param  {number}  y
+         * @return {boolean}
+         */
+        function isInsideCubicStroke(
+            x0, y0, x1, y1, x2, y2, x3, y3,
+            lineWidth, x, y
+        ) {
+            if (lineWidth === 0) {
+                return false;
+            }
+            var _l = Math.max(lineWidth, 5);
+            // Quick reject
+            if (
+                (y > y0 + _l && y > y1 + _l && y > y2 + _l && y > y3 + _l)
+                || (y < y0 - _l && y < y1 - _l && y < y2 - _l && y < y3 - _l)
+                || (x > x0 + _l && x > x1 + _l && x > x2 + _l && x > x3 + _l)
+                || (x < x0 - _l && x < x1 - _l && x < x2 - _l && x < x3 - _l)
+            ) {
+                return false;
+            }
+            var d =  curve.cubicProjectPoint(
+                x0, y0, x1, y1, x2, y2, x3, y3,
+                x, y, null
+            );
+            return d <= _l / 2;
+        }
+
+        /**
+         * 二次贝塞尔曲线描边包含判断
+         * @param  {number}  x0
+         * @param  {number}  y0
+         * @param  {number}  x1
+         * @param  {number}  y1
+         * @param  {number}  x2
+         * @param  {number}  y2
+         * @param  {number}  lineWidth
+         * @param  {number}  x
+         * @param  {number}  y
+         * @return {boolean}
+         */
+        function isInsideQuadraticStroke(
+            x0, y0, x1, y1, x2, y2,
+            lineWidth, x, y
+        ) {
+            if (lineWidth === 0) {
+                return false;
+            }
+            var _l = Math.max(lineWidth, 5);
+            // Quick reject
+            if (
+                (y > y0 + _l && y > y1 + _l && y > y2 + _l)
+                || (y < y0 - _l && y < y1 - _l && y < y2 - _l)
+                || (x > x0 + _l && x > x1 + _l && x > x2 + _l)
+                || (x < x0 - _l && x < x1 - _l && x < x2 - _l)
+            ) {
+                return false;
+            }
+            var d =  curve.quadraticProjectPoint(
+                x0, y0, x1, y1, x2, y2,
+                x, y, null
+            );
+            return d <= _l / 2;
+        }
+
+        /**
+         * 圆弧描边包含判断
+         * @param  {number}  cx
+         * @param  {number}  cy
+         * @param  {number}  r
+         * @param  {number}  startAngle
+         * @param  {number}  endAngle
+         * @param  {boolean}  anticlockwise
+         * @param  {number} lineWidth
+         * @param  {number}  x
+         * @param  {number}  y
+         * @return {Boolean}
+         */
+        function isInsideArcStroke(
+            cx, cy, r, startAngle, endAngle, anticlockwise,
+            lineWidth, x, y
+        ) {
+            if (lineWidth === 0) {
+                return false;
+            }
+            var _l = Math.max(lineWidth, 5);
+
+            x -= cx;
+            y -= cy;
+            var d = Math.sqrt(x * x + y * y);
+            if ((d - _l > r) || (d + _l < r)) {
+                return false;
+            }
+            if (anticlockwise) {
+                startAngle = normalizeRadian(endAngle);
+                endAngle = normalizeRadian(startAngle);
+            } else {
+                startAngle = normalizeRadian(startAngle);
+                endAngle = normalizeRadian(endAngle);
+            }
+            if (startAngle > endAngle) {
+                endAngle += PI2;
+            }
+            
+            var angle = Math.atan2(y, x);
+            if (angle < 0) {
+                angle += PI2;
+            }
+            return (angle >= startAngle && angle <= endAngle)
+                || (angle + PI2 >= startAngle && angle + PI2 <= endAngle);
+        }
+
+        function isInsideBrokenLine(points, lineWidth, x, y) {
+            var lineWidth = Math.max(lineWidth, 10);
+            for (var i = 0, l = points.length - 1; i < l; i++) {
+                var x0 = points[i][0];
+                var y0 = points[i][1];
+                var x1 = points[i + 1][0];
+                var y1 = points[i + 1][1];
+
+                if (isInsideLine(x0, y0, x1, y1, lineWidth, x, y)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function isInsideRing(cx, cy, r0, r, x, y) {
+            var d = (x - cx) * (x - cx) + (y - cy) * (y - cy);
+            return (d < r * r) && (d > r0 * r0);
+        }
+
+        /**
+         * 矩形包含判断
+         */
+        function isInsideRect(x0, y0, width, height, x, y) {
+            return x >= x0 && x <= (x0 + width)
+                && y >= y0 && y <= (y0 + height);
+        }
+
+        /**
+         * 圆形包含判断
+         */
+        function isInsideCircle(x0, y0, r, x, y) {
+            return (x - x0) * (x - x0) + (y - y0) * (y - y0)
+                   < r * r;
+        }
+
+        /**
+         * 扇形包含判断
+         */
+        function isInsideSector(area, x, y) {
+            if (!isInsideRing(area.x, area.y, area.r0 || 0, area.r, x, y)) {
+                // 大圆外或者小圆内直接false
+                return false;
+            }
+
+            // 判断夹角
+            if (Math.abs(area.endAngle - area.startAngle) >= 360) {
+                // 大于360度的扇形，在环内就为true
+                return true;
+            }
+            
+            var angle = (360
+                         - Math.atan2(y - area.y, x - area.x) / Math.PI
+                         * 180)
+                         % 360;
+            var endA = (360 + area.endAngle) % 360;
+            var startA = (360 + area.startAngle) % 360;
+            if (endA > startA) {
+                return (angle >= startA && angle <= endA);
+            }
+
+            return !(angle >= endA && angle <= startA);
+        }
+
+        /**
+         * 多边形包含判断
+         * 与 canvas 一样采用 non-zero winding rule
+         */
+        function isInsidePolygon(points, x, y) {
+            var N = points.length;
+            var w = 0;
+
+            for (var i = 0, j = N - 1; i < N; i++) {
+                var x0 = points[j][0];
+                var y0 = points[j][1];
+                var x1 = points[i][0];
+                var y1 = points[i][1];
+                w += windingLine(x0, y0, x1, y1, x, y);
+                j = i;
+            }
+            return w !== 0;
+        }
+
+        function windingLine(x0, y0, x1, y1, x, y) {
+            if ((y > y0 && y > y1) || (y < y0 && y < y1)) {
+                return 0;
+            }
+            if (y1 == y0) {
+                return 0;
+            }
+            var dir = y1 < y0 ? 1 : -1;
+            var t = (y - y0) / (y1 - y0);
+            var x_ = t * (x1 - x0) + x0;
+
+            return x_ > x ? dir : 0;
+        }
+
+        // 临时数组
+        var roots = [-1, -1, -1];
+        var extrema = [-1, -1];
+
+        function swapExtrema() {
+            var tmp = extrema[0];
+            extrema[0] = extrema[1];
+            extrema[1] = tmp;
+        }
+        function windingCubic(x0, y0, x1, y1, x2, y2, x3, y3, x, y) {
+            // Quick reject
+            if (
+                (y > y0 && y > y1 && y > y2 && y > y3)
+                || (y < y0 && y < y1 && y < y2 && y < y3)
+            ) {
+                return 0;
+            }
+            var nRoots = curve.cubicRootAt(y0, y1, y2, y3, y, roots);
+            if (nRoots === 0) {
+                return 0;
+            }
+            else {
+                var w = 0;
+                var nExtrema = -1;
+                var y0_, y1_;
+                for (var i = 0; i < nRoots; i++) {
+                    var t = roots[i];
+                    var x_ = curve.cubicAt(x0, x1, x2, x3, t);
+                    if (x_ < x) { // Quick reject
+                        continue;
+                    }
+                    if (nExtrema < 0) {
+                        nExtrema = curve.cubicExtrema(y0, y1, y2, y3, extrema);
+                        if (extrema[1] < extrema[0] && nExtrema > 1) {
+                            swapExtrema();
+                        }
+                        y0_ = curve.cubicAt(y0, y1, y2, y3, extrema[0]);
+                        if (nExtrema > 1) {
+                            y1_ = curve.cubicAt(y0, y1, y2, y3, extrema[1]);
+                        }
+                    }
+                    if (nExtrema == 2) {
+                        // 分成三段单调函数
+                        if (t < extrema[0]) {
+                            w += y0_ < y0 ? 1 : -1;
+                        } 
+                        else if (t < extrema[1]) {
+                            w += y1_ < y0_ ? 1 : -1;
+                        } 
+                        else {
+                            w += y3 < y1_ ? 1 : -1;
+                        }
+                    } 
+                    else {
+                        // 分成两段单调函数
+                        if (t < extrema[0]) {
+                            w += y0_ < y0 ? 1 : -1;
+                        } 
+                        else {
+                            w += y3 < y0_ ? 1 : -1;
+                        }
+                    }
+                }
+                return w;
+            }
+        }
+
+        function windingQuadratic(x0, y0, x1, y1, x2, y2, x, y) {
+            // Quick reject
+            if (
+                (y > y0 && y > y1 && y > y2)
+                || (y < y0 && y < y1 && y < y2)
+            ) {
+                return 0;
+            }
+            var nRoots = curve.quadraticRootAt(y0, y1, y2, y, roots);
+            if (nRoots === 0) {
+                return 0;
+            } 
+            else {
+                var t = curve.quadraticExtremum(y0, y1, y2);
+                if (t >=0 && t <= 1) {
+                    var w = 0;
+                    var y_ = curve.quadraticAt(y0, y1, y2, t);
+                    for (var i = 0; i < nRoots; i++) {
+                        var x_ = curve.quadraticAt(x0, x1, x2, roots[i]);
+                        if (x_ > x) {
+                            continue;
+                        }
+                        if (roots[i] < t) {
+                            w += y_ < y0 ? 1 : -1;
+                        } 
+                        else {
+                            w += y2 < y_ ? 1 : -1;
+                        }
+                    }
+                    return w;
+                } 
+                else {
+                    var x_ = curve.quadraticAt(x0, x1, x2, roots[0]);
+                    if (x_ > x) {
+                        return 0;
+                    }
+                    return y2 < y0 ? 1 : -1;
+                }
+            }
+        }
+        
+        // TODO
+        // Arc 旋转
+        function windingArc(
+            cx, cy, r, startAngle, endAngle, anticlockwise, x, y
+        ) {
+            y -= cy;
+            if (y > r || y < -r) {
+                return 0;
+            }
+            var tmp = Math.sqrt(r * r - y * y);
+            roots[0] = -tmp;
+            roots[1] = tmp;
+
+            if (anticlockwise) {
+                startAngle = normalizeRadian(endAngle);
+                endAngle = normalizeRadian(startAngle);
+            } else {
+                startAngle = normalizeRadian(startAngle);
+                endAngle = normalizeRadian(endAngle);
+            }
+            if (startAngle > endAngle) {
+                endAngle += PI2;
+            }
+
+            var w = 0;
+            for (var i = 0; i < 2; i++) {
+                var x_ = roots[i];
+                if (x_ + cx > x) {
+                    var angle = Math.atan2(y, x_);
+                    var dir = anticlockwise ? 1 : -1;
+                    if (angle < 0) {
+                        angle = PI2 + angle;
+                    }
+                    if (
+                        (angle >= startAngle && angle <= endAngle)
+                        || (angle + PI2 >= startAngle && angle + PI2 <= endAngle)
+                    ) {
+                        if (angle > Math.PI / 2 && angle < Math.PI * 1.5) {
+                            dir = -dir;
+                        }
+                        w += dir;
+                    }
+                }
+            }
+            return w;
+        }
+
+        /**
+         * 路径包含判断
+         * 与 canvas 一样采用 non-zero winding rule
+         */
+        function isInsidePath(pathArray, lineWidth, brushType, x, y) {
+            var w = 0;
+            var xi = 0;
+            var yi = 0;
+            var x0 = 0;
+            var y0 = 0;
+            var beginSubpath = true;
+
+            var hasStroke = brushType === 'stroke' || brushType === 'both';
+            var hasFill = brushType === 'fill' || brushType === 'both';
+
+            // var roots = [-1, -1, -1];
+            for (var i = 0; i < pathArray.length; i++) {
+                var seg = pathArray[i];
+                var p = seg.points;
+                // Begin a new subpath
+                if (beginSubpath || seg.command === 'M') {
+                    if (i > 0) {
+                        // Close previous subpath
+                        if (hasFill) {
+                            w += windingLine(xi, yi, x0, y0, x, y);
+                        }
+                        if (w !== 0) {
+                            return true;
+                        }
+                    }
+                    x0 = p[p.length - 2];
+                    y0 = p[p.length - 1];
+                    beginSubpath = false;
+                }
+                switch (seg.command) {
+                    case 'M':
+                        xi = p[0];
+                        yi = p[1];
+                        break;
+                    case 'L':
+                        if (hasStroke) {
+                            if (isInsideLine(
+                                xi, yi, p[0], p[1], lineWidth, x, y
+                            )) {
+                                return true;
+                            }
+                        }
+                        if (hasFill) {
+                            w += windingLine(xi, yi, p[0], p[1], x, y);
+                        }
+                        xi = p[0];
+                        yi = p[1];
+                        break;
+                    case 'C':
+                        if (hasStroke) {
+                            if (isInsideCubicStroke(
+                                xi, yi, p[0], p[1], p[2], p[3], p[4], p[5],
+                                lineWidth, x, y
+                            )) {
+                                return true;
+                            }
+                        }
+                        if (hasFill) {
+                            w += windingCubic(
+                                xi, yi, p[0], p[1], p[2], p[3], p[4], p[5], x, y
+                            );
+                        }
+                        xi = p[4];
+                        yi = p[5];
+                        break;
+                    case 'Q':
+                        if (hasStroke) {
+                            if (isInsideQuadraticStroke(
+                                xi, yi, p[0], p[1], p[2], p[3],
+                                lineWidth, x, y
+                            )) {
+                                return true;
+                            }
+                        }
+                        if (hasFill) {
+                            w += windingQuadratic(
+                                xi, yi, p[0], p[1], p[2], p[3], x, y
+                            );
+                        }
+                        xi = p[2];
+                        yi = p[3];
+                        break;
+                    case 'A':
+                        // TODO Arc 旋转
+                        // TODO Arc 判断的开销比较大
+                        var cx = p[0];
+                        var cy = p[1];
+                        var rx = p[2];
+                        var ry = p[3];
+                        var theta = p[4];
+                        var dTheta = p[5];
+                        var x1 = Math.cos(theta) * rx + cx;
+                        var y1 = Math.sin(theta) * ry + cy;
+                        w += windingLine(xi, yi, x1, y1);
+                        // zr 使用scale来模拟椭圆, 这里也对x做一定的缩放
+                        var _x = (x - cx) * ry / rx + cx;
+                        if (hasStroke) {
+                            if (isInsideArcStroke(
+                                cx, cy, ry, theta, theta + dTheta, 1 - p[7],
+                                lineWidth, _x, y
+                            )) {
+                                return true;
+                            }
+                        }
+                        if (hasFill) {
+                            w += windingArc(
+                                cx, cy, ry, theta, theta + dTheta, 1 - p[7],
+                                _x, y
+                            );
+                        }
+                        xi = Math.cos(theta + dTheta) * rx + cx;
+                        yi = Math.sin(theta + dTheta) * ry + cy;
+                        break;
+                    case 'z':
+                        if (hasStroke) {
+                            if (isInsideLine(
+                                xi, yi, x0, y0, lineWidth, x, y
+                            )) {
+                                return true;
+                            }
+                        }
+                        beginSubpath = true;
+                        break;
+                }
+            }
+            if (hasFill) {
+                w += windingLine(xi, yi, x0, y0, x, y);
+            }
+            return w !== 0;
+        }
+
+        /**
+         * 测算多行文本宽度
+         * @param {Object} text
+         * @param {Object} textFont
+         */
+        function getTextWidth(text, textFont) {
+            var key = text + ':' + textFont;
+            if (_textWidthCache[key]) {
+                return _textWidthCache[key];
+            }
+            _ctx = _ctx || util.getContext();
+            _ctx.save();
+
+            if (textFont) {
+                _ctx.font = textFont;
+            }
+            
+            text = (text + '').split('\n');
+            var width = 0;
+            for (var i = 0, l = text.length; i < l; i++) {
+                width =  Math.max(
+                    _ctx.measureText(text[i]).width,
+                    width
+                );
+            }
+            _ctx.restore();
+
+            _textWidthCache[key] = width;
+            if (++_textWidthCacheCounter > TEXT_CACHE_MAX) {
+                // 内存释放
+                _textWidthCacheCounter = 0;
+                _textWidthCache = {};
+            }
+            
+            return width;
+        }
+        
+        /**
+         * 测算多行文本高度
+         * @param {Object} text
+         * @param {Object} textFont
+         */
+        function getTextHeight(text, textFont) {
+            var key = text + ':' + textFont;
+            if (_textHeightCache[key]) {
+                return _textHeightCache[key];
+            }
+            
+            _ctx = _ctx || util.getContext();
+
+            _ctx.save();
+            if (textFont) {
+                _ctx.font = textFont;
+            }
+            
+            text = (text + '').split('\n');
+            // 比较粗暴
+            var height = (_ctx.measureText('国').width + 2) * text.length;
+
+            _ctx.restore();
+
+            _textHeightCache[key] = height;
+            if (++_textHeightCacheCounter > TEXT_CACHE_MAX) {
+                // 内存释放
+                _textHeightCacheCounter = 0;
+                _textHeightCache = {};
+            }
+            return height;
+        }
+
+        return {
+            isInside : isInside,
+            isOutside : isOutside,
+            getTextWidth : getTextWidth,
+            getTextHeight : getTextHeight,
+
+            isInsidePath: isInsidePath,
+            isInsidePolygon: isInsidePolygon,
+            isInsideSector: isInsideSector,
+            isInsideCircle: isInsideCircle,
+            isInsideLine: isInsideLine,
+            isInsideRect: isInsideRect,
+            isInsideBrokenLine: isInsideBrokenLine
+        };
+    }
+);
+
+/**
+ * 提供变换扩展
+ * @module zrender/mixin/Transformable
+ * @author pissang (https://www.github.com/pissang)
+ */
+define('zrender/mixin/Transformable',['require','../tool/matrix','../tool/vector'],function (require) {
+
+    
+
+    var matrix = require('../tool/matrix');
+    var vector = require('../tool/vector');
+    var origin = [ 0, 0 ];
+
+    var EPSILON = 5e-5;
+
+    function isAroundZero(val) {
+        return val > -EPSILON && val < EPSILON;
+    }
+    function isNotAroundZero(val) {
+        return val > EPSILON || val < -EPSILON;
+    }
+
+    /**
+     * @alias module:zrender/mixin/Transformable
+     * @constructor
+     */
+    var Transformable = function () {
+
+        if (!this.position) {
+            /**
+             * 平移
+             * @type {Array.<number>}
+             * @default [0, 0]
+             */
+            this.position = [ 0, 0 ];
+        }
+        if (typeof(this.rotation) == 'undefined') {
+            /**
+             * 旋转，可以通过数组二三项指定旋转的原点
+             * @type {Array.<number>}
+             * @default [0, 0, 0]
+             */
+            this.rotation = [ 0, 0, 0 ];
+        }
+        if (!this.scale) {
+            /**
+             * 缩放，可以通过数组三四项指定缩放的原点
+             * @type {Array.<number>}
+             * @default [1, 1, 0, 0]
+             */
+            this.scale = [ 1, 1, 0, 0 ];
+        }
+
+        this.needLocalTransform = false;
+
+        /**
+         * 是否有坐标变换
+         * @type {boolean}
+         * @readOnly
+         */
+        this.needTransform = false;
+    };
+
+    Transformable.prototype = {
+        
+        constructor: Transformable,
+
+        updateNeedTransform: function () {
+            this.needLocalTransform = isNotAroundZero(this.rotation[0])
+                || isNotAroundZero(this.position[0])
+                || isNotAroundZero(this.position[1])
+                || isNotAroundZero(this.scale[0] - 1)
+                || isNotAroundZero(this.scale[1] - 1);
+        },
+
+        /**
+         * 判断是否需要有坐标变换，更新needTransform属性。
+         * 如果有坐标变换, 则从position, rotation, scale以及父节点的transform计算出自身的transform矩阵
+         */
+        updateTransform: function () {
+            
+            this.updateNeedTransform();
+
+            if (this.parent) {
+                this.needTransform = this.needLocalTransform || this.parent.needTransform;
+            }
+            else {
+                this.needTransform = this.needLocalTransform;
+            }
+            
+            if (!this.needTransform) {
+                return;
+            }
+
+            var m = this.transform || matrix.create();
+            matrix.identity(m);
+
+            if (this.needLocalTransform) {
+                if (
+                    isNotAroundZero(this.scale[0])
+                 || isNotAroundZero(this.scale[1])
+                ) {
+                    origin[0] = -this.scale[2] || 0;
+                    origin[1] = -this.scale[3] || 0;
+                    var haveOrigin = isNotAroundZero(origin[0])
+                                  || isNotAroundZero(origin[1]);
+                    if (haveOrigin) {
+                        matrix.translate(
+                            m, m, origin
+                        );
+                    }
+                    matrix.scale(m, m, this.scale);
+                    if (haveOrigin) {
+                        origin[0] = -origin[0];
+                        origin[1] = -origin[1];
+                        matrix.translate(
+                            m, m, origin
+                        );
+                    }
+                }
+
+                if (this.rotation instanceof Array) {
+                    if (this.rotation[0] !== 0) {
+                        origin[0] = -this.rotation[1] || 0;
+                        origin[1] = -this.rotation[2] || 0;
+                        var haveOrigin = isNotAroundZero(origin[0])
+                                      || isNotAroundZero(origin[1]);
+                        if (haveOrigin) {
+                            matrix.translate(
+                                m, m, origin
+                            );
+                        }
+                        matrix.rotate(m, m, this.rotation[0]);
+                        if (haveOrigin) {
+                            origin[0] = -origin[0];
+                            origin[1] = -origin[1];
+                            matrix.translate(
+                                m, m, origin
+                            );
+                        }
+                    }
+                }
+                else {
+                    if (this.rotation !== 0) {
+                        matrix.rotate(m, m, this.rotation);
+                    }
+                }
+
+                if (
+                    isNotAroundZero(this.position[0]) || isNotAroundZero(this.position[1])
+                ) {
+                    matrix.translate(m, m, this.position);
+                }
+            }
+
+            // 保存这个变换矩阵
+            this.transform = m;
+
+            // 应用父节点变换
+            if (this.parent && this.parent.needTransform) {
+                if (this.needLocalTransform) {
+                    matrix.mul(this.transform, this.parent.transform, this.transform);
+                }
+                else {
+                    matrix.copy(this.transform, this.parent.transform);
+                }
+            }
+        },
+        /**
+         * 将自己的transform应用到context上
+         * @param {Context2D} ctx
+         */
+        setTransform: function (ctx) {
+            if (this.needTransform) {
+                var m = this.transform;
+                ctx.transform(
+                    m[0], m[1],
+                    m[2], m[3],
+                    m[4], m[5]
+                );
+            }
+        },
+        /**
+         * 设置图形的朝向
+         * @param  {Array.<number>|Float32Array} target
+         * @method
+         */
+        lookAt: (function () {
+            var v = vector.create();
+            return function(target) {
+                if (!this.transform) {
+                    this.transform = matrix.create();
+                }
+                var m = this.transform;
+                vector.sub(v, target, this.position);
+                if (isAroundZero(v[0]) && isAroundZero(v[1])) {
+                    return;
+                }
+                vector.normalize(v, v);
+                // Y Axis
+                // TODO Scale origin ?
+                m[2] = v[0] * this.scale[1];
+                m[3] = v[1] * this.scale[1];
+                // X Axis
+                m[0] = v[1] * this.scale[0];
+                m[1] = -v[0] * this.scale[0];
+                // Position
+                m[4] = this.position[0];
+                m[5] = this.position[1];
+
+                this.decomposeTransform();
+            };
+        })(),
+        /**
+         * 分解`transform`矩阵到`position`, `rotation`, `scale`
+         */
+        decomposeTransform: function () {
+            if (!this.transform) {
+                return;
+            }
+            var m = this.transform;
+            var sx = m[0] * m[0] + m[1] * m[1];
+            var position = this.position;
+            var scale = this.scale;
+            var rotation = this.rotation;
+            if (isNotAroundZero(sx - 1)) {
+                sx = Math.sqrt(sx);
+            }
+            var sy = m[2] * m[2] + m[3] * m[3];
+            if (isNotAroundZero(sy - 1)) {
+                sy = Math.sqrt(sy);
+            }
+            position[0] = m[4];
+            position[1] = m[5];
+            scale[0] = sx;
+            scale[1] = sy;
+            scale[2] = scale[3] = 0;
+            rotation[0] = Math.atan2(-m[1] / sy, m[0] / sx);
+            rotation[1] = rotation[2] = 0;
+        }
+    };
+
+    return Transformable;
+});
+
+/**
+ * 颜色辅助类
+ * @module zrender/tool/color
+ * @author CrossDo (chenhuaimu)
+ */
+define('zrender/tool/color',['require','../tool/util'],function(require) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var util = require('../tool/util');
 
     var _ctx;
@@ -8992,6 +10761,7 @@ define('zrender/tool/color',['require','../tool/util'],function(
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * zrender : shape基类
  *
  * desc:    zrender是一个轻量级的Canvas类库，MVC封装，数据驱动，提供类Dom事件模型。
@@ -9111,10 +10881,21 @@ define('zrender/tool/color',['require','../tool/util'],function(
  * @author  Kener (@Kener-林峰, linzhifeng)
  *          errorrik (errorrik@gmail.com)
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * shape基类
+ * @module zrender/shape/Base
+ * @author  Kener (@Kener-林峰, linzhifeng)
+ *          errorrik (errorrik@gmail.com)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  */
 
 /**
+<<<<<<< HEAD
  * @typedef {Object} IBaseS * @property {string} [brushType='fill']
+=======
+ * @typedef {Object} IBaseShapeStyle
+ * @property {string} [brushType='fill']
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @property {string} [color='#000000'] 填充颜色
  * @property {string} [strokeColor='#000000'] 描边颜色
  * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
@@ -9555,6 +11336,7 @@ define(
                 // 矩形内
                 return require('../tool/area').isInside(this, this.style, x, y);
             }
+<<<<<<< HEAD
 <<<<<<< HEAD
             else {
                 return false;
@@ -10599,9 +12381,13 @@ define(
             },
 =======
 >>>>>>> refs/heads/branch_1.1.0
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             
             return false;
         };
+<<<<<<< HEAD
+=======
 
         /**
          * 绘制附加文本
@@ -10616,7 +12402,32 @@ define(
             // 字体颜色策略
             var textColor = style.textColor || style.color || style.strokeColor;
             ctx.fillStyle = textColor;
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+        /**
+         * 绘制附加文本
+         * @param {CanvasRenderingContext2D} ctx
+         * @param {module:zrender/shape/Base~IBaseShapeStyle} style 样式
+         * @param {module:zrender/shape/Base~IBaseShapeStyle} normalStyle 默认样式，用于定位文字显示
+         */
+        Base.prototype.drawText = function (ctx, style, normalStyle) {
+            if (typeof(style.text) == 'undefined' || style.text === false) {
+                return;
+            }
+            // 字体颜色策略
+            var textColor = style.textColor || style.color || style.strokeColor;
+            ctx.fillStyle = textColor;
+=======
+            // 文本与图形间空白间隙
+            var dd = 10;
+            var al;         // 文本水平对齐
+            var bl;         // 文本垂直对齐
+            var tx;         // 文本横坐标
+            var ty;         // 文本纵坐标
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
             // 文本与图形间空白间隙
             var dd = 10;
             var al;         // 文本水平对齐
@@ -10646,6 +12457,11 @@ define(
                                || this.textPosition     // shape默认
                                || 'top';                // 全局默认
 >>>>>>> refs/heads/branch_1.1.0
+=======
+            var textPosition = style.textPosition       // 用户定义
+                               || this.textPosition     // shape默认
+                               || 'top';                // 全局默认
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
             switch (textPosition) {
                 case 'inside': 
@@ -10768,6 +12584,7 @@ define(
                     break;
             }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         var base = require('./base');
         base.derive(Ring);
@@ -10968,6 +12785,16 @@ define(
                     style.textAlign || al,
                     style.textBaseline || bl
 >>>>>>> refs/heads/branch_1.1.0
+=======
+            if (tx != null && ty != null) {
+                _fillText(
+                    ctx,
+                    style.text, 
+                    tx, ty, 
+                    style.textFont,
+                    style.textAlign || al,
+                    style.textBaseline || bl
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
                 );
             }
         };
@@ -11004,6 +12831,7 @@ define(
 /**
  * @module zrender/shape/Text
  * @author Kener (@Kener-林峰, linzhifeng)
+<<<<<<< HEAD
 <<<<<<< HEAD
  *
  * shape类：文字
@@ -11079,6 +12907,19 @@ define(
  *     });
  *     zr.addShape(shape);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * @example
+ *     var Text = require('zrender/shape/Text');
+ *     var shape = new Text({
+ *         style: {
+ *             text: 'Label',
+ *             x: 100,
+ *             y: 100,
+ *             textFont: '14px Arial'
+ *         }
+ *     });
+ *     zr.addShape(shape);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  */
 
 /**
@@ -11278,6 +13119,7 @@ define(
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * zrender
  *
  * @author Kener (@Kener-林峰, linzhifeng)
@@ -11309,6 +13151,25 @@ define(
  *     zr.addShape(shape);
  */
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * 矩形
+ * @module zrender/shape/Rectangle
+ * @author Kener (@Kener-林峰, linzhifeng) , 
+ *         strwind (@劲风FEI, yaofeifei)
+ * @example
+ *     var Rectangle = require('zrender/shape/Rectangle');
+ *     var shape = new Rectangle({
+ *         style: {
+ *             x: 0,
+ *             y: 0,
+ *             width: 100,
+ *             height: 100,
+ *             radius: 20
+ *         }
+ *     });
+ *     zr.addShape(shape);
+ */
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * @typedef {Object} IRectangleStyle
@@ -11503,6 +13364,7 @@ define(
  *
  * @author Kener (@Kener-林峰, linzhifeng)
 <<<<<<< HEAD
+<<<<<<< HEAD
  *
  * shape类：水滴
  * 可配图形属性：
@@ -11575,10 +13437,17 @@ define(
 =======
  *         errorrik (errorrik@gmail.com)
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ *         errorrik (errorrik@gmail.com)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  */
 
 define(
+<<<<<<< HEAD
     'zrender/loadingEffect/Base',['require','../tool/util','../s,'../shape/Rectangle'],function(require) {
+=======
+    'zrender/loadingEffect/Base',['require','../tool/util','../shape/Text','../shape/Rectangle'],function(require) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         var util = require('../tool/util');
         var TextShape = require('../shape/Text');
         var RectangleShape = require('../shape/Rectangle');
@@ -11639,6 +13508,7 @@ define(
             });
         };
         
+<<<<<<< HEAD
 <<<<<<< HEAD
         var shape = require('../shape');
         shape.define('droplet', new Droplet());
@@ -12037,6 +13907,8 @@ define('zrender/shape/path',['require','./base','../shape'],function(require) {
 
 =======
 >>>>>>> refs/heads/branch_1.1.0
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         /**
          * 获取loading背景图形
          * 
@@ -12130,6 +14002,7 @@ define('zrender/shape/path',['require','./base','../shape'],function(require) {
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * zrender
  *
  * @author lang( shenyi01 )
@@ -12158,6 +14031,22 @@ define('zrender/shape/path',['require','./base','../shape'],function(require) {
  *     zr.addShape(image);
  */
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * 图片绘制
+ * @module zrender/shape/Image
+ * @author pissang(https://www.github.com/pissang)
+ * @example
+ *     var ImageShape = require('zrender/shape/Image');
+ *     var image = new ImageShape({
+ *         style: {
+ *             image: 'test.jpg',
+ *             x: 100,
+ *             y: 100
+ *         }
+ *     });
+ *     zr.addShape(image);
+ */
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * @typedef {Object} IImageStyle
@@ -12353,6 +14242,7 @@ define(
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * zrender
  *
  * @author Neil (杨骥, yangji01)
@@ -12437,9 +14327,20 @@ define(
  *         errorrik (errorrik@gmail.com)
  *         pissang (https://www.github.com/pissang)
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * Painter绘图模块
+ * @module zrender/Painter
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *         errorrik (errorrik@gmail.com)
+ *         pissang (https://www.github.com/pissang)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  */
  define(
+<<<<<<< HEAD
     'zrender/Painter',,'./config','./tool/util','./tool/log','./tool/matrix','./loadingEffect/Base','./mixin/Transformable','./shape/Image'],function (require) {
+=======
+    'zrender/Painter',['require','./config','./tool/util','./tool/log','./tool/matrix','./loadingEffect/Base','./mixin/Transformable','./shape/Image'],function (require) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         
 
         var config = require('./config');
@@ -13372,6 +15273,7 @@ define(
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * zrender
  *
  * @author sushuang (宿爽, sushuang)
@@ -13405,6 +15307,27 @@ define(
  */
 define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transformable','./mixin/Eventful'],function(require) {
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * Group是一个容器，可以插入子节点，Group的变换也会被应用到子节点上
+ * @module zrender/Group
+ * @example
+ *     var Group = require('zrender/Group');
+ *     var Circle = require('zrender/shape/Circle');
+ *     var g = new Group();
+ *     g.position[0] = 100;
+ *     g.position[1] = 100;
+ *     g.addChild(new Circle({
+ *         style: {
+ *             x: 100,
+ *             y: 100,
+ *             r: 20,
+ *             brushType: 'fill'
+ *         }
+ *     }));
+ *     zr.addGroup(g);
+ */
+define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transformable','./mixin/Eventful'],function(require) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
     var guid = require('./tool/guid');
     var util = require('./tool/util');
@@ -13604,6 +15527,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
  * @author pissang (https://github.com/pissang/)
  */
 define(
+<<<<<<< HEAD
     'zrender/Storage',['require','./,'./Group'],function (require) {
 
         
@@ -16002,6 +17926,2409 @@ define(
  *             y: 100,
  *             r: 150,
  *             n:         text: '五角星'
+=======
+    'zrender/Storage',['require','./tool/util','./Group'],function (require) {
+
+        
+
+        var util = require('./tool/util');
+
+        var Group = require('./Group');
+
+        var defaultIterateOption = {
+            hover: false,
+            normal: 'down',
+            update: false
+        };
+
+        function shapeCompareFunc(a, b) {
+            if (a.zlevel == b.zlevel) {
+                if (a.z == b.z) {
+                    return a.__renderidx - b.__renderidx;
+                }
+                return a.z - b.z;
+            }
+            return a.zlevel - b.zlevel;
+        }
+        /**
+         * 内容仓库 (M)
+         * @alias module:zrender/Storage
+         * @constructor
+         */
+        var Storage = function () {
+            // 所有常规形状，id索引的map
+            this._elements = {};
+
+            // 高亮层形状，不稳定，动态增删，数组位置也是z轴方向，靠前显示在下方
+            this._hoverElements = [];
+
+            this._roots = [];
+
+            this._shapeList = [];
+
+            this._shapeListOffset = 0;
+        };
+
+        /**
+         * 遍历迭代器
+         * 
+         * @param {Function} fun 迭代回调函数，return true终止迭代
+         * @param {Object} [option] 迭代参数，缺省为仅降序遍历普通层图形
+         * @param {boolean} [option.hover=true] 是否是高亮层图形
+         * @param {string} [option.normal='up'] 是否是普通层图形，迭代时是否指定及z轴顺序
+         * @param {boolean} [option.update=false] 是否在迭代前更新形状列表
+         * 
+         */
+        Storage.prototype.iterShape = function (fun, option) {
+            if (!option) {
+                option = defaultIterateOption;
+            }
+
+            if (option.hover) {
+                // 高亮层数据遍历
+                for (var i = 0, l = this._hoverElements.length; i < l; i++) {
+                    var el = this._hoverElements[i];
+                    el.updateTransform();
+                    if (fun(el)) {
+                        return this;
+                    }
+                }
+            }
+
+            if (option.update) {
+                this.updateShapeList();
+            }
+
+            // 遍历: 'down' | 'up'
+            switch (option.normal) {
+                case 'down':
+                    // 降序遍历，高层优先
+                    var l = this._shapeList.length;
+                    while (l--) {
+                        if (fun(this._shapeList[l])) {
+                            return this;
+                        }
+                    }
+                    break;
+                // case 'up':
+                default:
+                    // 升序遍历，底层优先
+                    for (var i = 0, l = this._shapeList.length; i < l; i++) {
+                        if (fun(this._shapeList[i])) {
+                            return this;
+                        }
+                    }
+                    break;
+            }
+
+            return this;
+        };
+
+        /**
+         * 返回hover层的形状数组
+         * @param  {boolean} [update=false] 是否在返回前更新图形的变换
+         * @return {Array.<module:zrender/shape/Base>}
+         */
+        Storage.prototype.getHoverShapes = function (update) {
+            if (update) {
+                for (var i = 0, l = this._hoverElements.length; i < l; i++) {
+                    this._hoverElements[i].updateTransform();
+                }
+            }
+            return this._hoverElements;
+        };
+
+        /**
+         * 返回所有图形的绘制队列
+         * @param  {boolean} [update=false] 是否在返回前更新该数组
+         * 详见{@link module:zrender/shape/Base.prototype.updateShapeList}
+         * @return {Array.<module:zrender/shape/Base>}
+         */
+        Storage.prototype.getShapeList = function (update) {
+            if (update) {
+                this.updateShapeList();
+            }
+            return this._shapeList;
+        };
+
+        /**
+         * 更新图形的绘制队列。
+         * 每次绘制前都会调用，该方法会先深度优先遍历整个树，更新所有Group和Shape的变换并且把所有可见的Shape保存到数组中，
+         * 最后根据绘制的优先级（zlevel > z > 插入顺序）排序得到绘制队列
+         */
+        Storage.prototype.updateShapeList = function () {
+            this._shapeListOffset = 0;
+            for (var i = 0, len = this._roots.length; i < len; i++) {
+                var root = this._roots[i];
+                this._updateAndAddShape(root);
+            }
+            this._shapeList.length = this._shapeListOffset;
+
+            for (var i = 0, len = this._shapeList.length; i < len; i++) {
+                this._shapeList[i].__renderidx = i;
+            }
+
+            this._shapeList.sort(shapeCompareFunc);
+        };
+
+        Storage.prototype._updateAndAddShape = function (el) {
+            
+            if (el.ignore) {
+                return;
+            }
+
+            el.updateTransform();
+
+            if (el.type == 'group') {
+                
+                if (el.clipShape) {
+                    // clipShape 的变换是基于 group 的变换
+                    el.clipShape.parent = el;
+                    el.clipShape.updateTransform();
+
+                    var startClipShape = el._children[0];
+                    if (startClipShape) {
+                        startClipShape.__startClip = el.clipShape;
+                    }
+                }
+
+                for (var i = 0; i < el._children.length; i++) {
+                    var child = el._children[i];
+
+                    // Force to mark as dirty if group is dirty
+                    child.__dirty = el.__dirty || child.__dirty;
+
+                    this._updateAndAddShape(child);
+                }
+
+                if (el.clipShape) {
+                    var stopClipShape = this._shapeList[this._shapeListOffset - 1];
+                    if (stopClipShape) {
+                        stopClipShape.__stopClip = true;
+                    }
+                }
+
+                // Mark group clean here
+                el.__dirty = false;
+                
+            }
+            else {
+                this._shapeList[this._shapeListOffset++] = el;
+            }
+        };
+
+        /**
+         * 修改图形(Shape)或者组(Group)
+         * 
+         * @param {string} elId 唯一标识
+         * @param {Object} [params] 参数
+         */
+        Storage.prototype.mod = function (elId, params) {
+            var el = this._elements[elId];
+            if (el) {
+
+                el.modSelf();
+
+                if (params) {
+                    // 如果第二个参数直接使用 shape
+                    // parent, _storage, __startClip 三个属性会有循环引用
+                    // 主要为了向 1.x 版本兼容，2.x 版本不建议使用第二个参数
+                    if (params.parent || params._storage || params.__startClip) {
+                        var target = {};
+                        for (var name in params) {
+                            if (
+                                name == 'parent'
+                                || name == '_storage'
+                                || name == '__startClip'
+                            ) {
+                                continue;
+                            }
+                            if (params.hasOwnProperty(name)) {
+                                target[name] = params[name];
+                            }
+                        }
+                        util.merge(el, target, true);
+                    }
+                    else {
+                        util.merge(el, params, true);
+                    }
+                }
+            }
+
+            return this;
+        };
+
+        /**
+         * 移动指定的图形(Shape)或者组(Group)的位置
+         * @param {string} shapeId 形状唯一标识
+         * @param {number} dx
+         * @param {number} dy
+         */
+        Storage.prototype.drift = function (shapeId, dx, dy) {
+            var shape = this._elements[shapeId];
+            if (shape) {
+                shape.needTransform = true;
+                if (!shape.ondrift // ondrift
+                    // 有onbrush并且调用执行返回false或undefined则继续
+                    || (shape.ondrift && !shape.ondrift(dx, dy))
+                ) {
+                    shape.drift(dx, dy);
+                }
+            }
+
+            return this;
+        };
+
+        /**
+         * 添加高亮层数据
+         * 
+         * @param {module:zrender/shape/Base} shape
+         */
+        Storage.prototype.addHover = function (shape) {
+            shape.updateNeedTransform();
+            this._hoverElements.push(shape);
+            return this;
+        };
+
+        /**
+         * 清空高亮层数据
+         */
+        Storage.prototype.delHover = function () {
+            this._hoverElements = [];
+            return this;
+        };
+
+        /**
+         * 是否有图形在高亮层里
+         * @return {boolean}
+         */
+        Storage.prototype.hasHoverShape = function () {
+            return this._hoverElements.length > 0;
+        };
+
+        /**
+         * 添加图形(Shape)或者组(Group)到根节点
+         * @param {module:zrender/shape/Shape|module:zrender/Group} el
+         */
+        Storage.prototype.addRoot = function (el) {
+            if (el instanceof Group) {
+                el.addChildrenToStorage(this);
+            }
+
+            this.addToMap(el);
+            this._roots.push(el);
+        };
+
+        /**
+         * 删除指定的图形(Shape)或者组(Group)
+         * @param  {string|Array.<string>} [elId] 如果为空清空整个Storage
+         */
+        Storage.prototype.delRoot = function (elId) {
+            if (typeof(elId) == 'undefined') {
+                // 不指定elId清空
+                for (var i = 0; i < this._roots.length; i++) {
+                    var root = this._roots[i];
+                    if (root instanceof Group) {
+                        root.delChildrenFromStorage(this);
+                    }
+                }
+
+                this._elements = {};
+                this._hoverElements = [];
+                this._roots = [];
+
+                return;
+            }
+
+            if (elId instanceof Array) {
+                for (var i = 0, l = elId.length; i < l; i++) {
+                    this.delRoot(elId[i]);
+                }
+                return;
+            }
+
+            var el;
+            if (typeof(elId) == 'string') {
+                el = this._elements[elId];
+            }
+            else {
+                el = elId;
+            }
+
+            var idx = util.indexOf(this._roots, el);
+            if (idx >= 0) {
+                this.delFromMap(el.id);
+                this._roots.splice(idx, 1);
+                if (el instanceof Group) {
+                    el.delChildrenFromStorage(this);
+                }
+            }
+        };
+
+        Storage.prototype.addToMap = function (el) {
+            if (el instanceof Group) {
+                el._storage = this;
+            }
+            el.modSelf();
+
+            this._elements[el.id] = el;
+
+            return this;
+        };
+
+        Storage.prototype.get = function (elId) {
+            return this._elements[elId];
+        };
+
+        Storage.prototype.delFromMap = function (elId) {
+            var el = this._elements[elId];
+            if (el) {
+                delete this._elements[elId];
+
+                if (el instanceof Group) {
+                    el._storage = null;
+                }
+            }
+
+            return this;
+        };
+
+
+        /**
+         * 清空并且释放Storage
+         */
+        Storage.prototype.dispose = function () {
+            this._elements = 
+            this._renderList = 
+            this._roots =
+            this._hoverElements = null;
+        };
+
+        return Storage;
+    }
+);
+
+define(
+    'zrender/animation/easing',[],function() {
+        /**
+         * 缓动代码来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
+         * @see http://sole.github.io/tween.js/examples/03_graphs.html
+         * @exports zrender/animation/easing
+         */
+        var easing = {
+            // 线性
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            Linear: function (k) {
+                return k;
+            },
+
+            // 二次方的缓动（t^2）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuadraticIn: function (k) {
+                return k * k;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuadraticOut: function (k) {
+                return k * (2 - k);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuadraticInOut: function (k) {
+                if ((k *= 2) < 1) {
+                    return 0.5 * k * k;
+                }
+                return -0.5 * (--k * (k - 2) - 1);
+            },
+
+            // 三次方的缓动（t^3）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            CubicIn: function (k) {
+                return k * k * k;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            CubicOut: function (k) {
+                return --k * k * k + 1;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            CubicInOut: function (k) {
+                if ((k *= 2) < 1) {
+                    return 0.5 * k * k * k;
+                }
+                return 0.5 * ((k -= 2) * k * k + 2);
+            },
+
+            // 四次方的缓动（t^4）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuarticIn: function (k) {
+                return k * k * k * k;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuarticOut: function (k) {
+                return 1 - (--k * k * k * k);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuarticInOut: function (k) {
+                if ((k *= 2) < 1) {
+                    return 0.5 * k * k * k * k;
+                }
+                return -0.5 * ((k -= 2) * k * k * k - 2);
+            },
+
+            // 五次方的缓动（t^5）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuinticIn: function (k) {
+                return k * k * k * k * k;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuinticOut: function (k) {
+                return --k * k * k * k * k + 1;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            QuinticInOut: function (k) {
+                if ((k *= 2) < 1) {
+                    return 0.5 * k * k * k * k * k;
+                }
+                return 0.5 * ((k -= 2) * k * k * k * k + 2);
+            },
+
+            // 正弦曲线的缓动（sin(t)）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            SinusoidalIn: function (k) {
+                return 1 - Math.cos(k * Math.PI / 2);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            SinusoidalOut: function (k) {
+                return Math.sin(k * Math.PI / 2);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            SinusoidalInOut: function (k) {
+                return 0.5 * (1 - Math.cos(Math.PI * k));
+            },
+
+            // 指数曲线的缓动（2^t）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            ExponentialIn: function (k) {
+                return k === 0 ? 0 : Math.pow(1024, k - 1);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            ExponentialOut: function (k) {
+                return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            ExponentialInOut: function (k) {
+                if (k === 0) {
+                    return 0;
+                }
+                if (k === 1) {
+                    return 1;
+                }
+                if ((k *= 2) < 1) {
+                    return 0.5 * Math.pow(1024, k - 1);
+                }
+                return 0.5 * (-Math.pow(2, -10 * (k - 1)) + 2);
+            },
+
+            // 圆形曲线的缓动（sqrt(1-t^2)）
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            CircularIn: function (k) {
+                return 1 - Math.sqrt(1 - k * k);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            CircularOut: function (k) {
+                return Math.sqrt(1 - (--k * k));
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            CircularInOut: function (k) {
+                if ((k *= 2) < 1) {
+                    return -0.5 * (Math.sqrt(1 - k * k) - 1);
+                }
+                return 0.5 * (Math.sqrt(1 - (k -= 2) * k) + 1);
+            },
+
+            // 创建类似于弹簧在停止前来回振荡的动画
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            ElasticIn: function (k) {
+                var s; 
+                var a = 0.1;
+                var p = 0.4;
+                if (k === 0) {
+                    return 0;
+                }
+                if (k === 1) {
+                    return 1;
+                }
+                if (!a || a < 1) {
+                    a = 1; s = p / 4;
+                }
+                else {
+                    s = p * Math.asin(1 / a) / (2 * Math.PI);
+                }
+                return -(a * Math.pow(2, 10 * (k -= 1)) *
+                            Math.sin((k - s) * (2 * Math.PI) / p));
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            ElasticOut: function (k) {
+                var s;
+                var a = 0.1;
+                var p = 0.4;
+                if (k === 0) {
+                    return 0;
+                }
+                if (k === 1) {
+                    return 1;
+                }
+                if (!a || a < 1) {
+                    a = 1; s = p / 4;
+                }
+                else {
+                    s = p * Math.asin(1 / a) / (2 * Math.PI);
+                }
+                return (a * Math.pow(2, -10 * k) *
+                        Math.sin((k - s) * (2 * Math.PI) / p) + 1);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            ElasticInOut: function (k) {
+                var s;
+                var a = 0.1;
+                var p = 0.4;
+                if (k === 0) {
+                    return 0;
+                }
+                if (k === 1) {
+                    return 1;
+                }
+                if (!a || a < 1) {
+                    a = 1; s = p / 4;
+                }
+                else {
+                    s = p * Math.asin(1 / a) / (2 * Math.PI);
+                }
+                if ((k *= 2) < 1) {
+                    return -0.5 * (a * Math.pow(2, 10 * (k -= 1))
+                        * Math.sin((k - s) * (2 * Math.PI) / p));
+                }
+                return a * Math.pow(2, -10 * (k -= 1))
+                        * Math.sin((k - s) * (2 * Math.PI) / p) * 0.5 + 1;
+
+            },
+
+            // 在某一动画开始沿指示的路径进行动画处理前稍稍收回该动画的移动
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            BackIn: function (k) {
+                var s = 1.70158;
+                return k * k * ((s + 1) * k - s);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            BackOut: function (k) {
+                var s = 1.70158;
+                return --k * k * ((s + 1) * k + s) + 1;
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            BackInOut: function (k) {
+                var s = 1.70158 * 1.525;
+                if ((k *= 2) < 1) {
+                    return 0.5 * (k * k * ((s + 1) * k - s));
+                }
+                return 0.5 * ((k -= 2) * k * ((s + 1) * k + s) + 2);
+            },
+
+            // 创建弹跳效果
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            BounceIn: function (k) {
+                return 1 - easing.BounceOut(1 - k);
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            BounceOut: function (k) {
+                if (k < (1 / 2.75)) {
+                    return 7.5625 * k * k;
+                }
+                else if (k < (2 / 2.75)) {
+                    return 7.5625 * (k -= (1.5 / 2.75)) * k + 0.75;
+                }
+                else if (k < (2.5 / 2.75)) {
+                    return 7.5625 * (k -= (2.25 / 2.75)) * k + 0.9375;
+                }
+                else {
+                    return 7.5625 * (k -= (2.625 / 2.75)) * k + 0.984375;
+                }
+            },
+            /**
+             * @param {number} k
+             * @return {number}
+             */
+            BounceInOut: function (k) {
+                if (k < 0.5) {
+                    return easing.BounceIn(k * 2) * 0.5;
+                }
+                return easing.BounceOut(k * 2 - 1) * 0.5 + 0.5;
+            }
+        };
+
+        return easing;
+    }
+);
+
+
+/**
+ * 动画主控制器
+ * @config target 动画对象，可以是数组，如果是数组的话会批量分发onframe等事件
+ * @config life(1000) 动画时长
+ * @config delay(0) 动画延迟时间
+ * @config loop(true)
+ * @config gap(0) 循环的间隔时间
+ * @config onframe
+ * @config easing(optional)
+ * @config ondestroy(optional)
+ * @config onrestart(optional)
+ */
+define(
+    'zrender/animation/Clip',['require','./easing'],function(require) {
+
+        var Easing = require('./easing');
+
+        function Clip(options) {
+
+            this._targetPool = options.target || {};
+            if (!(this._targetPool instanceof Array)) {
+                this._targetPool = [ this._targetPool ];
+            }
+
+            // 生命周期
+            this._life = options.life || 1000;
+            // 延时
+            this._delay = options.delay || 0;
+            // 开始时间
+            this._startTime = new Date().getTime() + this._delay;// 单位毫秒
+
+            // 结束时间
+            this._endTime = this._startTime + this._life * 1000;
+
+            // 是否循环
+            this.loop = typeof options.loop == 'undefined'
+                        ? false : options.loop;
+
+            this.gap = options.gap || 0;
+
+            this.easing = options.easing || 'Linear';
+
+            this.onframe = options.onframe;
+            this.ondestroy = options.ondestroy;
+            this.onrestart = options.onrestart;
+        }
+
+        Clip.prototype = {
+            step : function (time) {
+                var percent = (time - this._startTime) / this._life;
+
+                // 还没开始
+                if (percent < 0) {
+                    return;
+                }
+
+                percent = Math.min(percent, 1);
+
+                var easingFunc = typeof this.easing == 'string'
+                                 ? Easing[this.easing]
+                                 : this.easing;
+                var schedule = typeof easingFunc === 'function'
+                    ? easingFunc(percent)
+                    : percent;
+
+                this.fire('frame', schedule);
+
+                // 结束
+                if (percent == 1) {
+                    if (this.loop) {
+                        this.restart();
+                        // 重新开始周期
+                        // 抛出而不是直接调用事件直到 stage.update 后再统一调用这些事件
+                        return 'restart';
+
+                    }
+                    
+                    // 动画完成将这个控制器标识为待删除
+                    // 在Animation.update中进行批量删除
+                    this._needsRemove = true;
+                    return 'destroy';
+                }
+                
+                return null;
+            },
+            restart : function() {
+                var time = new Date().getTime();
+                var remainder = (time - this._startTime) % this._life;
+                this._startTime = new Date().getTime() - remainder + this.gap;
+            },
+            fire : function(eventType, arg) {
+                for (var i = 0, len = this._targetPool.length; i < len; i++) {
+                    if (this['on' + eventType]) {
+                        this['on' + eventType](this._targetPool[i], arg);
+                    }
+                }
+            },
+            constructor: Clip
+        };
+
+        return Clip;
+    }
+);
+
+/**
+ * 动画主类, 调度和管理所有动画控制器
+ * 
+ * @module zrender/animation/Animation
+ * @author pissang(https://github.com/pissang)
+ */
+define(
+    'zrender/animation/Animation',['require','./Clip','../tool/color','../tool/util','../tool/event'],function(require) {
+        
+        
+
+        var Clip = require('./Clip');
+        var color = require('../tool/color');
+        var util = require('../tool/util');
+        var Dispatcher = require('../tool/event').Dispatcher;
+
+        var requestAnimationFrame = window.requestAnimationFrame
+                                    || window.msRequestAnimationFrame
+                                    || window.mozRequestAnimationFrame
+                                    || window.webkitRequestAnimationFrame
+                                    || function (func) {
+                                        setTimeout(func, 16);
+                                    };
+
+        var arraySlice = Array.prototype.slice;
+
+        /**
+         * @typedef {Object} IZRenderStage
+         * @property {Function} update
+         */
+        
+        /** 
+         * @alias module:zrender/animation/Animation
+         * @constructor
+         * @param {Object} [options]
+         * @param {Function} [options.onframe]
+         * @param {IZRenderStage} [options.stage]
+         * @example
+         *     var animation = new Animation();
+         *     var obj = {
+         *         x: 100,
+         *         y: 100
+         *     };
+         *     animation.animate(node.position)
+         *         .when(1000, {
+         *             x: 500,
+         *             y: 500
+         *         })
+         *         .when(2000, {
+         *             x: 100,
+         *             y: 100
+         *         })
+         *         .start('spline');
+         */
+        var Animation = function (options) {
+
+            options = options || {};
+
+            this.stage = options.stage || {};
+
+            this.onframe = options.onframe || function() {};
+
+            // private properties
+            this._clips = [];
+
+            this._running = false;
+
+            this._time = 0;
+
+            Dispatcher.call(this);
+        };
+
+        Animation.prototype = {
+            /**
+             * 添加动画片段
+             * @param {module:zrender/animation/Clip} clip
+             */
+            add: function(clip) {
+                this._clips.push(clip);
+            },
+            /**
+             * 删除动画片段
+             * @param {module:zrender/animation/Clip} clip
+             */
+            remove: function(clip) {
+                var idx = util.indexOf(this._clips, clip);
+                if (idx >= 0) {
+                    this._clips.splice(idx, 1);
+                }
+            },
+            _update: function() {
+
+                var time = new Date().getTime();
+                var delta = time - this._time;
+                var clips = this._clips;
+                var len = clips.length;
+
+                var deferredEvents = [];
+                var deferredClips = [];
+                for (var i = 0; i < len; i++) {
+                    var clip = clips[i];
+                    var e = clip.step(time);
+                    // Throw out the events need to be called after
+                    // stage.update, like destroy
+                    if (e) {
+                        deferredEvents.push(e);
+                        deferredClips.push(clip);
+                    }
+                }
+                if (this.stage.update) {
+                    this.stage.update();
+                }
+
+                // Remove the finished clip
+                for (var i = 0; i < len;) {
+                    if (clips[i]._needsRemove) {
+                        clips[i] = clips[len - 1];
+                        clips.pop();
+                        len--;
+                    }
+                    else {
+                        i++;
+                    }
+                }
+
+                len = deferredEvents.length;
+                for (var i = 0; i < len; i++) {
+                    deferredClips[i].fire(deferredEvents[i]);
+                }
+
+                this._time = time;
+
+                this.onframe(delta);
+
+                this.dispatch('frame', delta);
+            },
+            /**
+             * 开始运行动画
+             */
+            start: function () {
+                var self = this;
+
+                this._running = true;
+
+                function step() {
+                    if (self._running) {
+                        self._update();
+                        requestAnimationFrame(step);
+                    }
+                }
+
+                this._time = new Date().getTime();
+                requestAnimationFrame(step);
+            },
+            /**
+             * 停止运行动画
+             */
+            stop: function () {
+                this._running = false;
+            },
+            /**
+             * 清除所有动画片段
+             */
+            clear : function () {
+                this._clips = [];
+            },
+            /**
+             * 对一个目标创建一个animator对象，可以指定目标中的属性使用动画
+             * @param  {Object} target
+             * @param  {Object} options
+             * @param  {boolean} [options.loop=false] 是否循环播放动画
+             * @param  {Function} [options.getter=null]
+             *         如果指定getter函数，会通过getter函数取属性值
+             * @param  {Function} [options.setter=null]
+             *         如果指定setter函数，会通过setter函数设置属性值
+             * @return {module:zrender/animation/Animation~Animator}
+             */
+            animate : function (target, options) {
+                options = options || {};
+                var deferred = new Animator(
+                    target,
+                    options.loop,
+                    options.getter, 
+                    options.setter
+                );
+                deferred.animation = this;
+                return deferred;
+            },
+            constructor: Animation
+        };
+
+        util.merge(Animation.prototype, Dispatcher.prototype, true);
+
+        function _defaultGetter(target, key) {
+            return target[key];
+        }
+
+        function _defaultSetter(target, key, value) {
+            target[key] = value;
+        }
+
+        function _interpolateNumber(p0, p1, percent) {
+            return (p1 - p0) * percent + p0;
+        }
+
+        function _interpolateArray(p0, p1, percent, out, arrDim) {
+            var len = p0.length;
+            if (arrDim == 1) {
+                for (var i = 0; i < len; i++) {
+                    out[i] = _interpolateNumber(p0[i], p1[i], percent); 
+                }
+            }
+            else {
+                var len2 = p0[0].length;
+                for (var i = 0; i < len; i++) {
+                    for (var j = 0; j < len2; j++) {
+                        out[i][j] = _interpolateNumber(
+                            p0[i][j], p1[i][j], percent
+                        );
+                    }
+                }
+            }
+        }
+
+        function _isArrayLike(data) {
+            switch (typeof data) {
+                case 'undefined':
+                case 'string':
+                    return false;
+            }
+            
+            return typeof data.length !== 'undefined';
+        }
+
+        function _catmullRomInterpolateArray(
+            p0, p1, p2, p3, t, t2, t3, out, arrDim
+        ) {
+            var len = p0.length;
+            if (arrDim == 1) {
+                for (var i = 0; i < len; i++) {
+                    out[i] = _catmullRomInterpolate(
+                        p0[i], p1[i], p2[i], p3[i], t, t2, t3
+                    );
+                }
+            }
+            else {
+                var len2 = p0[0].length;
+                for (var i = 0; i < len; i++) {
+                    for (var j = 0; j < len2; j++) {
+                        out[i][j] = _catmullRomInterpolate(
+                            p0[i][j], p1[i][j], p2[i][j], p3[i][j],
+                            t, t2, t3
+                        );
+                    }
+                }
+            }
+        }
+
+        function _catmullRomInterpolate(p0, p1, p2, p3, t, t2, t3) {
+            var v0 = (p2 - p0) * 0.5;
+            var v1 = (p3 - p1) * 0.5;
+            return (2 * (p1 - p2) + v0 + v1) * t3 
+                    + (-3 * (p1 - p2) - 2 * v0 - v1) * t2
+                    + v0 * t + p1;
+        }
+
+        function _cloneValue(value) {
+            if (_isArrayLike(value)) {
+                var len = value.length;
+                if (_isArrayLike(value[0])) {
+                    var ret = [];
+                    for (var i = 0; i < len; i++) {
+                        ret.push(arraySlice.call(value[i]));
+                    }
+                    return ret;
+                }
+                else {
+                    return arraySlice.call(value);
+                }
+            }
+            else {
+                return value;
+            }
+        }
+
+        function rgba2String(rgba) {
+            rgba[0] = Math.floor(rgba[0]);
+            rgba[1] = Math.floor(rgba[1]);
+            rgba[2] = Math.floor(rgba[2]);
+
+            return 'rgba(' + rgba.join(',') + ')';
+        }
+
+        /**
+         * @alias module:zrender/animation/Animation~Animator
+         * @constructor
+         * @param {Object} target
+         * @param {boolean} loop
+         * @param {Function} getter
+         * @param {Function} setter
+         */
+        var Animator = function(target, loop, getter, setter) {
+            this._tracks = {};
+            this._target = target;
+
+            this._loop = loop || false;
+
+            this._getter = getter || _defaultGetter;
+            this._setter = setter || _defaultSetter;
+
+            this._clipCount = 0;
+
+            this._delay = 0;
+
+            this._doneList = [];
+
+            this._onframeList = [];
+
+            this._clipList = [];
+        };
+
+        Animator.prototype = {
+            /**
+             * 设置动画关键帧
+             * @param  {number} time 关键帧时间，单位是ms
+             * @param  {Object} props 关键帧的属性值，key-value表示
+             * @return {module:zrender/animation/Animation~Animator}
+             */
+            when : function(time /* ms */, props) {
+                for (var propName in props) {
+                    if (!this._tracks[propName]) {
+                        this._tracks[propName] = [];
+                        // If time is 0 
+                        //  Then props is given initialize value
+                        // Else
+                        //  Initialize value from current prop value
+                        if (time !== 0) {
+                            this._tracks[propName].push({
+                                time : 0,
+                                value : _cloneValue(
+                                    this._getter(this._target, propName)
+                                )
+                            });
+                        }
+                    }
+                    this._tracks[propName].push({
+                        time : parseInt(time, 10),
+                        value : props[propName]
+                    });
+                }
+                return this;
+            },
+            /**
+             * 添加动画每一帧的回调函数
+             * @param  {Function} callback
+             * @return {module:zrender/animation/Animation~Animator}
+             */
+            during: function (callback) {
+                this._onframeList.push(callback);
+                return this;
+            },
+            /**
+             * 开始执行动画
+             * @param  {string|Function} easing 
+             *         动画缓动函数，详见{@link module:zrender/animation/easing}
+             * @return {module:zrender/animation/Animation~Animator}
+             */
+            start: function (easing) {
+
+                var self = this;
+                var setter = this._setter;
+                var getter = this._getter;
+                var onFrameListLen = self._onframeList.length;
+                var useSpline = easing === 'spline';
+
+                var ondestroy = function() {
+                    self._clipCount--;
+                    if (self._clipCount === 0) {
+                        // Clear all tracks
+                        self._tracks = {};
+
+                        var len = self._doneList.length;
+                        for (var i = 0; i < len; i++) {
+                            self._doneList[i].call(self);
+                        }
+                    }
+                };
+
+                var createTrackClip = function (keyframes, propName) {
+                    var trackLen = keyframes.length;
+                    if (!trackLen) {
+                        return;
+                    }
+                    // Guess data type
+                    var firstVal = keyframes[0].value;
+                    var isValueArray = _isArrayLike(firstVal);
+                    var isValueColor = false;
+
+                    // For vertices morphing
+                    var arrDim = (
+                            isValueArray 
+                            && _isArrayLike(firstVal[0])
+                        )
+                        ? 2 : 1;
+                    // Sort keyframe as ascending
+                    keyframes.sort(function(a, b) {
+                        return a.time - b.time;
+                    });
+                    var trackMaxTime;
+                    if (trackLen) {
+                        trackMaxTime = keyframes[trackLen - 1].time;
+                    }
+                    else {
+                        return;
+                    }
+                    // Percents of each keyframe
+                    var kfPercents = [];
+                    // Value of each keyframe
+                    var kfValues = [];
+                    for (var i = 0; i < trackLen; i++) {
+                        kfPercents.push(keyframes[i].time / trackMaxTime);
+                        // Assume value is a color when it is a string
+                        var value = keyframes[i].value;
+                        if (typeof(value) == 'string') {
+                            value = color.toArray(value);
+                            if (value.length === 0) {    // Invalid color
+                                value[0] = value[1] = value[2] = 0;
+                                value[3] = 1;
+                            }
+                            isValueColor = true;
+                        }
+                        kfValues.push(value);
+                    }
+
+                    // Cache the key of last frame to speed up when 
+                    // animation playback is sequency
+                    var cacheKey = 0;
+                    var cachePercent = 0;
+                    var start;
+                    var i;
+                    var w;
+                    var p0;
+                    var p1;
+                    var p2;
+                    var p3;
+
+
+                    if (isValueColor) {
+                        var rgba = [ 0, 0, 0, 0 ];
+                    }
+
+                    var onframe = function (target, percent) {
+                        // Find the range keyframes
+                        // kf1-----kf2---------current--------kf3
+                        // find kf2 and kf3 and do interpolation
+                        if (percent < cachePercent) {
+                            // Start from next key
+                            start = Math.min(cacheKey + 1, trackLen - 1);
+                            for (i = start; i >= 0; i--) {
+                                if (kfPercents[i] <= percent) {
+                                    break;
+                                }
+                            }
+                            i = Math.min(i, trackLen - 2);
+                        }
+                        else {
+                            for (i = cacheKey; i < trackLen; i++) {
+                                if (kfPercents[i] > percent) {
+                                    break;
+                                }
+                            }
+                            i = Math.min(i - 1, trackLen - 2);
+                        }
+                        cacheKey = i;
+                        cachePercent = percent;
+
+                        var range = (kfPercents[i + 1] - kfPercents[i]);
+                        if (range === 0) {
+                            return;
+                        }
+                        else {
+                            w = (percent - kfPercents[i]) / range;
+                        }
+                        if (useSpline) {
+                            p1 = kfValues[i];
+                            p0 = kfValues[i === 0 ? i : i - 1];
+                            p2 = kfValues[i > trackLen - 2 ? trackLen - 1 : i + 1];
+                            p3 = kfValues[i > trackLen - 3 ? trackLen - 1 : i + 2];
+                            if (isValueArray) {
+                                _catmullRomInterpolateArray(
+                                    p0, p1, p2, p3, w, w * w, w * w * w,
+                                    getter(target, propName),
+                                    arrDim
+                                );
+                            }
+                            else {
+                                var value;
+                                if (isValueColor) {
+                                    value = _catmullRomInterpolateArray(
+                                        p0, p1, p2, p3, w, w * w, w * w * w,
+                                        rgba, 1
+                                    );
+                                    value = rgba2String(rgba);
+                                }
+                                else {
+                                    value = _catmullRomInterpolate(
+                                        p0, p1, p2, p3, w, w * w, w * w * w
+                                    );
+                                }
+                                setter(
+                                    target,
+                                    propName,
+                                    value
+                                );
+                            }
+                        }
+                        else {
+                            if (isValueArray) {
+                                _interpolateArray(
+                                    kfValues[i], kfValues[i + 1], w,
+                                    getter(target, propName),
+                                    arrDim
+                                );
+                            }
+                            else {
+                                var value;
+                                if (isValueColor) {
+                                    _interpolateArray(
+                                        kfValues[i], kfValues[i + 1], w,
+                                        rgba, 1
+                                    );
+                                    value = rgba2String(rgba);
+                                }
+                                else {
+                                    value = _interpolateNumber(kfValues[i], kfValues[i + 1], w);
+                                }
+                                setter(
+                                    target,
+                                    propName,
+                                    value
+                                );
+                            }
+                        }
+
+                        for (i = 0; i < onFrameListLen; i++) {
+                            self._onframeList[i](target, percent);
+                        }
+                    };
+
+                    var clip = new Clip({
+                        target : self._target,
+                        life : trackMaxTime,
+                        loop : self._loop,
+                        delay : self._delay,
+                        onframe : onframe,
+                        ondestroy : ondestroy
+                    });
+
+                    if (easing && easing !== 'spline') {
+                        clip.easing = easing;
+                    }
+                    self._clipList.push(clip);
+                    self._clipCount++;
+                    self.animation.add(clip);
+                };
+
+                for (var propName in this._tracks) {
+                    createTrackClip(this._tracks[propName], propName);
+                }
+                return this;
+            },
+            /**
+             * 停止动画
+             */
+            stop : function() {
+                for (var i = 0; i < this._clipList.length; i++) {
+                    var clip = this._clipList[i];
+                    this.animation.remove(clip);
+                }
+                this._clipList = [];
+            },
+            /**
+             * 设置动画延迟开始的时间
+             * @param  {number} time 单位ms
+             * @return {module:zrender/animation/Animation~Animator}
+             */
+            delay : function (time) {
+                this._delay = time;
+                return this;
+            },
+            /**
+             * 添加动画结束的回调
+             * @param  {Function} cb
+             * @return {module:zrender/animation/Animation~Animator}
+             */
+            done : function(cb) {
+                this._doneList.push(cb);
+                return this;
+            }
+        };
+
+        return Animation;
+    }
+);
+
+/*!
+ * ZRender, a high performance canvas library.
+ *  
+ * Copyright (c) 2013, Baidu Inc.
+ * All rights reserved.
+ * 
+ * LICENSE
+ * https://github.com/ecomfe/zrender/blob/master/LICENSE.txt
+ */
+define(
+    'zrender/zrender',['require','./dep/excanvas','./tool/util','./tool/log','./tool/guid','./Handler','./Painter','./Storage','./animation/Animation','./tool/env'],function(require) {
+        /*
+         * HTML5 Canvas for Internet Explorer!
+         * Modern browsers like Firefox, Safari, Chrome and Opera support
+         * the HTML5 canvas tag to allow 2D command-based drawing.
+         * ExplorerCanvas brings the same functionality to Internet Explorer.
+         * To use, web developers only need to include a single script tag
+         * in their existing web pages.
+         *
+         * https://code.google.com/p/explorercanvas/
+         * http://explorercanvas.googlecode.com/svn/trunk/excanvas.js
+         */
+        // 核心代码会生成一个全局变量 G_vmlCanvasManager，模块改造后借用于快速判断canvas支持
+        require('./dep/excanvas');
+
+        var util = require('./tool/util');
+        var log = require('./tool/log');
+        var guid = require('./tool/guid');
+
+        var Handler = require('./Handler');
+        var Painter = require('./Painter');
+        var Storage = require('./Storage');
+        var Animation = require('./animation/Animation');
+
+        var _instances = {};    // ZRender实例map索引
+
+        /**
+         * @exports zrender
+         * @author Kener (@Kener-林峰, linzhifeng)
+         *         pissang (https://www.github.com/pissang)
+         */
+        var zrender = {};
+        /**
+         * @type {string}
+         */
+        zrender.version = '2.0.4';
+
+        /**
+         * 创建zrender实例
+         *
+         * @param {HTMLElement} dom 绘图容器
+         * @return {module:zrender~ZRender} ZRender实例
+         */
+        // 不让外部直接new ZRender实例，为啥？
+        // 不为啥，提供全局可控同时减少全局污染和降低命名冲突的风险！
+        zrender.init = function(dom) {
+            var zr = new ZRender(guid(), dom);
+            _instances[zr.id] = zr;
+            return zr;
+        };
+
+        /**
+         * zrender实例销毁
+         * @param {module:zrender~ZRender} zr ZRender对象，不传则销毁全部
+         */
+        // 在_instances里的索引也会删除了
+        // 管生就得管死，可以通过zrender.dispose(zr)销毁指定ZRender实例
+        // 当然也可以直接zr.dispose()自己销毁
+        zrender.dispose = function (zr) {
+            if (zr) {
+                zr.dispose();
+            }
+            else {
+                for (var key in _instances) {
+                    _instances[key].dispose();
+                }
+                _instances = {};
+            }
+
+            return zrender;
+        };
+
+        /**
+         * 获取zrender实例
+         * @param {string} id ZRender对象索引
+         * @return {module:zrender~ZRender}
+         */
+        zrender.getInstance = function (id) {
+            return _instances[id];
+        };
+
+        /**
+         * 删除zrender实例，ZRender实例dispose时会调用，
+         * 删除后getInstance则返回undefined
+         * ps: 仅是删除，删除的实例不代表已经dispose了~~
+         *     这是一个摆脱全局zrender.dispose()自动销毁的后门，
+         *     take care of yourself~
+         *
+         * @param {string} id ZRender对象索引
+         */
+        zrender.delInstance = function (id) {
+            delete _instances[id];
+            return zrender;
+        };
+
+        function getFrameCallback(zrInstance) {
+            return function () {
+                var animatingElements = zrInstance.animatingElements;
+                for (var i = 0, l = animatingElements.length; i < l; i++) {
+                    zrInstance.storage.mod(animatingElements[i].id);
+                }
+
+                if (animatingElements.length || zrInstance._needsRefreshNextFrame) {
+                    zrInstance.refresh();
+                }
+            };
+        }
+
+        /**
+         * ZRender接口类，对外可用的所有接口都在这里
+         * 非get接口统一返回支持链式调用
+         *
+         * @constructor
+         * @alias module:zrender~ZRender
+         * @param {string} id 唯一标识
+         * @param {HTMLElement} dom dom对象，不帮你做document.getElementById
+         * @return {ZRender} ZRender实例
+         */
+        var ZRender = function(id, dom) {
+            /**
+             * 实例 id
+             * @type {string}
+             */
+            this.id = id;
+            this.env = require('./tool/env');
+
+            this.storage = new Storage();
+            this.painter = new Painter(dom, this.storage);
+            this.handler = new Handler(dom, this.storage, this.painter);
+
+            // 动画控制
+            this.animatingElements = [];
+            /**
+             * @type {module:zrender/animation/Animation}
+             */
+            this.animation = new Animation({
+                stage: {
+                    update: getFrameCallback(this)
+                }
+            });
+            this.animation.start();
+
+            this._needsRefreshNextFrame = false;
+        };
+
+        /**
+         * 获取实例唯一标识
+         * @return {string}
+         */
+        ZRender.prototype.getId = function () {
+            return this.id;
+        };
+
+        /**
+         * 添加图形形状到根节点
+         * 
+         * @param {module:zrender/shape/Base} shape 形状对象，可用属性全集，详见各shape
+         */
+        ZRender.prototype.addShape = function (shape) {
+            this.storage.addRoot(shape);
+            return this;
+        };
+
+        /**
+         * 添加组到根节点
+         *
+         * @param {module:zrender/Group} group
+         */
+        ZRender.prototype.addGroup = function(group) {
+            this.storage.addRoot(group);
+            return this;
+        };
+
+        /**
+         * 从根节点删除图形形状
+         * 
+         * @param {string} shapeId 形状对象唯一标识
+         */
+        ZRender.prototype.delShape = function (shapeId) {
+            this.storage.delRoot(shapeId);
+            return this;
+        };
+
+        /**
+         * 从根节点删除组
+         * 
+         * @param {string} groupId
+         */
+        ZRender.prototype.delGroup = function (groupId) {
+            this.storage.delRoot(groupId);
+            return this;
+        };
+
+        /**
+         * 修改图形形状
+         * 
+         * @param {string} shapeId 形状对象唯一标识
+         * @param {Object} shape 形状对象
+         */
+        ZRender.prototype.modShape = function (shapeId, shape) {
+            this.storage.mod(shapeId, shape);
+            return this;
+        };
+
+        /**
+         * 修改组
+         * 
+         * @param {string} groupId
+         * @param {Object} group
+         */
+        ZRender.prototype.modGroup = function (groupId, group) {
+            this.storage.mod(groupId, group);
+            return this;
+        };
+
+        /**
+         * 修改指定zlevel的绘制配置项
+         * 
+         * @param {string} zLevel
+         * @param {Object} config 配置对象
+         * @param {string} [config.clearColor=0] 每次清空画布的颜色
+         * @param {string} [config.motionBlur=false] 是否开启动态模糊
+         * @param {number} [config.lastFrameAlpha=0.7]
+         *                 在开启动态模糊的时候使用，与上一帧混合的alpha值，值越大尾迹越明显
+         * @param {Array.<number>} [config.position] 层的平移
+         * @param {Array.<number>} [config.rotation] 层的旋转
+         * @param {Array.<number>} [config.scale] 层的缩放
+         * @param {boolean} [config.zoomable=false] 层是否支持鼠标缩放操作
+         * @param {boolean} [config.panable=false] 层是否支持鼠标平移操作
+         */
+        ZRender.prototype.modLayer = function (zLevel, config) {
+            this.painter.modLayer(zLevel, config);
+            return this;
+        };
+
+        /**
+         * 添加额外高亮层显示，仅提供添加方法，每次刷新后高亮层图形均被清空
+         * 
+         * @param {Object} shape 形状对象
+         */
+        ZRender.prototype.addHoverShape = function (shape) {
+            this.storage.addHover(shape);
+            return this;
+        };
+
+        /**
+         * 渲染
+         * 
+         * @param {Function} callback  渲染结束后回调函数
+         */
+        ZRender.prototype.render = function (callback) {
+            this.painter.render(callback);
+            this._needsRefreshNextFrame = false;
+            return this;
+        };
+
+        /**
+         * 视图更新
+         * 
+         * @param {Function} callback  视图更新后回调函数
+         */
+        ZRender.prototype.refresh = function (callback) {
+            this.painter.refresh(callback);
+            this._needsRefreshNextFrame = false;
+            return this;
+        };
+
+        /**
+         * 标记视图在浏览器下一帧需要绘制
+         */
+        ZRender.prototype.refreshNextFrame = function() {
+            this._needsRefreshNextFrame = true;
+            return this;
+        };
+        
+        /**
+         * 绘制高亮层
+         * @param {Function} callback  视图更新后回调函数
+         */
+        ZRender.prototype.refreshHover = function (callback) {
+            this.painter.refreshHover(callback);
+            return this;
+        };
+
+        /**
+         * 视图更新
+         * 
+         * @param {Array.<module:zrender/shape/Base>} shapeList 需要更新的图形列表
+         * @param {Function} callback  视图更新后回调函数
+         */
+        ZRender.prototype.refreshShapes = function (shapeList, callback) {
+            this.painter.refreshShapes(shapeList, callback);
+            return this;
+        };
+
+        /**
+         * 调整视图大小
+         */
+        ZRender.prototype.resize = function() {
+            this.painter.resize();
+            return this;
+        };
+
+        /**
+         * 动画
+         * 
+         * @param {string|module:zrender/Group|module:zrender/shape/Base} el 动画对象
+         * @param {string} path 需要添加动画的属性获取路径，可以通过a.b.c来获取深层的属性
+         * @param {boolean} [loop] 动画是否循环
+         * @return {module:zrender/animation/Animation~Animator}
+         * @example:
+         *     zr.animate(circle.id, 'style', false)
+         *         .when(1000, {x: 10} )
+         *         .done(function(){ // Animation done })
+         *         .start()
+         */
+        ZRender.prototype.animate = function (el, path, loop) {
+            if (typeof(el) === 'string') {
+                el = this.storage.get(el);
+            }
+            if (el) {
+                var target;
+                if (path) {
+                    var pathSplitted = path.split('.');
+                    var prop = el;
+                    for (var i = 0, l = pathSplitted.length; i < l; i++) {
+                        if (!prop) {
+                            continue;
+                        }
+                        prop = prop[pathSplitted[i]];
+                    }
+                    if (prop) {
+                        target = prop;
+                    }
+                }
+                else {
+                    target = el;
+                }
+
+                if (!target) {
+                    log(
+                        'Property "'
+                        + path
+                        + '" is not existed in element '
+                        + el.id
+                    );
+                    return;
+                }
+
+                var animatingElements = this.animatingElements;
+                if (typeof el.__aniCount === 'undefined') {
+                    // 正在进行的动画记数
+                    el.__aniCount = 0;
+                }
+                if (el.__aniCount === 0) {
+                    animatingElements.push(el);
+                }
+                el.__aniCount++;
+
+                return this.animation.animate(target, { loop: loop })
+                    .done(function () {
+                        el.__aniCount--;
+                        if (el.__aniCount === 0) {
+                            // 从animatingElements里移除
+                            var idx = util.indexOf(animatingElements, el);
+                            animatingElements.splice(idx, 1);
+                        }
+                    });
+            }
+            else {
+                log('Element not existed');
+            }
+        };
+
+        /**
+         * 停止所有动画
+         */
+        ZRender.prototype.clearAnimation = function () {
+            this.animation.clear();
+        };
+
+        /**
+         * loading显示
+         * 
+         * @param {Object=} loadingEffect loading效果对象
+         */
+        ZRender.prototype.showLoading = function (loadingEffect) {
+            this.painter.showLoading(loadingEffect);
+            return this;
+        };
+
+        /**
+         * loading结束
+         */
+        ZRender.prototype.hideLoading = function () {
+            this.painter.hideLoading();
+            return this;
+        };
+
+        /**
+         * 获取视图宽度
+         */
+        ZRender.prototype.getWidth = function() {
+            return this.painter.getWidth();
+        };
+
+        /**
+         * 获取视图高度
+         */
+        ZRender.prototype.getHeight = function() {
+            return this.painter.getHeight();
+        };
+
+        /**
+         * 图像导出
+         * @param {string} type
+         * @param {string} [backgroundColor='#fff'] 背景色
+         * @return {string} 图片的Base64 url
+         */
+        ZRender.prototype.toDataURL = function(type, backgroundColor, args) {
+            return this.painter.toDataURL(type, backgroundColor, args);
+        };
+
+        /**
+         * 将常规shape转成image shape
+         * @param {module:zrender/shape/Base} e
+         * @param {number} width
+         * @param {number} height
+         */
+        ZRender.prototype.shapeToImage = function(e, width, height) {
+            var id = guid();
+            return this.painter.shapeToImage(id, e, width, height);
+        };
+
+        /**
+         * 事件绑定
+         * 
+         * @param {string} eventName 事件名称
+         * @param {Function} eventHandler 响应函数
+         */
+        ZRender.prototype.on = function(eventName, eventHandler) {
+            this.handler.on(eventName, eventHandler);
+            return this;
+        };
+
+        /**
+         * 事件解绑定，参数为空则解绑所有自定义事件
+         * 
+         * @param {string} eventName 事件名称
+         * @param {Function} eventHandler 响应函数
+         */
+        ZRender.prototype.un = function(eventName, eventHandler) {
+            this.handler.un(eventName, eventHandler);
+            return this;
+        };
+        
+        /**
+         * 事件触发
+         * 
+         * @param {string} eventName 事件名称，resize，hover，drag，etc
+         * @param {event=} event event dom事件对象
+         */
+        ZRender.prototype.trigger = function (eventName, event) {
+            this.handler.trigger(eventName, event);
+            return this;
+        };
+        
+
+        /**
+         * 清除当前ZRender下所有类图的数据和显示，clear后MVC和已绑定事件均还存在在，ZRender可用
+         */
+        ZRender.prototype.clear = function () {
+            this.storage.delRoot();
+            this.painter.clear();
+            return this;
+        };
+
+        /**
+         * 释放当前ZR实例（删除包括dom，数据、显示和事件绑定），dispose后ZR不可用
+         */
+        ZRender.prototype.dispose = function () {
+            this.animation.stop();
+            
+            this.clear();
+            this.storage.dispose();
+            this.painter.dispose();
+            this.handler.dispose();
+
+            this.animation = 
+            this.animatingElements = 
+            this.storage = 
+            this.painter = 
+            this.handler = null;
+
+            // 释放后告诉全局删除对自己的索引，没想到啥好方法
+            zrender.delInstance(this.id);
+        };
+
+        return zrender;
+    }
+);
+
+define('zrender', ['zrender/zrender'], function (main) { return main; });
+
+/**
+ * echarts层级查找方法
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/util/ecQuery',['zrender/tool/util'],function() {
+    var zrUtil = require('zrender/tool/util');
+    
+    /**
+     * 获取嵌套选项的基础方法
+     * 返回optionTarget中位于optionLocation上的值，如果没有定义，则返回undefined
+     */
+    function query(optionTarget, optionLocation) {
+        if (typeof optionTarget == 'undefined') {
+            return;
+        }
+
+        if (!optionLocation) {
+            return optionTarget;
+        }
+
+        optionLocation = optionLocation.split('.');
+        var length = optionLocation.length;
+        var curIdx = 0;
+        while (curIdx < length) {
+            optionTarget = optionTarget[optionLocation[curIdx]];
+            if (typeof optionTarget == 'undefined') {
+                return;
+            }
+            curIdx++;
+        }
+
+        return optionTarget;
+    }
+        
+    /**
+     * 获取多级控制嵌套属性的基础方法
+     * 返回ctrList中优先级最高（最靠前）的非undefined属性，ctrList中均无定义则返回undefined
+     */
+    function deepQuery(ctrList, optionLocation) {
+        var finalOption;
+        for (var i = 0, l = ctrList.length; i < l; i++) {
+            finalOption = query(ctrList[i], optionLocation);
+            if (typeof finalOption != 'undefined') {
+                return finalOption;
+            }
+        }
+    }
+    
+    /**
+     * 获取多级控制嵌套属性的基础方法
+     * 根据ctrList中优先级合并产出目标属性
+     */
+    function deepMerge(ctrList, optionLocation) {
+        var finalOption;
+        var len = ctrList.length;
+        while (len--) {
+            var tempOption = query(ctrList[len], optionLocation);
+            if (typeof tempOption != 'undefined') {
+                if (typeof finalOption == 'undefined') {
+                    finalOption = zrUtil.clone(tempOption);
+                }
+                else {
+                    zrUtil.merge(
+                        finalOption, tempOption, true
+                    );
+                }
+            }
+        }
+        
+        return finalOption;
+    }
+    
+    return {
+        query : query,
+        deepQuery : deepQuery,
+        deepMerge : deepMerge
+    };
+});
+/**
+ * echarts数字运算相关
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/util/number',[],function() {
+    function _trim(str) {
+        return str.replace(/^\s+/, '').replace(/\s+$/, '');
+    }
+    
+    /**
+     * 百分比计算
+     */
+    function parsePercent(value, maxValue) {
+        if (typeof value === 'string') {
+            if (_trim(value).match(/%$/)) {
+                return parseFloat(value) / 100 * maxValue;
+            }
+
+            return parseFloat(value);
+        }
+
+        return value;
+    }
+    
+    /**
+     * 获取中心坐标
+     */ 
+    function parseCenter(zr, center) {
+        return [
+            parsePercent(center[0], zr.getWidth()),
+            parsePercent(center[1], zr.getHeight())
+        ];
+    }
+
+    /**
+     * 获取自适应半径
+     */ 
+    function parseRadius(zr, radius) {
+        // 传数组实现环形图，[内半径，外半径]，传单个则默认为外半径为
+        if (!(radius instanceof Array)) {
+            radius = [0, radius];
+        }
+        var zrSize = Math.min(zr.getWidth(), zr.getHeight()) / 2;
+        return [
+            parsePercent(radius[0], zrSize),
+            parsePercent(radius[1], zrSize)
+        ];
+    }
+    
+    /**
+     * 每三位默认加,格式化
+     */
+    function addCommas(x) {
+        if (isNaN(x)) {
+            return '-';
+        }
+        x = (x + '').split('.');
+        return x[0].replace(/(\d{1,3})(?=(?:\d{3})+(?!\d))/g,'$1,') 
+               + (x.length > 1 ? ('.' + x[1]) : '');
+    }
+    
+    return {
+        parsePercent : parsePercent,
+        parseCenter : parseCenter,
+        parseRadius : parseRadius,
+        addCommas : addCommas
+    };
+});
+/**
+ * echarts组件基类
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/component/base',['require','../config','../util/ecQuery','../util/number','zrender/tool/util','zrender/tool/env'],function (require) {
+    var ecConfig = require('../config');
+    var ecQuery = require('../util/ecQuery');
+    var number = require('../util/number');
+    var zrUtil = require('zrender/tool/util');
+    
+    function Base(ecTheme, messageCenter, zr, option, myChart){
+        this.ecTheme = ecTheme;
+        this.messageCenter = messageCenter;
+        this.zr =zr;
+        this.option = option;
+        this.series = option.series;
+        this.myChart = myChart;
+        this.component = myChart.component;
+        
+        this._zlevelBase = this.getZlevelBase();
+        this.shapeList = [];
+        this.effectList = [];
+        
+        var self = this;
+        self.hoverConnect = function (param) {
+            var target = (param.target || {}).hoverConnect;
+            if (target) {
+                var zlevel = 10;
+                var shape;
+                if (!(target instanceof Array)) {
+                    shape = self.getShapeById(target);
+                    if (shape) {
+                        self.zr.addHoverShape(shape);
+                        zlevel = Math.min(zlevel, shape.zlevel);
+                    }
+                }
+                else {
+                    for (var i = 0, l = target.length; i < l; i++) {
+                        shape = self.getShapeById(target[i]);
+                        self.zr.addHoverShape(shape);
+                        zlevel = Math.min(zlevel, shape.zlevel);
+                    }
+                }
+                if (zlevel < param.target.zlevel) {
+                    self.zr.addHoverShape(param.target);
+                }
+            }
+        };
+    }
+
+    /**
+     * 基类方法
+     */
+    Base.prototype = {
+        canvasSupported: require('zrender/tool/env').canvasSupported,
+        /**
+         * 获取zlevel基数配置
+         * @param {Object} contentType
+         */
+        getZlevelBase: function (contentType) {
+            contentType = contentType || this.type + '';
+
+            switch (contentType) {
+                case ecConfig.COMPONENT_TYPE_GRID :
+                case ecConfig.COMPONENT_TYPE_AXIS_CATEGORY :
+                case ecConfig.COMPONENT_TYPE_AXIS_VALUE :
+                case ecConfig.COMPONENT_TYPE_POLAR :
+                    return 0;
+
+                case ecConfig.CHART_TYPE_LINE :
+                case ecConfig.CHART_TYPE_BAR :
+                case ecConfig.CHART_TYPE_SCATTER :
+                case ecConfig.CHART_TYPE_PIE :
+                case ecConfig.CHART_TYPE_RADAR :
+                case ecConfig.CHART_TYPE_MAP :
+                case ecConfig.CHART_TYPE_K :
+                case ecConfig.CHART_TYPE_CHORD:
+                case ecConfig.CHART_TYPE_GUAGE:
+                case ecConfig.CHART_TYPE_FUNNEL:
+                    return 2;
+
+                case ecConfig.COMPONENT_TYPE_LEGEND :
+                case ecConfig.COMPONENT_TYPE_DATARANGE:
+                case ecConfig.COMPONENT_TYPE_DATAZOOM :
+                case ecConfig.COMPONENT_TYPE_TIMELINE :
+                case ecConfig.COMPONENT_TYPE_ROAMCONTROLLER :
+                    return 4;
+
+                case ecConfig.CHART_TYPE_ISLAND :
+                    return 5;
+
+                case ecConfig.COMPONENT_TYPE_TOOLBOX :
+                case ecConfig.COMPONENT_TYPE_TITLE :
+                    return 6;
+
+                // ecConfig.EFFECT_ZLEVEL = 7;
+                
+                case ecConfig.COMPONENT_TYPE_TOOLTIP :
+                    return 8;
+
+                default :
+                    return 0;
+            }
+        },
+
+        /**
+         * 参数修正&默认值赋值
+         * @param {Object} opt 参数
+         *
+         * @return {Object} 修正后的参数
+         */
+        reformOption: function (opt) {
+            return zrUtil.merge(
+                       opt || {},
+                       zrUtil.clone(this.ecTheme[this.type] || {})
+                   );
+        },
+        
+        /**
+         * css类属性数组补全，如padding，margin等~
+         */
+        reformCssArray: function (p) {
+            if (p instanceof Array) {
+                switch (p.length + '') {
+                    case '4':
+                        return p;
+                    case '3':
+                        return [p[0], p[1], p[2], p[1]];
+                    case '2':
+                        return [p[0], p[1], p[0], p[1]];
+                    case '1':
+                        return [p[0], p[0], p[0], p[0]];
+                    case '0':
+                        return [0, 0, 0, 0];
+                }
+            }
+            else {
+                return [p, p, p, p];
+            }
+        },
+
+        getShapeById: function(id) {
+            for (var i = 0, l = this.shapeList.length; i < l; i++) {
+                if (this.shapeList[i].id === id) {
+                    return this.shapeList[i];
+                }
+            }
+            return null;
+        },
+        
+        /**
+         * 获取自定义和默认配置合并后的字体设置
+         */
+        getFont: function (textStyle) {
+            var finalTextStyle = zrUtil.merge(
+                zrUtil.clone(textStyle) || {},
+                this.ecTheme.textStyle
+            );
+            return finalTextStyle.fontStyle + ' '
+                   + finalTextStyle.fontWeight + ' '
+                   + finalTextStyle.fontSize + 'px '
+                   + finalTextStyle.fontFamily;
+        },
+        
+        getItemStyleColor: function (itemColor, seriesIndex, dataIndex, data) {
+            return typeof itemColor === 'function'
+                   ? itemColor(seriesIndex, dataIndex, data) : itemColor;
+            
+        },        
+        
+        // 亚像素优化
+        subPixelOptimize: function (position, lineWidth) {
+            if (lineWidth % 2 === 1) {
+                //position += position === Math.ceil(position) ? 0.5 : 0;
+                position = Math.floor(position) + 0.5;
+            }
+            else {
+                position = Math.round(position);
+            }
+            return position;
+        },
+        
+        
+        resize: function () {
+            this.refresh && this.refresh();
+            this.clearEffectShape && this.clearEffectShape(true);
+            var self = this;
+            setTimeout(function(){
+                self.animationEffect && self.animationEffect();
+            },200);
+        },
+
+        /**
+         * 清除图形数据，实例仍可用
+         */
+        clear :function () {
+            this.clearEffectShape && this.clearEffectShape();
+            this.zr && this.zr.delShape(this.shapeList);
+            this.shapeList = [];
+        },
+
+        /**
+         * 释放后实例不可用
+         */
+        dispose: function () {
+            this.clear();
+            this.shapeList = null;
+            this.effectList = null;
+        },
+        
+        query: ecQuery.query,
+        deepQuery: ecQuery.deepQuery,
+        deepMerge: ecQuery.deepMerge,
+        
+        parsePercent: number.parsePercent,
+        parseCenter: number.parseCenter,
+        parseRadius: number.parseRadius,
+        numAddCommas: number.addCommas
+    };
+    
+    return Base;
+});
+
+/**
+ * zrender: 数学辅助类
+ *
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * sin：正弦函数
+ * cos：余弦函数
+ * degreeToRadian：角度转弧度
+ * radianToDegree：弧度转角度
+ */
+define(
+    'zrender/tool/math',[],function () {
+
+        var _radians = Math.PI / 180;
+
+        /**
+         * @param {number} angle 弧度（角度）参数
+         * @param {boolean} isDegrees angle参数是否为角度计算，默认为false，angle为以弧度计量的角度
+         */
+        function sin(angle, isDegrees) {
+            return Math.sin(isDegrees ? angle * _radians : angle);
+        }
+
+        /**
+         * @param {number} angle 弧度（角度）参数
+         * @param {boolean} isDegrees angle参数是否为角度计算，默认为false，angle为以弧度计量的角度
+         */
+        function cos(angle, isDegrees) {
+            return Math.cos(isDegrees ? angle * _radians : angle);
+        }
+
+        /**
+         * 角度转弧度
+         * @param {Object} angle
+         */
+        function degreeToRadian(angle) {
+            return angle * _radians;
+        }
+
+        /**
+         * 弧度转角度
+         * @param {Object} angle
+         */
+        function radianToDegree(angle) {
+            return angle / _radians;
+        }
+
+        return {
+            sin : sin,
+            cos : cos,
+            degreeToRadian : degreeToRadian,
+            radianToDegree : radianToDegree
+        };
+    }
+);
+
+/**
+ * n角星（n>3）
+ * @module zrender/shape/Star
+ * @author sushuang (宿爽, sushuang)
+ * @example
+ *     var Star = require('zrender/shape/Star');
+ *     var shape = new Star({
+ *         style: {
+ *             x: 200,
+ *             y: 100,
+ *             r: 150,
+ *             n: 5,
+ *             text: '五角星'
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  *         }
  *     });
  *     zr.addShape(shape);
@@ -16156,6 +20483,7 @@ define(
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * zrender
  *
  * @author sushuang (宿爽, sushuang)
@@ -16188,6 +20516,27 @@ define(
  *   zr.addShape(shape);
  */
 >>>>>>> refs/heads/branch_1.1.0
+=======
+ * @module zrender/shape/Heart
+ * @author Kener (@Kener-林峰, linzhifeng)
+ * @example
+ *   var Heart = require('zrender/shape/Heart');
+ *   var shape = new Heart({
+ *       style: {
+ *           x: 100,
+ *           y: 100,
+ *           a: 40,
+ *           b: 40,
+ *           brushType: 'both',
+ *           color: 'blue',
+ *           strokeColor: 'red',
+ *           lineWidth: 3,
+ *           text: 'Heart'
+ *       }    
+ *   });
+ *   zr.addShape(shape);
+ */
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
 /**
  * @typedef {Object} IHeartStyle
@@ -16315,6 +20664,7 @@ define(
  *           y: 100,
  *           a: 40,
  *           b: 40,
+<<<<<<< HEAD
  *           brushType *           color: 'blue',
  *           strokeColor: 'red',
  *           lineWidth: 3,
@@ -16352,7 +20702,50 @@ define(
 define(
     'zrender/shape/Droplet',['require','./Base','../tool/util'],function (require) {
         
+=======
+ *           brushType: 'both',
+ *           color: 'blue',
+ *           strokeColor: 'red',
+ *           lineWidth: 3,
+ *           text: 'Droplet'
+ *       }    
+ *   });
+ *   zr.addShape(shape);
+ */
 
+/**
+ * @typedef {Object} IDropletStyle
+ * @property {number} x 水滴中心x坐标
+ * @property {number} y 水滴中心y坐标
+ * @property {number} a 水滴横宽（中心到水平边缘最宽处距离）
+ * @property {number} b 水滴纵高（中心到尖端距离）
+ * @property {string} [brushType='fill']
+ * @property {string} [color='#000000'] 填充颜色
+ * @property {string} [strokeColor='#000000'] 描边颜色
+ * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
+ * @property {number} [lineWidth=1] 描边宽度
+ * @property {number} [opacity=1] 绘制透明度
+ * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+ * @property {string} [shadowColor='#000000'] 阴影颜色
+ * @property {number} [shadowOffsetX=0] 阴影横向偏移
+ * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+ * @property {string} [text] 图形中的附加文本
+ * @property {string} [textColor='#000000'] 文本颜色
+ * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+ * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+ * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+ *                                可以是start, end, left, right, center
+ * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+ *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+ */
+define(
+    'zrender/shape/Droplet',['require','./Base','../tool/util'],function (require) {
+        
+
+        var Base = require('./Base');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
         var Base = require('./Base');
 
 <<<<<<< HEAD
@@ -16574,6 +20967,26 @@ define(
              * @type {module:zrender/shape/Droplet~IDropletStyle}
              */
 >>>>>>> refs/heads/branch_1.1.0
+=======
+        /**
+         * @alias module:zrender/shape/Droplet
+         * @constructor
+         * @extends module:zrender/shape/Base
+         * @param {Object} options
+         */
+        var Droplet = function(options) {
+            Base.call(this, options);
+            /**
+             * 水滴绘制样式
+             * @name module:zrender/shape/Droplet#style
+             * @type {module:zrender/shape/Droplet~IDropletStyle}
+             */
+            /**
+             * 水滴高亮绘制样式
+             * @name module:zrender/shape/Droplet#highlightStyle
+             * @type {module:zrender/shape/Droplet~IDropletStyle}
+             */
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         };
 
         Droplet.prototype = {
@@ -16602,6 +21015,7 @@ define(
                     style.x,
                     style.y + style.a
                 );
+<<<<<<< HEAD
 <<<<<<< HEAD
             }
         }
@@ -17697,12 +22111,17 @@ define(
                 ctx.closePath();
             },
 >>>>>>> refs/heads/branch_1.1.0
+=======
+                ctx.closePath();
+            },
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
             /**
              * 计算返回水滴的包围盒矩形
              * @param {module:zrender/shape/Droplet~IDropletStyle} style
              * @return {module:zrender/shape/Base~IBoundingRect}
              */
+<<<<<<< HEAD
 <<<<<<< HEAD
             function one(event, handler) {
                 if(!handler || !event) {
@@ -19452,6 +23871,11 @@ define(
                 if (style.__rect) {
                     return style.__rect;
 >>>>>>> refs/heads/branch_1.1.0
+=======
+            getRect : function(style) {
+                if (style.__rect) {
+                    return style.__rect;
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
                 }
                 
                 var lineWidth;
@@ -19488,7 +23912,12 @@ define(
        // 基础属性
        shape  : 'icon',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过'zrender/tool/guid'方法生成
+<<<<<<< HEAD
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层     invisible : {boolean},   // 默认为false，是否可见
+=======
+       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       invisible : {boolean},   // 默认为false，是否可见
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
        // 样式式属性
        style  : {
@@ -19987,7 +24416,11 @@ define(
         /**
          * 虚线lineTo 
          */
+<<<<<<< HEAD
         return function (ctx, x1, , dashLength) {
+=======
+        return function (ctx, x1, y1, x2, y2, dashLength) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             // http://msdn.microsoft.com/en-us/library/ie/dn265063(v=vs.85).aspx
             if (ctx.setLineDash) {
                 dashPattern[0] = dashPattern[1] = dashLength;
@@ -20038,7 +24471,11 @@ define(
  *           xEnd: 100,
  *           yEnd: 100,
  *           strokeColor: '#000',
+<<<<<<< HEAD
  *            10
+=======
+ *           lineWidth: 10
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  *       }
  *   });
  *   zr.addShape(line);
@@ -20072,6 +24509,7 @@ define(
         var dashedLineTo = require('./util/dashedLineTo');
         
 <<<<<<< HEAD
+<<<<<<< HEAD
         function MarkLine() {
             this.type = 'markLi   }
 =======
@@ -20086,6 +24524,18 @@ define(
             this.textPosition = 'end';
             Base.call(this, options);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+        /**
+         * @alias module:zrender/shape/Line
+         * @param {Object} options
+         * @constructor
+         * @extends module:zrender/shape/Base
+         */
+        var Line = function (options) {
+            this.brushTypeOnly = 'stroke';  // 线条只能描边，填充后果自负
+            this.textPosition = 'end';
+            Base.call(this, options);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
             /**
              * 直线绘制样式
@@ -20170,7 +24620,11 @@ define(
         /**
          * @inner
          */
+<<<<<<< HEAD
         function int0, p1, p2, p3, t, t2, t3) {
+=======
+        function interpolate(p0, p1, p2, p3, t, t2, t3) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             var v0 = (p2 - p0) * 0.5;
             var v1 = (p3 - p1) * 0.5;
             return (2 * (p1 - p2) + v0 + v1) * t3 
@@ -20178,6 +24632,7 @@ define(
                     + v0 * t + p1;
         }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     /**
      * 定义图形实现
@@ -20187,6 +24642,17 @@ define(
     self.define = function(name, clazz) {
         _chartLibrary[name] = clazz;
         return se
+=======
+        /**
+         * @alias module:zrender/shape/util/smoothSpline
+         * @param {Array} points 线段顶点数组
+         * @param {boolean} isLoop
+         * @param {Array} constraint 
+         * @return {Array}
+         */
+        return function (points, isLoop, constraint) {
+            var len = points.length;
+            var ret = [];
 =======
         /**
          * @alias module:zrender/shape/util/smoothSpline
@@ -20210,6 +24676,950 @@ define(
                 var pos = i / (segs - 1) * (isLoop ? len : len - 1);
                 var idx = Math.floor(pos);
 
+                var w = pos - idx;
+
+                var p0;
+                var p1 = points[idx % len];
+                var p2;
+                var p3;
+                if (!isLoop) {
+                    p0 = points[idx === 0 ? idx : idx - 1];
+                    p2 = points[idx > len - 2 ? len - 1 : idx + 1];
+                    p3 = points[idx > len - 3 ? len - 1 : idx + 2];
+                }
+                else {
+                    p0 = points[(idx - 1 + len) % len];
+                    p2 = points[(idx + 1) % len];
+                    p3 = points[(idx + 2) % len];
+                }
+
+                var w2 = w * w;
+                var w3 = w * w2;
+
+                ret.push([
+                    interpolate(p0[0], p1[0], p2[0], p3[0], w, w2, w3),
+                    interpolate(p0[1], p1[1], p2[1], p3[1], w, w2, w3)
+                ]);
+            }
+            return ret;
+        };
+    }
+);
+
+/**
+ * 贝塞尔平滑曲线 
+ * @module zrender/shape/util/smoothBezier
+ * @author pissang (https://www.github.com/pissang) 
+ *         Kener (@Kener-林峰, linzhifeng)
+ *         errorrik (errorrik@gmail.com)
+ */
+define(
+    'zrender/shape/util/smoothBezier',['require','../../tool/vector'],function (require) {
+        var vector = require('../../tool/vector');
+
+        /**
+         * 贝塞尔平滑曲线
+         * @alias module:zrender/shape/util/smoothBezier
+         * @param {Array} points 线段顶点数组
+         * @param {number} smooth 平滑等级, 0-1
+         * @param {boolean} isLoop
+         * @param {Array} constraint 将计算出来的控制点约束在一个包围盒内
+         *                           比如 [[0, 0], [100, 100]], 这个包围盒会与
+         *                           整个折线的包围盒做一个并集用来约束控制点。
+         * @param {Array} 计算出来的控制点数组
+         */
+        return function (points, smooth, isLoop, constraint) {
+            var cps = [];
+
+            var v = [];
+            var v1 = [];
+            var v2 = [];
+            var prevPoint;
+            var nextPoint;
+
+            var hasConstraint = !!constraint;
+            var min, max;
+            if (hasConstraint) {
+                min = [Infinity, Infinity];
+                max = [-Infinity, -Infinity];
+                for (var i = 0, len = points.length; i < len; i++) {
+                    vector.min(min, min, points[i]);
+                    vector.max(max, max, points[i]);
+                }
+                // 与指定的包围盒做并集
+                vector.min(min, min, constraint[0]);
+                vector.max(max, max, constraint[1]);
+            }
+
+            for (var i = 0, len = points.length; i < len; i++) {
+                var point = points[i];
+                var prevPoint;
+                var nextPoint;
+
+                if (isLoop) {
+                    prevPoint = points[i ? i - 1 : len - 1];
+                    nextPoint = points[(i + 1) % len];
+                } 
+                else {
+                    if (i === 0 || i === len - 1) {
+                        cps.push(points[i]);
+                        continue;
+                    } 
+                    else {
+                        prevPoint = points[i - 1];
+                        nextPoint = points[i + 1];
+                    }
+                }
+
+                vector.sub(v, nextPoint, prevPoint);
+
+                // use degree to scale the handle length
+                vector.scale(v, v, smooth);
+
+                var d0 = vector.distance(point, prevPoint);
+                var d1 = vector.distance(point, nextPoint);
+                var sum = d0 + d1;
+                if (sum !== 0) {
+                    d0 /= sum;
+                    d1 /= sum;
+                }
+
+                vector.scale(v1, v, -d0);
+                vector.scale(v2, v, d1);
+                var cp0 = vector.add([], point, v1);
+                var cp1 = vector.add([], point, v2);
+                if (hasConstraint) {
+                    vector.max(cp0, cp0, min);
+                    vector.min(cp0, cp0, max);
+                    vector.max(cp1, cp1, min);
+                    vector.min(cp1, cp1, max);
+                }
+                cps.push(cp0);
+                cps.push(cp1);
+            }
+            
+            if (isLoop) {
+                cps.push(cps.shift());
+            }
+
+            return cps;
+        };
+    }
+);
+
+/**
+ * 多边形
+ * @module zrender/shape/Polygon
+ * @author Kener (@Kener-林峰, linzhifeng)
+ * @example
+ *     var Polygon = require('zrender/shape/Polygon');
+ *     var shape = new Polygon({
+ *         style: {
+ *             // 100x100的正方形
+ *             pointList: [[0, 0], [100, 0], [100, 100], [0, 100]],
+ *             color: 'blue'
+ *         }
+ *     });
+ *     zr.addShape(shape);
+ */
+
+/**
+ * @typedef {Object} IPolygonStyle
+ * @property {string} pointList 多边形顶点数组
+ * @property {string} [smooth=''] 是否做平滑插值, 平滑算法可以选择 bezier, spline
+ * @property {number} [smoothConstraint] 平滑约束
+ * @property {string} [brushType='fill']
+ * @property {string} [color='#000000'] 填充颜色
+ * @property {string} [strokeColor='#000000'] 描边颜色
+ * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
+ * @property {number} [lineWidth=1] 描边宽度
+ * @property {number} [opacity=1] 绘制透明度
+ * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+ * @property {string} [shadowColor='#000000'] 阴影颜色
+ * @property {number} [shadowOffsetX=0] 阴影横向偏移
+ * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+ * @property {string} [text] 图形中的附加文本
+ * @property {string} [textColor='#000000'] 文本颜色
+ * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+ * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+ * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+ *                                可以是start, end, left, right, center
+ * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+ *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+ */
+define(
+    'zrender/shape/Polygon',['require','./Base','./util/smoothSpline','./util/smoothBezier','./util/dashedLineTo','../tool/util'],function (require) {
+        var Base = require('./Base');
+        var smoothSpline = require('./util/smoothSpline');
+        var smoothBezier = require('./util/smoothBezier');
+        var dashedLineTo = require('./util/dashedLineTo');
+
+        /**
+         * @alias module:zrender/shape/Polygon
+         * @param {Object} options
+         * @constructor
+         * @extends module:zrender/shape/Base
+         */
+        var Polygon = function (options) {
+            Base.call(this, options);
+            /**
+             * 多边形绘制样式
+             * @name module:zrender/shape/Polygon#style
+             * @type {module:zrender/shape/Polygon~IPolygonStyle}
+             */
+            /**
+             * 多边形高亮绘制样式
+             * @name module:zrender/shape/Polygon#highlightStyle
+             * @type {module:zrender/shape/Polygon~IPolygonStyle}
+             */
+        };
+
+        Polygon.prototype = {
+            type: 'polygon',
+
+            brush : function (ctx, isHighlight) {
+                var style = this.style;
+                if (isHighlight) {
+                    // 根据style扩展默认高亮样式
+                    style = this.getHighlightStyle(
+                        style,
+                        this.highlightStyle || {}
+                    );
+                }
+
+                ctx.save();
+                this.setContext(ctx, style);
+    
+                // 设置transform
+                this.setTransform(ctx);
+                
+                // 先fill再stroke
+                var hasPath = false;
+                if (style.brushType == 'fill' 
+                    || style.brushType == 'both'
+                    || typeof style.brushType == 'undefined' // 默认为fill
+                ) {
+                    ctx.beginPath();
+                    if (style.lineType == 'dashed' 
+                        || style.lineType == 'dotted'
+                    ) {
+                        // 特殊处理，虚线围不成path，实线再build一次
+                        this.buildPath(
+                            ctx, 
+                            {
+                                lineType: 'solid',
+                                lineWidth: style.lineWidth,
+                                pointList: style.pointList
+                            }
+                        );
+                        hasPath = false; // 这个path不能用
+                    }
+                    else {
+                        this.buildPath(ctx, style);
+                        hasPath = true; // 这个path能用
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                if (style.lineWidth > 0 
+                    && (style.brushType == 'stroke' || style.brushType == 'both')
+                ) {
+                    if (!hasPath) {
+                        ctx.beginPath();
+                        this.buildPath(ctx, style);
+                    }
+                    ctx.stroke();
+                }
+    
+                this.drawText(ctx, style, this.style);
+    
+                ctx.restore();
+    
+                return;
+            },
+        
+            /**
+             * 创建多边形路径
+             * @param {CanvasRenderingContext2D} ctx
+             * @param {module:zrender/shape/Polygon~IPolygonStyle} style
+             */
+            buildPath : function (ctx, style) {
+                // 虽然能重用brokenLine，但底层图形基于性能考虑，重复代码减少调用吧
+                var pointList = style.pointList;
+                // 开始点和结束点重复
+                /*
+                var start = pointList[0];
+                var end = pointList[pointList.length-1];
+
+                if (start && end) {
+                    if (start[0] == end[0] &&
+                        start[1] == end[1]) {
+                        // 移除最后一个点
+                        pointList.pop();
+                    }
+                }
+                */
+
+                if (pointList.length < 2) {
+                    // 少于2个点就不画了~
+                    return;
+                }
+
+                if (style.smooth && style.smooth !== 'spline') {
+                    var controlPoints = smoothBezier(
+                        pointList, style.smooth, true, style.smoothConstraint
+                    );
+
+                    ctx.moveTo(pointList[0][0], pointList[0][1]);
+                    var cp1;
+                    var cp2;
+                    var p;
+                    var len = pointList.length;
+                    for (var i = 0; i < len; i++) {
+                        cp1 = controlPoints[i * 2];
+                        cp2 = controlPoints[i * 2 + 1];
+                        p = pointList[(i + 1) % len];
+                        ctx.bezierCurveTo(
+                            cp1[0], cp1[1], cp2[0], cp2[1], p[0], p[1]
+                        );
+                    }
+                } 
+                else {
+                    if (style.smooth === 'spline') {
+                        pointList = smoothSpline(pointList, true);
+                    }
+
+                    if (!style.lineType || style.lineType == 'solid') {
+                        // 默认为实线
+                        ctx.moveTo(pointList[0][0], pointList[0][1]);
+                        for (var i = 1, l = pointList.length; i < l; i++) {
+                            ctx.lineTo(pointList[i][0], pointList[i][1]);
+                        }
+                        ctx.lineTo(pointList[0][0], pointList[0][1]);
+                    }
+                    else if (style.lineType == 'dashed'
+                            || style.lineType == 'dotted'
+                    ) {
+                        var dashLength = 
+                            style._dashLength
+                            || (style.lineWidth || 1) 
+                               * (style.lineType == 'dashed' ? 5 : 1);
+                        style._dashLength = dashLength;
+                        ctx.moveTo(pointList[0][0], pointList[0][1]);
+                        for (var i = 1, l = pointList.length; i < l; i++) {
+                            dashedLineTo(
+                                ctx,
+                                pointList[i - 1][0], pointList[i - 1][1],
+                                pointList[i][0], pointList[i][1],
+                                dashLength
+                            );
+                        }
+                        dashedLineTo(
+                            ctx,
+                            pointList[pointList.length - 1][0], 
+                            pointList[pointList.length - 1][1],
+                            pointList[0][0],
+                            pointList[0][1],
+                            dashLength
+                        );
+                    }
+                }
+                return;
+            },
+
+            /**
+             * 计算返回多边形包围盒矩阵
+             * @param {module:zrender/shape/Polygon~IPolygonStyle} style
+             * @return {module:zrender/shape/Base~IBoundingRect}
+             */
+            getRect : function (style) {
+                if (style.__rect) {
+                    return style.__rect;
+                }
+                
+                var minX =  Number.MAX_VALUE;
+                var maxX =  Number.MIN_VALUE;
+                var minY = Number.MAX_VALUE;
+                var maxY = Number.MIN_VALUE;
+
+                var pointList = style.pointList;
+                for (var i = 0, l = pointList.length; i < l; i++) {
+                    if (pointList[i][0] < minX) {
+                        minX = pointList[i][0];
+                    }
+                    if (pointList[i][0] > maxX) {
+                        maxX = pointList[i][0];
+                    }
+                    if (pointList[i][1] < minY) {
+                        minY = pointList[i][1];
+                    }
+                    if (pointList[i][1] > maxY) {
+                        maxY = pointList[i][1];
+                    }
+                }
+
+                var lineWidth;
+                if (style.brushType == 'stroke' || style.brushType == 'fill') {
+                    lineWidth = style.lineWidth || 1;
+                }
+                else {
+                    lineWidth = 0;
+                }
+                
+                style.__rect = {
+                    x : Math.round(minX - lineWidth / 2),
+                    y : Math.round(minY - lineWidth / 2),
+                    width : maxX - minX + lineWidth,
+                    height : maxY - minY + lineWidth
+                };
+                return style.__rect;
+            }
+        };
+
+        require('../tool/util').inherits(Polygon, Base);
+        return Polygon;
+    }
+);
+
+
+/**
+ * 折线
+ * @author Kener (@Kener-林峰, linzhifeng)
+ * @module zrender/shape/BrokenLine
+ * @example
+ *     var BrokenLine = require('zrender/shape/BrokenLine');
+ *     var shape = new BrokenLine({
+ *         style: {
+ *             pointList: [[0, 0], [100, 100], [100, 0]],
+ *             smooth: 'bezier',
+ *             strokeColor: 'purple'
+ *         }
+ *     });
+ *     zr.addShape(shape);
+ */
+
+/**
+ * @typedef {Object} IBrokenLineStyle
+ * @property {Array.<number>} pointList 顶点坐标数组
+ * @property {string} [smooth=''] 是否做平滑插值, 平滑算法可以选择 bezier, spline
+ * @property {number} [smoothConstraint] 平滑约束
+ * @property {string} [strokeColor='#000000'] 描边颜色
+ * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
+ * @property {string} [lineJoin='miter'] 线段连接样式，可以是 miter, round, bevel
+ * @property {number} [lineWidth=1] 描边宽度
+ * @property {number} [opacity=1] 绘制透明度
+ * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+ * @property {string} [shadowColor='#000000'] 阴影颜色
+ * @property {number} [shadowOffsetX=0] 阴影横向偏移
+ * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+ * @property {string} [text] 图形中的附加文本
+ * @property {string} [textColor='#000000'] 文本颜色
+ * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+ * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+ * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+ *                                可以是start, end, left, right, center
+ * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+ *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+ */
+define(
+    'zrender/shape/BrokenLine',['require','./Base','./util/smoothSpline','./util/smoothBezier','./util/dashedLineTo','./Polygon','../tool/util'],function (require) {
+        var Base = require('./Base');
+        var smoothSpline = require('./util/smoothSpline');
+        var smoothBezier = require('./util/smoothBezier');
+        var dashedLineTo = require('./util/dashedLineTo');
+
+        /**
+         * @alias module:zrender/shape/BrokenLine
+         * @constructor
+         * @extends module:zrender/shape/Base
+         * @param {Object} options
+         */
+        var BrokenLine = function(options) {
+            this.brushTypeOnly = 'stroke';  // 线条只能描边，填充后果自负
+            this.textPosition = 'end';
+            Base.call(this, options);
+            /**
+             * 贝赛尔曲线绘制样式
+             * @name module:zrender/shape/BrokenLine#style
+             * @type {module:zrender/shape/BrokenLine~IBrokenLineStyle}
+             */
+            /**
+             * 贝赛尔曲线高亮绘制样式
+             * @name module:zrender/shape/BrokenLine#highlightStyle
+             * @type {module:zrender/shape/BrokenLine~IBrokenLineStyle}
+             */
+        };
+
+        BrokenLine.prototype =  {
+            type: 'broken-line',
+
+            /**
+             * 创建多边形路径
+             * @param {CanvasRenderingContext2D} ctx
+             * @param {module:zrender/shape/BrokenLine~IBrokenLineStyle} style
+             */
+            buildPath : function(ctx, style) {
+                var pointList = style.pointList;
+                if (pointList.length < 2) {
+                    // 少于2个点就不画了~
+                    return;
+                }
+                
+                var len = Math.min(
+                    style.pointList.length, 
+                    Math.round(style.pointListLength || style.pointList.length)
+                );
+                
+                if (style.smooth && style.smooth !== 'spline') {
+                    var controlPoints = smoothBezier(
+                        pointList, style.smooth, false, style.smoothConstraint
+                    );
+
+                    ctx.moveTo(pointList[0][0], pointList[0][1]);
+                    var cp1;
+                    var cp2;
+                    var p;
+                    for (var i = 0; i < len - 1; i++) {
+                        cp1 = controlPoints[i * 2];
+                        cp2 = controlPoints[i * 2 + 1];
+                        p = pointList[i + 1];
+                        ctx.bezierCurveTo(
+                            cp1[0], cp1[1], cp2[0], cp2[1], p[0], p[1]
+                        );
+                    }
+                } 
+                else {
+                    if (style.smooth === 'spline') {
+                        pointList = smoothSpline(pointList);
+                        len = pointList.length;
+                    }
+                    if (!style.lineType || style.lineType == 'solid') {
+                        // 默认为实线
+                        ctx.moveTo(pointList[0][0], pointList[0][1]);
+                        for (var i = 1; i < len; i++) {
+                            ctx.lineTo(pointList[i][0], pointList[i][1]);
+                        }
+                    }
+                    else if (style.lineType == 'dashed'
+                            || style.lineType == 'dotted'
+                    ) {
+                        var dashLength = (style.lineWidth || 1) 
+                                         * (style.lineType == 'dashed' ? 5 : 1);
+                        ctx.moveTo(pointList[0][0], pointList[0][1]);
+                        for (var i = 1; i < len; i++) {
+                            dashedLineTo(
+                                ctx,
+                                pointList[i - 1][0], pointList[i - 1][1],
+                                pointList[i][0], pointList[i][1],
+                                dashLength
+                            );
+                        }
+                    }
+                }
+                return;
+            },
+
+            /**
+             * 计算返回折线包围盒矩形。
+             * @param {IZRenderBezierCurveStyle} style
+             * @return {module:zrender/shape/Base~IBoundingRect}
+             */
+            getRect : function(style) {
+                return require('./Polygon').prototype.getRect(style);
+            }
+        };
+
+        require('../tool/util').inherits(BrokenLine, Base);
+        return BrokenLine;
+    }
+);
+
+/**
+ * zrender
+ *
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * shape类：标线
+ */
+define('echarts/util/shape/MarkLine',['require','zrender/shape/Base','./Icon','zrender/shape/Line','zrender/shape/BrokenLine','zrender/tool/matrix','zrender/tool/area','zrender/shape/util/dashedLineTo','zrender/shape/util/smoothSpline','zrender/tool/util'],function (require) {
+    var Base = require('zrender/shape/Base');
+    var IconShape = require('./Icon');
+    var LineShape = require('zrender/shape/Line');
+    var lineInstance = new LineShape({});
+    var BrokenLineShape = require('zrender/shape/BrokenLine');
+    var brokenLineInstance = new BrokenLineShape({});
+
+    var matrix = require('zrender/tool/matrix');
+    var area = require('zrender/tool/area');
+    var dashedLineTo = require('zrender/shape/util/dashedLineTo');
+    var smoothSpline = require('zrender/shape/util/smoothSpline');
+    var zrUtil = require('zrender/tool/util');
+
+
+    function MarkLine(options) {
+        Base.call(this, options);
+    }
+
+    MarkLine.prototype =  {
+        type : 'mark-line',
+        /**
+         * 画刷
+         * @param ctx       画布句柄
+         * @param e         形状实体
+         * @param isHighlight   是否为高亮状态
+         * @param updateCallback 需要异步加载资源的shape可以通过这个callback(e)
+         *                       让painter更新视图，base.brush没用，需要的话重载brush
+         */
+        brush : function (ctx, isHighlight) {
+            var style = this.style;
+
+            if (isHighlight) {
+                // 根据style扩展默认高亮样式
+                style = this.getHighlightStyle(
+                    style,
+                    this.highlightStyle || {}
+                );
+            }
+
+            ctx.save();
+            this.setContext(ctx, style);
+
+            // 设置transform
+            this.setTransform(ctx);
+
+            ctx.save();
+            ctx.beginPath();
+            this.buildLinePath(ctx, style);
+            ctx.stroke();
+            ctx.restore();
+
+            this.brushSymbol(ctx, style, 0);
+            this.brushSymbol(ctx, style, 1);
+
+            this.drawText(ctx, style, this.style);
+
+            ctx.restore();
+        },
+
+        /**
+         * 创建线条路径
+         * @param {Context2D} ctx Canvas 2D上下文
+         * @param {Object} style 样式
+         */
+        buildLinePath : function (ctx, style) {
+            var pointList = style.pointList || this.getPointList(style);
+            style.pointList = pointList;
+
+            var len = Math.min(
+                    style.pointList.length,
+                    Math.round(style.pointListLength || style.pointList.length)
+                );
+
+            if (!style.lineType || style.lineType == 'solid') {
+                //默认为实线
+                ctx.moveTo(pointList[0][0],pointList[0][1]);
+                for (var i = 1; i < len; i++) {
+                    ctx.lineTo(pointList[i][0],pointList[i][1]);
+                }
+            }
+            else if (style.lineType == 'dashed'
+                    || style.lineType == 'dotted'
+            ) {
+                if (style.smooth !== 'spline') {
+                    // 直线
+                    var dashLength = (style.lineWidth || 1)
+                                 * (style.lineType == 'dashed' ? 5 : 1);
+                    ctx.moveTo(pointList[0][0],pointList[0][1]);
+                    for (var i = 1; i < len; i++) {
+                        dashedLineTo(
+                            ctx,
+                            pointList[i - 1][0], pointList[i - 1][1],
+                            pointList[i][0], pointList[i][1],
+                            dashLength
+                        );
+                    }
+                }
+                else {
+                    // 曲线
+                    for (var i = 1; i < len; i += 2) {
+                        ctx.moveTo(pointList[i - 1][0],pointList[i - 1][1]);
+                        ctx.lineTo(pointList[i][0],pointList[i][1]);
+                    }
+                }
+            }
+        },
+
+        /**
+         * 标线始末标注
+         */
+        brushSymbol : function (ctx, style, idx) {
+            if (style.symbol[idx] == 'none') {
+                return;
+            }
+            ctx.save();
+            ctx.beginPath();
+
+            ctx.lineWidth = style.symbolBorder;
+            ctx.strokeStyle = style.symbolBorderColor;
+            // symbol
+            style.iconType = style.symbol[idx].replace('empty', '')
+                                              .toLowerCase();
+            if (style.symbol[idx].match('empty')) {
+                ctx.fillStyle = '#fff'; //'rgba(0, 0, 0, 0)';
+            }
+
+            // symbolRotate
+            var len = Math.min(
+                    style.pointList.length,
+                    Math.round(style.pointListLength || style.pointList.length)
+                );
+            var x = idx === 0 ? style.pointList[0][0] : style.pointList[len - 1][0];
+            var y = idx === 0 ? style.pointList[0][1] : style.pointList[len - 1][1];
+            var rotate = typeof style.symbolRotate[idx] != 'undefined'
+                         ? (style.symbolRotate[idx] - 0) : 0;
+            var transform;
+            if (rotate !== 0) {
+                transform = matrix.create();
+                matrix.identity(transform);
+                if (x || y ) {
+                    matrix.translate(transform, transform, [-x, -y]);
+                }
+                matrix.rotate(
+                    transform, transform,
+                    rotate * Math.PI / 180
+                );
+                if (x || y ) {
+                    matrix.translate(transform, transform, [x, y]);
+                }
+                ctx.transform.apply(ctx, transform);
+            }
+
+            if (style.iconType == 'arrow' && rotate === 0) {
+                // 箭头自动旋转，手动画
+                this.buildArrawPath(ctx, style, idx);
+            }
+            else {
+                // symbolSize
+                var symbolSize = style.symbolSize[idx];
+                style.x = x - symbolSize;
+                style.y = y - symbolSize,
+                style.width = symbolSize * 2;
+                style.height = symbolSize * 2;
+                IconShape.prototype.buildPath(ctx, style);
+            }
+
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+        },
+
+        buildArrawPath : function (ctx, style, idx) {
+            var len = Math.min(
+                    style.pointList.length,
+                    Math.round(style.pointListLength || style.pointList.length)
+                );
+            var symbolSize = style.symbolSize[idx] * 2;
+            var xStart = style.pointList[0][0];
+            var xEnd = style.pointList[len - 1][0];
+            var yStart = style.pointList[0][1];
+            var yEnd = style.pointList[len - 1][1];
+            var delta = 0;
+            if (style.smooth === 'spline') {
+                delta = 0.2; // 偏移0.2弧度
+            }
+            // 原谅我吧，这三角函数实在没想明白，只能这么笨了
+            var rotate = Math.atan(
+                    Math.abs((yEnd - yStart) / (xStart - xEnd)
+                ));
+            if (idx === 0) {
+                if (xEnd > xStart) {
+                    if (yEnd > yStart) {
+                        rotate =  Math.PI * 2 - rotate + delta;
+                    }
+                    else {
+                        rotate += delta;
+                    }
+                }
+                else {
+                    if (yEnd > yStart) {
+                        rotate += Math.PI - delta;
+                    }
+                    else {
+                        rotate = Math.PI - rotate - delta;
+                    }
+                }
+            }
+            else {
+                if (xStart > xEnd) {
+                    if (yStart > yEnd) {
+                        rotate =  Math.PI * 2 - rotate + delta;
+                    }
+                    else {
+                        rotate += delta;
+                    }
+                }
+                else {
+                    if (yStart > yEnd) {
+                        rotate += Math.PI - delta;
+                    }
+                    else {
+                        rotate = Math.PI - rotate - delta;
+                    }
+                }
+            }
+
+            var halfRotate = Math.PI / 8; // 夹角
+            var x = idx === 0 ? xStart : xEnd;
+            var y = idx === 0 ? yStart : yEnd;
+            var point= [
+                [
+                    x + symbolSize * Math.cos(rotate - halfRotate),
+                    y - symbolSize * Math.sin(rotate - halfRotate)
+                ],
+                [
+                    x + symbolSize * 0.6 * Math.cos(rotate),
+                    y - symbolSize * 0.6 * Math.sin(rotate)
+                ],
+                [
+                    x + symbolSize * Math.cos(rotate + halfRotate),
+                    y - symbolSize * Math.sin(rotate + halfRotate)
+                ]
+            ];
+            ctx.moveTo(x, y);
+            for (var i = 0, l = point.length; i <l; i++) {
+                ctx.lineTo(point[i][0], point[i][1]);
+            }
+            ctx.lineTo(x, y);
+        },
+
+        getPointList : function (style) {
+            var pointList = [
+                [style.xStart, style.yStart],
+                [style.xEnd, style.yEnd]
+            ];
+            if (style.smooth === 'spline') {
+                var lastPointX = pointList[1][0];
+                var lastPointY = pointList[1][1];
+                pointList[3] = [lastPointX, lastPointY];
+                pointList[1] = this.getOffetPoint(pointList[0], pointList[3]);
+                pointList[2] = this.getOffetPoint(pointList[3], pointList[0]);
+                pointList = smoothSpline(pointList, false);
+                // 修正最后一点在插值产生的偏移
+                pointList[pointList.length - 1] = [lastPointX, lastPointY];
+            }
+            return pointList;
+        },
+
+        /**
+         * {Array} start point
+         * {Array} end point
+         */
+        getOffetPoint : function (sp, ep) {
+            var distance = Math.sqrt(Math.round(
+                    (sp[0] - ep[0]) * (sp[0] - ep[0]) + (sp[1] - ep[1]) * (sp[1] - ep[1])
+                )) / 3;
+            //console.log(delta);
+            var mp = [sp[0], sp[1]];
+            var angle;
+            var deltaAngle = 0.2; // 偏移0.2弧度
+            if (sp[0] != ep[0] && sp[1] != ep[1]) {
+                // 斜率存在
+                var k = (ep[1] - sp[1]) / (ep[0] - sp[0]);
+                angle = Math.atan(k);
+            }
+            else if (sp[0] == ep[0]){
+                // 垂直线
+                angle = (sp[1] <= ep[1] ? 1 : -1) * Math.PI / 2;
+            }
+            else {
+                // 水平线
+                angle = 0;
+            }
+            var dX;
+            var dY;
+            if (sp[0] <= ep[0]) {
+                angle -= deltaAngle;
+                dX = Math.round(Math.cos(angle) * distance);
+                dY = Math.round(Math.sin(angle) * distance);
+                mp[0] += dX;
+                mp[1] += dY;
+            }
+            else {
+                angle += deltaAngle;
+                dX = Math.round(Math.cos(angle) * distance);
+                dY = Math.round(Math.sin(angle) * distance);
+                mp[0] -= dX;
+                mp[1] -= dY;
+            }
+            return mp;
+        },
+
+        /**
+         * 返回矩形区域，用于局部刷新和文字定位
+         * @param {Object} style
+         */
+        getRect : function (style) {
+            if (style.__rect) {
+                return style.__rect;
+            }
+
+            var lineWidth = style.lineWidth || 1;
+            style.__rect = {
+                x : Math.min(style.xStart, style.xEnd) - lineWidth,
+                y : Math.min(style.yStart, style.yEnd) - lineWidth,
+                width : Math.abs(style.xStart - style.xEnd)
+                        + lineWidth,
+                height : Math.abs(style.yStart - style.yEnd)
+                         + lineWidth
+            };
+
+            return style.__rect;
+        },
+
+        isCover : function (x, y) {
+            var originPos = this.getTansform(x, y);
+            x = originPos[0];
+            y = originPos[1];
+
+            // 快速预判并保留判断矩形
+            var rect = this.style.__rect;
+            if (!rect) {
+                rect = this.style.__rect = this.getRect(this.style);
+            }
+            if (x >= rect.x
+                && x <= (rect.x + rect.width)
+                && y >= rect.y
+                && y <= (rect.y + rect.height)
+            ) {
+                // 矩形内
+                return this.style.smooth !== 'spline'
+                       ? area.isInside(lineInstance, this.style, x, y)
+                       : area.isInside(brokenLineInstance, this.style, x, y);
+            }
+
+            return false;
+        }
+    };
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
+            var distance = 0;
+            for (var i = 1; i < len; i++) {
+                distance += vector.distance(points[i - 1], points[i]);
+            }
+            
+            var segs = distance / 5;
+            segs = segs < len ? len : segs;
+            for (var i = 0; i < segs; i++) {
+                var pos = i / (segs - 1) * (isLoop ? len : len - 1);
+                var idx = Math.floor(pos);
+=======
+    zrUtil.inherits(MarkLine, Base);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
                 var w = pos - idx;
 
                 var p0;
@@ -21139,6 +26549,8 @@ se = require('zrender/shape/Base');
 
     zrUtil.inherits(MarkLine, Base);
 
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     return MarkLine;
 });
 
@@ -21179,7 +26591,12 @@ define('echarts/util/shape/normalIsCover',[],function () {
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
+<<<<<<< HEAD
        // 样式属性，默       style  : {
+=======
+       // 样式属性，默认状态样式样式属性
+       style  : {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
            pointList     : {Array},   // 必须，二维数组，二维内容如下
                x         : {number},  // 必须，横坐标
                y         : {number},  // 必须，纵坐标数组
@@ -21490,13 +26907,18 @@ define('echarts/util/ecAnimation',['require','zrender/tool/util','zrender/shape/
      * @param {shape} oldShape
      * @param {shape} newShape
      * @param {number} duration
+<<<<<<< HEAD
      * @ng} easing
+=======
+     * @param {tring} easing
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
      */
     function pointList(zr, oldShape, newShape, duration, easing) {
         var newPointList = newShape.style.pointList;
         var newPointListLen = newPointList.length;
         var oldPointList;
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         self.zr =zr;
 
@@ -21596,6 +27018,14 @@ define('echarts/util/ecAnimation',['require','zrender/tool/util','zrender/shape/
                 for (var i = 0; i < newPointListLen; i++) {
                     oldPointList[i] = [newPointList[i][0], y];
 >>>>>>> refs/heads/branch_1.1.0
+=======
+        if (!oldShape) {        // add
+            oldPointList = [];
+            if (newShape._orient != 'vertical') {
+                var y = newPointList[0][1];
+                for (var i = 0; i < newPointListLen; i++) {
+                    oldPointList[i] = [newPointList[i][0], y];
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
                 }
             }
             else {
@@ -22128,7 +27558,12 @@ define('echarts/util/ecAnimation',['require','zrender/tool/util','zrender/shape/
  *           lineWidth: 3,
  *           text: 'Circle'
  *       }    
+<<<<<<< HEAD
  *  zr.addShape(shape);
+=======
+ *   });
+ *   zr.addShape(shape);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  */
 
 /**
@@ -22237,6 +27672,7 @@ define('echarts/util/ecEffect',['require','../util/ecData','zrender/shape/Circle
     var ecData = require('../util/ecData');
     
     var CircleShape = require('zrender/shape/Circle');
+<<<<<<< HEAD
     var ImageShape = require('zrender/shape/Imagar IconShape = require('../util/shape/Icon');
     var SymbolShape = require('../util/shape/Symbol');
     
@@ -22587,6 +28023,359 @@ define('echarts/chart/base',['require','zrender/shape/Image','../util/shape/Icon
     // 图形依赖
     var ImageShape = require('zrender/shape/Image');
     vae = require('../util/shape/Icon');
+=======
+    var ImageShape = require('zrender/shape/Image');
+    var IconShape = require('../util/shape/Icon');
+    var SymbolShape = require('../util/shape/Symbol');
+    
+    var canvasSupported = require('zrender/tool/env').canvasSupported;
+    
+    function point(zr, effectList, shape, zlevel) {
+        var effect = shape.effect;
+        var color = effect.color || shape.style.strokeColor || shape.style.color;
+        var shadowColor = effect.shadowColor || color;
+        var size = effect.scaleSize;
+        var shadowBlur = typeof effect.shadowBlur != 'undefined'
+                         ? effect.shadowBlur : size;
+
+        var effectShape = new IconShape({
+            zlevel : zlevel,
+            style : {
+                brushType : 'stroke',
+                iconType : (shape.style.iconType != 'pin' 
+                            && shape.style.iconType != 'droplet')
+                           ? shape.style.iconType
+                           : 'circle',
+                x : shadowBlur + 1, // 线宽
+                y : shadowBlur + 1,
+                n : shape.style.n,
+                width : shape.style.width * size,
+                height : shape.style.height * size,
+                lineWidth : 1,
+                strokeColor : color,
+                shadowColor : shadowColor,
+                shadowBlur : shadowBlur
+            },
+            draggable : false,
+            hoverable : false
+        });
+        
+        if (canvasSupported) {  // 提高性能，换成image
+            effectShape.style.image = zr.shapeToImage(
+                effectShape, 
+                effectShape.style.width + shadowBlur * 2 + 2, 
+                effectShape.style.height + shadowBlur * 2 + 2
+            ).style.image;
+            
+            effectShape = new ImageShape({
+                zlevel : effectShape.zlevel,
+                style : effectShape.style,
+                draggable : false,
+                hoverable : false
+            });
+        }
+        
+        ecData.clone(shape, effectShape);
+        
+        // 改变坐标，不能移到前面
+        effectShape.position = shape.position;
+        effectList.push(effectShape);
+        zr.addShape(effectShape);
+        
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        var offset = (effectShape.style.width / devicePixelRatio - shape.style.width) / 2;
+        effectShape.style.x = shape.style._x - offset;
+        effectShape.style.y = shape.style._y - offset;
+        var duration = (effect.period + Math.random() * 10) * 100;
+        
+        zr.modShape(
+            shape.id, 
+            { invisible : true}
+        );
+        
+        var centerX = effectShape.style.x + (effectShape.style.width) / 2 / devicePixelRatio;
+        var centerY = effectShape.style.y + (effectShape.style.height) / 2 / devicePixelRatio;
+        zr.modShape(
+            effectShape.id, 
+            {
+                scale : [0.1, 0.1, centerX, centerY]
+            }
+        );
+        
+        zr.animate(effectShape.id, '', effect.loop)
+            .when(
+                duration,
+                {
+                    scale : [1, 1, centerX, centerY]
+                }
+            )
+            .done(function() {
+                shape.effect.show = false;
+                zr.delShape(effectShape.id);
+            })
+            .start();
+    }
+    
+    function largePoint(zr, effectList, shape, zlevel) {
+        var effect = shape.effect;
+        var color = effect.color || shape.style.strokeColor || shape.style.color;
+        var size = effect.scaleSize;
+        var shadowColor = effect.shadowColor || color;
+        var shadowBlur = typeof effect.shadowBlur != 'undefined'
+                         ? effect.shadowBlur : (size * 2);
+        var devicePixelRatio = window.devicePixelRatio || 1;
+        var effectShape = new SymbolShape({
+            zlevel : zlevel,
+            position : shape.position,
+            scale : shape.scale,
+            style : {
+                pointList : shape.style.pointList,
+                iconType : shape.style.iconType,
+                color : color,
+                strokeColor : color,
+                shadowColor : shadowColor,
+                shadowBlur : shadowBlur * devicePixelRatio,
+                random : true,
+                brushType: 'fill',
+                lineWidth:1,
+                size : shape.style.size
+            },
+            draggable : false,
+            hoverable : false
+        });
+        
+        effectList.push(effectShape);
+        zr.addShape(effectShape);
+        zr.modShape(
+            shape.id, 
+            { invisible : true}
+        );
+        
+        var duration = Math.round(effect.period * 100);
+        var clip1 = {};
+        var clip2 = {};
+        for (var i = 0; i < 20; i++) {
+            effectShape.style['randomMap' + i] = 0;
+            clip1 = {};
+            clip1['randomMap' + i] = 100;
+            clip2 = {};
+            clip2['randomMap' + i] = 0;
+            effectShape.style['randomMap' + i] = Math.random() * 100;
+            zr.animate(effectShape.id, 'style', true)
+                .when(duration, clip1)
+                .when(duration * 2, clip2)
+                .when(duration * 3, clip1)
+                .when(duration * 4, clip1)
+                .delay(Math.random() * duration * i)
+                //.delay(duration / 15 * (15 - i + 1))
+                .start();
+            
+        }
+    }
+    
+    function line(zr, effectList, shape, zlevel) {
+        var effect = shape.effect;
+        var color = effect.color || shape.style.strokeColor || shape.style.color;
+        var shadowColor = effect.shadowColor || shape.style.strokeColor || color;
+        var size = shape.style.lineWidth * effect.scaleSize;
+        var shadowBlur = typeof effect.shadowBlur != 'undefined'
+                         ? effect.shadowBlur : size;
+                     
+        var effectShape = new CircleShape({
+            zlevel : zlevel,
+            style : {
+                x : shadowBlur,
+                y : shadowBlur,
+                r : size,
+                color : color,
+                shadowColor : shadowColor,
+                shadowBlur : shadowBlur
+            },
+            draggable : false,
+            hoverable : false
+        });
+        
+        var offset;
+        if (canvasSupported) {  // 提高性能，换成image
+            effectShape.style.image = zr.shapeToImage(
+                effectShape, 
+                (size + shadowBlur) * 2,
+                (size + shadowBlur) * 2
+            ).style.image;
+            effectShape = new ImageShape({
+                zlevel : effectShape.zlevel,
+                style : effectShape.style,
+                draggable : false,
+                hoverable : false
+            });
+            offset = shadowBlur;
+        }
+        else {
+            offset = 0;
+        }
+        
+        ecData.clone(shape, effectShape);
+        
+        // 改变坐标， 不能移到前面
+        effectShape.position = shape.position;
+        effectList.push(effectShape);
+        zr.addShape(effectShape);
+        
+        effectShape.style.x = shape.style.xStart - offset;
+        effectShape.style.y = shape.style.yStart - offset;
+        var distance = (shape.style.xStart - shape.style.xEnd) 
+                            * (shape.style.xStart - shape.style.xEnd)
+                        +
+                       (shape.style.yStart - shape.style.yEnd) 
+                            * (shape.style.yStart - shape.style.yEnd);
+        var duration = Math.round(Math.sqrt(Math.round(
+                           distance * effect.period * effect.period
+                       )));
+        if (!shape.style.smooth) {
+            // 直线
+            zr.animate(effectShape.id, 'style', effect.loop)
+                .when(
+                    duration,
+                    {
+                        x : shape._x - offset,
+                        y : shape._y - offset
+                    }
+                )
+                .done(function() {
+                    shape.effect.show = false;
+                    zr.delShape(effectShape.id);
+                })
+                .start();
+        }
+        else {
+            // 曲线
+            var pointList = shape.style.pointList || shape.getPointList(shape.style);
+            var len = pointList.length;
+            duration = Math.round(duration / len);
+            var deferred = zr.animate(effectShape.id, 'style', effect.loop);
+            var step = Math.ceil(len / 8);
+            for (var j = 0; j < len - step; j+= step) {
+                deferred.when(
+                    duration * (j + 1),
+                    {
+                        x : pointList[j][0] - offset,
+                        y : pointList[j][1] - offset
+                    }
+                );
+            }
+            deferred.when(
+                duration * len,
+                {
+                    x : pointList[len - 1][0] - offset,
+                    y : pointList[len - 1][1] - offset
+                }
+            );
+            deferred.done(function() {
+                shape.effect.show = false;
+                zr.delShape(effectShape.id);
+            });
+            deferred.start('spline');
+        }
+    }
+
+    return {
+        point : point,
+        largePoint : largePoint,
+        line : line
+    };
+});
+
+/**
+ * 高精度数学运算
+ */
+define('echarts/util/accMath',[],function() {
+    // 除法函数，用来得到精确的除法结果 
+    // 说明：javascript的除法结果会有误差，在两个浮点数相除的时候会比较明显。这个函数返回较为精确的除法结果。 
+    // 调用：accDiv(arg1,arg2) 
+    // 返回值：arg1除以arg2的精确结果
+    function accDiv(arg1,arg2){
+        var s1 = arg1.toString();
+        var s2 = arg2.toString(); 
+        var m = 0;
+        try {
+            m = s2.split('.')[1].length;
+        }
+        catch(e) {}
+        try {
+            m -= s1.split('.')[1].length;
+        }
+        catch(e) {}
+        
+        return (s1.replace('.', '') - 0) / (s2.replace('.', '') - 0) * Math.pow(10, m);
+    }
+
+    // 乘法函数，用来得到精确的乘法结果
+    // 说明：javascript的乘法结果会有误差，在两个浮点数相乘的时候会比较明显。这个函数返回较为精确的乘法结果。 
+    // 调用：accMul(arg1,arg2) 
+    // 返回值：arg1乘以arg2的精确结果
+    function accMul(arg1, arg2) {
+        var s1 = arg1.toString();
+        var s2 = arg2.toString();
+        var m = 0;
+        try {
+            m += s1.split('.')[1].length;
+        }
+        catch(e) {}
+        try {
+            m += s2.split('.')[1].length;
+        }
+        catch(e) {}
+        
+        return (s1.replace('.', '') - 0) * (s2.replace('.', '') - 0) / Math.pow(10, m);
+    }
+
+    // 加法函数，用来得到精确的加法结果 
+    // 说明：javascript的加法结果会有误差，在两个浮点数相加的时候会比较明显。这个函数返回较为精确的加法结果。 
+    // 调用：accAdd(arg1,arg2) 
+    // 返回值：arg1加上arg2的精确结果 
+    function accAdd(arg1, arg2) {
+        var r1 = 0;
+        var r2 = 0;
+        try {
+            r1 = arg1.toString().split('.')[1].length;
+        }
+        catch(e) {}
+        try {
+            r2 = arg2.toString().split('.')[1].length;
+        }
+        catch(e) {}
+        
+        var m = Math.pow(10, Math.max(r1, r2));
+        return (Math.round(arg1 * m) + Math.round(arg2 * m)) / m; 
+    }
+
+    //减法函数，用来得到精确的减法结果 
+    //说明：javascript的减法结果会有误差，在两个浮点数减法的时候会比较明显。这个函数返回较为精确的减法结果。 
+    //调用：accSub(arg1,arg2) 
+    //返回值：arg1减法arg2的精确结果 
+    function accSub(arg1,arg2) {
+        return accAdd(arg1, -arg2);
+    }
+
+    return {
+        accDiv : accDiv,
+        accMul : accMul,
+        accAdd : accAdd,
+        accSub : accSub
+    };
+});
+/**
+ * echarts图表基类
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/chart/base',['require','zrender/shape/Image','../util/shape/Icon','../util/shape/MarkLine','../util/shape/Symbol','../config','../util/ecData','../util/ecAnimation','../util/ecEffect','../util/accMath','zrender/tool/util','zrender/tool/area'],function (require) {
+    // 图形依赖
+    var ImageShape = require('zrender/shape/Image');
+    var IconShape = require('../util/shape/Icon');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var MarkLineShape = require('../util/shape/MarkLine');
     var SymbolShape = require('../util/shape/Symbol');
     
@@ -23559,6 +29348,7 @@ define('echarts/chart/base',['require','zrender/shape/Image','../util/shape/Icon
                 color = legend.getColor(serie.name);
             }
 <<<<<<< HEAD
+<<<<<<< HEAD
         }
         
         /**
@@ -23956,6 +29746,25 @@ define('echarts/chart/calculableBase',['require','../util/ecData','../util/accMa
                 // 有值域，并且值域返回null且用户没有自己定义颜色，则隐藏这个mark
                 if (nColor == null && eColor == null) {
 >>>>>>> refs/heads/branch_1.1.0
+=======
+            // 值域
+            if (dataRange) {
+                value = data[0] != null
+                        ? (data[0].value != null
+                          ? data[0].value
+                          : data[0])
+                        : '-';
+                color = isNaN(value) ? color : dataRange.getColor(value);
+                
+                nColor = this.deepQuery(
+                    queryTarget, 'itemStyle.normal.color'
+                ) || color;
+                eColor = this.deepQuery(
+                    queryTarget, 'itemStyle.emphasis.color'
+                ) || nColor;
+                // 有值域，并且值域返回null且用户没有自己定义颜色，则隐藏这个mark
+                if (nColor == null && eColor == null) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
                     return;
                 }
             }
@@ -24310,6 +30119,37 @@ define('echarts/chart',[],function (/*require*/) {     //chart
 
     /**
      * 获取图形实现
+     * @param {Object} name
+     */
+    self.get = function (name) {
+        return _chartLibrary[name];
+    };
+
+    return self;
+});
+/**
+ * echart图表库
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ */
+define('echarts/chart',[],function (/*require*/) {     //chart
+    var self = {};
+
+    var _chartLibrary = {};         //echart图表库
+
+    /**
+     * 定义图形实现
+     * @param {Object} name
+     * @param {Object} clazz 图形实现
+     */
+    self.define = function (name, clazz) {
+        _chartLibrary[name] = clazz;
+        return self;
+    };
+
+    /**
+     * 获取图形实现
      * @pct} name
      */
     self.get = function (name) {
@@ -24330,7 +30170,11 @@ define('echarts/chart/island',['require','../component/base','./base','zrender/s
     var ChartBase = require('./base');
     
     // 图形依赖
+<<<<<<< HEAD
     var CircleShape = requer/shape/Circle');
+=======
+    var CircleShape = require('zrender/shape/Circle');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     
     var ecConfig = require('../config');
     var ecData = require('../util/ecData');
@@ -24343,6 +30187,7 @@ define('echarts/chart/island',['require','../component/base','./base','zrender/s
      * @param {ZRender} zr zrender实例
      * @param {Object} option 图表选项
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
  n Island(messageCenter, zr) {
         // 基类装饰
@@ -24358,6 +30203,13 @@ define('echarts/chart/island',['require','../component/base','./base','zrender/s
         // 图表基类
         ChartBase.call(this);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function Island(ecTheme, messageCenter, zr, option, myChart) {
+        // 基类
+        ComponentBase.call(this, ecTheme, messageCenter, zr, {}, myChart);
+        // 图表基类
+        ChartBase.call(this);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         this._nameConnector;
         this._valueConnector;
@@ -24630,6 +30482,7 @@ define('echarts/component/dataView',['require','./base','../config','zrender/too
      * 构造函数
      * @param {Object} messageCenter echart消息中心
      * @param {ZRender} zr zrender实例
+<<<<<<< HEAD
      * @param {Object} option 提示框@param {HtmlElement} dom 目标对象
      */
     function DataView(ecTheme, messageCenter, zr, option, myChart) {
@@ -25089,6 +30942,468 @@ define('echarts/component/toolbox',['require','./base','zrender/shape/Line','zre
     // 图形依赖
     var LineShape = require('zrender/shape/Line');
     var ImageShape = require('zrenImage');
+=======
+     * @param {Object} option 提示框参数
+     * @param {HtmlElement} dom 目标对象
+     */
+    function DataView(ecTheme, messageCenter, zr, option, myChart) {
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+
+        this.dom = myChart.dom;
+        
+        // dataview dom & css
+        this._tDom = document.createElement('div');
+        this._textArea = document.createElement('textArea');
+        this._buttonRefresh = document.createElement('button');
+        this._buttonClose = document.createElement('button');
+        this._hasShow = false;
+
+        // 缓存一些高宽数据
+        this._zrHeight = zr.getHeight();
+        this._zrWidth = zr.getWidth();
+    
+        this._tDom.className = 'echarts-dataview',
+        this.hide();
+        this.dom.firstChild.appendChild(this._tDom);
+
+        if (window.addEventListener) {
+            this._tDom.addEventListener('click', this._stop);
+            this._tDom.addEventListener('mousewheel', this._stop);
+            this._tDom.addEventListener('mousemove', this._stop);
+            this._tDom.addEventListener('mousedown', this._stop);
+            this._tDom.addEventListener('mouseup', this._stop);
+
+            // mobile支持
+            this._tDom.addEventListener('touchstart', this._stop);
+            this._tDom.addEventListener('touchmove', this._stop);
+            this._tDom.addEventListener('touchend', this._stop);
+        }
+        else {
+            this._tDom.attachEvent('onclick', this._stop);
+            this._tDom.attachEvent('onmousewheel', this._stop);
+            this._tDom.attachEvent('onmousemove', this._stop);
+            this._tDom.attachEvent('onmousedown', this._stop);
+            this._tDom.attachEvent('onmouseup', this._stop);
+        }
+    }
+    
+    DataView.prototype = {
+        type : ecConfig.COMPONENT_TYPE_DATAVIEW,
+        _lang : ['Data View', 'close', 'refresh'],
+        // 通用样式
+        _gCssText : 'position:absolute;'
+                    + 'display:block;'
+                    + 'overflow:hidden;'
+                    + 'transition:height 0.8s,background-color 1s;'
+                    + '-moz-transition:height 0.8s,background-color 1s;'
+                    + '-webkit-transition:height 0.8s,background-color 1s;'
+                    + '-o-transition:height 0.8s,background-color 1s;'
+                    + 'z-index:1;'
+                    + 'left:0;'
+                    + 'top:0;',
+        hide : function () {
+            this._sizeCssText = 'width:' + this._zrWidth + 'px;'
+                           + 'height:' + 0 + 'px;'
+                           + 'background-color:#f0ffff;';
+            this._tDom.style.cssText = this._gCssText + this._sizeCssText;
+            // 这是个很恶心的事情
+            /*
+            this.dom.onselectstart = function () {
+                return false;
+            };
+            */
+        },
+
+        show : function (newOption) {
+            this._hasShow = true;
+            var lang = this.query(this.option, 'toolbox.feature.dataView.lang')
+                       || this._lang;
+
+            this.option = newOption;
+
+            this._tDom.innerHTML = '<p style="padding:8px 0;margin:0 0 10px 0;'
+                              + 'border-bottom:1px solid #eee">'
+                              + (lang[0] || this._lang[0])
+                              + '</p>';
+
+            this._textArea.style.cssText =
+                'display:block;margin:0 0 8px 0;padding:4px 6px;overflow:auto;'
+                + 'width:' + (this._zrWidth - 15) + 'px;'
+                + 'height:' + (this._zrHeight - 100) + 'px;';
+            var customContent = this.query(
+                this.option, 'toolbox.feature.dataView.optionToContent'
+            );
+            if (typeof customContent != 'function') {
+                this._textArea.value = this._optionToContent();
+            }
+            else {
+                this._textArea.value = customContent(this.option);
+            }
+            this._tDom.appendChild(this._textArea);
+
+            this._buttonClose.style.cssText = 'float:right;padding:1px 6px;';
+            this._buttonClose.innerHTML = lang[1] || this._lang[1];
+            var self = this;
+            this._buttonClose.onclick = function (){
+                self.hide();
+            };
+            this._tDom.appendChild(this._buttonClose);
+
+            if (this.query(this.option, 'toolbox.feature.dataView.readOnly')
+                === false
+            ) {
+                this._buttonRefresh.style.cssText =
+                    'float:right;margin-right:10px;padding:1px 6px;';
+                this._buttonRefresh.innerHTML = lang[2] || this._lang[2];
+                this._buttonRefresh.onclick = function (){
+                    self._save();
+                };
+                this._tDom.appendChild(this._buttonRefresh);
+                this._textArea.readOnly = false;
+                this._textArea.style.cursor = 'default';
+            }
+            else {
+                this._textArea.readOnly = true;
+                this._textArea.style.cursor = 'text';
+            }
+
+            this._sizeCssText = 'width:' + this._zrWidth + 'px;'
+                           + 'height:' + this._zrHeight + 'px;'
+                           + 'background-color:#fff;';
+            this._tDom.style.cssText = this._gCssText + this._sizeCssText;
+            // 这是个很恶心的事情
+            /*
+            this.dom.onselectstart = function () {
+                return true;
+            };
+            */
+        },
+
+        _optionToContent : function () {
+            var i;
+            var j;
+            var k;
+            var len;
+            var data;
+            var valueList;
+            var axisList = [];
+            var content = '';
+            if (this.option.xAxis) {
+                if (this.option.xAxis instanceof Array) {
+                    axisList = this.option.xAxis;
+                } else {
+                    axisList = [this.option.xAxis];
+                }
+                for (i = 0, len = axisList.length; i < len; i++) {
+                    // 横纵默认为类目
+                    if ((axisList[i].type || 'category') == 'category') {
+                        valueList = [];
+                        for (j = 0, k = axisList[i].data.length; j < k; j++) {
+                            data = axisList[i].data[j];
+                            valueList.push(
+                                typeof data.value != 'undefined'
+                                ? data.value : data
+                            );
+                        }
+                        content += valueList.join(', ') + '\n\n';
+                    }
+                }
+            }
+
+            if (this.option.yAxis) {
+                if (this.option.yAxis instanceof Array) {
+                    axisList = this.option.yAxis;
+                } else {
+                    axisList = [this.option.yAxis];
+                }
+                for (i = 0, len = axisList.length; i < len; i++) {
+                    if (axisList[i].type  == 'category') {
+                        valueList = [];
+                        for (j = 0, k = axisList[i].data.length; j < k; j++) {
+                            data = axisList[i].data[j];
+                            valueList.push(
+                                typeof data.value != 'undefined'
+                                ? data.value : data
+                            );
+                        }
+                        content += valueList.join(', ') + '\n\n';
+                    }
+                }
+            }
+
+            var series = this.option.series;
+            var itemName;
+            for (i = 0, len = series.length; i < len; i++) {
+                valueList = [];
+                for (j = 0, k = series[i].data.length; j < k; j++) {
+                    data = series[i].data[j];
+                    if (series[i].type == ecConfig.CHART_TYPE_PIE
+                        || series[i].type == ecConfig.CHART_TYPE_MAP
+                    ) {
+                        itemName = (data.name || '-') + ':';
+                    }
+                    else {
+                        itemName = '';
+                    }
+                    
+                    if (series[i].type == ecConfig.CHART_TYPE_SCATTER) {
+                        data = typeof data.value != 'undefined' 
+                               ? data.value
+                               : data;
+                        data = data.join(', ');
+                    }
+                    valueList.push(
+                        itemName
+                        + (typeof data.value != 'undefined' ? data.value : data)
+                    );
+                }
+                content += (series[i].name || '-') + ' : \n';
+                content += valueList.join(
+                    series[i].type == ecConfig.CHART_TYPE_SCATTER ? '\n': ', '
+                );
+                content += '\n\n';
+            }
+
+            return content;
+        },
+
+        _save : function () {
+            var text = this._textArea.value;
+            var customContent = this.query(
+                this.option, 'toolbox.feature.dataView.contentToOption'
+            );
+            if (typeof customContent != 'function') {
+                text = text.split('\n');
+                var content = [];
+                for (var i = 0, l = text.length; i < l; i++) {
+                    text[i] = this._trim(text[i]);
+                    if (text[i] !== '') {
+                        content.push(text[i]);
+                    }
+                }
+                this._contentToOption(content);
+            }
+            else {
+                customContent(text, this.option);
+            }
+
+            this.hide();
+            
+            var self = this;
+            setTimeout(
+                function (){
+                    self.messageCenter && self.messageCenter.dispatch(
+                        ecConfig.EVENT.DATA_VIEW_CHANGED,
+                        null,
+                        {option : self.option},
+                        self.myChart
+                    );
+                },
+                // 有动画，所以高级浏览器时间更长点
+                self.canvasSupported ? 800 : 100
+            );
+        },
+
+        _contentToOption : function (content) {
+            var i;
+            var j;
+            var k;
+            var len;
+            var data;
+            var axisList = [];
+
+            var contentIdx = 0;
+            var contentValueList;
+            var value;
+
+            if (this.option.xAxis) {
+                if (this.option.xAxis instanceof Array) {
+                    axisList = this.option.xAxis;
+                } else {
+                    axisList = [this.option.xAxis];
+                }
+                for (i = 0, len = axisList.length; i < len; i++) {
+                    // 横纵默认为类目
+                    if ((axisList[i].type || 'category') == 'category'
+                    ) {
+                        contentValueList = content[contentIdx].split(',');
+                        for (j = 0, k = axisList[i].data.length; j < k; j++) {
+                            value = this._trim(contentValueList[j] || '');
+                            data = axisList[i].data[j];
+                            if (typeof axisList[i].data[j].value != 'undefined'
+                            ) {
+                                axisList[i].data[j].value = value;
+                            }
+                            else {
+                                axisList[i].data[j] = value;
+                            }
+                        }
+                        contentIdx++;
+                    }
+                }
+            }
+
+            if (this.option.yAxis) {
+                if (this.option.yAxis instanceof Array) {
+                    axisList = this.option.yAxis;
+                } else {
+                    axisList = [this.option.yAxis];
+                }
+                for (i = 0, len = axisList.length; i < len; i++) {
+                    if (axisList[i].type  == 'category') {
+                        contentValueList = content[contentIdx].split(',');
+                        for (j = 0, k = axisList[i].data.length; j < k; j++) {
+                            value = this._trim(contentValueList[j] || '');
+                            data = axisList[i].data[j];
+                            if (typeof axisList[i].data[j].value != 'undefined'
+                            ) {
+                                axisList[i].data[j].value = value;
+                            }
+                            else {
+                                axisList[i].data[j] = value;
+                            }
+                        }
+                        contentIdx++;
+                    }
+                }
+            }
+
+            var series = this.option.series;
+            for (i = 0, len = series.length; i < len; i++) {
+                contentIdx++;
+                if (series[i].type == ecConfig.CHART_TYPE_SCATTER) {
+                    for (var j = 0, k = series[i].data.length; j < k; j++) {
+                        contentValueList = content[contentIdx];
+                        value = contentValueList.replace(' ','').split(',');
+                        if (typeof series[i].data[j].value != 'undefined'
+                        ) {
+                            series[i].data[j].value = value;
+                        }
+                        else {
+                            series[i].data[j] = value;
+                        }
+                        contentIdx++;
+                    }
+                }
+                else {
+                    contentValueList = content[contentIdx].split(',');
+                    for (var j = 0, k = series[i].data.length; j < k; j++) {
+                        value = (contentValueList[j] || '').replace(/.*:/,'');
+                        value = this._trim(value);
+                        value = (value != '-' && value !== '')
+                                ? (value - 0)
+                                : '-';
+                        if (typeof series[i].data[j].value != 'undefined'
+                        ) {
+                            series[i].data[j].value = value;
+                        }
+                        else {
+                            series[i].data[j] = value;
+                        }
+                    }
+                    contentIdx++;
+                }
+            }
+        },
+
+        _trim : function (str){
+            var trimer = new RegExp(
+                '(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)', 'g'
+            );
+            return str.replace(trimer, '');
+        },
+
+        // 阻塞zrender事件
+        _stop : function (e){
+            e = e || window.event;
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            else {
+                e.cancelBubble = true;
+            }
+        },
+
+        /**
+         * zrender事件响应：窗口大小改变
+         */
+        resize : function () {
+            this._zrHeight = this.zr.getHeight();
+            this._zrWidth = this.zr.getWidth();
+            if (this._tDom.offsetHeight > 10) {
+                this._sizeCssText = 'width:' + this._zrWidth + 'px;'
+                               + 'height:' + this._zrHeight + 'px;'
+                               + 'background-color:#fff;';
+                this._tDom.style.cssText = this._gCssText + this._sizeCssText;
+                this._textArea.style.cssText = 'display:block;margin:0 0 8px 0;'
+                                        + 'padding:4px 6px;overflow:auto;'
+                                        + 'width:' + (this._zrWidth - 15) + 'px;'
+                                        + 'height:' + (this._zrHeight - 100) + 'px;';
+            }
+        },
+
+        /**
+         * 释放后实例不可用，重载基类方法
+         */
+        dispose : function () {
+            if (window.removeEventListener) {
+                this._tDom.removeEventListener('click', this._stop);
+                this._tDom.removeEventListener('mousewheel', this._stop);
+                this._tDom.removeEventListener('mousemove', this._stop);
+                this._tDom.removeEventListener('mousedown', this._stop);
+                this._tDom.removeEventListener('mouseup', this._stop);
+
+                // mobile支持
+                this._tDom.removeEventListener('touchstart', this._stop);
+                this._tDom.removeEventListener('touchmove', this._stop);
+                this._tDom.removeEventListener('touchend', this._stop);
+            }
+            else {
+                this._tDom.detachEvent('onclick', this._stop);
+                this._tDom.detachEvent('onmousewheel', this._stop);
+                this._tDom.detachEvent('onmousemove', this._stop);
+                this._tDom.detachEvent('onmousedown', this._stop);
+                this._tDom.detachEvent('onmouseup', this._stop);
+            }
+
+            this._buttonRefresh.onclick = null;
+            this._buttonClose.onclick = null;
+
+            if (this._hasShow) {
+                this._tDom.removeChild(this._textArea);
+                this._tDom.removeChild(this._buttonRefresh);
+                this._tDom.removeChild(this._buttonClose);
+            }
+
+            this._textArea = null;
+            this._buttonRefresh = null;
+            this._buttonClose = null;
+
+            this.dom.firstChild.removeChild(this._tDom);
+            this._tDom = null;
+        }
+    };
+    
+    zrUtil.inherits(DataView, Base);
+    
+    require('../component').define('dataView', DataView);
+    
+    return DataView;
+});
+/**
+ * echarts组件：工具箱
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/component/toolbox',['require','./base','zrender/shape/Line','zrender/shape/Image','zrender/shape/Rectangle','../util/shape/Icon','../config','zrender/tool/util','zrender/config','zrender/tool/event','./dataView','../component'],function (require) {
+    var Base = require('./base');
+    
+    // 图形依赖
+    var LineShape = require('zrender/shape/Line');
+    var ImageShape = require('zrender/shape/Image');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var RectangleShape = require('zrender/shape/Rectangle');
     var IconShape = require('../util/shape/Icon');
     
@@ -26204,7 +32519,12 @@ define('echarts/component/title',['require','./base','zrender/shape/Text','zrend
     var TextShape = require('zrender/shape/Text');
     var RectangleShape = require('zrender/shape/Rectangle');
     
+<<<<<<< HEAD
     var ecConfig = require('../co  var zrUtil = require('zrender/tool/util');
+=======
+    var ecConfig = require('../config');
+    var zrUtil = require('zrender/tool/util');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var zrArea = require('zrender/tool/area');
     var zrColor = require('zrender/tool/color');
     
@@ -26214,6 +32534,7 @@ define('echarts/component/title',['require','./base','zrender/shape/Text','zrend
      * @param {ZRender} zr zrender实例
      * @param {Object} option 图表参数
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     function Title(messageCenter, zr, option) {
         var Base = require('./bas   Base.call(this, zr);
@@ -26230,6 +32551,19 @@ define('echarts/component/title',['require','./base','zrender/shape/Text','zrend
             // 标题元素组的位置参数，通过计算所得x, y, width, height
             this._itemGroupLocation = this._getItemGroupLocation();
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function Title(ecTheme, messageCenter, zr, option, myChart) {
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+        
+        this.refresh(option);
+    }
+    
+    Title.prototype = {
+        type: ecConfig.COMPONENT_TYPE_TITLE,
+        _buildShape: function () {
+            // 标题元素组的位置参数，通过计算所得x, y, width, height
+            this._itemGroupLocation = this._getItemGroupLocation();
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
             this._buildBackground();
             this._buildItem();
@@ -26493,6 +32827,7 @@ define('echarts/component/title',['require','./base','zrender/shape/Text','zrend
        style  : {
            rect      : {Object},  // 必须，对角框
            x         : {number},  // 必须，横坐标
+<<<<<<< HEAD
            : {number},  // 必须，纵坐标
        },
 
@@ -33715,6 +40050,7235 @@ define('echarts/chart/funnel',['require','../component/base','./base','zrender/s
     var TextShape = require('zrender/shape/Text');
     var LineShape = require('zrender/shape/Line');
     var PolygonShape = require('zrender/shape/Polygonar ecConfig = require('../config');
+=======
+           y         : {number},  // 必须，纵坐标
+       },
+
+       // 样式属性，高亮样式属性，当不存在highlightStyle时使用基于默认样式扩展显示
+       highlightStyle : {
+           // 同style
+       }
+
+       // 交互属性，详见shape.Base
+
+       // 事件属性，详见shape.Base
+   }
+ */
+define('echarts/util/shape/Cross',['require','zrender/shape/Base','zrender/shape/Line','zrender/tool/util','./normalIsCover'],function (require) {
+    var Base = require('zrender/shape/Base');
+    var LineShape = require('zrender/shape/Line');
+    var zrUtil = require('zrender/tool/util');
+
+    function Cross(options) {
+        Base.call(this, options);
+    }
+
+    Cross.prototype =  {
+        type : 'cross',
+
+        /**
+         * 创建矩形路径
+         * @param {Context2D} ctx Canvas 2D上下文
+         * @param {Object} style 样式
+         */
+        buildPath : function (ctx, style) {
+            var rect = style.rect;
+            style.xStart = rect.x;
+            style.xEnd = rect.x + rect.width;
+            style.yStart = style.yEnd = style.y;
+            LineShape.prototype.buildPath(ctx, style);
+            style.xStart = style.xEnd = style.x;
+            style.yStart = rect.y;
+            style.yEnd = rect.y + rect.height;
+            LineShape.prototype.buildPath(ctx, style);
+        },
+
+        /**
+         * 返回矩形区域，用于局部刷新和文字定位
+         * @param {Object} style
+         */
+        getRect : function (style) {
+            return style.rect;
+        },
+
+        isCover : require('./normalIsCover')
+    };
+
+    zrUtil.inherits(Cross, Base);
+
+    return Cross;
+});
+
+/**
+ * echarts组件：提示框
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/component/tooltip',['require','./base','../util/shape/Cross','zrender/shape/Line','zrender/shape/Rectangle','../config','../util/ecData','zrender/config','zrender/tool/event','zrender/tool/area','zrender/tool/color','zrender/tool/util','zrender/shape/Base','../component'],function (require) {
+    var Base = require('./base');
+    
+    // 图形依赖
+    var CrossShape = require('../util/shape/Cross');
+    var LineShape = require('zrender/shape/Line');
+    var RectangleShape = require('zrender/shape/Rectangle');
+    var rectangleInstance = new RectangleShape({});
+    
+    var ecConfig = require('../config');
+    var ecData = require('../util/ecData');
+    var zrConfig = require('zrender/config');
+    var zrEvent = require('zrender/tool/event');
+    var zrArea = require('zrender/tool/area');
+    var zrColor = require('zrender/tool/color');
+    var zrUtil = require('zrender/tool/util');
+    var zrShapeBase = require('zrender/shape/Base');
+
+    /**
+     * 构造函数
+     * @param {Object} messageCenter echart消息中心
+     * @param {ZRender} zr zrender实例
+     * @param {Object} option 提示框参数
+     * @param {HtmlElement} dom 目标对象
+     * @param {ECharts} myChart 当前图表实例
+     */
+    function Tooltip(ecTheme, messageCenter, zr, option, myChart) {
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+        
+        this.dom = myChart.dom;
+        
+        var self = this;
+        self._onmousemove = function (param) {
+            return self.__onmousemove(param);
+        };
+        self._onglobalout = function (param) {
+            return self.__onglobalout(param);
+        };
+        
+        this.zr.on(zrConfig.EVENT.MOUSEMOVE, self._onmousemove);
+        this.zr.on(zrConfig.EVENT.GLOBALOUT, self._onglobalout);
+
+        self._hide = function (param) {
+            return self.__hide(param);
+        };
+        self._tryShow = function(param) {
+            return self.__tryShow(param);
+        };
+        self._refixed = function(param) {
+            return self.__refixed(param);
+        };
+        
+        self._setContent = function(ticket, res) {
+            return self.__setContent(ticket, res);
+        };
+        
+        this._tDom = this._tDom || document.createElement('div');
+        // 避免拖拽时页面选中的尴尬
+        this._tDom.onselectstart = function() {
+            return false;
+        };
+        this._tDom.style.position = 'absolute';  // 不是多余的，别删！
+        this.hasAppend = false;
+        
+        this._axisLineShape && this.zr.delShape(this._axisLineShape.id);
+        this._axisLineShape = new LineShape({
+            zlevel: this._zlevelBase,
+            invisible: true,
+            hoverable: false
+        });
+        this.shapeList.push(this._axisLineShape);
+        this.zr.addShape(this._axisLineShape);
+        
+        this._axisShadowShape && this.zr.delShape(this._axisShadowShape.id);
+        this._axisShadowShape = new LineShape({
+            zlevel: 1,                      // grid上，chart下
+            invisible: true,
+            hoverable: false
+        });
+        this.shapeList.push(this._axisShadowShape);
+        this.zr.addShape(this._axisShadowShape);
+        
+        this._axisCrossShape && this.zr.delShape(this._axisCrossShape.id);
+        this._axisCrossShape = new CrossShape({
+            zlevel: this._zlevelBase,
+            invisible: true,
+            hoverable: false
+        });
+        this.shapeList.push(this._axisCrossShape);
+        this.zr.addShape(this._axisCrossShape);
+        
+        this.showing = false;
+        this.refresh(option);
+    }
+    
+    Tooltip.prototype = {
+        type: ecConfig.COMPONENT_TYPE_TOOLTIP,
+        // 通用样式
+        _gCssText: 'position:absolute;display:block;border-style:solid;white-space:nowrap;',
+        /**
+         * 根据配置设置dom样式
+         */
+        _style: function (opt) {
+            if (!opt) {
+                return '';
+            }
+            var cssText = [];
+            if (opt.transitionDuration) {
+                var transitionText = 'left ' + opt.transitionDuration + 's,'
+                                    + 'top ' + opt.transitionDuration + 's';
+                cssText.push(
+                    'transition:' + transitionText
+                );
+                cssText.push(
+                    '-moz-transition:' + transitionText
+                );
+                cssText.push(
+                    '-webkit-transition:' + transitionText
+                );
+                cssText.push(
+                    '-o-transition:' + transitionText
+                );
+            }
+
+            if (opt.backgroundColor) {
+                // for sb ie~
+                cssText.push(
+                    'background-Color:' + zrColor.toHex(
+                        opt.backgroundColor
+                    )
+                );
+                cssText.push('filter:alpha(opacity=70)');
+                cssText.push('background-Color:' + opt.backgroundColor);
+            }
+
+            if (opt.borderWidth != null) {
+                cssText.push('border-width:' + opt.borderWidth + 'px');
+            }
+
+            if (opt.borderColor != null) {
+                cssText.push('border-color:' + opt.borderColor);
+            }
+
+            if (opt.borderRadius != null) {
+                cssText.push(
+                    'border-radius:' + opt.borderRadius + 'px'
+                );
+                cssText.push(
+                    '-moz-border-radius:' + opt.borderRadius + 'px'
+                );
+                cssText.push(
+                    '-webkit-border-radius:' + opt.borderRadius + 'px'
+                );
+                cssText.push(
+                    '-o-border-radius:' + opt.borderRadius + 'px'
+                );
+            }
+
+            var textStyle = opt.textStyle;
+            if (textStyle) {
+                textStyle.color && cssText.push('color:' + textStyle.color);
+                textStyle.decoration && cssText.push(
+                    'text-decoration:' + textStyle.decoration
+                );
+                textStyle.align && cssText.push(
+                    'text-align:' + textStyle.align
+                );
+                textStyle.fontFamily && cssText.push(
+                    'font-family:' + textStyle.fontFamily
+                );
+                textStyle.fontSize && cssText.push(
+                    'font-size:' + textStyle.fontSize + 'px'
+                );
+                textStyle.fontSize && cssText.push(
+                    'line-height:' + Math.round(textStyle.fontSize*3/2) + 'px'
+                );
+                textStyle.fontStyle && cssText.push(
+                    'font-style:' + textStyle.fontStyle
+                );
+                textStyle.fontWeight && cssText.push(
+                    'font-weight:' + textStyle.fontWeight
+                );
+            }
+
+
+            var padding = opt.padding;
+            if (padding != null) {
+                padding = this.reformCssArray(padding);
+                cssText.push(
+                    'padding:' + padding[0] + 'px '
+                               + padding[1] + 'px '
+                               + padding[2] + 'px '
+                               + padding[3] + 'px'
+                );
+            }
+
+            cssText = cssText.join(';') + ';';
+
+            return cssText;
+        },
+        
+        __hide: function () {
+            if (this._tDom) {
+                this._tDom.style.display = 'none';
+            }
+            var needRefresh = false;
+            if (!this._axisLineShape.invisible) {
+                this._axisLineShape.invisible = true;
+                this.zr.modShape(this._axisLineShape.id);
+                needRefresh = true;
+            }
+            if (!this._axisShadowShape.invisible) {
+                this._axisShadowShape.invisible = true;
+                this.zr.modShape(this._axisShadowShape.id);
+                needRefresh = true;
+            }
+            if (!this._axisCrossShape.invisible) {
+                this._axisCrossShape.invisible = true;
+                this.zr.modShape(this._axisCrossShape.id);
+                needRefresh = true;
+            }
+            if (this._lastTipShape && this._lastTipShape.tipShape.length > 0) {
+                this.zr.delShape(this._lastTipShape.tipShape);
+                this._lastTipShape = false;
+                this.shapeList.length = 2;
+            }
+            needRefresh && this.zr.refresh();
+            this.showing = false;
+        },
+        
+        _show: function (position, x, y, specialCssText) {
+            var domHeight = this._tDom.offsetHeight;
+            var domWidth = this._tDom.offsetWidth;
+            if (position) {
+                if (typeof position === 'function') {
+                    position = position([x, y]);
+                }
+                if (position instanceof Array) {
+                    x = position[0];
+                    y = position[1];
+                }
+            }
+            if (x + domWidth > this._zrWidth) {
+                // 太靠右
+                //x = this._zrWidth - domWidth;
+                x -= (domWidth + 40);
+            }
+            if (y + domHeight > this._zrHeight) {
+                // 太靠下
+                //y = this._zrHeight - domHeight;
+                y -= (domHeight - 20);
+            }
+            if (y < 20) {
+                y = 0;
+            }
+            this._tDom.style.cssText = this._gCssText
+                                  + this._defaultCssText
+                                  + (specialCssText ? specialCssText : '')
+                                  + 'left:' + x + 'px;top:' + y + 'px;';
+            
+            if (domHeight < 10 || domWidth < 10) {
+                // this._zrWidth - x < 100 || this._zrHeight - y < 100
+                setTimeout(this._refixed, 20);
+            }
+            this.showing = true;
+        },
+        
+        __refixed: function () {
+            if (this._tDom) {
+                var cssText = '';
+                var domHeight = this._tDom.offsetHeight;
+                var domWidth = this._tDom.offsetWidth;
+                if (this._tDom.offsetLeft + domWidth > this._zrWidth) {
+                    cssText += 'left:' + (this._zrWidth - domWidth - 20) + 'px;';
+                }
+                if (this._tDom.offsetTop + domHeight > this._zrHeight) {
+                    cssText += 'top:' + (this._zrHeight - domHeight - 10) + 'px;';
+                }
+                if (cssText !== '') {
+                    this._tDom.style.cssText += cssText;
+                }
+            }
+        },
+        
+        __tryShow: function () {
+            var needShow;
+            var trigger;
+            if (!this._curTarget) {
+                // 坐标轴事件
+                this._findPolarTrigger() || this._findAxisTrigger();
+            }
+            else {
+                // 数据项事件
+                if (this._curTarget._type === 'island' && this.option.tooltip.show) {
+                    this._showItemTrigger();
+                    return;
+                }
+                var serie = ecData.get(this._curTarget, 'series');
+                var data = ecData.get(this._curTarget, 'data');
+                needShow = this.deepQuery(
+                    [data, serie, this.option],
+                    'tooltip.show'
+                );
+                if (serie == null || data == null || !needShow) {
+                    // 不响应tooltip的数据对象延时隐藏
+                    clearTimeout(this._hidingTicket);
+                    clearTimeout(this._showingTicket);
+                    this._hidingTicket = setTimeout(this._hide, this._hideDelay);
+                }
+                else {
+                    trigger = this.deepQuery(
+                        [data, serie, this.option],
+                        'tooltip.trigger'
+                    );
+                    
+                    trigger === 'axis'
+                               ? this._showAxisTrigger(
+                                     serie.xAxisIndex, serie.yAxisIndex,
+                                     ecData.get(this._curTarget, 'dataIndex')
+                                 )
+                               : this._showItemTrigger();
+                }
+            }
+        },
+
+        /**
+         * 直角系 
+         */
+        _findAxisTrigger: function () {
+            if (!this.component.xAxis || !this.component.yAxis) {
+                this._hidingTicket = setTimeout(this._hide, this._hideDelay);
+                return;
+            }
+            var series = this.option.series;
+            var xAxisIndex;
+            var yAxisIndex;
+            for (var i = 0, l = series.length; i < l; i++) {
+                // 找到第一个axis触发tooltip的系列
+                if (this.deepQuery([series[i], this.option], 'tooltip.trigger') === 'axis') {
+                    xAxisIndex = series[i].xAxisIndex || 0;
+                    yAxisIndex = series[i].yAxisIndex || 0;
+                    if (this.component.xAxis.getAxis(xAxisIndex)
+                        && this.component.xAxis.getAxis(xAxisIndex).type
+                           === ecConfig.COMPONENT_TYPE_AXIS_CATEGORY
+                    ) {
+                        // 横轴为类目轴
+                        this._showAxisTrigger(xAxisIndex, yAxisIndex,
+                            this._getNearestDataIndex(
+                                'x', this.component.xAxis.getAxis(xAxisIndex)
+                            )
+                        );
+                        return;
+                    } 
+                    else if (this.component.yAxis.getAxis(yAxisIndex)
+                             && this.component.yAxis.getAxis(yAxisIndex).type
+                                === ecConfig.COMPONENT_TYPE_AXIS_CATEGORY
+                    ) {
+                        // 纵轴为类目轴
+                        this._showAxisTrigger(xAxisIndex, yAxisIndex,
+                            this._getNearestDataIndex(
+                                'y', this.component.yAxis.getAxis(yAxisIndex)
+                            )
+                        );
+                        return;
+                    }
+                    else {
+                        // 双数值轴
+                        this._showAxisTrigger(xAxisIndex, yAxisIndex, -1);
+                        return;
+                    }
+                }
+            }
+            if (this.option.tooltip.axisPointer.type === 'cross') {
+                this._showAxisTrigger(-1, -1, -1);
+            }
+        },
+        
+        /**
+         * 极坐标 
+         */
+        _findPolarTrigger: function () {
+            if (!this.component.polar) {
+                return false;
+            }
+            var x = zrEvent.getX(this._event);
+            var y = zrEvent.getY(this._event);
+            var polarIndex = this.component.polar.getNearestIndex([x, y]);
+            var valueIndex;
+            if (polarIndex) {
+                valueIndex = polarIndex.valueIndex;
+                polarIndex = polarIndex.polarIndex;
+            }
+            else {
+                polarIndex = -1;
+            }
+            
+            if (polarIndex != -1) {
+                return this._showPolarTrigger(polarIndex, valueIndex);
+            }
+            
+            return false;
+        },
+        
+        /**
+         * 根据坐标轴事件带的属性获取最近的axisDataIndex
+         */
+        _getNearestDataIndex: function (direction, categoryAxis) {
+            var dataIndex = -1;
+            var x = zrEvent.getX(this._event);
+            var y = zrEvent.getY(this._event);
+            if (direction === 'x') {
+                // 横轴为类目轴
+                var left;
+                var right;
+                var xEnd = this.component.grid.getXend();
+                var curCoord = categoryAxis.getCoordByIndex(dataIndex);
+                while (curCoord < xEnd) {
+                    right = curCoord;
+                    if (curCoord <= x) {
+                        left = curCoord;
+                    }
+                    else {
+                        break;
+                    }
+                    curCoord = categoryAxis.getCoordByIndex(++dataIndex);
+                }
+                if (dataIndex <= 0) {
+                    dataIndex = 0;
+                }
+                else if (x - left <= right - x) {
+                    dataIndex -= 1;
+                }
+                else {
+                    // 离右边近，看是否为最后一个
+                    if (categoryAxis.getNameByIndex(dataIndex) == null) {
+                        dataIndex -= 1;
+                    }
+                }
+                return dataIndex;
+            }
+            else {
+                // 纵轴为类目轴
+                var top;
+                var bottom;
+                var yStart = this.component.grid.getY();
+                var curCoord = categoryAxis.getCoordByIndex(dataIndex);
+                while (curCoord > yStart) {
+                    top = curCoord;
+                    if (curCoord >= y) {
+                        bottom = curCoord;
+                    }
+                    else {
+                        break;
+                    }
+                    curCoord = categoryAxis.getCoordByIndex(++dataIndex);
+                }
+
+                if (dataIndex <= 0) {
+                    dataIndex = 0;
+                }
+                else if (y - top >= bottom - y) {
+                    dataIndex -= 1;
+                }
+                else {
+                    // 离上方边近，看是否为最后一个
+                    if (categoryAxis.getNameByIndex(dataIndex) == null) {
+                        dataIndex -= 1;
+                    }
+                }
+                return dataIndex;
+            }
+            return -1;
+        },
+
+        /**
+         * 直角系 
+         */
+        _showAxisTrigger: function (xAxisIndex, yAxisIndex, dataIndex) {
+            !this._event.connectTrigger && this.messageCenter.dispatch(
+                ecConfig.EVENT.TOOLTIP_IN_GRID,
+                this._event,
+                null,
+                this.myChart
+            );
+            if (this.component.xAxis == null
+                || this.component.yAxis == null
+                || xAxisIndex == null
+                || yAxisIndex == null
+                // || dataIndex < 0
+            ) {
+                // 不响应tooltip的数据对象延时隐藏
+                clearTimeout(this._hidingTicket);
+                clearTimeout(this._showingTicket);
+                this._hidingTicket = setTimeout(this._hide, this._hideDelay);
+                return;
+            }
+            var series = this.option.series;
+            var seriesArray = [];
+            var seriesIndex = [];
+            var categoryAxis;
+            var x;
+            var y;
+
+            var formatter;
+            var position;
+            var showContent;
+            var specialCssText = '';
+            if (this.option.tooltip.trigger === 'axis') {
+                if (!this.option.tooltip.show) {
+                    return;
+                }
+                formatter = this.option.tooltip.formatter;
+                position = this.option.tooltip.position;
+            }
+
+            if (xAxisIndex != -1
+                && this.component.xAxis.getAxis(xAxisIndex).type
+                   === ecConfig.COMPONENT_TYPE_AXIS_CATEGORY
+            ) {
+                // 横轴为类目轴，找到所有用这条横轴并且axis触发的系列数据
+                categoryAxis = this.component.xAxis.getAxis(xAxisIndex);
+                for (var i = 0, l = series.length; i < l; i++) {
+                    if (!this._isSelected(series[i].name)) {
+                        continue;
+                    }
+                    if (series[i].xAxisIndex === xAxisIndex
+                        && this.deepQuery([series[i], this.option], 'tooltip.trigger') === 'axis'
+                    ) {
+                        showContent = this.query(series[i], 'tooltip.showContent') 
+                                      || showContent;
+                        formatter = this.query(series[i], 'tooltip.formatter') 
+                                    || formatter;
+                        position = this.query(series[i], 'tooltip.position') 
+                                   || position;
+                        
+                        specialCssText += this._style(this.query(series[i], 'tooltip'));
+                        if (series[i].stack != null) {
+                            seriesArray.unshift(series[i]);
+                            seriesIndex.unshift(i);
+                        }
+                        else {
+                            seriesArray.push(series[i]);
+                            seriesIndex.push(i);
+                        }
+                    }
+                }
+                
+                // 寻找高亮元素
+                this.messageCenter.dispatch(
+                    ecConfig.EVENT.TOOLTIP_HOVER,
+                    this._event,
+                    {
+                        seriesIndex: seriesIndex,
+                        dataIndex: dataIndex
+                    },
+                    this.myChart
+                );
+                y = zrEvent.getY(this._event);
+                x = this.subPixelOptimize(
+                    categoryAxis.getCoordByIndex(dataIndex),
+                    this._axisLineWidth
+                );
+                this._styleAxisPointer(
+                    seriesArray,
+                    x, this.component.grid.getY(), 
+                    x, this.component.grid.getYend(),
+                    categoryAxis.getGap(), x, y
+                );
+            }
+            else if (yAxisIndex != -1
+                     && this.component.yAxis.getAxis(yAxisIndex).type
+                        === ecConfig.COMPONENT_TYPE_AXIS_CATEGORY
+            ) {
+                // 纵轴为类目轴，找到所有用这条纵轴并且axis触发的系列数据
+                categoryAxis = this.component.yAxis.getAxis(yAxisIndex);
+                for (var i = 0, l = series.length; i < l; i++) {
+                    if (!this._isSelected(series[i].name)) {
+                        continue;
+                    }
+                    if (series[i].yAxisIndex === yAxisIndex
+                        && this.deepQuery([series[i], this.option], 'tooltip.trigger') === 'axis'
+                    ) {
+                        showContent = this.query(series[i], 'tooltip.showContent') 
+                                      || showContent;
+                        formatter = this.query(series[i], 'tooltip.formatter') 
+                                    || formatter;
+                        position = this.query(series[i], 'tooltip.position') 
+                                   || position;
+                        specialCssText += this._style(this.query(series[i], 'tooltip'));
+                        seriesArray.push(series[i]);
+                        seriesIndex.push(i);
+                    }
+                }
+                // 寻找高亮元素
+                this.messageCenter.dispatch(
+                    ecConfig.EVENT.TOOLTIP_HOVER,
+                    this._event,
+                    {
+                        seriesIndex: seriesIndex,
+                        dataIndex: dataIndex
+                    },
+                    this.myChart
+                );
+                x = zrEvent.getX(this._event);
+                y = this.subPixelOptimize(
+                    categoryAxis.getCoordByIndex(dataIndex),
+                    this._axisLineWidth
+                );
+                this._styleAxisPointer(
+                    seriesArray,
+                    this.component.grid.getX(), y, 
+                    this.component.grid.getXend(), y,
+                    categoryAxis.getGap(), x, y
+                );
+            }
+            else {
+                // 双数值轴
+                x = zrEvent.getX(this._event);
+                y = zrEvent.getY(this._event);
+                this._styleAxisPointer(
+                    series,
+                    this.component.grid.getX(), y, 
+                    this.component.grid.getXend(), y,
+                    0, x, y
+                );
+                if (dataIndex >= 0) {
+                    this._showItemTrigger();
+                }
+                else {
+                    clearTimeout(this._hidingTicket);
+                    clearTimeout(this._showingTicket);
+                    this._tDom.style.display = 'none';
+                }
+            }
+
+            if (seriesArray.length > 0) {
+                var data;
+                if (typeof formatter === 'function') {
+                    var params = [];
+                    for (var i = 0, l = seriesArray.length; i < l; i++) {
+                        data = seriesArray[i].data[dataIndex];
+                        data = data != null
+                               ? (data.value != null
+                                   ? data.value
+                                   : data)
+                               : '-';
+                               
+                        params.push([
+                            seriesArray[i].name || '',
+                            categoryAxis.getNameByIndex(dataIndex),
+                            data
+                        ]);
+                    }
+                    this._curTicket = 'axis:' + dataIndex;
+                    this._tDom.innerHTML = formatter.call(
+                        this.myChart, params, this._curTicket, this._setContent
+                    );
+                }
+                else if (typeof formatter === 'string') {
+                    this._curTicket = NaN;
+                    formatter = formatter.replace('{a}','{a0}')
+                                         .replace('{b}','{b0}')
+                                         .replace('{c}','{c0}');
+                    for (var i = 0, l = seriesArray.length; i < l; i++) {
+                        formatter = formatter.replace(
+                            '{a' + i + '}',
+                            this._encodeHTML(seriesArray[i].name || '')
+                        );
+                        formatter = formatter.replace(
+                            '{b' + i + '}',
+                            this._encodeHTML(categoryAxis.getNameByIndex(dataIndex))
+                        );
+                        data = seriesArray[i].data[dataIndex];
+                        data = data != null
+                               ? (data.value != null
+                                   ? data.value
+                                   : data)
+                               : '-';
+                        formatter = formatter.replace(
+                            '{c' + i + '}',
+                            data instanceof Array 
+                            ? data : this.numAddCommas(data)
+                        );
+                    }
+                    this._tDom.innerHTML = formatter;
+                }
+                else {
+                    this._curTicket = NaN;
+                    formatter = this._encodeHTML(
+                        categoryAxis.getNameByIndex(dataIndex)
+                    );
+
+                    for (var i = 0, l = seriesArray.length; i < l; i++) {
+                        formatter += '<br/>' 
+                                     + this._encodeHTML(seriesArray[i].name || '')
+                                     + ' : ';
+                        data = seriesArray[i].data[dataIndex];
+                        data = data != null
+                               ? (data.value != null
+                                   ? data.value
+                                   : data)
+                               : '-';
+                        formatter += data instanceof Array 
+                                     ? data : this.numAddCommas(data);
+                    }
+                    this._tDom.innerHTML = formatter;
+                }
+
+                // don't modify, just false, showContent == undefined == true
+                if (showContent === false || !this.option.tooltip.showContent) {
+                    // 只用tooltip的行为，不显示主体
+                    return;
+                }
+                
+                if (!this.hasAppend) {
+                    this._tDom.style.left = this._zrWidth / 2 + 'px';
+                    this._tDom.style.top = this._zrHeight / 2 + 'px';
+                    this.dom.firstChild.appendChild(this._tDom);
+                    this.hasAppend = true;
+                }
+                this._show(position, x + 10, y + 10, specialCssText);
+            }
+        },
+        
+        /**
+         * 极坐标 
+         */
+        _showPolarTrigger: function (polarIndex, dataIndex) {
+            if (this.component.polar == null
+                || polarIndex == null
+                || dataIndex == null
+                || dataIndex < 0
+            ) {
+                return false;
+            }
+            var series = this.option.series;
+            var seriesArray = [];
+
+            var formatter;
+            var position;
+            var showContent;
+            var specialCssText = '';
+            if (this.option.tooltip.trigger === 'axis') {
+                if (!this.option.tooltip.show) {
+                    return false;
+                }
+                formatter = this.option.tooltip.formatter;
+                position = this.option.tooltip.position;
+            }
+            var indicatorName = this.option.polar[polarIndex].indicator[dataIndex].text;
+
+            // 找到所有用这个极坐标并且axis触发的系列数据
+            for (var i = 0, l = series.length; i < l; i++) {
+                if (!this._isSelected(series[i].name)) {
+                    continue;
+                }
+                if (series[i].polarIndex === polarIndex
+                    && this.deepQuery([series[i], this.option], 'tooltip.trigger') === 'axis'
+                ) {
+                    showContent = this.query(series[i], 'tooltip.showContent') 
+                                  || showContent;
+                    formatter = this.query(series[i], 'tooltip.formatter') 
+                                || formatter;
+                    position = this.query(series[i], 'tooltip.position') 
+                               || position;
+                    specialCssText += this._style(this.query(series[i], 'tooltip'));
+                    seriesArray.push(series[i]);
+                }
+            }
+            if (seriesArray.length > 0) {
+                var polarData;
+                var data;
+                var params = [];
+
+                for (var i = 0, l = seriesArray.length; i < l; i++) {
+                    polarData = seriesArray[i].data;
+                    for (var j = 0, k = polarData.length; j < k; j++) {
+                        data = polarData[j];
+                        if (!this._isSelected(data.name)) {
+                            continue;
+                        }
+                        data = data != null
+                               ? data
+                               : {name:'', value: {dataIndex:'-'}};
+                               
+                        params.push([
+                            seriesArray[i].name || '',
+                            data.name,
+                            data.value[dataIndex].value != null
+                                ? data.value[dataIndex].value : data.value[dataIndex],
+                            indicatorName
+                        ]);
+                    }
+                }
+                if (params.length <= 0) {
+                    return;
+                }
+                if (typeof formatter === 'function') {
+                    this._curTicket = 'axis:' + dataIndex;
+                    this._tDom.innerHTML = formatter.call(
+                        this.myChart, params, this._curTicket, this._setContent
+                    );
+                }
+                else if (typeof formatter === 'string') {
+                    formatter = formatter.replace('{a}','{a0}')
+                                         .replace('{b}','{b0}')
+                                         .replace('{c}','{c0}')
+                                         .replace('{d}','{d0}');
+                    for (var i = 0, l = params.length; i < l; i++) {
+                        formatter = formatter.replace(
+                            '{a' + i + '}',
+                            this._encodeHTML(params[i][0])
+                        );
+                        formatter = formatter.replace(
+                            '{b' + i + '}',
+                            this._encodeHTML(params[i][1])
+                        );
+                        formatter = formatter.replace(
+                            '{c' + i + '}',
+                            this.numAddCommas(params[i][2])
+                        );
+                        formatter = formatter.replace(
+                            '{d' + i + '}',
+                            this._encodeHTML(params[i][3])
+                        );
+                    }
+                    this._tDom.innerHTML = formatter;
+                }
+                else {
+                    formatter = this._encodeHTML(params[0][1]) + '<br/>' 
+                                + this._encodeHTML(params[0][3]) + ' : ' 
+                                + this.numAddCommas(params[0][2]);
+                    for (var i = 1, l = params.length; i < l; i++) {
+                        formatter += '<br/>' + this._encodeHTML(params[i][1]) 
+                                     + '<br/>';
+                        formatter += this._encodeHTML(params[i][3]) + ' : ' 
+                                     + this.numAddCommas(params[i][2]);
+                    }
+                    this._tDom.innerHTML = formatter;
+                }
+
+                // don't modify, just false, showContent == undefined == true
+                if (showContent === false || !this.option.tooltip.showContent) {
+                    // 只用tooltip的行为，不显示主体
+                    return;
+                }
+                
+                if (!this.hasAppend) {
+                    this._tDom.style.left = this._zrWidth / 2 + 'px';
+                    this._tDom.style.top = this._zrHeight / 2 + 'px';
+                    this.dom.firstChild.appendChild(this._tDom);
+                    this.hasAppend = true;
+                }
+                this._show(
+                    position,
+                    zrEvent.getX(this._event), 
+                    zrEvent.getY(this._event), 
+                    specialCssText
+                );
+                return true;
+            }
+        },
+        
+        _showItemTrigger: function () {
+            if (!this._curTarget) {
+                return;
+            }
+            var serie = ecData.get(this._curTarget, 'series');
+            var data = ecData.get(this._curTarget, 'data');
+            var name = ecData.get(this._curTarget, 'name');
+            var value = ecData.get(this._curTarget, 'value');
+            var special = ecData.get(this._curTarget, 'special');
+            var special2 = ecData.get(this._curTarget, 'special2');
+            // 从低优先级往上找到trigger为item的formatter和样式
+            var formatter;
+            var position;
+            var showContent;
+            var specialCssText = '';
+            var indicator;
+            var html = '';
+            if (this._curTarget._type != 'island') {
+                // 全局
+                if (this.option.tooltip.trigger === 'item') {
+                    formatter = this.option.tooltip.formatter;
+                    position = this.option.tooltip.position;
+                }
+                // 系列
+                if (this.query(serie, 'tooltip.trigger') === 'item') {
+                    showContent = this.query(serie, 'tooltip.showContent') 
+                                  || showContent;
+                    formatter = this.query(serie, 'tooltip.formatter') 
+                                || formatter;
+                    position = this.query(serie, 'tooltip.position') 
+                               || position;
+                    specialCssText += this._style(this.query(serie, 'tooltip'));
+                }
+                // 数据项
+                showContent = this.query(data, 'tooltip.showContent') 
+                              || showContent;
+                formatter = this.query(data, 'tooltip.formatter') 
+                            || formatter;
+                position = this.query(data, 'tooltip.position') 
+                           || position;
+                specialCssText += this._style(this.query(data, 'tooltip'));
+            }
+            else {
+                showContent = this.deepQuery([data, serie, this.option], 'tooltip.showContent');
+                formatter = this.deepQuery([data, serie, this.option], 'tooltip.islandFormatter');
+                position = this.deepQuery([data, serie, this.option], 'tooltip.islandPosition');
+            }
+
+            if (typeof formatter === 'function') {
+                this._curTicket = (serie.name || '')
+                                  + ':'
+                                  + ecData.get(this._curTarget, 'dataIndex');
+                this._tDom.innerHTML = formatter.call(
+                    this.myChart,
+                    [
+                        serie.name || '',
+                        name,
+                        value,
+                        special,
+                        special2,
+                        data
+                    ],
+                    this._curTicket,
+                    this._setContent
+                );
+            }
+            else if (typeof formatter === 'string') {
+                this._curTicket = NaN;
+                formatter = formatter.replace('{a}','{a0}')
+                                     .replace('{b}','{b0}')
+                                     .replace('{c}','{c0}');
+                formatter = formatter.replace('{a0}', this._encodeHTML(serie.name || ''))
+                                     .replace('{b0}', this._encodeHTML(name))
+                                     .replace(
+                                         '{c0}', 
+                                         value instanceof Array ? value : this.numAddCommas(value)
+                                     );
+
+                formatter = formatter.replace('{d}','{d0}')
+                                     .replace('{d0}', special || '');
+                formatter = formatter.replace('{e}','{e0}')
+                            .replace('{e0}', ecData.get(this._curTarget, 'special2') || '');
+
+                this._tDom.innerHTML = formatter;
+            }
+            else {
+                this._curTicket = NaN;
+                if (serie.type === ecConfig.CHART_TYPE_SCATTER) {
+                    this._tDom.innerHTML = ''
+                        + (serie.name != null ? (this._encodeHTML(serie.name) + '<br/>') : '') 
+                        + (name === '' ? '' : (this._encodeHTML(name) + ' : ')) 
+                        + value 
+                        + (special == null ? '' : (' (' + special + ')'));
+                }
+                else if (serie.type === ecConfig.CHART_TYPE_RADAR && special) {
+                    indicator = special;
+                    html += this._encodeHTML(name === '' ? (serie.name || '') : name);
+                    html += html === '' ? '' : '<br />';
+                    for (var i = 0 ; i < indicator.length; i ++) {
+                        html += this._encodeHTML(indicator[i].text) + ' : ' 
+                                + this.numAddCommas(value[i]) + '<br />';
+                    }
+                    this._tDom.innerHTML = html;
+                }
+                else if (serie.type === ecConfig.CHART_TYPE_CHORD) {
+                    if (special2 == null) {
+                        // 外环上
+                        this._tDom.innerHTML = this._encodeHTML(name) + ' (' 
+                                               + this.numAddCommas(value) + ')';
+                    }
+                    else {
+                        var name1 = this._encodeHTML(name);
+                        var name2 = this._encodeHTML(special);
+                        // 内部弦上
+                        this._tDom.innerHTML = ''
+                            + (serie.name != null ? (this._encodeHTML(serie.name) + '<br/>') : '')
+                            + name1 + ' -> ' + name2 
+                            + ' (' + this.numAddCommas(value) + ')'
+                            + '<br />'
+                            + name2 + ' -> ' + name1
+                            + ' (' + this.numAddCommas(special2) + ')';
+                    }
+                }
+                else {
+                    this._tDom.innerHTML = ''
+                        + (serie.name != null ? (this._encodeHTML(serie.name) + '<br/>') : '')
+                        + this._encodeHTML(name) + ' : ' 
+                        + this.numAddCommas(value) 
+                        + (special == null ? '' : (' ('+ this.numAddCommas(special) +')'));
+                }
+            }
+
+            if (!this._axisLineShape.invisible 
+                || !this._axisShadowShape.invisible
+            ) {
+                this._axisLineShape.invisible = true;
+                this.zr.modShape(this._axisLineShape.id);
+                this._axisShadowShape.invisible = true;
+                this.zr.modShape(this._axisShadowShape.id);
+                this.zr.refresh();
+            }
+            
+            // don't modify, just false, showContent == undefined == true
+            if (showContent === false || !this.option.tooltip.showContent) {
+                // 只用tooltip的行为，不显示主体
+                return;
+            }
+            
+            if (!this.hasAppend) {
+                this._tDom.style.left = this._zrWidth / 2 + 'px';
+                this._tDom.style.top = this._zrHeight / 2 + 'px';
+                this.dom.firstChild.appendChild(this._tDom);
+                this.hasAppend = true;
+            }
+            
+            this._show(
+                position,
+                zrEvent.getX(this._event) + 20,
+                zrEvent.getY(this._event) - 20,
+                specialCssText
+            );
+        },
+
+        /**
+         * 设置坐标轴指示器样式 
+         */
+        _styleAxisPointer: function (seriesArray, xStart, yStart, xEnd, yEnd, gap, x, y) {
+            if (seriesArray.length > 0) {
+                var queryTarget;
+                var curType;
+                var axisPointer = this.option.tooltip.axisPointer;
+                var pointType = axisPointer.type;
+                var style = {
+                    line: { },
+                    cross: { },
+                    shadow: { }
+                };
+                for (var pType in style) {
+                    style[pType].color = axisPointer[pType + 'Style'].color;
+                    style[pType].width = axisPointer[pType + 'Style'].width;
+                    style[pType].type = axisPointer[pType + 'Style'].type;
+                }
+                for (var i = 0, l = seriesArray.length; i < l; i++) {
+                    if (this.deepQuery(
+                           [seriesArray[i], this.option], 'tooltip.trigger'
+                       ) === 'axis'
+                    ) {
+                        queryTarget = seriesArray[i];
+                        curType = this.query(queryTarget, 'tooltip.axisPointer.type');
+                        pointType = curType || pointType; 
+                        if (curType) {
+                            style[curType].color = this.query(
+                                queryTarget,
+                                'tooltip.axisPointer.' + curType + 'Style.color'
+                            ) || style[curType].color;
+                            style[curType].width = this.query(
+                                queryTarget,
+                                'tooltip.axisPointer.' + curType + 'Style.width'
+                            ) || style[curType].width;
+                            style[curType].type = this.query(
+                                queryTarget,
+                                'tooltip.axisPointer.' + curType + 'Style.type'
+                            ) || style[curType].type;
+                        }
+                    }
+                }
+                
+                if (pointType === 'line') {
+                    this._axisLineShape.style = {
+                        xStart: xStart,
+                        yStart: yStart,
+                        xEnd: xEnd,
+                        yEnd: yEnd,
+                        strokeColor: style.line.color,
+                        lineWidth: style.line.width,
+                        lineType: style.line.type
+                    };
+                    this._axisLineShape.invisible = false;
+                    this.zr.modShape(this._axisLineShape.id);
+                }
+                else if (pointType === 'cross') {
+                    this._axisCrossShape.style = {
+                        brushType: 'stroke',
+                        rect: this.component.grid.getArea(),
+                        x: x,
+                        y: y,
+                        text: ('( ' 
+                               + this.component.xAxis.getAxis(0).getValueFromCoord(x)
+                               + ' , '
+                               + this.component.yAxis.getAxis(0).getValueFromCoord(y) 
+                               + ' )'
+                              ).replace('  , ', ' ').replace(' ,  ', ' '),
+                        textPosition: 'specific',
+                        strokeColor: style.cross.color,
+                        lineWidth: style.cross.width,
+                        lineType: style.cross.type
+                    };
+                    if (this.component.grid.getXend() - x > 100) {          // 右侧有空间
+                        this._axisCrossShape.style.textAlign = 'left';
+                        this._axisCrossShape.style.textX = x + 10;
+                    }
+                    else {
+                        this._axisCrossShape.style.textAlign = 'right';
+                        this._axisCrossShape.style.textX = x - 10;
+                    }
+                    if (y - this.component.grid.getY() > 50) {             // 上方有空间
+                        this._axisCrossShape.style.textBaseline = 'bottom';
+                        this._axisCrossShape.style.textY = y - 10;
+                    }
+                    else {
+                        this._axisCrossShape.style.textBaseline = 'top';
+                        this._axisCrossShape.style.textY = y + 10;
+                    }
+                    this._axisCrossShape.invisible = false;
+                    this.zr.modShape(this._axisCrossShape.id);
+                }
+                else if (pointType === 'shadow') {
+                    if (style.shadow.width == null 
+                        || style.shadow.width === 'auto'
+                        || isNaN(style.shadow.width)
+                    ) {
+                        style.shadow.width = gap;
+                    }
+                    if (xStart === xEnd) {
+                        // 纵向
+                        if (Math.abs(this.component.grid.getX() - xStart) < 2) {
+                            // 最左边
+                            style.shadow.width /= 2;
+                            xStart = xEnd = xEnd + style.shadow.width / 2;
+                        }
+                        else if (Math.abs(this.component.grid.getXend() - xStart) < 2) {
+                            // 最右边
+                            style.shadow.width /= 2;
+                            xStart = xEnd = xEnd - style.shadow.width / 2;
+                        }
+                    }
+                    else if (yStart === yEnd) {
+                        // 横向
+                        if (Math.abs(this.component.grid.getY() - yStart) < 2) {
+                            // 最上边
+                            style.shadow.width /= 2;
+                            yStart = yEnd = yEnd + style.shadow.width / 2;
+                        }
+                        else if (Math.abs(this.component.grid.getYend() - yStart) < 2) {
+                            // 最右边
+                            style.shadow.width /= 2;
+                            yStart = yEnd = yEnd - style.shadow.width / 2;
+                        }
+                    }
+                    this._axisShadowShape.style = {
+                        xStart: xStart,
+                        yStart: yStart,
+                        xEnd: xEnd,
+                        yEnd: yEnd,
+                        strokeColor: style.shadow.color,
+                        lineWidth: style.shadow.width
+                    };
+                    this._axisShadowShape.invisible = false;
+                    this.zr.modShape(this._axisShadowShape.id);
+                }
+                this.zr.refresh();
+            }
+        },
+
+        __onmousemove: function (param) {
+            clearTimeout(this._hidingTicket);
+            clearTimeout(this._showingTicket);
+            var target = param.target;
+            var mx = zrEvent.getX(param.event);
+            var my = zrEvent.getY(param.event);
+            if (!target) {
+                // 判断是否落到直角系里，axis触发的tooltip
+                this._curTarget = false;
+                this._event = param.event;
+                // this._event._target = this._event.target || this._event.toElement;
+                this._event.zrenderX = mx;
+                this._event.zrenderY = my;
+                if (this._needAxisTrigger 
+                    && this.component.grid 
+                    && zrArea.isInside(rectangleInstance, this.component.grid.getArea(), mx, my)
+                ) {
+                    this._showingTicket = setTimeout(this._tryShow, this._showDelay);
+                }
+                else if (this._needAxisTrigger 
+                        && this.component.polar 
+                        && this.component.polar.isInside([mx, my]) != -1
+                ) {
+                    this._showingTicket = setTimeout(this._tryShow, this._showDelay);
+                }
+                else {
+                    !this._event.connectTrigger && this.messageCenter.dispatch(
+                        ecConfig.EVENT.TOOLTIP_OUT_GRID,
+                        this._event,
+                        null,
+                        this.myChart
+                    );
+                    this._hidingTicket = setTimeout(this._hide, this._hideDelay);
+                }
+            }
+            else {
+                this._curTarget = target;
+                this._event = param.event;
+                // this._event._target = this._event.target || this._event.toElement;
+                this._event.zrenderX = mx;
+                this._event.zrenderY = my;
+                var polarIndex;
+                if (this._needAxisTrigger 
+                    && this.component.polar 
+                    && (polarIndex = this.component.polar.isInside([mx, my])) != -1
+                ) {
+                    // 看用这个polar的系列数据是否是axis触发，如果是设置_curTarget为nul
+                    var series = this.option.series;
+                    for (var i = 0, l = series.length; i < l; i++) {
+                        if (series[i].polarIndex === polarIndex
+                            && this.deepQuery(
+                                   [series[i], this.option], 'tooltip.trigger'
+                               ) === 'axis'
+                        ) {
+                            this._curTarget = null;
+                            break;
+                        }
+                    }
+                   
+                }
+                this._showingTicket = setTimeout(this._tryShow, this._showDelay);
+            }
+        },
+
+        /**
+         * zrender事件响应：鼠标离开绘图区域
+         */
+        __onglobalout: function () {
+            clearTimeout(this._hidingTicket);
+            clearTimeout(this._showingTicket);
+            this._hidingTicket = setTimeout(this._hide, this._hideDelay);
+        },
+        
+        /**
+         * 异步回调填充内容
+         */
+        __setContent: function (ticket, content) {
+            if (!this._tDom) {
+                return;
+            }
+            if (ticket === this._curTicket) {
+                this._tDom.innerHTML = content;
+            }
+            
+            setTimeout(this._refixed, 20);
+        },
+
+        ontooltipHover: function (param, tipShape) {
+            if (!this._lastTipShape // 不存在或者存在但dataIndex发生变化才需要重绘
+                || (this._lastTipShape && this._lastTipShape.dataIndex != param.dataIndex)
+            ) {
+                if (this._lastTipShape && this._lastTipShape.tipShape.length > 0) {
+                    this.zr.delShape(this._lastTipShape.tipShape);
+                    this.shapeList.length = 2;
+                }
+                for (var i = 0, l = tipShape.length; i < l; i++) {
+                    tipShape[i].zlevel = this._zlevelBase;
+                    tipShape[i].style = zrShapeBase.prototype.getHighlightStyle(
+                        tipShape[i].style,
+                        tipShape[i].highlightStyle
+                    );
+                    tipShape[i].draggable = false;
+                    tipShape[i].hoverable = false;
+                    tipShape[i].clickable = false;
+                    tipShape[i].ondragend = null;
+                    tipShape[i].ondragover = null;
+                    tipShape[i].ondrop = null;
+                    this.shapeList.push(tipShape[i]);
+                    this.zr.addShape(tipShape[i]);
+                }
+                this._lastTipShape = {
+                    dataIndex: param.dataIndex,
+                    tipShape: tipShape
+                };
+            }
+        },
+        
+        ondragend: function () {
+            this._hide();
+        },
+        
+        /**
+         * 图例选择
+         */
+        onlegendSelected: function (param) {
+            this._selectedMap = param.selected;
+        },
+        
+        _setSelectedMap: function () {
+            if (this.component.legend) {
+                this._selectedMap = zrUtil.clone(this.component.legend.getSelectedMap());
+            }
+            else {
+                this._selectedMap = {};
+            }
+        },
+        
+        _isSelected: function (itemName) {
+            if (this._selectedMap[itemName] != null) {
+                return this._selectedMap[itemName];
+            }
+            else {
+                return true; // 没在legend里定义的都为true啊~
+            }
+        },
+
+        /**
+         * 模拟tooltip hover方法
+         * {object} params  参数
+         *          {seriesIndex: 0, seriesName:'', dataInex:0} line、bar、scatter、k、radar
+         *          {seriesIndex: 0, seriesName:'', name:''} map、pie、chord
+         */
+        showTip: function (params) {
+            if (!params) {
+                return;
+            }
+            
+            var seriesIndex;
+            var series = this.option.series;
+            if (params.seriesIndex != null) {
+                seriesIndex = params.seriesIndex;
+            }
+            else {
+                var seriesName = params.seriesName;
+                for (var i = 0, l = series.length; i < l; i++) {
+                    if (series[i].name === seriesName) {
+                        seriesIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            var serie = series[seriesIndex];
+            if (serie == null) {
+                return;
+            }
+            var chart = this.myChart.chart[serie.type];
+            var isAxisTrigger = this.deepQuery(
+                                    [serie, this.option], 'tooltip.trigger'
+                                ) === 'axis';
+            
+            if (!chart) {
+                return;
+            }
+            
+            if (isAxisTrigger) {
+                // axis trigger
+                var dataIndex = params.dataIndex;
+                switch (chart.type) {
+                    case ecConfig.CHART_TYPE_LINE :
+                    case ecConfig.CHART_TYPE_BAR :
+                    case ecConfig.CHART_TYPE_K :
+                        if (this.component.xAxis == null 
+                            || this.component.yAxis == null
+                            || serie.data.length <= dataIndex
+                        ) {
+                            return;
+                        }
+                        var xAxisIndex = serie.xAxisIndex || 0;
+                        var yAxisIndex = serie.yAxisIndex || 0;
+                        if (this.component.xAxis.getAxis(xAxisIndex).type 
+                            === ecConfig.COMPONENT_TYPE_AXIS_CATEGORY
+                        ) {
+                            // 横轴是类目
+                            this._event = {
+                                zrenderX: this.component.xAxis.getAxis(xAxisIndex)
+                                          .getCoordByIndex(dataIndex),
+                                zrenderY: this.component.grid.getY() 
+                                          + (this.component.grid.getYend() 
+                                             - this.component.grid.getY()
+                                            ) / 4
+                            };
+                        }
+                        else {
+                            // 纵轴是类目
+                            this._event = {
+                                zrenderX: this.component.grid.getX() 
+                                          + (this.component.grid.getXend() 
+                                              - this.component.grid.getX()
+                                            ) / 4,
+                                zrenderY: this.component.yAxis.getAxis(yAxisIndex)
+                                           .getCoordByIndex(dataIndex)
+                            };
+                        }
+                        this._showAxisTrigger(
+                            xAxisIndex, 
+                            yAxisIndex,
+                            dataIndex
+                        );
+                        break;
+                    case ecConfig.CHART_TYPE_RADAR :
+                        if (this.component.polar == null 
+                            || serie.data[0].value.length <= dataIndex
+                        ) {
+                            return;
+                        }
+                        var polarIndex = serie.polarIndex || 0;
+                        var vector = this.component.polar.getVector(
+                            polarIndex, dataIndex, 'max'
+                        );
+                        this._event = {
+                            zrenderX: vector[0],
+                            zrenderY: vector[1]
+                        };
+                        this._showPolarTrigger(
+                            polarIndex, 
+                            dataIndex
+                        );
+                        break;
+                }
+            }
+            else {
+                // item trigger
+                var shapeList = chart.shapeList;
+                var x;
+                var y;
+                switch (chart.type) {
+                    case ecConfig.CHART_TYPE_LINE :
+                    case ecConfig.CHART_TYPE_BAR :
+                    case ecConfig.CHART_TYPE_K :
+                    case ecConfig.CHART_TYPE_SCATTER :
+                        var dataIndex = params.dataIndex;
+                        for (var i = 0, l = shapeList.length; i < l; i++) {
+                            if (ecData.get(shapeList[i], 'seriesIndex') === seriesIndex
+                                && ecData.get(shapeList[i], 'dataIndex') === dataIndex
+                            ) {
+                                this._curTarget = shapeList[i];
+                                x = shapeList[i].style.x;
+                                y = chart.type != ecConfig.CHART_TYPE_K 
+                                    ? shapeList[i].style.y : shapeList[i].style.y[0];
+                                break;
+                            }
+                        }
+                        break;
+                    case ecConfig.CHART_TYPE_RADAR :
+                        var dataIndex = params.dataIndex;
+                        for (var i = 0, l = shapeList.length; i < l; i++) {
+                            if (shapeList[i].type === 'polygon'
+                                && ecData.get(shapeList[i], 'seriesIndex') === seriesIndex
+                                && ecData.get(shapeList[i], 'dataIndex') === dataIndex
+                            ) {
+                                this._curTarget = shapeList[i];
+                                var vector = this.component.polar.getCenter(
+                                    serie.polarIndex || 0
+                                );
+                                x = vector[0];
+                                y = vector[1];
+                                break;
+                            }
+                        }
+                        break;
+                    case ecConfig.CHART_TYPE_PIE :
+                        var name = params.name;
+                        for (var i = 0, l = shapeList.length; i < l; i++) {
+                            if (shapeList[i].type === 'sector'
+                                && ecData.get(shapeList[i], 'seriesIndex') === seriesIndex
+                                && ecData.get(shapeList[i], 'name') === name
+                            ) {
+                                this._curTarget = shapeList[i];
+                                var style = this._curTarget.style;
+                                var midAngle = (style.startAngle + style.endAngle) 
+                                                / 2 * Math.PI / 180;
+                                x = this._curTarget.style.x + Math.cos(midAngle) * style.r / 1.5;
+                                y = this._curTarget.style.y - Math.sin(midAngle) * style.r / 1.5;
+                                break;
+                            }
+                        }
+                        break;
+                    case ecConfig.CHART_TYPE_MAP :
+                        var name = params.name;
+                        var mapType = serie.mapType;
+                        for (var i = 0, l = shapeList.length; i < l; i++) {
+                            if (shapeList[i].type === 'text'
+                                && shapeList[i]._mapType === mapType
+                                && shapeList[i].style._name === name
+                            ) {
+                                this._curTarget = shapeList[i];
+                                x = this._curTarget.style.x + this._curTarget.position[0];
+                                y = this._curTarget.style.y + this._curTarget.position[1];
+                                break;
+                            }
+                        }
+                        break;
+                    case ecConfig.CHART_TYPE_CHORD:
+                        var name = params.name;
+                        for (var i = 0, l = shapeList.length; i < l; i++) {
+                            if (shapeList[i].type === 'sector'
+                                && ecData.get(shapeList[i], 'name') === name
+                            ) {
+                                this._curTarget = shapeList[i];
+                                var style = this._curTarget.style;
+                                var midAngle = (style.startAngle + style.endAngle) 
+                                                / 2 * Math.PI / 180;
+                                x = this._curTarget.style.x + Math.cos(midAngle) * (style.r - 2);
+                                y = this._curTarget.style.y - Math.sin(midAngle) * (style.r - 2);
+                                this.zr.trigger(
+                                    zrConfig.EVENT.MOUSEMOVE,
+                                    {
+                                        zrenderX: x,
+                                        zrenderY: y
+                                    }
+                                );
+                                return;
+                            }
+                        }
+                        break;
+                    case ecConfig.CHART_TYPE_FORCE:
+                        var name = params.name;
+                        for (var i = 0, l = shapeList.length; i < l; i++) {
+                            if (shapeList[i].type === 'circle'
+                                && ecData.get(shapeList[i], 'name') === name
+                            ) {
+                                this._curTarget = shapeList[i];
+                                x = this._curTarget.position[0];
+                                y = this._curTarget.position[1];
+                                break;
+                            }
+                        }
+                        break;
+                }
+                if (x != null && y != null) {
+                    this._event = {
+                        zrenderX: x,
+                        zrenderY: y
+                    };
+                    this.zr.addHoverShape(this._curTarget);
+                    this.zr.refreshHover();
+                    this._showItemTrigger();
+                }
+            }
+        },
+        
+        /**
+         * 关闭，公开接口 
+         */
+        hideTip: function () {
+            this._hide();
+        },
+        
+        /**
+         * 刷新
+         */
+        refresh: function (newOption) {
+            // this._selectedMap;
+            // this._defaultCssText;    // css样式缓存
+            // this._needAxisTrigger;   // 坐标轴触发
+            // this._curTarget;
+            // this._event;
+            // this._curTicket;         // 异步回调标识，用来区分多个请求
+            
+            // 缓存一些高宽数据
+            this._zrHeight = this.zr.getHeight();
+            this._zrWidth = this.zr.getWidth();
+            
+            if (this._lastTipShape && this._lastTipShape.tipShape.length > 0) {
+                this.zr.delShape(this._lastTipShape.tipShape);
+            }
+            this._lastTipShape = false;
+            this.shapeList.length = 2;
+            
+            if (newOption) {
+                this.option = newOption;
+                this.option.tooltip = this.reformOption(this.option.tooltip);
+                this.option.tooltip.textStyle = zrUtil.merge(
+                    this.option.tooltip.textStyle,
+                    this.ecTheme.textStyle
+                );
+                // 补全padding属性
+                this.option.tooltip.padding = this.reformCssArray(
+                    this.option.tooltip.padding
+                );
+    
+                this._needAxisTrigger = false;
+                if (this.option.tooltip.trigger === 'axis') {
+                    this._needAxisTrigger = true;
+                }
+    
+                var series = this.option.series;
+                for (var i = 0, l = series.length; i < l; i++) {
+                    if (this.query(series[i], 'tooltip.trigger') === 'axis') {
+                        this._needAxisTrigger = true;
+                        break;
+                    }
+                }
+                // this._hidingTicket;
+                // this._showingTicket;
+                this._showDelay = this.option.tooltip.showDelay; // 显示延迟
+                this._hideDelay = this.option.tooltip.hideDelay; // 隐藏延迟
+                this._defaultCssText = this._style(this.option.tooltip);
+                
+                this._setSelectedMap();
+                this._axisLineWidth = this.option.tooltip.axisPointer.lineStyle.width;
+            }
+            if (this.showing) {
+                var self = this;
+                setTimeout(function(){
+                    self.zr.trigger(zrConfig.EVENT.MOUSEMOVE, self.zr.handler._event);
+                },50);
+            }
+        },
+
+        /**
+         * 释放后实例不可用，重载基类方法
+         */
+        dispose: function () {
+            if (this._lastTipShape && this._lastTipShape.tipShape.length > 0) {
+                this.zr.delShape(this._lastTipShape.tipShape);
+            }
+            this.clear();
+            this.shapeList = null;
+            
+            clearTimeout(this._hidingTicket);
+            clearTimeout(this._showingTicket);
+            this.zr.un(zrConfig.EVENT.MOUSEMOVE, this._onmousemove);
+            this.zr.un(zrConfig.EVENT.GLOBALOUT, this._onglobalout);
+            
+            if (this.hasAppend) {
+                this.dom.firstChild.removeChild(this._tDom);
+            }
+            this._tDom = null;
+        },
+        
+        /**
+         * html转码的方法
+         */
+        _encodeHTML: function (source) {
+            return String(source)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+        }
+    };
+    
+    zrUtil.inherits(Tooltip, Base);
+    
+    require('../component').define('tooltip', Tooltip);
+
+    return Tooltip;
+});
+/**
+ * 圆环
+ * @module zrender/shape/Ring
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * @example
+ *     var Ring = require('zrender/shape/Ring');
+ *     var shape = new Ring({
+ *         style: {
+ *             x: 100,
+ *             y: 100,
+ *             r0: 30,
+ *             r: 50
+ *         }
+ *     });
+ *     zr.addShape(shape);
+ */
+
+/**
+ * @typedef {Object} IRingStyle
+ * @property {number} x 圆心x坐标
+ * @property {number} y 圆心y坐标
+ * @property {number} r0 内圆半径
+ * @property {number} r 外圆半径
+ * @property {string} [color='#000000'] 填充颜色
+ * @property {string} [strokeColor='#000000'] 描边颜色
+ * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
+ * @property {number} [lineWidth=1] 描边宽度
+ * @property {number} [opacity=1] 绘制透明度
+ * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+ * @property {string} [shadowColor='#000000'] 阴影颜色
+ * @property {number} [shadowOffsetX=0] 阴影横向偏移
+ * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+ * @property {string} [text] 图形中的附加文本
+ * @property {string} [textColor='#000000'] 文本颜色
+ * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+ * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+ * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+ *                                可以是start, end, left, right, center
+ * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+ *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+ */
+define(
+    'zrender/shape/Ring',['require','./Base','../tool/util'],function (require) {
+        var Base = require('./Base');
+        
+        /**
+         * @alias module:zrender/shape/Ring
+         * @constructor
+         * @extends module:zrender/shape/Base
+         * @param {Object} options
+         */
+        var Ring = function (options) {
+            Base.call(this, options);
+            /**
+             * 圆环绘制样式
+             * @name module:zrender/shape/Ring#style
+             * @type {module:zrender/shape/Ring~IRingStyle}
+             */
+            /**
+             * 圆环高亮绘制样式
+             * @name module:zrender/shape/Ring#highlightStyle
+             * @type {module:zrender/shape/Ring~IRingStyle}
+             */
+        };
+
+        Ring.prototype = {
+            type: 'ring',
+
+            /**
+             * 创建圆环路径
+             * @param {CanvasRenderingContext2D} ctx
+             * @param {module:zrender/shape/Ring~IRingStyle} style
+             */
+            buildPath : function (ctx, style) {
+                // 非零环绕填充优化
+                ctx.arc(style.x, style.y, style.r, 0, Math.PI * 2, false);
+                ctx.moveTo(style.x + style.r0, style.y);
+                ctx.arc(style.x, style.y, style.r0, 0, Math.PI * 2, true);
+                return;
+            },
+
+            /**
+             * 计算返回圆环包围盒矩阵
+             * @param {module:zrender/shape/Ring~IRingStyle} style
+             * @return {module:zrender/shape/Base~IBoundingRect}
+             */
+            getRect : function (style) {
+                if (style.__rect) {
+                    return style.__rect;
+                }
+                
+                var lineWidth;
+                if (style.brushType == 'stroke' || style.brushType == 'fill') {
+                    lineWidth = style.lineWidth || 1;
+                }
+                else {
+                    lineWidth = 0;
+                }
+                style.__rect = {
+                    x : Math.round(style.x - style.r - lineWidth / 2),
+                    y : Math.round(style.y - style.r - lineWidth / 2),
+                    width : style.r * 2 + lineWidth,
+                    height : style.r * 2 + lineWidth
+                };
+                
+                return style.__rect;
+            }
+        };
+
+        require('../tool/util').inherits(Ring, Base);
+        return Ring;
+    }
+);
+
+/**
+ * 扇形
+ * @author Kener (@Kener-林峰, linzhifeng)
+ * @module zrender/shape/Sector
+ * @example
+ *     var Sector = require('zrender/shape/Sector');
+ *     var shape = new Sector({
+ *         style: {
+ *             x: 100,
+ *             y: 100,
+ *             r: 60,
+ *             r0: 30,
+ *             startAngle: 0,
+ *             endEngle: 180
+ *         } 
+ *     });
+ *     zr.addShape(shape);
+ */
+
+/**
+ * @typedef {Object} ISectorStyle
+ * @property {number} x 圆心x坐标
+ * @property {number} y 圆心y坐标
+ * @property {number} r 外圆半径
+ * @property {number} [r0=0] 内圆半径，指定后将出现内弧，同时扇边长度为`r - r0`
+ * @property {number} startAngle 起始角度，`[0, 360)`
+ * @property {number} endAngle 结束角度，`(0, 360]`
+ * @property {string} [brushType='fill']
+ * @property {string} [color='#000000'] 填充颜色
+ * @property {string} [strokeColor='#000000'] 描边颜色
+ * @property {string} [lineCape='butt'] 线帽样式，可以是 butt, round, square
+ * @property {number} [lineWidth=1] 描边宽度
+ * @property {number} [opacity=1] 绘制透明度
+ * @property {number} [shadowBlur=0] 阴影模糊度，大于0有效
+ * @property {string} [shadowColor='#000000'] 阴影颜色
+ * @property {number} [shadowOffsetX=0] 阴影横向偏移
+ * @property {number} [shadowOffsetY=0] 阴影纵向偏移
+ * @property {string} [text] 图形中的附加文本
+ * @property {string} [textColor='#000000'] 文本颜色
+ * @property {string} [textFont] 附加文本样式，eg:'bold 18px verdana'
+ * @property {string} [textPosition='end'] 附加文本位置, 可以是 inside, left, right, top, bottom
+ * @property {string} [textAlign] 默认根据textPosition自动设置，附加文本水平对齐。
+ *                                可以是start, end, left, right, center
+ * @property {string} [textBaseline] 默认根据textPosition自动设置，附加文本垂直对齐。
+ *                                可以是top, bottom, middle, alphabetic, hanging, ideographic
+ */
+
+define(
+    'zrender/shape/Sector',['require','../tool/math','./Base','./Ring','./Polygon','../tool/util'],function (require) {
+        var math = require('../tool/math');
+        var Base = require('./Base');
+
+        /**
+         * @alias module:zrender/shape/Sector
+         * @constructor
+         * @extends module:zrender/shape/Base
+         * @param {Object} options
+         */
+        var Sector = function (options) {
+            Base.call(this, options);
+            /**
+             * 扇形绘制样式
+             * @name module:zrender/shape/Sector#style
+             * @type {module:zrender/shape/Sector~ISectorStyle}
+             */
+            /**
+             * 扇形高亮绘制样式
+             * @name module:zrender/shape/Sector#highlightStyle
+             * @type {module:zrender/shape/Sector~ISectorStyle}
+             */
+        };
+
+        Sector.prototype = {
+            type: 'sector',
+
+            /**
+             * 创建扇形路径
+             * @param {CanvasRenderingContext2D} ctx
+             * @param {module:zrender/shape/Sector~ISectorStyle} style
+             */
+            buildPath : function (ctx, style) {
+                var x = style.x;   // 圆心x
+                var y = style.y;   // 圆心y
+                var r0 = typeof style.r0 == 'undefined'     // 形内半径[0,r)
+                         ? 0 : style.r0;
+                var r = style.r;                            // 扇形外半径(0,r]
+                var startAngle = style.startAngle;          // 起始角度[0,360)
+                var endAngle = style.endAngle;              // 结束角度(0,360]
+
+                if (Math.abs(endAngle - startAngle) >= 360) {
+                    // 大于360度的扇形简化为圆环画法
+                    ctx.arc(x, y, r, 0, Math.PI * 2, false);
+                    if (r0 !== 0) {
+                        ctx.moveTo(x + r0, y);
+                        ctx.arc(x, y, r0, 0, Math.PI * 2, true);
+                    }
+                    return;
+                }
+                
+                startAngle = math.degreeToRadian(startAngle);
+                endAngle = math.degreeToRadian(endAngle);
+
+                var PI2 = Math.PI * 2;
+                var cosStartAngle = math.cos(startAngle);
+                var sinStartAngle = math.sin(startAngle);
+                ctx.moveTo(
+                    cosStartAngle * r0 + x,
+                    y - sinStartAngle * r0
+                );
+
+                ctx.lineTo(
+                    cosStartAngle * r + x,
+                    y - sinStartAngle * r
+                );
+
+                ctx.arc(x, y, r, PI2 - startAngle, PI2 - endAngle, true);
+
+                ctx.lineTo(
+                    math.cos(endAngle) * r0 + x,
+                    y - math.sin(endAngle) * r0
+                );
+
+                if (r0 !== 0) {
+                    ctx.arc(x, y, r0, PI2 - endAngle, PI2 - startAngle, false);
+                }
+
+                ctx.closePath();
+
+                return;
+            },
+
+            /**
+             * 返回扇形包围盒矩形
+             * @param {module:zrender/shape/Sector~ISectorStyle} style
+             * @return {module:zrender/shape/Base~IBoundingRect}
+             */
+            getRect : function (style) {
+                if (style.__rect) {
+                    return style.__rect;
+                }
+                
+                var x = style.x;   // 圆心x
+                var y = style.y;   // 圆心y
+                var r0 = typeof style.r0 == 'undefined'     // 形内半径[0,r)
+                         ? 0 : style.r0;
+                var r = style.r;                            // 扇形外半径(0,r]
+                var startAngle = style.startAngle;          // 起始角度[0,360)
+                var endAngle = style.endAngle;              // 结束角度(0,360]
+                
+                if (Math.abs(endAngle - startAngle) >= 360) {
+                    // 大于360度的扇形简化为圆环bbox
+                    style.__rect = require('./Ring').prototype.getRect(style);
+                    return style.__rect;
+                }
+                
+                startAngle = (720 + startAngle) % 360;
+                endAngle = (720 + endAngle) % 360;
+                if (endAngle <= startAngle) {
+                    endAngle += 360;
+                }
+                var pointList = [];
+                if (startAngle <= 90 && endAngle >= 90) {
+                    pointList.push([
+                        x, y - r
+                    ]);
+                }
+                if (startAngle <= 180 && endAngle >= 180) {
+                    pointList.push([
+                        x - r, y
+                    ]);
+                }
+                if (startAngle <= 270 && endAngle >= 270) {
+                    pointList.push([
+                        x, y + r
+                    ]);
+                }
+                if (startAngle <= 360 && endAngle >= 360) {
+                    pointList.push([
+                        x + r, y
+                    ]);
+                }
+
+                startAngle = math.degreeToRadian(startAngle);
+                endAngle = math.degreeToRadian(endAngle);
+
+
+                pointList.push([
+                    math.cos(startAngle) * r0 + x,
+                    y - math.sin(startAngle) * r0
+                ]);
+
+                pointList.push([
+                    math.cos(startAngle) * r + x,
+                    y - math.sin(startAngle) * r
+                ]);
+
+                pointList.push([
+                    math.cos(endAngle) * r + x,
+                    y - math.sin(endAngle) * r
+                ]);
+
+                pointList.push([
+                    math.cos(endAngle) * r0 + x,
+                    y - math.sin(endAngle) * r0
+                ]);
+
+                style.__rect = require('./Polygon').prototype.getRect({
+                    brushType : style.brushType,
+                    lineWidth : style.lineWidth,
+                    pointList : pointList
+                });
+                
+                return style.__rect;
+            }
+        };
+
+
+        require('../tool/util').inherits(Sector, Base);
+        return Sector;
+    }
+);
+
+/**
+ * zrender
+ *
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * shape类：蜡烛
+ * 可配图形属性：
+   {
+       // 基础属性
+       shape  : 'candle',       // 必须，shape类标识，需要显式指定
+       id     : {string},       // 必须，图形唯一标识，可通过'zrender/tool/guid'方法生成
+       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       invisible : {boolean},   // 默认为false，是否可见
+
+       // 样式属性，默认状态样式样式属性
+       style  : {
+           x             : {number},  // 必须，横坐标
+           y             : {Array},   // 必须，纵坐标数组
+       },
+
+       // 样式属性，高亮样式属性，当不存在highlightStyle时使用基于默认样式扩展显示
+       highlightStyle : {
+           // 同style
+       }
+
+       // 交互属性，详见shape.Base
+
+       // 事件属性，详见shape.Base
+   }
+         例子：
+   {
+       shape  : 'candle',
+       id     : '123456',
+       zlevel : 1,
+       style  : {
+           x : 200,
+           y : [100,123,90,125],
+           width : 150,
+           color : '#eee',
+           text : 'Baidu'
+       },
+       myName : 'kener',  // 可自带任何有效自定义属性
+
+       clickable : true,
+       onClick : function (eventPacket) {
+           alert(eventPacket.target.myName);
+       }
+   }
+ */
+define('echarts/util/shape/Candle',['require','zrender/shape/Base','zrender/tool/util','./normalIsCover'],function (require) {
+    var Base = require('zrender/shape/Base');
+    var zrUtil = require('zrender/tool/util');
+
+    function Candle(options) {
+        Base.call(this, options);
+    }
+
+    Candle.prototype =  {
+        type: 'candle',
+        _numberOrder : function (a, b) {
+            return b - a;
+        },
+
+        /**
+         * 创建矩形路径
+         * @param {Context2D} ctx Canvas 2D上下文
+         * @param {Object} style 样式
+         */
+        buildPath : function (ctx, style) {
+            var yList = zrUtil.clone(style.y).sort(this._numberOrder);
+
+            ctx.moveTo(style.x, yList[3]);
+            ctx.lineTo(style.x, yList[2]);
+            ctx.moveTo(style.x - style.width / 2, yList[2]);
+            ctx.rect(
+                style.x - style.width / 2,
+                yList[2],
+                style.width,
+                yList[1] - yList[2]
+            );
+            ctx.moveTo(style.x, yList[1]);
+            ctx.lineTo(style.x, yList[0]);
+        },
+
+        /**
+         * 返回矩形区域，用于局部刷新和文字定位
+         * @param {Object} style
+         */
+        getRect : function (style) {
+            if (!style.__rect) {
+                var lineWidth = 0;
+                if (style.brushType == 'stroke' || style.brushType == 'fill') {
+                    lineWidth = style.lineWidth || 1;
+                }
+
+                var yList = zrUtil.clone(style.y).sort(this._numberOrder);
+                style.__rect = {
+                    x : Math.round(style.x - style.width / 2 - lineWidth / 2),
+                    y : Math.round(yList[3] - lineWidth / 2),
+                    width : style.width + lineWidth,
+                    height : yList[0] - yList[3] + lineWidth
+                };
+            }
+
+            return style.__rect;
+        },
+
+
+        isCover : require('./normalIsCover')
+    };
+
+    zrUtil.inherits(Candle, Base);
+
+    return Candle;
+});
+
+/**
+ * echarts组件：图例
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/component/legend',['require','./base','zrender/shape/Text','zrender/shape/Rectangle','zrender/shape/Sector','../util/shape/Icon','../util/shape/Candle','../config','zrender/tool/util','zrender/tool/area','../component'],function (require) {
+    var Base = require('./base');
+    
+    // 图形依赖
+    var TextShape = require('zrender/shape/Text');
+    var RectangleShape = require('zrender/shape/Rectangle');
+    var SectorShape = require('zrender/shape/Sector');
+    //var BeziercurveShape = require('zrender/shape/Beziercurve');
+    var IconShape = require('../util/shape/Icon');
+    var CandleShape = require('../util/shape/Candle');
+    
+    var ecConfig = require('../config');
+    var zrUtil = require('zrender/tool/util');
+    var zrArea = require('zrender/tool/area');
+
+    /**
+     * 构造函数
+     * @param {Object} messageCenter echart消息中心
+     * @param {ZRender} zr zrender实例
+     * @param {Object} option 图表参数
+     */
+    function Legend(ecTheme, messageCenter, zr, option, myChart) {
+        if (!this.query(option, 'legend.data')) {
+            console.error('option.legend.data has not been defined.');
+            return;
+        }
+        
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+        
+        var self = this;
+        self._legendSelected = function (param) {
+            self.__legendSelected(param);
+        };
+        
+        this._colorIndex = 0;
+        this._colorMap = {};
+        this._selectedMap = {};
+        
+        this.refresh(option);
+    }
+    
+    Legend.prototype = {
+        type: ecConfig.COMPONENT_TYPE_LEGEND,
+        _buildShape: function () {
+            // 图例元素组的位置参数，通过计算所得x, y, width, height
+            this._itemGroupLocation = this._getItemGroupLocation();
+
+            this._buildBackground();
+            this._buildItem();
+
+            for (var i = 0, l = this.shapeList.length; i < l; i++) {
+                this.zr.addShape(this.shapeList[i]);
+            }
+        },
+
+        /**
+         * 构建所有图例元素
+         */
+        _buildItem: function () {
+            var data = this.legendOption.data;
+            var dataLength = data.length;
+            var itemName;
+            var itemType;
+            var itemShape;
+            var textShape;
+            var textStyle  = this.legendOption.textStyle;
+            var dataTextStyle;
+            var dataFont;
+            var formattedName;
+
+            var zrWidth = this.zr.getWidth();
+            var zrHeight = this.zr.getHeight();
+            var lastX = this._itemGroupLocation.x;
+            var lastY = this._itemGroupLocation.y;
+            var itemWidth = this.legendOption.itemWidth;
+            var itemHeight = this.legendOption.itemHeight;
+            var itemGap = this.legendOption.itemGap;
+            var color;
+
+            if (this.legendOption.orient === 'vertical' && this.legendOption.x === 'right') {
+                lastX = this._itemGroupLocation.x
+                        + this._itemGroupLocation.width
+                        - itemWidth;
+            }
+
+            for (var i = 0; i < dataLength; i++) {
+                dataTextStyle = zrUtil.merge(
+                    data[i].textStyle || {},
+                    textStyle
+                );
+                dataFont = this.getFont(dataTextStyle);
+                
+                itemName = this._getName(data[i]);
+                formattedName = this._getFormatterName(itemName);
+                if (itemName === '') { // 别帮我代码优化
+                    if (this.legendOption.orient === 'horizontal') {
+                        lastX = this._itemGroupLocation.x;
+                        lastY += itemHeight + itemGap;
+                    }
+                    else {
+                        this.legendOption.x === 'right'
+                            ? lastX -= this._itemGroupLocation.maxWidth + itemGap
+                            : lastX += this._itemGroupLocation.maxWidth + itemGap;
+                        lastY = this._itemGroupLocation.y;
+                    }
+                    continue;
+                }
+                itemType = data[i].icon || this._getSomethingByName(itemName).type;
+                
+                color = this.getColor(itemName);
+
+                if (this.legendOption.orient === 'horizontal') {
+                    if (zrWidth - lastX < 200   // 最后200px做分行预判
+                        && (itemWidth + 5 + zrArea.getTextWidth(formattedName, dataFont)
+                            // 分行的最后一个不用算itemGap
+                            + (i === dataLength - 1 || data[i + 1] === '' ? 0 : itemGap)
+                           ) >= zrWidth - lastX
+                    ) {
+                        lastX = this._itemGroupLocation.x;
+                        lastY += itemHeight + itemGap;
+                    }
+                }
+                else {
+                    if (zrHeight - lastY < 200   // 最后200px做分行预判
+                        && (itemHeight
+                            // 分行的最后一个不用算itemGap
+                            + (i === dataLength - 1 || data[i + 1] === '' ? 0 : itemGap)
+                           ) 
+                           >= zrHeight - lastY
+                    ) {
+                        this.legendOption.x === 'right'
+                        ? lastX -= this._itemGroupLocation.maxWidth + itemGap
+                        : lastX += this._itemGroupLocation.maxWidth + itemGap;
+                        lastY = this._itemGroupLocation.y;
+                    }
+                }
+
+                // 图形
+                itemShape = this._getItemShapeByType(
+                    lastX, lastY,
+                    itemWidth, itemHeight,
+                    (this._selectedMap[itemName] ? color : '#ccc'),
+                    itemType,
+                    color
+                );
+                itemShape._name = itemName;
+                itemShape = new IconShape(itemShape);
+
+                // 文字
+                textShape = {
+                    // shape: 'text',
+                    zlevel: this._zlevelBase,
+                    style: {
+                        x: lastX + itemWidth + 5,
+                        y: lastY + itemHeight / 2,
+                        color: this._selectedMap[itemName]
+                                ? (dataTextStyle.color === 'auto' ? color : dataTextStyle.color)
+                                : '#ccc',
+                        text: formattedName,
+                        textFont: dataFont,
+                        textBaseline: 'middle'
+                    },
+                    highlightStyle: {
+                        color: color,
+                        brushType: 'fill'
+                    },
+                    hoverable: !!this.legendOption.selectedMode,
+                    clickable: !!this.legendOption.selectedMode
+                };
+
+                if (this.legendOption.orient === 'vertical'
+                    && this.legendOption.x === 'right'
+                ) {
+                    textShape.style.x -= (itemWidth + 10);
+                    textShape.style.textAlign = 'right';
+                }
+
+                textShape._name = itemName;
+                textShape = new TextShape(textShape);
+                
+                if (this.legendOption.selectedMode) {
+                    itemShape.onclick = textShape.onclick = this._legendSelected;
+                    itemShape.onmouseover =  textShape.onmouseover = this.hoverConnect;
+                    itemShape.hoverConnect = textShape.id;
+                    textShape.hoverConnect = itemShape.id;
+                }
+                this.shapeList.push(itemShape);
+                this.shapeList.push(textShape);
+
+                if (this.legendOption.orient === 'horizontal') {
+                    lastX += itemWidth + 5
+                             + zrArea.getTextWidth(formattedName, dataFont)
+                             + itemGap;
+                }
+                else {
+                    lastY += itemHeight + itemGap;
+                }
+            }
+        
+            if (this.legendOption.orient === 'horizontal'
+                && this.legendOption.x === 'center'
+                && lastY != this._itemGroupLocation.y
+            ) {
+                // 多行橫排居中优化
+                this._mLineOptimize();
+            }
+        },
+        
+        _getName: function(data) {
+            return typeof data.name != 'undefined' ? data.name : data;
+        },
+
+        _getFormatterName: function(itemName) {
+            var formatter = this.legendOption.formatter;
+            var formattedName;
+            if (typeof formatter === 'function') {
+                formattedName = formatter.call(this.myChart, itemName);
+            }
+            else if (typeof formatter === 'string') {
+                formattedName = formatter.replace('{name}', itemName);
+            }
+            else {
+                formattedName = itemName;
+            }
+            return formattedName;
+        },
+
+        _getFormatterNameFromData: function(data) {
+            var itemName = this._getName(data);
+            return this._getFormatterName(itemName);
+        },
+        
+        // 多行橫排居中优化
+        _mLineOptimize: function () {
+            var lineOffsetArray = []; // 每行宽度
+            var lastX = this._itemGroupLocation.x;
+            for (var i = 2, l = this.shapeList.length; i < l; i++) {
+                if (this.shapeList[i].style.x === lastX) {
+                    lineOffsetArray.push(
+                        (
+                            this._itemGroupLocation.width 
+                            - (
+                                this.shapeList[i - 1].style.x
+                                + zrArea.getTextWidth(
+                                      this.shapeList[i - 1].style.text,
+                                      this.shapeList[i - 1].style.textFont
+                                  )
+                                - lastX
+                            )
+                        ) / 2
+                    );
+                }
+                else if (i === l - 1) {
+                    lineOffsetArray.push(
+                        (
+                            this._itemGroupLocation.width 
+                            - (
+                                this.shapeList[i].style.x
+                                + zrArea.getTextWidth(
+                                      this.shapeList[i].style.text,
+                                      this.shapeList[i].style.textFont
+                                  )
+                                - lastX
+                            )
+                        ) / 2
+                    );
+                }
+            }
+            var curLineIndex = -1;
+            for (var i = 1, l = this.shapeList.length; i < l; i++) {
+                if (this.shapeList[i].style.x === lastX) {
+                    curLineIndex++;
+                }
+                if (lineOffsetArray[curLineIndex] === 0) {
+                    continue;
+                }
+                else {
+                    this.shapeList[i].style.x += lineOffsetArray[curLineIndex];
+                }
+            }
+        },
+
+        _buildBackground: function () {
+            var pTop = this.legendOption.padding[0];
+            var pRight = this.legendOption.padding[1];
+            var pBottom = this.legendOption.padding[2];
+            var pLeft = this.legendOption.padding[3];
+
+            this.shapeList.push(new RectangleShape({
+                zlevel: this._zlevelBase,
+                hoverable :false,
+                style: {
+                    x: this._itemGroupLocation.x - pLeft,
+                    y: this._itemGroupLocation.y - pTop,
+                    width: this._itemGroupLocation.width + pLeft + pRight,
+                    height: this._itemGroupLocation.height + pTop + pBottom,
+                    brushType: this.legendOption.borderWidth === 0 ? 'fill' : 'both',
+                    color: this.legendOption.backgroundColor,
+                    strokeColor: this.legendOption.borderColor,
+                    lineWidth: this.legendOption.borderWidth
+                }
+            }));
+        },
+
+        /**
+         * 根据选项计算图例实体的位置坐标
+         */
+        _getItemGroupLocation: function () {
+            var data = this.legendOption.data;
+            var dataLength = data.length;
+            var itemGap = this.legendOption.itemGap;
+            var itemWidth = this.legendOption.itemWidth + 5; // 5px是图形和文字的间隔，不可配
+            var itemHeight = this.legendOption.itemHeight;
+            var textStyle  = this.legendOption.textStyle;
+            var font = this.getFont(textStyle);
+            var totalWidth = 0;
+            var totalHeight = 0;
+            var padding = this.legendOption.padding;
+            var zrWidth = this.zr.getWidth() - padding[1] - padding[3];
+            var zrHeight = this.zr.getHeight() - padding[0] - padding[2];
+            
+            var temp = 0; // 宽高计算，用于多行判断
+            var maxWidth = 0; // 垂直布局有用
+            if (this.legendOption.orient === 'horizontal') {
+                // 水平布局，计算总宽度
+                totalHeight = itemHeight;
+                for (var i = 0; i < dataLength; i++) {
+                    if (this._getName(data[i]) === '') {
+                        temp -= itemGap;
+                        if (temp > zrWidth) {
+                            totalWidth = zrWidth;
+                            totalHeight += itemHeight + itemGap;
+                        }
+                        else {
+                            totalWidth = Math.max(totalWidth, temp);
+                        }
+                        totalHeight += itemHeight + itemGap;
+                        temp = 0;
+                        continue;
+                    }
+                    temp += itemWidth
+                            + zrArea.getTextWidth(
+                                  this._getFormatterNameFromData(data[i]),
+                                  data[i].textStyle 
+                                  ? this.getFont(zrUtil.merge(
+                                        data[i].textStyle || {},
+                                        textStyle
+                                    ))
+                                  : font
+                              )
+                            + itemGap;
+                }
+                totalHeight = Math.max(totalHeight, itemHeight);
+                temp -= itemGap;    // 减去最后一个的itemGap
+                if (temp > zrWidth) {
+                    totalWidth = zrWidth;
+                    totalHeight += itemHeight + itemGap;
+                } else {
+                    totalWidth = Math.max(totalWidth, temp);
+                }
+            }
+            else {
+                // 垂直布局，计算总高度
+                for (var i = 0; i < dataLength; i++) {
+                    maxWidth = Math.max(
+                        maxWidth,
+                        zrArea.getTextWidth(
+                            this._getFormatterNameFromData(data[i]),
+                            data[i].textStyle 
+                            ? this.getFont(zrUtil.merge(
+                                  data[i].textStyle || {},
+                                  textStyle
+                              ))
+                            : font
+                        )
+                    );
+                }
+                maxWidth += itemWidth;
+                totalWidth = maxWidth;
+                for (var i = 0; i < dataLength; i++) {
+                    if (this._getName(data[i]) === '') {
+                        temp -= itemGap;
+                        if (temp > zrHeight) {
+                            totalHeight = zrHeight;
+                            totalWidth += maxWidth + itemGap;
+                        }
+                        else {
+                            totalHeight = Math.max(totalHeight, temp);
+                        }
+                        totalWidth += maxWidth + itemGap;
+                        temp = 0;
+                        continue;
+                    }
+                    temp += itemHeight + itemGap;
+                }
+                totalWidth = Math.max(totalWidth, maxWidth);
+                temp -= itemGap;    // 减去最后一个的itemGap
+                if (temp > zrHeight) {
+                    totalHeight = zrHeight;
+                    totalWidth += maxWidth + itemGap;
+                } else {
+                    totalHeight = Math.max(totalHeight, temp);
+                }
+            }
+
+            zrWidth = this.zr.getWidth();
+            zrHeight = this.zr.getHeight();
+            var x;
+            switch (this.legendOption.x) {
+                case 'center' :
+                    x = Math.floor((zrWidth - totalWidth) / 2);
+                    break;
+                case 'left' :
+                    x = this.legendOption.padding[3] + this.legendOption.borderWidth;
+                    break;
+                case 'right' :
+                    x = zrWidth
+                        - totalWidth
+                        - this.legendOption.padding[1]
+                        - this.legendOption.padding[3]
+                        - this.legendOption.borderWidth * 2;
+                    break;
+                default :
+                    x = this.parsePercent(this.legendOption.x, zrWidth);
+                    break;
+            }
+            
+            var y;
+            switch (this.legendOption.y) {
+                case 'top' :
+                    y = this.legendOption.padding[0] + this.legendOption.borderWidth;
+                    break;
+                case 'bottom' :
+                    y = zrHeight
+                        - totalHeight
+                        - this.legendOption.padding[0]
+                        - this.legendOption.padding[2]
+                        - this.legendOption.borderWidth * 2;
+                    break;
+                case 'center' :
+                    y = Math.floor((zrHeight - totalHeight) / 2);
+                    break;
+                default :
+                    y = this.parsePercent(this.legendOption.y, zrHeight);
+                    break;
+            }
+
+            return {
+                x: x,
+                y: y,
+                width: totalWidth,
+                height: totalHeight,
+                maxWidth: maxWidth
+            };
+        },
+
+        /**
+         * 根据名称返回series数据或data
+         */
+        _getSomethingByName: function (name) {
+            var series = this.option.series;
+            var data;
+            for (var i = 0, l = series.length; i < l; i++) {
+                if (series[i].name === name) {
+                    // 系列名称优先
+                    return {
+                        type: series[i].type,
+                        series: series[i],
+                        seriesIndex: i,
+                        data: null,
+                        dataIndex: -1
+                    };
+                }
+
+                if (
+                    series[i].type === ecConfig.CHART_TYPE_PIE 
+                    || series[i].type === ecConfig.CHART_TYPE_RADAR
+                    || series[i].type === ecConfig.CHART_TYPE_CHORD
+                    || series[i].type === ecConfig.CHART_TYPE_FORCE
+                    || series[i].type === ecConfig.CHART_TYPE_FUNNEL
+                ) {
+                    data = series[i].type != ecConfig.CHART_TYPE_FORCE
+                           ? series[i].data         // 饼图、雷达图、和弦图得查找里面的数据名字
+                           : series[i].categories;  // 力导布局查找categories配置
+                    for (var j = 0, k = data.length; j < k; j++) {
+                        if (data[j].name === name) {
+                            return {
+                                type: series[i].type,
+                                series: series[i],
+                                seriesIndex: i,
+                                data: data[j],
+                                dataIndex: j
+                            };
+                        }
+                    }
+                }
+            }
+            return {
+                type: 'bar',
+                series: null,
+                seriesIndex: -1,
+                data: null,
+                dataIndex: -1
+            };
+        },
+        
+        _getItemShapeByType: function (x, y, width, height, color, itemType, defaultColor) {
+            var highlightColor = color === '#ccc' ? defaultColor : color;
+            var itemShape = {
+                zlevel: this._zlevelBase,
+                style: {
+                    iconType: 'legendicon' + itemType,
+                    x: x,
+                    y: y,
+                    width: width,
+                    height: height,
+                    color: color,
+                    strokeColor: color,
+                    lineWidth: 2
+                },
+                highlightStyle: {
+                    color: highlightColor,
+                    strokeColor: highlightColor,
+                    lineWidth: 1
+                },
+                hoverable: this.legendOption.selectedMode,
+                clickable: this.legendOption.selectedMode
+            };
+            
+            var imageLocation;
+            if (itemType.match('image')) {
+                var imageLocation = itemType.replace(
+                    new RegExp('^image:\\/\\/'), ''
+                );
+                itemType = 'image';
+            }
+            // 特殊设置
+            switch (itemType) {
+                case 'line':
+                    itemShape.style.brushType = 'stroke';
+                    itemShape.highlightStyle.lineWidth = 3;
+                    break;
+                case 'radar':
+                case 'scatter':
+                    itemShape.highlightStyle.lineWidth = 3;
+                    break;
+                case 'k':
+                    itemShape.style.brushType = 'both';
+                    itemShape.highlightStyle.lineWidth = 3;
+                    itemShape.highlightStyle.color =
+                    itemShape.style.color = this.query(this.ecTheme, 'k.itemStyle.normal.color') 
+                                            || '#fff';
+                    itemShape.style.strokeColor = color != '#ccc' 
+                        ? (this.query(this.ecTheme, 'k.itemStyle.normal.lineStyle.color') 
+                           || '#ff3200')
+                        : color;
+                    break;
+                case 'image':
+                    itemShape.style.iconType = 'image';
+                    itemShape.style.image = imageLocation;
+                    if (color === '#ccc') {
+                        itemShape.style.opacity = 0.5;
+                    }
+                    break;
+            }
+            return itemShape;
+        },
+
+        __legendSelected: function (param) {
+            var itemName = param.target._name;
+            if (this.legendOption.selectedMode === 'single') {
+                for (var k in this._selectedMap) {
+                    this._selectedMap[k] = false;
+                }
+            }
+            this._selectedMap[itemName] = !this._selectedMap[itemName];
+            this.messageCenter.dispatch(
+                ecConfig.EVENT.LEGEND_SELECTED,
+                param.event,
+                {
+                    selected: this._selectedMap,
+                    target: itemName
+                },
+                this.myChart
+            );
+        },
+
+        /**
+         * 刷新
+         */
+        refresh: function (newOption) {
+            if (newOption) {
+                this.option = newOption || this.option;
+                this.option.legend = this.reformOption(this.option.legend);
+                // 补全padding属性
+                this.option.legend.padding = this.reformCssArray(
+                    this.option.legend.padding
+                );
+                this.legendOption = this.option.legend;
+                
+                var data = this.legendOption.data || [];
+                var itemName;
+                var something;
+                var color;
+                var queryTarget;
+                if (this.legendOption.selected) {
+                    for (var k in this.legendOption.selected) {
+                        this._selectedMap[k] = typeof this._selectedMap[k] != 'undefined'
+                                               ? this._selectedMap[k]
+                                               : this.legendOption.selected[k];
+                    }
+                }
+                for (var i = 0, dataLength = data.length; i < dataLength; i++) {
+                    itemName = this._getName(data[i]);
+                    if (itemName === '') {
+                        continue;
+                    }
+                    something = this._getSomethingByName(itemName);
+                    if (!something.series) {
+                        this._selectedMap[itemName] = false;
+                    } 
+                    else {
+                        if (something.data
+                            && (something.type === ecConfig.CHART_TYPE_PIE
+                                || something.type === ecConfig.CHART_TYPE_FORCE
+                                || something.type === ecConfig.CHART_TYPE_FUNNEL)
+                        ) {
+                            queryTarget = [something.data, something.series];
+                        }
+                        else {
+                            queryTarget = [something.series];
+                        }
+                        
+                        color = this.getItemStyleColor(
+                            this.deepQuery(queryTarget, 'itemStyle.normal.color'),
+                            something.seriesIndex,
+                            something.dataIndex,
+                            something.data
+                        );
+                        if (color && something.type != ecConfig.CHART_TYPE_K) {
+                            this.setColor(itemName, color);
+                        }
+                        this._selectedMap[itemName] = 
+                            typeof this._selectedMap[itemName] != 'undefined'
+                            ? this._selectedMap[itemName] : true; 
+                    }
+                }
+            }
+            this.clear();
+            this._buildShape();
+        },
+        
+        getRelatedAmount: function(name) {
+            var amount = 0;
+            var series = this.option.series;
+            var data;
+            for (var i = 0, l = series.length; i < l; i++) {
+                if (series[i].name === name) {
+                    // 系列名称优先
+                    amount++;
+                }
+
+                if (
+                    series[i].type === ecConfig.CHART_TYPE_PIE 
+                    || series[i].type === ecConfig.CHART_TYPE_RADAR
+                    || series[i].type === ecConfig.CHART_TYPE_CHORD
+                    || series[i].type === ecConfig.CHART_TYPE_FORCE
+                    || series[i].type === ecConfig.CHART_TYPE_FUNNEL
+                ) {
+                    data = series[i].type != ecConfig.CHART_TYPE_FORCE
+                           ? series[i].data         // 饼图、雷达图、和弦图得查找里面的数据名字
+                           : series[i].categories;  // 力导布局查找categories配置
+                    for (var j = 0, k = data.length; j < k; j++) {
+                        if (data[j].name === name && data[j].value != '-') {
+                            amount++;
+                        }
+                    }
+                }
+            }
+            return amount;
+        },
+
+        setColor: function (legendName, color) {
+            this._colorMap[legendName] = color;
+        },
+
+        getColor: function (legendName) {
+            if (!this._colorMap[legendName]) {
+                this._colorMap[legendName] = this.zr.getColor(this._colorIndex++);
+            }
+            return this._colorMap[legendName];
+        },
+        
+        hasColor: function (legendName) {
+            return this._colorMap[legendName] ? this._colorMap[legendName] : false;
+        },
+
+        add: function (name, color){
+            var data = this.legendOption.data;
+            for (var i = 0, dataLength = data.length; i < dataLength; i++) {
+                if (this._getName(data[i]) === name) {
+                    // 已有就不重复加了
+                    return;
+                }
+            }
+            this.legendOption.data.push(name);
+            this.setColor(name,color);
+            this._selectedMap[name] = true;
+        },
+
+        del: function (name){
+            var data = this.legendOption.data;
+            for (var i = 0, dataLength = data.length; i < dataLength; i++) {
+                if (this._getName(data[i]) === name) {
+                    return this.legendOption.data.splice(i, 1);
+                }
+            }
+        },
+        
+        /**
+         * 特殊图形元素回调设置
+         * @param {Object} name
+         * @param {Object} itemShape
+         */
+        getItemShape: function (name) {
+            if (name == null) {
+                return;
+            }
+            var shape;
+            for (var i = 0, l = this.shapeList.length; i < l; i++) {
+                shape = this.shapeList[i];
+                if (shape._name === name && shape.type != 'text') {
+                    return shape;
+                }
+            }
+        },
+        
+        /**
+         * 特殊图形元素回调设置
+         * @param {Object} name
+         * @param {Object} itemShape
+         */
+        setItemShape: function (name, itemShape) {
+            var shape;
+            for (var i = 0, l = this.shapeList.length; i < l; i++) {
+                shape = this.shapeList[i];
+                if (shape._name === name && shape.type != 'text') {
+                    if (!this._selectedMap[name]) {
+                        itemShape.style.color = '#ccc';
+                        itemShape.style.strokeColor = '#ccc';
+                    }
+                    this.zr.modShape(shape.id, itemShape);
+                }
+            }
+        },
+
+        isSelected: function (itemName) {
+            if (typeof this._selectedMap[itemName] != 'undefined') {
+                return this._selectedMap[itemName];
+            }
+            else {
+                // 没在legend里定义的都为true啊~
+                return true;
+            }
+        },
+        
+        getSelectedMap: function () {
+            return this._selectedMap;
+        },
+        
+        setSelected: function(itemName, selectStatus) {
+            if (this.legendOption.selectedMode === 'single') {
+                for (var k in this._selectedMap) {
+                    this._selectedMap[k] = false;
+                }
+            }
+            this._selectedMap[itemName] = selectStatus;
+            this.messageCenter.dispatch(
+                ecConfig.EVENT.LEGEND_SELECTED,
+                null,
+                {
+                    selected: this._selectedMap,
+                    target: itemName
+                },
+                this.myChart
+            );
+        },
+        
+        /**
+         * 图例选择
+         */
+        onlegendSelected: function (param, status) {
+            var legendSelected = param.selected;
+            for (var itemName in legendSelected) {
+                if (this._selectedMap[itemName] != legendSelected[itemName]) {
+                    // 有一项不一致都需要重绘
+                    status.needRefresh = true;
+                }
+                this._selectedMap[itemName] = legendSelected[itemName];
+            }
+            return;
+        }
+    };
+    
+    var legendIcon = {
+        line: function (ctx, style) {
+            var dy = style.height / 2;
+            ctx.moveTo(style.x,     style.y + dy);
+            ctx.lineTo(style.x + style.width,style.y + dy);
+        },
+        
+        pie: function (ctx, style) {
+            var x = style.x;
+            var y = style.y;
+            var width = style.width;
+            var height = style.height;
+            SectorShape.prototype.buildPath(ctx, {
+                x: x + width / 2,
+                y: y + height + 2,
+                r: height + 2,
+                r0: 6,
+                startAngle: 45,
+                endAngle: 135
+            });
+        },
+        /*
+        chord: function (ctx, style) {
+            var x = style.x;
+            var y = style.y;
+            var width = style.width;
+            var height = style.height;
+            ctx.moveTo(x, y + height);
+            BeziercurveShape.prototype.buildPath(ctx, {
+                xStart: x,
+                yStart: y + height,
+                cpX1: x + width,
+                cpY1: y + height,
+                cpX2: x,
+                cpY2: y + 4,
+                xEnd: x + width,
+                yEnd: y + 4
+            });
+            ctx.lineTo(x + width, y);
+            BeziercurveShape.prototype.buildPath(ctx, {
+                xStart: x + width,
+                yStart: y,
+                cpX1: x,
+                cpY1: y,
+                cpX2: x + width,
+                cpY2: y + height - 4,
+                xEnd: x,
+                yEnd: y + height - 4
+            });
+            ctx.lineTo(x, y + height);
+        },
+        */
+        k: function (ctx, style) {
+            var x = style.x;
+            var y = style.y;
+            var width = style.width;
+            var height = style.height;
+            CandleShape.prototype.buildPath(ctx, {
+                x: x + width / 2,
+                y: [y + 1, y + 1, y + height - 6, y + height],
+                width: width - 6
+            });
+        },
+        
+        bar: function (ctx, style) {
+            var x = style.x;
+            var y = style.y +1;
+            var width = style.width;
+            var height = style.height - 2;
+            var r = 3;
+            
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + width - r, y);
+            ctx.quadraticCurveTo(
+                x + width, y, x + width, y + r
+            );
+            ctx.lineTo(x + width, y + height - r);
+            ctx.quadraticCurveTo(
+                x + width, y + height, x + width - r, y + height
+            );
+            ctx.lineTo(x + r, y + height);
+            ctx.quadraticCurveTo(
+                x, y + height, x, y + height - r
+            );
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+        },
+        
+        force: function (ctx, style) {
+            IconShape.prototype.iconLibrary.circle(ctx, style);
+        },
+        
+        radar: function (ctx, style) {
+            var n = 6;
+            var x = style.x + style.width / 2;
+            var y = style.y + style.height / 2;
+            var r = style.height / 2;
+
+            var dStep = 2 * Math.PI / n;
+            var deg = -Math.PI / 2;
+            var xStart = x + r * Math.cos(deg);
+            var yStart = y + r * Math.sin(deg);
+            
+            ctx.moveTo(xStart, yStart);
+            deg += dStep;
+            for (var i = 0, end = n - 1; i < end; i ++) {
+                ctx.lineTo(x + r * Math.cos(deg), y + r * Math.sin(deg));
+                deg += dStep;
+            }
+            ctx.lineTo(xStart, yStart);
+        }
+    };
+    legendIcon.chord = legendIcon.pie;
+    legendIcon.map = legendIcon.bar;
+    
+    for (var k in legendIcon) {
+        IconShape.prototype.iconLibrary['legendicon' + k] = legendIcon[k];
+    }
+    
+    zrUtil.inherits(Legend, Base);
+    
+    require('../component').define('legend', Legend);
+    
+    return Legend;
+});
+
+
+
+/**
+ * zrender
+ *
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * shape类：时间轴线
+ */
+define('echarts/util/shape/Chain',['require','zrender/shape/Base','./Icon','zrender/shape/util/dashedLineTo','zrender/tool/util','zrender/tool/matrix'],function (require) {
+    var Base = require('zrender/shape/Base');
+    var IconShape = require('./Icon');
+
+    var dashedLineTo = require('zrender/shape/util/dashedLineTo');
+    var zrUtil = require('zrender/tool/util');
+    var matrix = require('zrender/tool/matrix');
+
+    function Chain(options) {
+        Base.call(this, options);
+    }
+
+    Chain.prototype =  {
+        type : 'chain',
+
+        /**
+         * 画刷
+         * @param ctx       画布句柄
+         * @param e         形状实体
+         * @param isHighlight   是否为高亮状态
+         * @param updateCallback 需要异步加载资源的shape可以通过这个callback(e)
+         *                       让painter更新视图，base.brush没用，需要的话重载brush
+         */
+        brush : function (ctx, isHighlight) {
+            var style = this.style;
+
+            if (isHighlight) {
+                // 根据style扩展默认高亮样式
+                style = this.getHighlightStyle(
+                    style,
+                    this.highlightStyle || {}
+                );
+            }
+
+            ctx.save();
+            this.setContext(ctx, style);
+
+            // 设置transform
+            this.setTransform(ctx);
+
+            ctx.save();
+            ctx.beginPath();
+            this.buildLinePath(ctx, style);
+            ctx.stroke();
+            ctx.restore();
+            
+            this.brushSymbol(ctx, style);
+
+            ctx.restore();
+            return;
+        },
+
+        /**
+         * 创建线条路径
+         * @param {Context2D} ctx Canvas 2D上下文
+         * @param {Object} style 样式
+         */
+        buildLinePath : function (ctx, style) {
+            var x = style.x;
+            var y = style.y + 5;
+            var width = style.width;
+            var height = style.height / 2 - 10;
+
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + height);
+            ctx.moveTo(x + width, y);
+            ctx.lineTo(x + width, y + height);
+
+            ctx.moveTo(x, y + height / 2);
+            if (!style.lineType || style.lineType == 'solid') {
+                ctx.lineTo(x + width, y + height / 2);
+            }
+            else if (style.lineType == 'dashed' || style.lineType == 'dotted') {
+                var dashLength = (style.lineWidth || 1)
+                             * (style.lineType == 'dashed' ? 5 : 1);
+                dashedLineTo(ctx, x, y + height / 2, x + width, y + height / 2, dashLength);
+            }
+        },
+
+        /**
+         * 标线始末标注
+         */
+        brushSymbol : function (ctx, style) {
+            var y = style.y + style.height / 4;
+            ctx.save();
+
+            var chainPoint = style.chainPoint;
+            var curPoint;
+            for (var idx = 0, l = chainPoint.length; idx < l; idx++) {
+                curPoint = chainPoint[idx];
+                if (curPoint.symbol != 'none') {
+                    ctx.beginPath();
+                    var symbolSize = curPoint.symbolSize;
+                    IconShape.prototype.buildPath(
+                        ctx,
+                        {
+                            iconType : curPoint.symbol,
+                            x : curPoint.x - symbolSize,
+                            y : y - symbolSize,
+                            width : symbolSize * 2,
+                            height : symbolSize * 2,
+                            n : curPoint.n
+                        }
+                    );
+                    ctx.fillStyle = curPoint.isEmpty ? '#fff' : style.strokeColor;
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                }
+
+                if (curPoint.showLabel) {
+                    ctx.font = curPoint.textFont;
+                    ctx.fillStyle = curPoint.textColor;
+                    ctx.textAlign = curPoint.textAlign;
+                    ctx.textBaseline = curPoint.textBaseline;
+                    if (curPoint.rotation) {
+                        ctx.save();
+                        this._updateTextTransform(ctx, curPoint.rotation);
+                        ctx.fillText(curPoint.name, curPoint.textX, curPoint.textY);
+                        ctx.restore();
+                    }
+                    else {
+                        ctx.fillText(curPoint.name, curPoint.textX, curPoint.textY);
+                    }
+                }
+            }
+
+            ctx.restore();
+        },
+
+        _updateTextTransform : function (ctx, rotation) {
+            var _transform = matrix.create();
+            matrix.identity(_transform);
+
+            if (rotation[0] !== 0) {
+                var originX = rotation[1] || 0;
+                var originY = rotation[2] || 0;
+                if (originX || originY) {
+                    matrix.translate(
+                        _transform, _transform, [-originX, -originY]
+                    );
+                }
+                matrix.rotate(_transform, _transform, rotation[0]);
+                if (originX || originY) {
+                    matrix.translate(
+                        _transform, _transform, [originX, originY]
+                    );
+                }
+            }
+
+            // 保存这个变换矩阵
+            ctx.transform.apply(ctx, _transform);
+        },
+
+        isCover : function (x, y) {
+            var rect = this.style;
+            if (x >= rect.x
+                && x <= (rect.x + rect.width)
+                && y >= rect.y
+                && y <= (rect.y + rect.height)
+            ) {
+                // 矩形内
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    };
+
+    zrUtil.inherits(Chain, Base);
+
+    return Chain;
+});
+
+/**
+ * echarts组件：时间轴组件
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/component/timeline',['require','./base','zrender/shape/Rectangle','../util/shape/Icon','../util/shape/Chain','../config','zrender/tool/util','zrender/tool/area','zrender/tool/event','../component'],function (require) {
+    var Base = require('./base');
+    
+    // 图形依赖
+    var RectangleShape = require('zrender/shape/Rectangle');
+    var IconShape = require('../util/shape/Icon');
+    var ChainShape = require('../util/shape/Chain');
+    
+    var ecConfig = require('../config');
+    var zrUtil = require('zrender/tool/util');
+    var zrArea = require('zrender/tool/area');
+    var zrEvent = require('zrender/tool/event');
+
+    /**
+     * 构造函数
+     * @param {Object} messageCenter echart消息中心
+     * @param {ZRender} zr zrender实例
+     * @param {Object} option 图表参数
+     */
+    function Timeline(ecTheme, messageCenter, zr, option, myChart) {
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+
+        var self = this;
+        self._onclick = function(param) {
+            return self.__onclick(param);
+        };
+        self._ondrift = function (dx, dy) {
+            return self.__ondrift(this, dx, dy);
+        };
+        self._ondragend = function () {
+            return self.__ondragend();
+        };
+        self._setCurrentOption = function() {
+            var timelineOption = self.timelineOption;
+            self.currentIndex %= timelineOption.data.length;
+            // console.log(self.currentIndex);
+            var curOption = self.options[self.currentIndex] || {};
+            self.myChart.setOption(curOption, timelineOption.notMerge);
+            
+            self.messageCenter.dispatch(
+                ecConfig.EVENT.TIMELINE_CHANGED,
+                null,
+                {
+                    currentIndex: self.currentIndex,
+                    data: timelineOption.data[self.currentIndex].name != null
+                          ? timelineOption.data[self.currentIndex].name
+                          : timelineOption.data[self.currentIndex]
+                },
+                self.myChart
+            );
+        };
+        self._onFrame = function() {
+            self._setCurrentOption();
+            self._syncHandleShape();
+            
+            if (self.timelineOption.autoPlay) {
+                self.playTicket = setTimeout(
+                    function() {
+                        self.currentIndex += 1;
+                        if (!self.timelineOption.loop
+                            && self.currentIndex >= self.timelineOption.data.length
+                        ) {
+                            self.currentIndex = self.timelineOption.data.length - 1;
+                            self.stop();
+                            return;
+                        }
+                        self._onFrame();
+                    },
+                    self.timelineOption.playInterval
+                );
+            }
+        };
+
+        this.setTheme(false);
+        this.options = this.option.options;
+        this.currentIndex = this.timelineOption.currentIndex % this.timelineOption.data.length;
+        
+        if (!this.timelineOption.notMerge && this.currentIndex !== 0) {
+            /*
+            for (var i = 1, l = this.timelineOption.data.length; i < l; i++) {
+                this.options[i] = zrUtil.merge(
+                    this.options[i], this.options[i - 1]
+                );
+            }
+            */
+           this.options[this.currentIndex] = zrUtil.merge(
+               this.options[this.currentIndex], this.options[0]
+           );
+        }
+        
+        if (this.timelineOption.show) {
+            this._buildShape();
+            this._syncHandleShape();
+        }
+        
+        this._setCurrentOption();
+        
+        if (this.timelineOption.autoPlay) {
+            var self = this;
+            this.playTicket = setTimeout(
+                function() {
+                    self.play();
+                },
+                this.ecTheme.animationDuration
+            );
+        }
+    }
+    
+    Timeline.prototype = {
+        type: ecConfig.COMPONENT_TYPE_TIMELINE,
+        _buildShape: function () {
+            // 位置参数，通过计算所得x, y, width, height
+            this._location = this._getLocation();
+            this._buildBackground();
+            this._buildControl();
+            this._chainPoint = this._getChainPoint();
+            if (this.timelineOption.label.show) {
+                // 标签显示的挑选间隔
+                var interval = this._getInterval();
+                for (var i = 0, len = this._chainPoint.length; i < len; i += interval) {
+                    this._chainPoint[i].showLabel = true;
+                }
+            }
+            this._buildChain();
+            this._buildHandle();
+
+            for (var i = 0, l = this.shapeList.length; i < l; i++) {
+                this.zr.addShape(this.shapeList[i]);
+            }
+        },
+
+        /**
+         * 根据选项计算实体的位置坐标
+         */
+        _getLocation: function () {
+            var timelineOption = this.timelineOption;
+            var padding = timelineOption.padding;
+            
+            // 水平布局
+            var zrWidth = this.zr.getWidth();
+            var x = this.parsePercent(timelineOption.x, zrWidth);
+            var x2 = this.parsePercent(timelineOption.x2, zrWidth);
+            var width;
+            if (timelineOption.width == null) {
+                width = zrWidth - x - x2;
+                x2 = zrWidth - x2;
+            }
+            else {
+                width = this.parsePercent(timelineOption.width, zrWidth);
+                x2 = x + width;
+            }
+
+            var zrHeight = this.zr.getHeight();
+            var height = this.parsePercent(timelineOption.height, zrHeight);
+            var y;
+            var y2;
+            if (timelineOption.y != null) {
+                y = this.parsePercent(timelineOption.y, zrHeight);
+                y2 = y + height;
+            }
+            else {
+                y2 = zrHeight - this.parsePercent(timelineOption.y2, zrHeight);
+                y = y2 - height;
+            }
+
+            return {
+                x: x + padding[3],
+                y: y + padding[0],
+                x2: x2 - padding[1],
+                y2: y2 - padding[2],
+                width: width - padding[1] - padding[3],
+                height: height - padding[0] - padding[2]
+            };
+        },
+
+        _getReformedLabel: function (idx) {
+            var timelineOption = this.timelineOption;
+            var data = timelineOption.data[idx].name != null
+                       ? timelineOption.data[idx].name
+                       : timelineOption.data[idx];
+            var formatter = timelineOption.data[idx].formatter 
+                            || timelineOption.label.formatter;
+            if (formatter) {
+                if (typeof formatter === 'function') {
+                    data = formatter.call(this.myChart, data);
+                }
+                else if (typeof formatter === 'string') {
+                    data = formatter.replace('{value}', data);
+                }
+            }
+            return data;
+        },
+        
+        /**
+         * 计算标签显示挑选间隔
+         */
+        _getInterval: function () {
+            var chainPoint = this._chainPoint;
+            var timelineOption = this.timelineOption;
+            var interval   = timelineOption.label.interval;
+            if (interval === 'auto') {
+                // 麻烦的自适应计算
+                var fontSize = timelineOption.label.textStyle.fontSize;
+                var data = timelineOption.data;
+                var dataLength = timelineOption.data.length;
+
+                // 横向
+                if (dataLength > 3) {
+                    var isEnough = false;
+                    var labelSpace;
+                    var labelSize;
+                    interval = 0;
+                    while (!isEnough && interval < dataLength) {
+                        interval++;
+                        isEnough = true;
+                        for (var i = interval; i < dataLength; i += interval) {
+                            labelSpace = chainPoint[i].x - chainPoint[i - interval].x;
+                            if (timelineOption.label.rotate !== 0) {
+                                // 有旋转
+                                labelSize = fontSize;
+                            }
+                            else if (data[i].textStyle) {
+                                labelSize = zrArea.getTextWidth(
+                                    chainPoint[i].name,
+                                    chainPoint[i].textFont
+                                );
+                            }
+                            else {
+                                // 不定义data级特殊文本样式，用fontSize优化getTextWidth
+                                var label = chainPoint[i].name + '';
+                                var wLen = (label.match(/\w/g) || '').length;
+                                var oLen = label.length - wLen;
+                                labelSize = wLen * fontSize * 2 / 3 + oLen * fontSize;
+                            }
+
+                            if (labelSpace < labelSize) {
+                                // 放不下，中断循环让interval++
+                                isEnough = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else {
+                    // 少于3个则全部显示
+                    interval = 1;
+                }
+            }
+            else {
+                // 用户自定义间隔
+                interval = interval - 0 + 1;
+            }
+
+            return interval;
+        },
+        
+        /**
+         * 根据选项计算时间链条上的坐标及symbolList
+         */
+        _getChainPoint: function() {
+            var timelineOption = this.timelineOption;
+            var symbol = timelineOption.symbol.toLowerCase();
+            var symbolSize = timelineOption.symbolSize;
+            var rotate = timelineOption.label.rotate;
+            var textStyle = timelineOption.label.textStyle;
+            var textFont = this.getFont(textStyle);
+            var dataTextStyle;
+            var data = timelineOption.data;
+            var x = this._location.x;
+            var y = this._location.y + this._location.height / 4 * 3;
+            var width = this._location.x2 - this._location.x;
+            var len = data.length;
+            
+            function _getName(i) {
+                return data[i].name != null ? data[i].name : data[i];
+            }
+            var xList = [];
+            if (len > 1) {
+                var boundaryGap = width / len;
+                boundaryGap = boundaryGap > 50 ? 50 : (boundaryGap < 20 ? 5 : boundaryGap);
+                width -= boundaryGap * 2;
+                if (timelineOption.type === 'number') {
+                    // 平均分布
+                    for (var i = 0; i < len; i++) {
+                        xList.push(x + boundaryGap + width / (len - 1) * i);
+                    }
+                }
+                else {
+                    // 时间比例
+                    xList[0] = new Date(_getName(0).replace(/-/g, '/'));
+                    xList[len - 1] = new Date(_getName(len - 1).replace(/-/g, '/')) - xList[0];
+                    for (var i = 1; i < len; i++) {
+                        xList[i] =  x + boundaryGap 
+                                    + width 
+                                      * (new Date(_getName(i).replace(/-/g, '/')) - xList[0]) 
+                                      / xList[len - 1];
+                    }
+                    xList[0] = x + boundaryGap;
+                }
+            }
+            else {
+                xList.push(x + width / 2);
+            }
+            
+            var list = [];
+            var curSymbol;
+            var n;
+            var isEmpty;
+            var textAlign;
+            var rotation;
+            for (var i = 0; i < len; i++) {
+                x = xList[i];
+                curSymbol = (data[i].symbol && data[i].symbol.toLowerCase()) || symbol;
+                if (curSymbol.match('empty')) {
+                    curSymbol = curSymbol.replace('empty', '');
+                    isEmpty = true;
+                }
+                else {
+                    isEmpty = false;
+                }
+                if (curSymbol.match('star')) {
+                    n = (curSymbol.replace('star','') - 0) || 5;
+                    curSymbol = 'star';
+                }
+                
+                dataTextStyle = data[i].textStyle 
+                                ? zrUtil.merge(data[i].textStyle || {}, textStyle)
+                                : textStyle;
+                
+                textAlign = dataTextStyle.align || 'center';
+                
+                if (rotate) {
+                    textAlign = rotate > 0 ? 'right' : 'left';
+                    rotation = [rotate * Math.PI / 180, x, y - 5];
+                }
+                else {
+                    rotation = false;
+                }
+                
+                list.push({
+                    x: x,
+                    n: n,
+                    isEmpty: isEmpty,
+                    symbol: curSymbol,
+                    symbolSize: data[i].symbolSize || symbolSize,
+                    color: data[i].color,
+                    borderColor: data[i].borderColor,
+                    borderWidth: data[i].borderWidth,
+                    name: this._getReformedLabel(i),
+                    textColor: dataTextStyle.color,
+                    textAlign: textAlign,
+                    textBaseline: dataTextStyle.baseline || 'middle',
+                    textX: x,
+                    textY: y - (rotate ? 5 : 0),
+                    textFont: data[i].textStyle ? this.getFont(dataTextStyle) : textFont,
+                    rotation: rotation,
+                    showLabel: false
+                });
+            }
+            
+            return list;
+        },
+        
+        _buildBackground: function () {
+            var timelineOption = this.timelineOption;
+            var padding = timelineOption.padding;
+            var width = this._location.width;
+            var height = this._location.height;
+            
+            if (timelineOption.borderWidth !== 0 
+                || timelineOption.backgroundColor.replace(/\s/g,'') != 'rgba(0,0,0,0)'
+            ) {
+                // 背景
+                this.shapeList.push(new RectangleShape({
+                    zlevel: this._zlevelBase,
+                    hoverable :false,
+                    style: {
+                        x: this._location.x - padding[3],
+                        y: this._location.y - padding[0],
+                        width: width + padding[1] + padding[3],
+                        height: height + padding[0] + padding[2],
+                        brushType: timelineOption.borderWidth === 0 ? 'fill' : 'both',
+                        color: timelineOption.backgroundColor,
+                        strokeColor: timelineOption.borderColor,
+                        lineWidth: timelineOption.borderWidth
+                    }
+                }));
+            }
+        },
+
+        _buildControl: function() {
+            var self = this;
+            var timelineOption = this.timelineOption;
+            var lineStyle = timelineOption.lineStyle;
+            var controlStyle = timelineOption.controlStyle;
+            if (timelineOption.controlPosition === 'none') {
+                return;
+            }
+            var iconSize = 15;
+            var iconGap = 5;
+            var x;
+            if (timelineOption.controlPosition === 'left') {
+                x = this._location.x;
+                this._location.x += (iconSize + iconGap) * 3;
+            }
+            else {
+                x = this._location.x2 - ((iconSize + iconGap) * 3 - iconGap);
+                this._location.x2 -= (iconSize + iconGap) * 3;
+            }
+            
+            var y = this._location.y;
+            var iconStyle = {
+                zlevel: this._zlevelBase + 1,
+                style: {
+                    iconType: 'timelineControl',
+                    symbol: 'last',
+                    x: x,
+                    y: y,
+                    width: iconSize,
+                    height: iconSize,
+                    brushType: 'stroke',
+                    color: controlStyle.normal.color,
+                    strokeColor: controlStyle.normal.color,
+                    lineWidth: lineStyle.width
+                },
+                highlightStyle: {
+                    color: controlStyle.emphasis.color,
+                    strokeColor: controlStyle.emphasis.color,
+                    lineWidth: lineStyle.width + 1
+                },
+                clickable: true
+            };
+            
+            this._ctrLastShape = new IconShape(iconStyle);
+            this._ctrLastShape.onclick = function() {
+                self.last();
+            };
+            this.shapeList.push(this._ctrLastShape);
+            
+            x += iconSize + iconGap;
+            this._ctrPlayShape = new IconShape(zrUtil.clone(iconStyle));
+            this._ctrPlayShape.style.brushType = 'fill';
+            this._ctrPlayShape.style.symbol = 'play';
+            this._ctrPlayShape.style.status = this.timelineOption.autoPlay ? 'playing' : 'stop';
+            this._ctrPlayShape.style.x = x;
+            this._ctrPlayShape.onclick = function() {
+                if (self._ctrPlayShape.style.status === 'stop') {
+                    self.play();
+                }
+                else {
+                    self.stop();
+                }
+            };
+            this.shapeList.push(this._ctrPlayShape);
+            
+            x += iconSize + iconGap;
+            this._ctrNextShape = new IconShape(zrUtil.clone(iconStyle));
+            this._ctrNextShape.style.symbol = 'next';
+            this._ctrNextShape.style.x = x;
+            this._ctrNextShape.onclick = function() {
+                self.next();
+            };
+            this.shapeList.push(this._ctrNextShape);
+        },
+        
+        /**
+         * 构建时间轴
+         */
+        _buildChain: function () {
+            var timelineOption = this.timelineOption;
+            var lineStyle = timelineOption.lineStyle;
+            this._timelineShae = {
+                zlevel: this._zlevelBase,
+                style: {
+                    x: this._location.x,
+                    y: this.subPixelOptimize(this._location.y, lineStyle.width),
+                    width: this._location.x2 - this._location.x,
+                    height: this._location.height,
+                    chainPoint: this._chainPoint,
+                    brushType:'both',
+                    strokeColor: lineStyle.color,
+                    lineWidth: lineStyle.width,
+                    lineType: lineStyle.type
+                },
+                hoverable: false,
+                clickable: true,
+                onclick: this._onclick
+            };
+
+            this._timelineShae = new ChainShape(this._timelineShae);
+            this.shapeList.push(this._timelineShae);
+        },
+
+        /**
+         * 构建拖拽手柄
+         */
+        _buildHandle: function () {
+            var curPoint = this._chainPoint[this.currentIndex];
+            var symbolSize = curPoint.symbolSize + 1;
+            symbolSize = symbolSize < 5 ? 5 : symbolSize;
+            
+            this._handleShape = {
+                zlevel: this._zlevelBase + 1,
+                hoverable: false,
+                draggable: true,
+                style: {
+                    iconType: 'diamond',
+                    n: curPoint.n,
+                    x: curPoint.x - symbolSize,
+                    y: this._location.y + this._location.height / 4 - symbolSize,
+                    width: symbolSize * 2,
+                    height: symbolSize * 2,
+                    brushType:'both',
+                    textPosition: 'specific',
+                    textX: curPoint.x,
+                    textY: this._location.y - this._location.height / 4,
+                    textAlign: 'center',
+                    textBaseline: 'middle'
+                },
+                highlightStyle: {},
+                ondrift: this._ondrift,
+                ondragend: this._ondragend
+            };
+            
+            this._handleShape = new IconShape(this._handleShape);
+            this.shapeList.push(this._handleShape);
+        },
+        
+        /**
+         * 同步拖拽图形样式 
+         */
+        _syncHandleShape: function() {
+            if (!this.timelineOption.show) {
+                return;
+            }
+            
+            var timelineOption = this.timelineOption;
+            var cpStyle = timelineOption.checkpointStyle;
+            var curPoint = this._chainPoint[this.currentIndex];
+
+            this._handleShape.style.text = cpStyle.label.show ? curPoint.name : '';
+            this._handleShape.style.textFont = curPoint.textFont;
+            
+            this._handleShape.style.n = curPoint.n;
+            if (cpStyle.symbol === 'auto') {
+                this._handleShape.style.iconType = curPoint.symbol != 'none' 
+                                                   ? curPoint.symbol : 'diamond';
+            }
+            else {
+                this._handleShape.style.iconType = cpStyle.symbol;
+                if (cpStyle.symbol.match('star')) {
+                    this._handleShape.style.n = (cpStyle.symbol.replace('star','') - 0) || 5;
+                    this._handleShape.style.iconType = 'star';
+                }
+            }
+            
+            var symbolSize;
+            if (cpStyle.symbolSize === 'auto') {
+                symbolSize = curPoint.symbolSize + 2;
+                symbolSize = symbolSize < 5 ? 5 : symbolSize;
+            }
+            else {
+                symbolSize = cpStyle.symbolSize - 0;
+            }
+            
+            this._handleShape.style.color = cpStyle.color === 'auto'
+                                            ? (curPoint.color 
+                                               ? curPoint.color 
+                                               : timelineOption.controlStyle.emphasis.color
+                                              )
+                                            : cpStyle.color;
+            this._handleShape.style.textColor = cpStyle.label.textStyle.color === 'auto'
+                                                ? this._handleShape.style.color
+                                                : cpStyle.label.textStyle.color;
+            this._handleShape.highlightStyle.strokeColor = 
+            this._handleShape.style.strokeColor = cpStyle.borderColor === 'auto'
+                                ? (curPoint.borderColor ? curPoint.borderColor : '#fff')
+                                : cpStyle.borderColor;
+            this._handleShape.style.lineWidth = cpStyle.borderWidth === 'auto'
+                                ? (curPoint.borderWidth ? curPoint.borderWidth : 0)
+                                : (cpStyle.borderWidth - 0);
+            this._handleShape.highlightStyle.lineWidth = this._handleShape.style.lineWidth + 1;
+            
+            this.zr.animate(this._handleShape.id, 'style')
+                .when(
+                    500,
+                    {
+                        x: curPoint.x - symbolSize,
+                        textX: curPoint.x,
+                        y: this._location.y + this._location.height / 4 - symbolSize,
+                        width: symbolSize * 2,
+                        height: symbolSize * 2
+                    }
+                )
+                .start('ExponentialOut');
+        },
+
+        _findChainIndex: function(x) {
+            var chainPoint = this._chainPoint;
+            var len = chainPoint.length;
+            if (x <= chainPoint[0].x) {
+                return 0;
+            }
+            else if (x >= chainPoint[len - 1].x) {
+                return len - 1;
+            }
+            for (var i = 0; i < len - 1; i++) {
+                if (x >= chainPoint[i].x && x <= chainPoint[i + 1].x) {
+                    // catch you！
+                    return (Math.abs(x - chainPoint[i].x) < Math.abs(x - chainPoint[i + 1].x))
+                           ? i : (i + 1);
+                }
+            }
+        },
+        
+        __onclick: function(param) {
+            var x = zrEvent.getX(param.event);
+            var newIndex =  this._findChainIndex(x);
+            if (newIndex === this.currentIndex) {
+                return true; // 啥事都没发生
+            }
+            
+            this.currentIndex = newIndex;
+            this.timelineOption.autoPlay && this.stop(); // 停止自动播放
+            clearTimeout(this.playTicket);
+            this._onFrame();
+        },
+        
+        /**
+         * 拖拽范围控制
+         */
+        __ondrift: function (shape, dx) {
+            this.timelineOption.autoPlay && this.stop(); // 停止自动播放
+            
+            var chainPoint = this._chainPoint;
+            var len = chainPoint.length;
+            var newIndex;
+            if (shape.style.x + dx <= chainPoint[0].x - chainPoint[0].symbolSize) {
+                shape.style.x = chainPoint[0].x - chainPoint[0].symbolSize;
+                newIndex = 0;
+            }
+            else if (shape.style.x + dx >= chainPoint[len - 1].x - chainPoint[len - 1].symbolSize) {
+                shape.style.x = chainPoint[len - 1].x - chainPoint[len - 1].symbolSize;
+                newIndex = len - 1;
+            }
+            else {
+                shape.style.x += dx;
+                newIndex = this._findChainIndex(shape.style.x);
+            }
+            var curPoint = chainPoint[newIndex];
+            var symbolSize = curPoint.symbolSize + 2;
+            shape.style.iconType = curPoint.symbol;
+            shape.style.n = curPoint.n;
+            shape.style.textX = shape.style.x + symbolSize / 2;
+            shape.style.y = this._location.y + this._location.height / 4 - symbolSize;
+            shape.style.width = symbolSize * 2;
+            shape.style.height = symbolSize * 2;
+            shape.style.text = curPoint.name;
+            
+            //console.log(newIndex)
+            if (newIndex === this.currentIndex) {
+                return true; // 啥事都没发生
+            }
+            
+            this.currentIndex = newIndex;
+            if (this.timelineOption.realtime) {
+                clearTimeout(this.playTicket);
+                var self = this;
+                this.playTicket = setTimeout(function() {
+                    self._setCurrentOption();
+                },200);
+            }
+
+            return true;
+        },
+        
+        __ondragend: function () {
+            this.isDragend = true;
+        },
+        
+        /**
+         * 数据项被拖拽出去
+         */
+        ondragend: function (param, status) {
+            if (!this.isDragend || !param.target) {
+                // 没有在当前实例上发生拖拽行为则直接返回
+                return;
+            }
+            !this.timelineOption.realtime && this._setCurrentOption();
+            
+            // 别status = {}赋值啊！！
+            status.dragOut = true;
+            status.dragIn = true;
+            status.needRefresh = false; // 会有消息触发fresh，不用再刷一遍
+            // 处理完拖拽事件后复位
+            this.isDragend = false;
+            this._syncHandleShape();
+            return;
+        },
+        
+        last: function () {
+            this.timelineOption.autoPlay && this.stop(); // 停止自动播放
+            
+            this.currentIndex -= 1;
+            if (this.currentIndex < 0) {
+                this.currentIndex = this.timelineOption.data.length - 1;
+            }
+            this._onFrame();
+            
+            return this.currentIndex;
+        },
+        
+        next: function () {
+            this.timelineOption.autoPlay && this.stop(); // 停止自动播放
+            
+            this.currentIndex += 1;
+            if (this.currentIndex >= this.timelineOption.data.length) {
+                this.currentIndex = 0;
+            }
+            this._onFrame();
+            
+            return this.currentIndex;
+        },
+        
+        play: function (targetIndex, autoPlay) {
+            if (this._ctrPlayShape && this._ctrPlayShape.style.status != 'playing') {
+                this._ctrPlayShape.style.status = 'playing';
+                this.zr.modShape(this._ctrPlayShape.id);
+                this.zr.refresh();
+            }
+            
+            
+            this.timelineOption.autoPlay = autoPlay != null ? autoPlay : true;
+            
+            if (!this.timelineOption.autoPlay) {
+                clearTimeout(this.playTicket);
+            }
+            
+            this.currentIndex = targetIndex != null ? targetIndex : (this.currentIndex + 1);
+            if (this.currentIndex >= this.timelineOption.data.length) {
+                this.currentIndex = 0;
+            }
+            this._onFrame();
+            
+            return this.currentIndex;
+        },
+        
+        stop: function () {
+            if (this._ctrPlayShape && this._ctrPlayShape.style.status != 'stop') {
+                this._ctrPlayShape.style.status = 'stop';
+                this.zr.modShape(this._ctrPlayShape.id);
+                this.zr.refresh();
+            }
+            
+            this.timelineOption.autoPlay = false;
+            
+            clearTimeout(this.playTicket);
+            
+            return this.currentIndex;
+        },
+        
+        /**
+         * 避免dataZoom带来两次refresh，不设refresh接口，resize重复一下buildshape逻辑 
+         */
+        resize: function () {
+            if (this.timelineOption.show) {
+                this.clear();
+                this._buildShape();
+                this._syncHandleShape();
+            }
+        },
+        
+        setTheme: function(needRefresh) {
+            this.timelineOption = this.reformOption(zrUtil.clone(this.option.timeline));
+            // 补全padding属性
+            this.timelineOption.padding = this.reformCssArray(
+                this.timelineOption.padding
+            );
+            // 通用字体设置
+            this.timelineOption.label.textStyle = zrUtil.merge(
+                this.timelineOption.label.textStyle || {},
+                this.ecTheme.textStyle
+            );
+            this.timelineOption.checkpointStyle.label.textStyle = zrUtil.merge(
+                this.timelineOption.checkpointStyle.label.textStyle || {},
+                this.ecTheme.textStyle
+            );
+            
+            if (this.timelineOption.show && needRefresh) {
+                this.clear();
+                this._buildShape();
+                this._syncHandleShape();
+            }
+        },
+        
+        /**
+         * 释放后实例不可用，重载基类方法
+         */
+        dispose: function () {
+            this.clear();
+            this.shapeList = null;
+            
+            clearTimeout(this.playTicket);
+        }
+    };
+    
+    function timelineControl(ctx, style) {
+        var lineWidth = 2;//style.lineWidth;
+        var x = style.x + lineWidth;
+        var y = style.y + lineWidth + 2;
+        var width = style.width - lineWidth;
+        var height = style.height - lineWidth;
+        
+        
+        var symbol = style.symbol;
+        if (symbol === 'last') {
+            ctx.moveTo(x + width - 2, y + height / 3);
+            ctx.lineTo(x + width - 2, y);
+            ctx.lineTo(x + 2, y + height / 2);
+            ctx.lineTo(x + width - 2, y + height);
+            ctx.lineTo(x + width - 2, y + height / 3 * 2);
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y);
+        } 
+        else if (symbol === 'next') {
+            ctx.moveTo(x + 2, y + height / 3);
+            ctx.lineTo(x + 2, y);
+            ctx.lineTo(x + width - 2, y + height / 2);
+            ctx.lineTo(x + 2, y + height);
+            ctx.lineTo(x + 2, y + height / 3 * 2);
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y);
+        }
+        else if (symbol === 'play') {
+            if (style.status === 'stop') {
+                ctx.moveTo(x + 2, y);
+                ctx.lineTo(x + width - 2, y + height / 2);
+                ctx.lineTo(x + 2, y + height);
+                ctx.lineTo(x + 2, y);
+            }
+            else {
+                var delta = style.brushType === 'both' ? 2 : 3;
+                ctx.rect(x + 2, y, delta, height);
+                ctx.rect(x + width - delta - 2, y, delta, height);
+            }
+        }
+        else if (symbol.match('image')) {
+            var imageLocation = '';
+            imageLocation = symbol.replace(
+                    new RegExp('^image:\\/\\/'), ''
+                );
+            symbol = IconShape.prototype.iconLibrary.image;
+            symbol(ctx, {
+                x: x,
+                y: y,
+                width: width,
+                height: height,
+                image: imageLocation
+            });
+        }
+    }
+    IconShape.prototype.iconLibrary['timelineControl'] = timelineControl;
+    
+    zrUtil.inherits(Timeline, Base);
+    
+    require('../component').define('timeline', Timeline);
+    
+    return Timeline;
+});
+
+define(
+    'zrender/loadingEffect/Bar',['require','./Base','../tool/util','../tool/color','../shape/Rectangle'],function (require) {
+        var Base = require('./Base');
+        var util = require('../tool/util');
+        var zrColor = require('../tool/color');
+        var RectangleShape = require('../shape/Rectangle');
+
+        function Bar(options) {
+            Base.call(this, options);
+        }
+        util.inherits(Bar, Base);
+
+        
+        /**
+         * 进度条
+         * 
+         * @param {Object} addShapeHandle
+         * @param {Object} refreshHandle
+         */
+        Bar.prototype._start = function (addShapeHandle, refreshHandle) {
+            // 特效默认配置
+            var options = util.merge(
+                this.options,
+                {
+                    textStyle : {
+                        color : '#888'
+                    },
+                    backgroundColor : 'rgba(250, 250, 250, 0.8)',
+                    effectOption : {
+                        x : 0,
+                        y : this.canvasHeight / 2 - 30,
+                        width : this.canvasWidth,
+                        height : 5,
+                        brushType : 'fill',
+                        timeInterval : 100
+                    }
+                }
+            );
+
+            var textShape = this.createTextShape(options.textStyle);
+            var background = this.createBackgroundShape(options.backgroundColor);
+
+            var effectOption = options.effectOption;
+
+            // 初始化动画元素
+            var barShape = new RectangleShape({
+                highlightStyle : util.clone(effectOption)
+            });
+
+            barShape.highlightStyle.color =
+                effectOption.color
+                || zrColor.getLinearGradient(
+                    effectOption.x,
+                    effectOption.y,
+                    effectOption.x + effectOption.width,
+                    effectOption.y + effectOption.height,
+                    [ [ 0, '#ff6400' ], [ 0.5, '#ffe100' ], [ 1, '#b1ff00' ] ]
+                );
+
+            if (options.progress != null) {
+                // 指定进度
+                addShapeHandle(background);
+
+                barShape.highlightStyle.width =
+                    this.adjust(options.progress, [ 0, 1 ])
+                    * options.effectOption.width;
+                    
+                addShapeHandle(barShape);
+                addShapeHandle(textShape);
+
+                refreshHandle();
+                return;
+            }
+            else {
+                // 循环显示
+                barShape.highlightStyle.width = 0;
+                return setInterval(
+                    function () {
+                        addShapeHandle(background);
+
+                        if (barShape.highlightStyle.width < effectOption.width) {
+                            barShape.highlightStyle.width += 8;
+                        }
+                        else {
+                            barShape.highlightStyle.width = 0;
+                        }
+                        addShapeHandle(barShape);
+                        addShapeHandle(textShape);
+                        refreshHandle();
+                    },
+                    effectOption.timeInterval
+                );
+            }
+        };
+
+        return Bar;
+    }
+);
+
+
+define(
+    'zrender/loadingEffect/Bubble',['require','./Base','../tool/util','../tool/color','../shape/Circle'],function (require) {
+        var Base = require('./Base');
+        var util = require('../tool/util');
+        var zrColor = require('../tool/color');
+        var CircleShape = require('../shape/Circle');
+
+        function Bubble(options) {
+            Base.call(this, options);
+        }
+        util.inherits(Bubble, Base);
+
+        /**
+         * 泡泡
+         *
+         * @param {Object} addShapeHandle
+         * @param {Object} refreshHandle
+         */
+        Bubble.prototype._start = function (addShapeHandle, refreshHandle) {
+            
+            // 特效默认配置
+            var options = util.merge(
+                this.options,
+                {
+                    textStyle : {
+                        color : '#888'
+                    },
+                    backgroundColor : 'rgba(250, 250, 250, 0.8)',
+                    effect : {
+                        n : 50,
+                        lineWidth : 2,
+                        brushType : 'stroke',
+                        color : 'random',
+                        timeInterval : 100
+                    }
+                }
+            );
+
+            var textShape = this.createTextShape(options.textStyle);
+            var background = this.createBackgroundShape(options.backgroundColor);
+
+            var effectOption = options.effect;
+            var n = effectOption.n;
+            var brushType = effectOption.brushType;
+            var lineWidth = effectOption.lineWidth;
+
+            var shapeList = [];
+            var canvasWidth = this.canvasWidth;
+            var canvasHeight = this.canvasHeight;
+            
+            // 初始化动画元素
+            for (var i = 0; i < n; i++) {
+                var color = effectOption.color == 'random'
+                    ? zrColor.alpha(zrColor.random(), 0.3)
+                    : effectOption.color;
+
+                shapeList[i] = new CircleShape({
+                    highlightStyle : {
+                        x : Math.ceil(Math.random() * canvasWidth),
+                        y : Math.ceil(Math.random() * canvasHeight),
+                        r : Math.ceil(Math.random() * 40),
+                        brushType : brushType,
+                        color : color,
+                        strokeColor : color,
+                        lineWidth : lineWidth
+                    },
+                    animationY : Math.ceil(Math.random() * 20)
+                });
+            }
+            
+            return setInterval(
+                function () {
+                    addShapeHandle(background);
+                    
+                    for (var i = 0; i < n; i++) {
+                        var style = shapeList[i].highlightStyle;
+
+                        if (style.y - shapeList[i].animationY + style.r <= 0) {
+                            shapeList[i].highlightStyle.y = canvasHeight + style.r;
+                            shapeList[i].highlightStyle.x = Math.ceil(
+                                Math.random() * canvasWidth
+                            );
+                        }
+                        shapeList[i].highlightStyle.y -=
+                            shapeList[i].animationY;
+
+                        addShapeHandle(shapeList[i]);
+                    }
+
+                    addShapeHandle(textShape);
+                    refreshHandle();
+                },
+                effectOption.timeInterval
+            );
+        };
+
+        return Bubble;
+    }
+);
+
+
+define(
+    'zrender/loadingEffect/DynamicLine',['require','./Base','../tool/util','../tool/color','../shape/Line'],function (require) {
+        var Base = require('./Base');
+        var util = require('../tool/util');
+        var zrColor = require('../tool/color');
+        var LineShape = require('../shape/Line');
+
+        function DynamicLine(options) {
+            Base.call(this, options);
+        }
+        util.inherits(DynamicLine, Base);
+
+
+        /**
+         * 动态线
+         * 
+         * @param {Object} addShapeHandle
+         * @param {Object} refreshHandle
+         */
+        DynamicLine.prototype._start = function (addShapeHandle, refreshHandle) {
+            // 特效默认配置
+            var options = util.merge(
+                this.options,
+                {
+                    textStyle : {
+                        color : '#fff'
+                    },
+                    backgroundColor : 'rgba(0, 0, 0, 0.8)',
+                    effectOption : {
+                        n : 30,
+                        lineWidth : 1,
+                        color : 'random',
+                        timeInterval : 100
+                    }
+                }
+            );
+
+            var textShape = this.createTextShape(options.textStyle);
+            var background = this.createBackgroundShape(options.backgroundColor);
+
+            var effectOption = options.effectOption;
+            var n = effectOption.n;
+            var lineWidth = effectOption.lineWidth;
+
+            var shapeList = [];
+            var canvasWidth = this.canvasWidth;
+            var canvasHeight = this.canvasHeight;
+            
+            // 初始化动画元素
+            for (var i = 0; i < n; i++) {
+                var xStart = -Math.ceil(Math.random() * 1000);
+                var len = Math.ceil(Math.random() * 400);
+                var pos = Math.ceil(Math.random() * canvasHeight);
+
+                var color = effectOption.color == 'random'
+                    ? zrColor.random()
+                    : effectOption.color;
+                
+                shapeList[i] = new LineShape({
+                    highlightStyle : {
+                        xStart : xStart,
+                        yStart : pos,
+                        xEnd : xStart + len,
+                        yEnd : pos,
+                        strokeColor : color,
+                        lineWidth : lineWidth
+                    },
+                    animationX : Math.ceil(Math.random() * 100),
+                    len : len
+                });
+            }
+            
+            return setInterval(
+                function() {
+                    addShapeHandle(background);
+                    
+                    for (var i = 0; i < n; i++) {
+                        var style = shapeList[i].highlightStyle;
+
+                        if (style.xStart >= canvasWidth) {
+                            
+                            shapeList[i].len = Math.ceil(Math.random() * 400);
+                            style.xStart = -400;
+                            style.xEnd = -400 + shapeList[i].len;
+                            style.yStart = Math.ceil(Math.random() * canvasHeight);
+                            style.yEnd = style.yStart;
+                        }
+
+                        style.xStart += shapeList[i].animationX;
+                        style.xEnd += shapeList[i].animationX;
+
+                        addShapeHandle(shapeList[i]);
+                    }
+
+                    addShapeHandle(textShape);
+                    refreshHandle();
+                },
+                effectOption.timeInterval
+            );
+        };
+
+        return DynamicLine;
+    }
+);
+
+
+define(
+    'zrender/loadingEffect/Ring',['require','./Base','../tool/util','../tool/color','../shape/Ring','../shape/Sector'],function (require) {
+        var Base = require('./Base');
+        var util = require('../tool/util');
+        var zrColor = require('../tool/color');
+        var RingShape = require('../shape/Ring');
+        var SectorShape = require('../shape/Sector');
+
+        function Ring(options) {
+            Base.call(this, options);
+        }
+        util.inherits(Ring, Base);
+
+
+        /**
+         * 圆环
+         * 
+         * @param {Object} addShapeHandle
+         * @param {Object} refreshHandle
+         */
+        Ring.prototype._start = function (addShapeHandle, refreshHandle) {
+            
+            // 特效默认配置
+            var options = util.merge(
+                this.options,
+                {
+                    textStyle : {
+                        color : '#07a'
+                    },
+                    backgroundColor : 'rgba(250, 250, 250, 0.8)',
+                    effect : {
+                        x : this.canvasWidth / 2,
+                        y : this.canvasHeight / 2,
+                        r0 : 60,
+                        r : 100,
+                        color : '#bbdcff',
+                        brushType: 'fill',
+                        textPosition : 'inside',
+                        textFont : 'normal 30px verdana',
+                        textColor : 'rgba(30, 144, 255, 0.6)',
+                        timeInterval : 100
+                    }
+                }
+            );
+
+            var effectOption = options.effect;
+
+            var textStyle = options.textStyle;
+            if (textStyle.x == null) {
+                textStyle.x = effectOption.x;
+            }
+            if (textStyle.y == null) {
+                textStyle.y = (effectOption.y + (effectOption.r0 + effectOption.r) / 2 - 5);
+            }
+            
+            var textShape = this.createTextShape(options.textStyle);
+            var background = this.createBackgroundShape(options.backgroundColor);
+
+            var x = effectOption.x;
+            var y = effectOption.y;
+            var r0 = effectOption.r0 + 6;
+            var r = effectOption.r - 6;
+            var color = effectOption.color;
+            var darkColor = zrColor.lift(color, 0.1);
+
+            var shapeRing = new RingShape({
+                highlightStyle : util.clone(effectOption)
+            });
+
+            // 初始化动画元素
+            var shapeList = [];
+            var clolrList = zrColor.getGradientColors(
+                [ '#ff6400', '#ffe100', '#97ff00' ], 25
+            );
+            var preAngle = 15;
+            var endAngle = 240;
+
+            for (var i = 0; i < 16; i++) {
+                shapeList.push(new SectorShape({
+                    highlightStyle  : {
+                        x : x,
+                        y : y,
+                        r0 : r0,
+                        r : r,
+                        startAngle : endAngle - preAngle,
+                        endAngle : endAngle,
+                        brushType: 'fill',
+                        color : darkColor
+                    },
+                    _color : zrColor.getLinearGradient(
+                        x + r0 * Math.cos(endAngle, true),
+                        y - r0 * Math.sin(endAngle, true),
+                        x + r0 * Math.cos(endAngle - preAngle, true),
+                        y - r0 * Math.sin(endAngle - preAngle, true),
+                        [
+                            [ 0, clolrList[i * 2] ],
+                            [ 1, clolrList[i * 2 + 1] ]
+                        ]
+                    )
+                }));
+                endAngle -= preAngle;
+            }
+            endAngle = 360;
+            for (var i = 0; i < 4; i++) {
+                shapeList.push(new SectorShape({
+                    highlightStyle  : {
+                        x : x,
+                        y : y,
+                        r0 : r0,
+                        r : r,
+                        startAngle : endAngle - preAngle,
+                        endAngle : endAngle,
+                        brushType: 'fill',
+                        color : darkColor
+                    },
+                    _color : zrColor.getLinearGradient(
+                        x + r0 * Math.cos(endAngle, true),
+                        y - r0 * Math.sin(endAngle, true),
+                        x + r0 * Math.cos(endAngle - preAngle, true),
+                        y - r0 * Math.sin(endAngle - preAngle, true),
+                        [
+                            [ 0, clolrList[i * 2 + 32] ],
+                            [ 1, clolrList[i * 2 + 33] ]
+                        ]
+                    )
+                }));
+                endAngle -= preAngle;
+            }
+
+            var n = 0;
+            if (options.progress != null) {
+                // 指定进度
+                addShapeHandle(background);
+
+                n = this.adjust(options.progress, [ 0, 1 ]).toFixed(2) * 100 / 5;
+                shapeRing.highlightStyle.text = n * 5 + '%';
+                addShapeHandle(shapeRing);
+
+                for (var i = 0; i < 20; i++) {
+                    shapeList[i].highlightStyle.color = i < n
+                        ? shapeList[i]._color : darkColor;
+                    addShapeHandle(shapeList[i]);
+                }
+
+                addShapeHandle(textShape);
+                refreshHandle();
+                return;
+            }
+
+            // 循环显示
+            return setInterval(
+                function() {
+                    addShapeHandle(background);
+
+                    n += n >= 20 ? -20 : 1;
+
+                    // shapeRing.highlightStyle.text = n * 5 + '%';
+                    addShapeHandle(shapeRing);
+
+                    for (var i = 0; i < 20; i++) {
+                        shapeList[i].highlightStyle.color = i < n
+                            ? shapeList[i]._color : darkColor;
+                        addShapeHandle(shapeList[i]);
+                    }
+
+                    addShapeHandle(textShape);
+                    refreshHandle();
+                },
+                effectOption.timeInterval
+            );
+        };
+
+        return Ring;
+    }
+);
+
+
+define(
+    'zrender/loadingEffect/Spin',['require','./Base','../tool/util','../tool/color','../tool/area','../shape/Sector'],function (require) {
+        var Base = require('./Base');
+        var util = require('../tool/util');
+        var zrColor = require('../tool/color');
+        var zrArea = require('../tool/area');
+        var SectorShape = require('../shape/Sector');
+
+        function Spin(options) {
+            Base.call(this, options);
+        }
+        util.inherits(Spin, Base);
+
+        /**
+         * 旋转
+         * 
+         * @param {Object} addShapeHandle
+         * @param {Object} refreshHandle
+         */
+        Spin.prototype._start = function (addShapeHandle, refreshHandle) {
+            var options = util.merge(
+                this.options,
+                {
+                    textStyle : {
+                        color : '#fff',
+                        textAlign : 'start'
+                    },
+                    backgroundColor : 'rgba(0, 0, 0, 0.8)'
+                }
+            );
+            var textShape = this.createTextShape(options.textStyle);
+            
+            var textGap = 10;
+            var textWidth = zrArea.getTextWidth(
+                textShape.highlightStyle.text, textShape.highlightStyle.textFont
+            );
+            var textHeight = zrArea.getTextHeight(
+                textShape.highlightStyle.text, textShape.highlightStyle.textFont
+            );
+            
+            // 特效默认配置
+            var effectOption =  util.merge(
+                this.options.effect || {},
+                {
+                    r0 : 9,
+                    r : 15,
+                    n : 18,
+                    color : '#fff',
+                    timeInterval : 100
+                }
+            );
+            
+            var location = this.getLocation(
+                this.options.textStyle,
+                textWidth + textGap + effectOption.r * 2,
+                Math.max(effectOption.r * 2, textHeight)
+            );
+            effectOption.x = location.x + effectOption.r;
+            effectOption.y = textShape.highlightStyle.y = location.y + location.height / 2;
+            textShape.highlightStyle.x = effectOption.x + effectOption.r + textGap;
+            
+            var background = this.createBackgroundShape(options.backgroundColor);
+            var n = effectOption.n;
+            var x = effectOption.x;
+            var y = effectOption.y;
+            var r0 = effectOption.r0;
+            var r = effectOption.r;
+            var color = effectOption.color;
+
+            // 初始化动画元素
+            var shapeList = [];
+            var preAngle = Math.round(180 / n);
+            for (var i = 0; i < n; i++) {
+                shapeList[i] = new SectorShape({
+                    highlightStyle  : {
+                        x : x,
+                        y : y,
+                        r0 : r0,
+                        r : r,
+                        startAngle : preAngle * i * 2,
+                        endAngle : preAngle * i * 2 + preAngle,
+                        color : zrColor.alpha(color, (i + 1) / n),
+                        brushType: 'fill'
+                    }
+                });
+            }
+
+            var pos = [ 0, x, y ];
+
+            return setInterval(
+                function() {
+                    addShapeHandle(background);
+                    pos[0] -= 0.3;
+                    for (var i = 0; i < n; i++) {
+                        shapeList[i].rotation = pos;
+                        addShapeHandle(shapeList[i]);
+                    }
+
+                    addShapeHandle(textShape);
+                    refreshHandle();
+                },
+                effectOption.timeInterval
+            );
+        };
+
+        return Spin;
+    }
+);
+
+
+define(
+    'zrender/loadingEffect/Whirling',['require','./Base','../tool/util','../tool/area','../shape/Ring','../shape/Droplet','../shape/Circle'],function (require) {
+        var Base = require('./Base');
+        var util = require('../tool/util');
+        var zrArea = require('../tool/area');
+        var RingShape = require('../shape/Ring');
+        var DropletShape = require('../shape/Droplet');
+        var CircleShape = require('../shape/Circle');
+
+        function Whirling(options) {
+            Base.call(this, options);
+        }
+        util.inherits(Whirling, Base);
+
+        /**
+         * 旋转水滴
+         * 
+         * @param {Object} addShapeHandle
+         * @param {Object} refreshHandle
+         */
+        Whirling.prototype._start = function (addShapeHandle, refreshHandle) {
+            var options = util.merge(
+                this.options,
+                {
+                    textStyle : {
+                        color : '#888',
+                        textAlign : 'start'
+                    },
+                    backgroundColor : 'rgba(250, 250, 250, 0.8)'
+                }
+            );
+            var textShape = this.createTextShape(options.textStyle);
+            
+            var textGap = 10;
+            var textWidth = zrArea.getTextWidth(
+                textShape.highlightStyle.text, textShape.highlightStyle.textFont
+            );
+            var textHeight = zrArea.getTextHeight(
+                textShape.highlightStyle.text, textShape.highlightStyle.textFont
+            );
+            
+            // 特效默认配置
+            var effectOption = util.merge(
+                this.options.effect || {},
+                {
+                    r : 18,
+                    colorIn : '#fff',
+                    colorOut : '#555',
+                    colorWhirl : '#6cf',
+                    timeInterval : 50
+                }
+            );
+            
+            var location = this.getLocation(
+                this.options.textStyle,
+                textWidth + textGap + effectOption.r * 2,
+                Math.max(effectOption.r * 2, textHeight)
+            );
+            effectOption.x = location.x + effectOption.r;
+            effectOption.y = textShape.highlightStyle.y = location.y + location.height / 2;
+            textShape.highlightStyle.x = effectOption.x + effectOption.r + textGap;
+            
+            var background = this.createBackgroundShape(options.backgroundColor);
+            // 初始化动画元素
+            var droplet = new DropletShape({
+                highlightStyle : {
+                    a : Math.round(effectOption.r / 2),
+                    b : Math.round(effectOption.r - effectOption.r / 6),
+                    brushType : 'fill',
+                    color : effectOption.colorWhirl
+                }
+            });
+            var circleIn = new CircleShape({
+                highlightStyle : {
+                    r : Math.round(effectOption.r / 6),
+                    brushType : 'fill',
+                    color : effectOption.colorIn
+                }
+            });
+            var circleOut = new RingShape({
+                highlightStyle : {
+                    r0 : Math.round(effectOption.r - effectOption.r / 3),
+                    r : effectOption.r,
+                    brushType : 'fill',
+                    color : effectOption.colorOut
+                }
+            });
+
+            var pos = [ 0, effectOption.x, effectOption.y ];
+
+            droplet.highlightStyle.x
+                = circleIn.highlightStyle.x
+                = circleOut.highlightStyle.x
+                = pos[1];
+            droplet.highlightStyle.y
+                = circleIn.highlightStyle.y
+                = circleOut.highlightStyle.y
+                = pos[2];
+
+            return setInterval(
+                function() {
+                    addShapeHandle(background);
+                    addShapeHandle(circleOut);
+                    pos[0] -= 0.3;
+                    droplet.rotation = pos;
+                    addShapeHandle(droplet);
+                    addShapeHandle(circleIn);
+                    addShapeHandle(textShape);
+                    refreshHandle();
+                },
+                effectOption.timeInterval
+            );
+        };
+
+        return Whirling;
+    }
+);
+
+/**
+ * echarts默认主题，开发中
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/theme/default',[],function() {
+    var config = {
+    };
+
+    return config;
+});
+/*!
+ * ECharts, a javascript interactive chart library.
+ *  
+ * Copyright (c) 2014, Baidu Inc.
+ * All rights reserved.
+ * 
+ * LICENSE
+ * https://github.com/ecomfe/echarts/blob/master/LICENSE.txt
+ */
+
+/**
+ * echarts
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/echarts',['require','./config','zrender/tool/util','zrender/tool/event','zrender/tool/env','zrender','zrender/config','zrender','./chart/island','./component/toolbox','./component','./component/title','./component/tooltip','./component/legend','./util/ecData','./chart','./component','zrender/tool/color','./component/timeline','zrender','zrender/shape/Image','zrender/loadingEffect/Bar','zrender/loadingEffect/Bubble','zrender/loadingEffect/DynamicLine','zrender/loadingEffect/Ring','zrender/loadingEffect/Spin','zrender/loadingEffect/Whirling','./theme/default'],function (require) {
+    var ecConfig = require('./config');
+    var zrUtil = require('zrender/tool/util');
+    var zrEvent = require('zrender/tool/event');
+    
+    var self = { };
+    
+    var _canvasSupported = require('zrender/tool/env').canvasSupported;
+    var _idBase = new Date() - 0;
+    var _instances = { };    // ECharts实例map索引
+    var DOM_ATTRIBUTE_KEY = '_echarts_instance_';
+    
+    self.version = '2.0.4';
+    self.dependencies = {
+        zrender: '2.0.4'
+    };
+    /**
+     * 入口方法 
+     */
+    self.init = function (dom, theme) {
+        var zrender = require('zrender');
+        if (((zrender.version || '1.0.3').replace('.', '') - 0)
+            < (self.dependencies.zrender.replace('.', '') - 0)
+        ) {
+            console.error(
+                'ZRender ' + (zrender.version || '1.0.3-') 
+                + ' is too old for ECharts ' + self.version 
+                + '. Current version need ZRender ' 
+                + self.dependencies.zrender + '+'
+            );
+        }
+            
+        dom = dom instanceof Array ? dom[0] : dom;
+
+        // dom与echarts实例映射索引
+        var key = dom.getAttribute(DOM_ATTRIBUTE_KEY);
+        if (!key) {
+            key = _idBase++;
+            dom.setAttribute(DOM_ATTRIBUTE_KEY, key);
+        }
+
+        if (_instances[key]) {
+            // 同一个dom上多次init，自动释放已有实例
+            _instances[key].dispose();
+        }
+        _instances[key] = new Echarts(dom);
+        _instances[key].id = key;
+        _instances[key].setTheme(theme);
+        
+        return  _instances[key];
+    };
+    
+    /**
+     * 通过id获得ECharts实例，id可在实例化后读取 
+     */
+    self.getInstanceById = function (key) {
+        return _instances[key];
+    };
+
+    /**
+     * 消息中心
+     */
+    function MessageCenter() {
+        zrEvent.Dispatcher.call(this);
+    }
+    zrUtil.merge(MessageCenter.prototype, zrEvent.Dispatcher.prototype, true);
+
+    /**
+     * 基于zrender实现Echarts接口层
+     * @param {HtmlElement} dom 必要
+     */
+    function Echarts(dom) {
+        this._themeConfig = zrUtil.clone(ecConfig);
+
+        this.dom = dom;
+        // this._zr;
+        // this._option;                    // curOption clone
+        // this._optionRestore;             // for restore;
+        // this._island;
+        // this._toolbox;
+        // this._timeline;
+        // this._refreshInside;             // 内部刷新标志位
+        
+        this._connected = false;
+        this._status = {                    // 用于图表间通信
+            dragIn: false,
+            dragOut: false,
+            needRefresh: false
+        };
+        this._curEventType = false;         // 破循环信号灯
+        this._chartList = [ ];               // 图表实例
+
+        this._messageCenter = new MessageCenter();
+
+        this._messageCenterOutSide = new MessageCenter();    // Echarts层的外部消息中心，做Echarts层的消息转发
+        
+        // resize方法经常被绑定到window.resize上，闭包一个this
+        this.resize = this.resize();
+        
+        // 初始化::构造函数
+        this._init();
+    }
+    
+    /**
+     * ZRender EVENT
+     * 
+     * @inner
+     * @const
+     * @type {Object}
+     */
+    var ZR_EVENT = require('zrender/config').EVENT;
+
+    /**
+     * 要绑定监听的zrender事件列表
+     * 
+     * @const
+     * @inner
+     * @type {Array}
+     */
+    var ZR_EVENT_LISTENS = [
+        'CLICK', 'DBLCLICK', 'MOUSEOVER', 'MOUSEOUT',
+        'DRAGSTART', 'DRAGEND', 'DRAGENTER', 'DRAGOVER', 'DRAGLEAVE', 'DROP'
+    ];
+
+    /**
+     * 对echarts的实例中的chartList属性成员，逐个进行方法调用，遍历顺序为逆序
+     * 由于在事件触发的默认行为处理中，多次用到相同逻辑，所以抽象了该方法
+     * 由于所有的调用场景里，最多只有两个参数，基于性能和体积考虑，这里就不使用call或者apply了
+     * 
+     * @inner
+     * @param {ECharts} ecInstance ECharts实例
+     * @param {string} methodName 要调用的方法名
+     * @param {*} arg0 调用参数1
+     * @param {*} arg1 调用参数2
+     * @param {*} arg2 调用参数3
+     */
+    function callChartListMethodReverse(ecInstance, methodName, arg0, arg1, arg2) {
+        var chartList = ecInstance._chartList;
+        var len = chartList.length;
+
+        while (len--) {
+            var chart = chartList[len];
+            if (typeof chart[methodName] === 'function') {
+                chart[methodName](arg0, arg1, arg2);
+            }
+        }
+    }
+
+    Echarts.prototype = {
+        /**
+         * 初始化::构造函数
+         */ 
+        _init: function () {
+            var self = this;
+            var _zr = require('zrender').init(this.dom);
+            this._zr = _zr;
+            
+            // wrap: n,e,d,t for name event data this
+            this._messageCenter.dispatch = function(type, event, eventPackage, that) {
+                eventPackage = eventPackage || { };
+                eventPackage.type = type;
+                eventPackage.event = event;
+
+                self._messageCenter.dispatchWithContext(type, eventPackage, that);
+                if (type != 'HOVER' && type != 'MOUSEOUT') {    // 频繁事件直接抛出
+                    setTimeout(function(){
+                        self._messageCenterOutSide.dispatchWithContext(
+                            type, eventPackage, that
+                        );
+                    },50);
+                }
+                else {
+                    self._messageCenterOutSide.dispatchWithContext(
+                        type, eventPackage, that
+                    );
+                }
+            };
+            
+            this._onevent = function(param){
+                return self.__onevent(param);
+            };
+            for (var e in ecConfig.EVENT) {
+                if (e != 'CLICK' && e != 'DBLCLICK' 
+                    && e != 'HOVER' && e != 'MOUSEOUT' && e != 'MAP_ROAM'
+                ) {
+                    this._messageCenter.bind(ecConfig.EVENT[e], this._onevent, this);
+                }
+            }
+
+
+            var eventBehaviors = { };
+            this._onzrevent = function (param) {
+                return self[eventBehaviors[ param.type ]](param);
+            };
+
+            // 挂载关心的事件
+            for (var i = 0, len = ZR_EVENT_LISTENS.length; i < len; i++) {
+                var eventName = ZR_EVENT_LISTENS[i];
+                var eventValue = ZR_EVENT[eventName];
+                eventBehaviors[eventValue] = '_on' + eventName.toLowerCase();
+                _zr.on(eventValue, this._onzrevent);
+            }
+
+            this.chart = { };            // 图表索引
+            this.component = { };        // 组件索引
+            
+            // 内置图表
+            // 孤岛
+            var Island = require('./chart/island');
+            this._island = new Island(this._themeConfig, this._messageCenter, _zr, { }, this);
+            this.chart.island = this._island;
+            
+            // 内置通用组件
+            // 工具箱
+            var Toolbox = require('./component/toolbox');
+            this._toolbox = new Toolbox(this._themeConfig, this._messageCenter, _zr, { }, this);
+            this.component.toolbox = this._toolbox;
+            
+            var componentLibrary = require('./component');
+            componentLibrary.define('title', require('./component/title'));
+            componentLibrary.define('tooltip', require('./component/tooltip'));
+            componentLibrary.define('legend', require('./component/legend'));
+            
+            if (_zr.getWidth() === 0 || _zr.getHeight() === 0) {
+                console.error('Dom’s width & height should be ready before init.');
+            }
+        },
+
+        /**
+         * ECharts事件处理中心 
+         */
+        __onevent: function (param){
+            param.__echartsId = param.__echartsId || this.id;
+
+            // 来自其他联动图表的事件
+            var fromMyself = (param.__echartsId === this.id);
+            
+            if (!this._curEventType) {
+                this._curEventType = param.type;
+            }
+            
+            switch (param.type) {
+                case ecConfig.EVENT.LEGEND_SELECTED :
+                    this._onlegendSelected(param);
+                    break;
+                case ecConfig.EVENT.DATA_ZOOM :
+                    if (!fromMyself) {
+                        var dz = this.component.dataZoom;
+                        if (dz) {
+                            dz.silence(true);
+                            dz.absoluteZoom(param.zoom);
+                            dz.silence(false);
+                        }
+                    }
+                    this._ondataZoom(param);
+                    break;        
+                case ecConfig.EVENT.DATA_RANGE :
+                    fromMyself && this._ondataRange(param);
+                    break;        
+                case ecConfig.EVENT.MAGIC_TYPE_CHANGED :
+                    if (!fromMyself) {
+                        var tb = this.component.toolbox;
+                        if (tb) {
+                            tb.silence(true);
+                            tb.setMagicType(param.magicType);
+                            tb.silence(false);
+                        }
+                    }
+                    this._onmagicTypeChanged(param);
+                    break;        
+                case ecConfig.EVENT.DATA_VIEW_CHANGED :
+                    fromMyself && this._ondataViewChanged(param);
+                    break;        
+                case ecConfig.EVENT.TOOLTIP_HOVER :
+                    fromMyself && this._tooltipHover(param);
+                    break;        
+                case ecConfig.EVENT.RESTORE :
+                    this._onrestore();
+                    break;        
+                case ecConfig.EVENT.REFRESH :
+                    fromMyself && this._onrefresh(param);
+                    break;
+                // 鼠标同步
+                case ecConfig.EVENT.TOOLTIP_IN_GRID :
+                case ecConfig.EVENT.TOOLTIP_OUT_GRID :
+                    if (!fromMyself) {
+                        // 只处理来自外部的鼠标同步
+                        var grid = this.component.grid;
+                        if (grid) {
+                            this._zr.trigger(
+                                'mousemove',
+                                {
+                                    connectTrigger: true,
+                                    zrenderX: grid.getX() + param.x * grid.getWidth(),
+                                    zrenderY: grid.getY() + param.y * grid.getHeight()
+                                }
+                            );
+                        }
+                    } 
+                    else if (this._connected) {
+                        // 来自自己，并且存在多图联动，空间坐标映射修改参数分发
+                        var grid = this.component.grid;
+                        if (grid) {
+                            param.x = (param.event.zrenderX - grid.getX()) / grid.getWidth();
+                            param.y = (param.event.zrenderY - grid.getY()) / grid.getHeight();
+                        }
+                    }
+                    break;
+                /*
+                case ecConfig.EVENT.RESIZE :
+                case ecConfig.EVENT.DATA_CHANGED :
+                case ecConfig.EVENT.PIE_SELECTED :
+                case ecConfig.EVENT.MAP_SELECTED :
+                    break;
+                */
+            }
+            
+            // 多图联动，只做自己的一级事件分发，避免级联事件循环
+            if (this._connected && fromMyself && this._curEventType === param.type) { 
+                for (var c in this._connected) {
+                    this._connected[c].connectedEventHandler(param);
+                }
+                // 分发完毕后复位
+                this._curEventType = null;
+            }
+            
+            if (!fromMyself || (!this._connected && fromMyself)) {  // 处理了完联动事件复位
+                this._curEventType = null;
+            }
+        },
+
+        /**
+         * 点击事件，响应zrender事件，包装后分发到Echarts层
+         */
+        _onclick: function (param) {
+            callChartListMethodReverse(this, 'onclick', param);
+
+            if (param.target) {
+                var ecData = this._eventPackage(param.target);
+                if (ecData && ecData.seriesIndex != null) {
+                    this._messageCenter.dispatch(
+                        ecConfig.EVENT.CLICK,
+                        param.event,
+                        ecData,
+                        this
+                    );
+                }
+            }
+        },
+        
+        /**
+         * 双击事件，响应zrender事件，包装后分发到Echarts层
+         */
+        _ondblclick: function (param) {
+            callChartListMethodReverse(this, 'ondblclick', param);
+
+            if (param.target) {
+                var ecData = this._eventPackage(param.target);
+                if (ecData && ecData.seriesIndex != null) {
+                    this._messageCenter.dispatch(
+                        ecConfig.EVENT.DBLCLICK,
+                        param.event,
+                        ecData,
+                        this
+                    );
+                }
+            }
+        },
+
+        /**
+         * 鼠标移入事件，响应zrender事件，包装后分发到Echarts层
+         */
+        _onmouseover: function (param) {
+            if (param.target) {
+                var ecData = this._eventPackage(param.target);
+                if (ecData && ecData.seriesIndex != null) {
+                    this._messageCenter.dispatch(
+                        ecConfig.EVENT.HOVER,
+                        param.event,
+                        ecData,
+                        this
+                    );
+                }
+            }
+        },
+        
+        /**
+         * 鼠标移出事件，响应zrender事件，包装后分发到Echarts层
+         */
+        _onmouseout: function (param) {
+            if (param.target) {
+                var ecData = this._eventPackage(param.target);
+                if (ecData && ecData.seriesIndex != null) {
+                    this._messageCenter.dispatch(
+                        ecConfig.EVENT.MOUSEOUT,
+                        param.event,
+                        ecData,
+                        this
+                    );
+                }
+            }
+        },
+
+        /**
+         * dragstart回调，可计算特性实现
+         */
+        _ondragstart: function (param) {
+            // 复位用于图表间通信拖拽标识
+            this._status = {
+                dragIn: false,
+                dragOut: false,
+                needRefresh: false
+            };
+
+            callChartListMethodReverse(this, 'ondragstart', param);
+        },
+
+        /**
+         * dragging回调，可计算特性实现
+         */
+        _ondragenter: function (param) {
+            callChartListMethodReverse(this, 'ondragenter', param);
+        },
+
+        /**
+         * dragstart回调，可计算特性实现
+         */
+        _ondragover: function (param) {
+            callChartListMethodReverse(this, 'ondragover', param);
+        },
+        
+        /**
+         * dragstart回调，可计算特性实现
+         */
+        _ondragleave: function (param) {
+            callChartListMethodReverse(this, 'ondragleave', param);
+        },
+
+        /**
+         * dragstart回调，可计算特性实现
+         */
+        _ondrop: function (param) {
+            callChartListMethodReverse(this, 'ondrop', param, this._status);
+            this._island.ondrop(param, this._status);
+        },
+
+        /**
+         * dragdone回调 ，可计算特性实现
+         */
+        _ondragend: function (param) {
+            callChartListMethodReverse(this, 'ondragend', param, this._status);
+
+            this._timeline && this._timeline.ondragend(param, this._status);
+            this._island.ondragend(param, this._status);
+
+            // 发生过重计算
+            if (this._status.needRefresh) {
+                this._syncBackupData(this._option);
+
+                var messageCenter = this._messageCenter;
+                messageCenter.dispatch(
+                    ecConfig.EVENT.DATA_CHANGED,
+                    param.event,
+                    this._eventPackage(param.target),
+                    this
+                );
+                messageCenter.dispatch(ecConfig.EVENT.REFRESH, null, null, this);
+            }
+        },
+
+        /**
+         * 图例选择响应
+         */
+        _onlegendSelected: function (param) {
+            // 用于图表间通信
+            this._status.needRefresh = false;
+            callChartListMethodReverse(this, 'onlegendSelected', param, this._status);
+
+            if (this._status.needRefresh) {
+                this._messageCenter.dispatch(ecConfig.EVENT.REFRESH, null, null, this);
+            }
+        },
+
+        /**
+         * 数据区域缩放响应 
+         */
+        _ondataZoom: function (param) {
+            // 用于图表间通信
+            this._status.needRefresh = false;
+            callChartListMethodReverse(this, 'ondataZoom', param, this._status);
+
+            if (this._status.needRefresh) {
+                this._messageCenter.dispatch(ecConfig.EVENT.REFRESH, null, null, this);
+            }
+        },
+
+        /**
+         * 值域漫游响应 
+         */
+        _ondataRange: function (param) {
+            this._clearEffect();
+            // 用于图表间通信
+            this._status.needRefresh = false;
+            callChartListMethodReverse(this, 'ondataRange', param, this._status);
+            
+            // 没有相互影响，直接刷新即可
+            if (this._status.needRefresh) {
+                this._zr.refresh();
+            }
+        },
+
+        /**
+         * 动态类型切换响应 
+         */
+        _onmagicTypeChanged: function () {
+            this._clearEffect();
+            this._render(this._toolbox.getMagicOption());
+        },
+
+        /**
+         * 数据视图修改响应 
+         */
+        _ondataViewChanged: function (param) {
+            this._syncBackupData(param.option);
+            this._messageCenter.dispatch(
+                ecConfig.EVENT.DATA_CHANGED,
+                null,
+                param,
+                this
+            );
+            this._messageCenter.dispatch(ecConfig.EVENT.REFRESH, null, null, this);
+        },
+        
+        /**
+         * tooltip与图表间通信 
+         */
+        _tooltipHover: function (param) {
+            var tipShape = [ ];
+            callChartListMethodReverse(this, 'ontooltipHover', param, tipShape);
+        },
+
+        /**
+         * 还原 
+         */
+        _onrestore: function () {
+            this.restore();
+        },
+
+        /**
+         * 刷新 
+         */
+        _onrefresh: function (param) {
+            this._refreshInside = true;
+            this.refresh(param);
+            this._refreshInside = false;
+        },
+        
+        /**
+         * 数据修改后的反向同步dataZoom持有的备份数据 
+         */
+        _syncBackupData: function (curOption) {
+            this.component.dataZoom && this.component.dataZoom.syncBackupData(curOption);
+        },
+
+        /**
+         * 打包Echarts层的事件附件
+         */
+        _eventPackage: function (target) {
+            if (target) {
+                var ecData = require('./util/ecData');
+                
+                var seriesIndex = ecData.get(target, 'seriesIndex');
+                var dataIndex = ecData.get(target, 'dataIndex');
+                
+                dataIndex = seriesIndex != -1 && this.component.dataZoom
+                            ? this.component.dataZoom.getRealDataIndex(
+                                seriesIndex,
+                                dataIndex
+                              )
+                            : dataIndex;
+                return {
+                    seriesIndex: seriesIndex,
+                    seriesName: (ecData.get(target, 'series') || { }).name,
+                    dataIndex: dataIndex,
+                    data: ecData.get(target, 'data'),
+                    name: ecData.get(target, 'name'),
+                    value: ecData.get(target, 'value'),
+                    special: ecData.get(target, 'special')
+                };
+            }
+            return;
+        },
+
+        /**
+         * 图表渲染 
+         */
+        _render: function (magicOption) {
+            this._mergeGlobalConifg(magicOption);
+
+            var bgColor = magicOption.backgroundColor;
+            if (bgColor) {
+                if (!_canvasSupported 
+                    && bgColor.indexOf('rgba') != -1
+                ) {
+                    // IE6~8对RGBA的处理，filter会带来其他颜色的影响
+                    var cList = bgColor.split(',');
+                    this.dom.style.filter = 'alpha(opacity=' +
+                        cList[3].substring(0, cList[3].lastIndexOf(')')) * 100
+                        + ')';
+                    cList.length = 3;
+                    cList[0] = cList[0].replace('a', '');
+                    this.dom.style.backgroundColor = cList.join(',') + ')';
+                }
+                else {
+                    this.dom.style.backgroundColor = bgColor;
+                }
+            }
+            
+            this._zr.clearAnimation();
+            this._chartList = [ ];
+
+            var chartLibrary = require('./chart');
+            var componentLibrary = require('./component');
+            
+            if (magicOption.xAxis || magicOption.yAxis) {
+                magicOption.grid = magicOption.grid || { };
+                magicOption.dataZoom = magicOption.dataZoom || { };
+            }
+            
+            var componentList = [
+                'title', 'legend', 'tooltip', 'dataRange', 'roamController',
+                'grid', 'dataZoom', 'xAxis', 'yAxis', 'polar'
+            ];
+            
+            var ComponentClass;
+            var componentType;
+            var component;
+            for (var i = 0, l = componentList.length; i < l; i++) {
+                componentType = componentList[i];
+                component = this.component[componentType];
+
+                if (magicOption[componentType]) {
+                    if (component) {
+                        component.refresh && component.refresh(magicOption);
+                    }
+                    else {
+                        ComponentClass = componentLibrary.get(
+                            /^[xy]Axis$/.test(componentType) ? 'axis' : componentType
+                        );
+                        component = new ComponentClass(
+                            this._themeConfig, this._messageCenter, this._zr,
+                            magicOption, this, componentType
+                        );
+                        this.component[componentType] = component;
+                    }
+                    this._chartList.push(component);
+                }
+                else if (component) {
+                    component.dispose();
+                    this.component[componentType] = null;
+                    delete this.component[componentType];
+                }
+            }
+
+            var ChartClass;
+            var chartType;
+            var chart;
+            var chartMap = { };      // 记录已经初始化的图表
+            for (var i = 0, l = magicOption.series.length; i < l; i++) {
+                chartType = magicOption.series[i].type;
+                if (!chartType) {
+                    console.error('series[' + i + '] chart type has not been defined.');
+                    continue;
+                }
+
+                if (!chartMap[chartType]) {
+                    chartMap[chartType] = true;
+                    ChartClass = chartLibrary.get(chartType);
+                    if (ChartClass) {
+                        if (this.chart[chartType]) {
+                            chart = this.chart[chartType];
+                            chart.refresh(magicOption);
+                        }
+                        else {
+                            chart = new ChartClass(
+                                this._themeConfig, this._messageCenter, this._zr,
+                                magicOption, this
+                            );
+                        }
+                        this._chartList.push(chart);
+                        this.chart[chartType] = chart;
+                    }
+                    else {
+                        console.error(chartType + ' has not been required.');
+                    }
+                }
+            }
+            
+            // 已有实例但新option不带这类图表的实例释放
+            for (chartType in this.chart) {
+                if (chartType != ecConfig.CHART_TYPE_ISLAND  && !chartMap[chartType]) {
+                    this.chart[chartType].dispose();
+                    this.chart[chartType] = null;
+                    delete this.chart[chartType];
+                }
+            }
+            
+            this.component.grid && this.component.grid.refixAxisShape(this.component);
+
+            this._island.refresh(magicOption);
+            this._toolbox.refresh(magicOption);
+            
+            magicOption.animation && !magicOption.renderAsImage
+                ? this._zr.refresh()
+                : this._zr.render();
+            
+            var imgId = 'IMG' + this.id;
+            var img = document.getElementById(imgId);
+            if (magicOption.renderAsImage && _canvasSupported) {
+                // IE8- 不支持图片渲染形式
+                if (img) {
+                    // 已经渲染过则更新显示
+                    img.src = this.getDataURL(magicOption.renderAsImage);
+                }
+                else {
+                    // 没有渲染过插入img dom
+                    img = this.getImage(magicOption.renderAsImage);
+                    img.id = imgId;
+                    img.style.position = 'absolute';
+                    img.style.left = 0;
+                    img.style.top = 0;
+                    this.dom.firstChild.appendChild(img);
+                }
+                this.un();
+                this._zr.un();
+                this._disposeChartList();
+                this._zr.clear();
+            }
+            else if (img) {
+                // 删除可能存在的img
+                img.parentNode.removeChild(img);
+            }
+            img = null;
+            
+            this._option = magicOption;
+        },
+
+        /**
+         * 还原 
+         */
+        restore: function () {
+            this._clearEffect();
+            this._option = zrUtil.clone(this._optionRestore);
+            this._disposeChartList();
+            this._island.clear();
+            this._toolbox.reset(this._option, true);
+            this._render(this._option);
+        },
+
+        /**
+         * 刷新 
+         * @param {Object=} param，可选参数，用于附带option，内部同步用，外部不建议带入数据修改，无法同步 
+         */
+        refresh: function (param) {
+            this._clearEffect();
+            param = param || { };
+            var magicOption = param.option;
+            
+            // 外部调用的refresh且有option带入
+            if (!this._refreshInside && magicOption) {
+                // 做简单的差异合并去同步内部持有的数据克隆，不建议带入数据
+                // 开启数据区域缩放、拖拽重计算、数据视图可编辑模式情况下，当用户产生了数据变化后无法同步
+                // 如有带入option存在数据变化，请重新setOption
+                magicOption = this.getOption();
+                zrUtil.merge(magicOption, param.option, true);
+                zrUtil.merge(this._optionRestore, param.option, true);
+                this._toolbox.reset(magicOption);
+            }
+            
+            this._island.refresh(magicOption);
+            this._toolbox.refresh(magicOption);
+            
+            // 停止动画
+            this._zr.clearAnimation();
+            // 先来后到，安顺序刷新各种图表，图表内部refresh优化检查magicOption，无需更新则不更新~
+            for (var i = 0, l = this._chartList.length; i < l; i++) {
+                this._chartList[i].refresh && this._chartList[i].refresh(magicOption);
+            }
+            this.component.grid && this.component.grid.refixAxisShape(this.component);
+            this._zr.refresh();
+        },
+
+        /**
+         * 释放图表实例
+         */
+        _disposeChartList: function () {
+            this._clearEffect();
+
+            // 停止动画
+            this._zr.clearAnimation();
+
+            var len = this._chartList.length;
+            while (len--) {
+                var chart = this._chartList[len];
+
+                if (chart) {
+                    var chartType = chart.type;
+                    this.chart[chartType] && delete this.chart[chartType];
+                    this.component[chartType] && delete this.component[chartType];
+                    chart.dispose && chart.dispose();
+                }
+            }
+
+            this._chartList = [ ];
+        },
+
+        /**
+         * 非图表全局属性merge~~ 
+         */
+        _mergeGlobalConifg: function (magicOption) {
+            var mergeList = [
+                // 背景颜色
+                'backgroundColor',
+                
+                // 拖拽重计算相关
+                'calculable', 'calculableColor', 'calculableHolderColor',
+                
+                // 孤岛显示连接符
+                'nameConnector', 'valueConnector',
+                
+                // 动画相关
+                'animation', 'animationThreshold', 'animationDuration',
+                'animationEasing', 'addDataAnimation',
+                
+                // 默认标志图形类型列表
+                'symbolList',
+                
+                // 降低图表内元素拖拽敏感度，单位ms，不建议外部干预
+                'DRAG_ENABLE_TIME'
+            ];
+
+            var len = mergeList.length;
+            while (len--) {
+                var mergeItem = mergeList[len];
+                if (magicOption[mergeItem] == null) {
+                    magicOption[mergeItem] = this._themeConfig[mergeItem];
+                }
+            }
+            
+            // 数值系列的颜色列表，不传则采用内置颜色，可配数组，借用zrender实例注入，会有冲突风险，先这样
+            var themeColor = magicOption.color;
+            if (!(themeColor && themeColor.length)) {
+                themeColor = this._themeConfig.color;
+            }
+
+            this._zr.getColor = function (idx) {
+                var zrColor = require('zrender/tool/color');
+                return zrColor.getColor(idx, themeColor);
+            };
+        },
+        
+        /**
+         * 万能接口，配置图表实例任何可配置选项，多次调用时option选项做merge处理
+         * @param {Object} option
+         * @param {boolean=} notMerge 多次调用时option选项是默认是合并（merge）的，
+         *                   如果不需求，可以通过notMerger参数为true阻止与上次option的合并
+         */
+        setOption: function (option, notMerge) {
+            if (!option.timeline) {
+                return this._setOption(option, notMerge);
+            }
+            else {
+                return this._setTimelineOption(option);
+            }
+        },
+        
+        /**
+         * 万能接口，配置图表实例任何可配置选项，多次调用时option选项做merge处理
+         * @param {Object} option
+         * @param {boolean=} notMerge 多次调用时option选项是默认是合并（merge）的，
+         *                   如果不需求，可以通过notMerger参数为true阻止与上次option的合并
+         */
+        _setOption: function (option, notMerge) {
+            if (!notMerge && this._option) {
+                this._option = zrUtil.merge(
+                    this.getOption(),
+                    zrUtil.clone(option),
+                    true
+                );
+            }
+            else {
+                this._option = zrUtil.clone(option);
+            }
+
+            this._optionRestore = zrUtil.clone(this._option);
+            
+            if (!this._option.series || this._option.series.length === 0) {
+                this._zr.clear();
+                return;
+            }
+
+            if (this.component.dataZoom                         // 存在dataZoom控件
+                && (this._option.dataZoom                       // 并且新option也存在
+                    || (this._option.toolbox
+                        && this._option.toolbox.feature
+                        && this._option.toolbox.feature.dataZoom
+                        && this._option.toolbox.feature.dataZoom.show
+                    )
+                )
+            ) {
+                // dataZoom同步数据
+                this.component.dataZoom.syncOption(this._option);
+            }
+            this._toolbox.reset(this._option);
+            this._render(this._option);
+            return this;
+        },
+
+        /**
+         * 返回内部持有的当前显示option克隆 
+         */
+        getOption: function () {
+            var magicOption = zrUtil.clone(this._option);
+            
+            var self = this;
+            function restoreOption(prop) {
+                var restoreSource = self._optionRestore[prop];
+
+                if (restoreSource) {
+                    if (restoreSource instanceof Array) {
+                        var len = restoreSource.length;
+                        while (len--) {
+                            magicOption[prop][len].data = zrUtil.clone(
+                                restoreSource[len].data
+                            );
+                        }
+                    }
+                    else {
+                        magicOption[prop].data = zrUtil.clone(restoreSource.data);
+                    }
+                }
+            }
+
+            // 横轴数据还原
+            restoreOption('xAxis');
+            
+            // 纵轴数据还原
+            restoreOption('yAxis');
+            
+            // 系列数据还原
+            restoreOption('series');
+            
+            return magicOption;
+        },
+
+        /**
+         * 数据设置快捷接口
+         * @param {Array} series
+         * @param {boolean=} notMerge 多次调用时option选项是默认是合并（merge）的，
+         *                   如果不需求，可以通过notMerger参数为true阻止与上次option的合并。
+         */
+        setSeries: function (series, notMerge) {
+            if (!notMerge) {
+                this.setOption({series: series});
+            }
+            else {
+                this._option.series = series;
+                this.setOption(this._option, notMerge);
+            }
+            return this;
+        },
+
+        /**
+         * 返回内部持有的当前显示series克隆 
+         */
+        getSeries: function () {
+            return this.getOption().series;
+        },
+        
+        /**
+         * timelineOption接口，配置图表实例任何可配置选项
+         * @param {Object} option
+         */
+        _setTimelineOption: function(option) {
+            this._timeline && this._timeline.dispose();
+            var Timeline = require('./component/timeline');
+            var timeline = new Timeline(
+                this._themeConfig, this._messageCenter, this._zr, option, this
+            );
+            this._timeline = timeline;
+            this.component.timeline = this._timeline;
+            
+            return this;
+        },
+        
+        /**
+         * 动态数据添加
+         * 形参为单组数据参数，多组时为数据，内容同[seriesIdx, data, isShift, additionData]
+         * @param {number} seriesIdx 系列索引
+         * @param {number | Object} data 增加数据
+         * @param {boolean=} isHead 是否队头加入，默认，不指定或false时为队尾插入
+         * @param {boolean=} dataGrow 是否增长数据队列长度，默认，不指定或false时移出目标数组对位数据
+         * @param {string=} additionData 是否增加类目轴(饼图为图例)数据，附加操作同isHead和dataGrow
+         */
+        addData: function (seriesIdx, data, isHead, dataGrow, additionData) {
+            var params = seriesIdx instanceof Array
+                ? seriesIdx
+                : [[seriesIdx, data, isHead, dataGrow, additionData]];
+
+            //this._optionRestore 和 magicOption 都要同步
+            var magicOption = this.getOption();
+            var optionRestore = this._optionRestore;
+            for (var i = 0, l = params.length; i < l; i++) {
+                seriesIdx = params[i][0];
+                data = params[i][1];
+                isHead = params[i][2];
+                dataGrow = params[i][3];
+                additionData = params[i][4];
+
+                
+                var seriesItem = optionRestore.series[seriesIdx];
+                var inMethod = isHead ? 'unshift' : 'push';
+                var outMethod = isHead ? 'pop' : 'shift';
+                if (seriesItem) {
+                    var seriesItemData = seriesItem.data;
+                    var mSeriesItemData = magicOption.series[seriesIdx].data;
+
+                    seriesItemData[inMethod](data);
+                    mSeriesItemData[inMethod](data);
+                    if (!dataGrow) {
+                        seriesItemData[outMethod]();
+                        data = mSeriesItemData[outMethod]();
+                    }
+                    
+                    
+                    if (additionData != null) {
+                        var legend;
+                        var legendData;
+
+                        if (seriesItem.type === ecConfig.CHART_TYPE_PIE
+                            && (legend = optionRestore.legend) 
+                            && (legendData = legend.data)
+                        ) {
+                            var mLegendData = magicOption.legend.data;
+                            legendData[inMethod](additionData);
+                            mLegendData[inMethod](additionData);
+
+                            if (!dataGrow) {
+                                var legendDataIdx = zrUtil.indexOf(legendData, data.name);
+                                legendDataIdx != -1 && legendData.splice(legendDataIdx, 1);
+                                
+                                legendDataIdx = zrUtil.indexOf(mLegendData, data.name);
+                                legendDataIdx != -1 && mLegendData.splice(legendDataIdx, 1);
+                            }
+                        }
+                        else if (optionRestore.xAxis != null && optionRestore.yAxis != null) {
+                            // x轴类目
+                            var axisData;
+                            var mAxisData;
+                            var axisIdx = seriesItem.xAxisIndex || 0;
+
+                            if (optionRestore.xAxis[axisIdx].type == null
+                                || optionRestore.xAxis[axisIdx].type === 'category'
+                            ) {
+                                axisData = optionRestore.xAxis[axisIdx].data;
+                                mAxisData = magicOption.xAxis[axisIdx].data;
+
+                                axisData[inMethod](additionData);
+                                mAxisData[inMethod](additionData);
+                                if (!dataGrow) {
+                                    axisData[outMethod]();
+                                    mAxisData[outMethod]();
+                                }
+                            }
+                            
+                            // y轴类目
+                            axisIdx = seriesItem.yAxisIndex || 0;
+                            if (optionRestore.yAxis[axisIdx].type === 'category') {
+                                axisData = optionRestore.yAxis[axisIdx].data;
+                                mAxisData = magicOption.yAxis[axisIdx].data;
+
+                                axisData[inMethod](additionData);
+                                mAxisData[inMethod](additionData);
+                                if (!dataGrow) {
+                                    axisData[outMethod]();
+                                    mAxisData[outMethod]();
+                                }
+                            }
+                        }
+                    }
+
+                    // 同步图表内状态，动画需要
+                    this._option.series[seriesIdx].data = magicOption.series[seriesIdx].data;
+                }
+            }
+            
+            this._zr.clearAnimation();
+            var chartList = this._chartList;
+            for (var i = 0, l = chartList.length; i < l; i++) {
+                if (magicOption.addDataAnimation && chartList[i].addDataAnimation) {
+                    chartList[i].addDataAnimation(params);
+                }
+            }
+
+            // dataZoom同步数据
+            this.component.dataZoom && this.component.dataZoom.syncOption(magicOption);
+            
+            this._option = magicOption;
+            var self = this;
+            setTimeout(function (){
+                if (!self._zr) {
+                    return; // 已经被释放
+                }
+                self._zr.clearAnimation();
+                for (var i = 0, l = chartList.length; i < l; i++) {
+                    // 有addData动画就去掉过渡动画
+                    chartList[i].motionlessOnce = 
+                        magicOption.addDataAnimation && chartList[i].addDataAnimation;
+                }
+                self._messageCenter.dispatch(
+                    ecConfig.EVENT.REFRESH,
+                    null,
+                    {option: magicOption},
+                    self
+                );
+            }, magicOption.addDataAnimation ? 500 : 0);
+            return this;
+        },
+
+        /**
+         * 动态[标注 | 标线]添加
+         * @param {number} seriesIdx 系列索引
+         * @param {Object} markData [标注 | 标线]对象，支持多个
+         */
+        addMarkPoint: function (seriesIdx, markData) {
+            return this._addMark(seriesIdx, markData, 'markPoint');
+        },
+        
+        addMarkLine: function (seriesIdx, markData) {
+            return this._addMark(seriesIdx, markData, 'markLine');
+        },
+        
+        _addMark: function (seriesIdx, markData, markType) {
+            var series = this._option.series;
+            var seriesItem;
+
+            if (series && (seriesItem = series[seriesIdx])) {
+                var seriesR = this._optionRestore.series;
+                var seriesRItem = seriesR[seriesIdx];
+                var markOpt = seriesItem[markType];
+                var markOptR = seriesRItem[markType];
+
+                markOpt = seriesItem[markType] = markOpt || {data: [ ]};
+                markOptR = seriesRItem[markType] = markOptR || {data: [ ]};
+
+                for (var key in markData) {
+                    if (key === 'data') {
+                        // 数据concat
+                        markOpt.data = markOpt.data.concat(markData.data);
+                        markOptR.data = markOptR.data.concat(markData.data);
+                    }
+                    else if (typeof markData[key] != 'object' || markOpt[key] == null) {
+                        // 简单类型或新值直接赋值
+                        markOpt[key] = markOptR[key] = markData[key];
+                    }
+                    else {
+                        // 非数据的复杂对象merge
+                        zrUtil.merge(markOpt[key], markData[key], true);
+                        zrUtil.merge(markOptR[key], markData[key], true);
+                    }
+                }
+                
+                var chart = this.chart[seriesItem.type];
+                chart && chart.addMark(seriesIdx, markData, markType);
+            }
+
+            return this;
+        },
+        
+        /**
+         * 动态[标注 | 标线]删除
+         * @param {number} seriesIdx 系列索引
+         * @param {string} markName [标注 | 标线]名称
+         */
+        delMarkPoint: function (seriesIdx, markName) {
+            return this._delMark(seriesIdx, markName, 'markPoint');
+        },
+        
+        delMarkLine: function (seriesIdx, markName) {
+            return this._delMark(seriesIdx, markName, 'markLine');
+        },
+        
+        _delMark: function (seriesIdx, markName, markType) {
+            var series = this._option.series;
+            var seriesItem;
+            var mark;
+            var dataArray;
+
+            if (!(
+                    series 
+                    && (seriesItem = series[seriesIdx]) 
+                    && (mark = seriesItem[markType])
+                    && (dataArray = mark.data)
+                )
+            ) {
+                return this;
+            }
+
+            markName = markName.split(' > ');
+            var targetIndex = -1;
+            
+            for (var i = 0, l = dataArray.length; i < l; i++) {
+                var dataItem = dataArray[i];
+                if (dataItem instanceof Array) {
+                    if (dataItem[0].name === markName[0]
+                        && dataItem[1].name === markName[1]
+                    ) {
+                        targetIndex = i;
+                        break;
+                    }
+                }
+                else if (dataItem.name === markName[0]) {
+                    targetIndex = i;
+                    break;
+                }
+            }
+            
+            if (targetIndex > -1) {
+                dataArray.splice(targetIndex, 1);
+                this._optionRestore.series[seriesIdx][markType].data.splice(targetIndex, 1);
+
+                var chart = this.chart[seriesItem.type];
+                chart && chart.delMark(seriesIdx, markName.join(' > '), markType);
+            }
+            
+            return this;
+        },
+        
+        /**
+         * 获取当前dom 
+         */
+        getDom: function () {
+            return this.dom;
+        },
+        
+        /**
+         * 获取当前zrender实例，可用于添加额为的shape和深度控制 
+         */
+        getZrender: function () {
+            return this._zr;
+        },
+
+        /**
+         * 获取Base64图片dataURL
+         * @param {string} imgType 图片类型，支持png|jpeg，默认为png
+         * @return imgDataURL
+         */
+        getDataURL: function (imgType) {
+            if (!_canvasSupported) {
+                return '';
+            }
+
+            if (this._chartList.length === 0) {
+                // 渲染为图片
+                var imgId = 'IMG' + this.id;
+                var img = document.getElementById(imgId);
+                if (img) {
+                    return img.src;
+                }
+            }
+
+            // 清除可能存在的tooltip元素
+            var tooltip = this.component.tooltip;
+            tooltip && tooltip.hideTip();
+                
+            switch (imgType) {
+                case 'jpeg':
+                    break;
+                default:
+                    imgType = 'png';
+            }
+
+            var bgColor = this._option.backgroundColor;
+            if (bgColor && bgColor.replace(' ','') === 'rgba(0,0,0,0)') {
+                bgColor = '#fff';
+            }
+
+            return this._zr.toDataURL('image/' + imgType, bgColor); 
+        },
+
+        /**
+         * 获取img
+         * @param {string} imgType 图片类型，支持png|jpeg，默认为png
+         * @return img dom
+         */
+        getImage: function (imgType) {
+            var title = this._optionRestore.title;
+            var imgDom = document.createElement('img');
+            imgDom.src = this.getDataURL(imgType);
+            imgDom.title = (title && title.text) || 'ECharts';
+            return imgDom;
+        },
+        
+        /**
+         * 获取多图联动的Base64图片dataURL
+         * @param {string} imgType 图片类型，支持png|jpeg，默认为png
+         * @return imgDataURL
+         */
+        getConnectedDataURL: function (imgType) {
+            if (!this.isConnected()) {
+                return this.getDataURL(imgType);
+            }
+            
+            var tempDom = this.dom;
+            var imgList = {
+                'self': {
+                    img: this.getDataURL(imgType),
+                    left: tempDom.offsetLeft,
+                    top: tempDom.offsetTop,
+                    right: tempDom.offsetLeft + tempDom.offsetWidth,
+                    bottom: tempDom.offsetTop + tempDom.offsetHeight
+                }
+            };
+
+            var minLeft = imgList.self.left;
+            var minTop = imgList.self.top;
+            var maxRight = imgList.self.right;
+            var maxBottom = imgList.self.bottom;
+
+            for (var c in this._connected) {
+                tempDom = this._connected[c].getDom();
+                imgList[c] = {
+                    img: this._connected[c].getDataURL(imgType),
+                    left: tempDom.offsetLeft,
+                    top: tempDom.offsetTop,
+                    right: tempDom.offsetLeft + tempDom.offsetWidth,
+                    bottom: tempDom.offsetTop + tempDom.offsetHeight
+                };
+
+                minLeft = Math.min(minLeft, imgList[c].left);
+                minTop = Math.min(minTop, imgList[c].top);
+                maxRight = Math.max(maxRight, imgList[c].right);
+                maxBottom = Math.max(maxBottom, imgList[c].bottom);
+            }
+            
+            var zrDom = document.createElement('div');
+            zrDom.style.position = 'absolute';
+            zrDom.style.left = '-4000px';
+            zrDom.style.width = (maxRight - minLeft) + 'px';
+            zrDom.style.height = (maxBottom - minTop) + 'px';
+            document.body.appendChild(zrDom);
+            
+            var zrImg = require('zrender').init(zrDom);
+            
+            var ImageShape = require('zrender/shape/Image');
+            for (var c in imgList) {
+                zrImg.addShape(new ImageShape({
+                    style: {
+                        x: imgList[c].left - minLeft,
+                        y: imgList[c].top - minTop,
+                        image: imgList[c].img
+                    }
+                }));
+            }
+            
+            zrImg.render();
+            var bgColor = this._option.backgroundColor;
+            if (bgColor && bgColor.replace(/ /g, '') === 'rgba(0,0,0,0)') {
+                bgColor = '#fff';
+            }
+            
+            var image = zrImg.toDataURL('image/png', bgColor);
+            
+            setTimeout(function () {
+                zrImg.dispose();
+                zrDom.parentNode.removeChild(zrDom);
+                zrDom = null;
+            }, 100);
+            
+            return image;
+        },
+        
+        /**
+         * 获取多图联动的img
+         * @param {string} imgType 图片类型，支持png|jpeg，默认为png
+         * @return img dom
+         */
+        getConnectedImage: function (imgType) {
+            var title = this._optionRestore.title;
+            var imgDom = document.createElement('img');
+            imgDom.src = this.getConnectedDataURL(imgType);
+            imgDom.title = (title && title.text) || 'ECharts';
+            return imgDom;
+        },
+
+        /**
+         * 外部接口绑定事件
+         * @param {Object} eventName 事件名称
+         * @param {Object} eventListener 事件响应函数
+         */
+        on: function (eventName, eventListener) {
+            this._messageCenterOutSide.bind(eventName, eventListener, this);
+            return this;
+        },
+
+        /**
+         * 外部接口解除事件绑定
+         * @param {Object} eventName 事件名称
+         * @param {Object} eventListener 事件响应函数
+         */
+        un: function (eventName, eventListener) {
+            this._messageCenterOutSide.unbind(eventName, eventListener);
+            return this;
+        },
+        
+        /**
+         * 多图联动 
+         * @param connectTarget{ECharts | Array <ECharts>} connectTarget 联动目标
+         */
+        connect: function (connectTarget) {
+            if (!connectTarget) {
+                return this;
+            }
+            
+            if (!this._connected) {
+                this._connected = { };
+            }
+            
+            if (connectTarget instanceof Array) {
+                for (var i = 0, l = connectTarget.length; i < l; i++) {
+                    this._connected[connectTarget[i].id] = connectTarget[i];
+                }
+            }
+            else {
+                this._connected[connectTarget.id] = connectTarget;
+            }
+            
+            return this;
+        },
+        
+        /**
+         * 解除多图联动 
+         * @param connectTarget{ECharts | Array <ECharts>} connectTarget 解除联动目标
+         */
+        disConnect: function (connectTarget) {
+            if (!connectTarget || !this._connected) {
+                return this;
+            }
+            
+            if (connectTarget instanceof Array) {
+                for (var i = 0, l = connectTarget.length; i < l; i++) {
+                    delete this._connected[connectTarget[i].id];
+                }
+            }
+            else {
+                delete this._connected[connectTarget.id];
+            }
+            
+            for (var k in this._connected) {
+                return k, this; // 非空
+            }
+            
+            // 空，转为标志位
+            this._connected = false;
+            return this;
+        },
+        
+        /**
+         * 联动事件响应 
+         */
+        connectedEventHandler: function (param) {
+            if (param.__echartsId != this.id) {
+                // 来自其他联动图表的事件
+                this._onevent(param);
+            }
+        },
+        
+        /**
+         * 是否存在多图联动 
+         */
+        isConnected: function () {
+            return !!this._connected;
+        },
+        
+        /**
+         * 显示loading过渡 
+         * @param {Object} loadingOption
+         */
+        showLoading: function (loadingOption) {
+            var effectList = {
+                bar: require('zrender/loadingEffect/Bar'),
+                bubble: require('zrender/loadingEffect/Bubble'),
+                dynamicLine: require('zrender/loadingEffect/DynamicLine'),
+                ring: require('zrender/loadingEffect/Ring'),
+                spin: require('zrender/loadingEffect/Spin'),
+                whirling: require('zrender/loadingEffect/Whirling')
+            };
+            this._toolbox.hideDataView();
+
+            loadingOption = loadingOption || { };
+
+            var textStyle = loadingOption.textStyle || { };
+            loadingOption.textStyle = textStyle;
+
+            var finalTextStyle = zrUtil.merge(
+                zrUtil.clone(textStyle),
+                this._themeConfig.textStyle
+            );
+            textStyle.textFont = finalTextStyle.fontStyle + ' '
+                                 + finalTextStyle.fontWeight + ' '
+                                 + finalTextStyle.fontSize + 'px '
+                                 + finalTextStyle.fontFamily;
+
+            textStyle.text = loadingOption.text || this._themeConfig.loadingText;
+
+            if (loadingOption.x != null) {
+                textStyle.x = loadingOption.x;
+            }
+            if (loadingOption.y != null) {
+                textStyle.y = loadingOption.y;
+            }
+            
+            loadingOption.effectOption = loadingOption.effectOption || { };
+            loadingOption.effectOption.textStyle = textStyle;
+            
+            var Effect = loadingOption.effect;
+            if (typeof Effect === 'string' || Effect == null) {
+                Effect =  effectList[loadingOption.effect || 'spin'];
+            }
+            this._zr.showLoading(new Effect(loadingOption.effectOption));
+            return this;
+        },
+
+        /**
+         * 隐藏loading过渡 
+         */
+        hideLoading: function () {
+            this._zr.hideLoading();
+            return this;
+        },
+        
+        /**
+         * 主题设置 
+         */
+        setTheme: function (theme) {
+            if (theme) {
+               if (typeof theme === 'string') {
+                    // 默认主题
+                    switch (theme) {
+                        // case 'themename':
+                        //     theme = require('./theme/themename');
+                        default:
+                            theme = require('./theme/default');
+                    }
+                }
+                else {
+                    theme = theme || { };
+                }
+                
+                // 复位默认配置
+                // this._themeConfig会被别的对象引用持有
+                // 所以不能改成this._themeConfig = { };
+                for (var key in this._themeConfig) {
+                    delete this._themeConfig[key];
+                }
+                for (var key in ecConfig) {
+                    this._themeConfig[key] = zrUtil.clone(ecConfig[key]);
+                }
+                
+                // 颜色数组随theme，不merge
+                theme.color && (this._themeConfig.color = [ ]);
+                
+                // 默认标志图形类型列表，不merge
+                theme.symbolList && (this._themeConfig.symbolList = [ ]);
+                
+                // 应用新主题
+                zrUtil.merge(this._themeConfig, zrUtil.clone(theme), true);
+            }
+            
+            if (!_canvasSupported) {   // IE8-
+                this._themeConfig.textStyle.fontFamily = this._themeConfig.textStyle.fontFamily2;
+            }
+            
+            this._timeline && this._timeline.setTheme(true);
+            this._optionRestore && this.restore();
+        },
+
+        /**
+         * 视图区域大小变化更新，不默认绑定，供使用方按需调用 
+         */
+        resize: function () {
+            var self = this;
+            return function(){
+                self._clearEffect();
+                self._zr.resize();
+                if (self._option && self._option.renderAsImage && _canvasSupported) {
+                    // 渲染为图片重走render模式
+                    self._render(self._option);
+                    return self;
+                }
+                // 停止动画
+                self._zr.clearAnimation();
+                self._island.resize();
+                self._toolbox.resize();
+                self._timeline && self._timeline.resize();
+                // 先来后到，不能仅刷新自己，也不能在上一个循环中刷新，如坐标系数据改变会影响其他图表的大小
+                // 所以安顺序刷新各种图表，图表内部refresh优化无需更新则不更新~
+                for (var i = 0, l = self._chartList.length; i < l; i++) {
+                    self._chartList[i].resize && self._chartList[i].resize();
+                }
+                self.component.grid && self.component.grid.refixAxisShape(self.component);
+                self._zr.refresh();
+                self._messageCenter.dispatch(ecConfig.EVENT.RESIZE, null, null, self);
+                return self;
+            };
+        },
+        
+        _clearEffect: function() {
+            this._zr.modLayer(ecConfig.EFFECT_ZLEVEL, { motionBlur: false });
+            this._zr.painter.clearLayer(ecConfig.EFFECT_ZLEVEL);
+        },
+        
+        /**
+         * 清除已渲染内容 ，clear后echarts实例可用
+         */
+        clear: function () {
+            this._disposeChartList();
+            this._zr.clear();
+            this._option = { };
+            this._optionRestore = { };
+            return this;
+        },
+
+        /**
+         * 释放，dispose后echarts实例不可用
+         */
+        dispose: function () {
+            var key = this.dom.getAttribute(DOM_ATTRIBUTE_KEY);
+            key && delete _instances[key];
+        
+            this._island.dispose();
+            this._toolbox.dispose();
+            this._timeline && this._timeline.dispose();
+            this._messageCenter.unbind();
+            this.clear();
+            this._zr.dispose();
+            this._zr = null;
+        }
+    };
+
+    return self;
+});
+define('echarts', ['echarts/echarts'], function (main) { return main; });
+
+/**
+ * zrender
+ *
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ * shape类：仪表盘指针
+ * 可配图形属性：
+   {
+       // 基础属性
+       shape  : 'gauge-pointer',       // 必须，shape类标识，需要显式指定
+       id     : {string},       // 必须，图形唯一标识，可通过'zrender/tool/guid'方法生成
+       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       invisible : {boolean},   // 默认为false，是否可见
+
+       // 样式属性，默认状态样式样式属性
+       style  : {
+           xStart        : {number},  // 必须，起点横坐标
+           yStart        : {number},  // 必须，起点纵坐标
+           xEnd          : {number},  // 必须，终点横坐标
+           yEnd          : {number},  // 必须，终点纵坐标
+           strokeColor   : {color},   // 默认为'#000'，线条颜色（轮廓），支持rgba
+           lineWidth     : {number},  // 线条宽度
+       },
+
+       // 交互属性，详见shape.Base
+
+       // 事件属性，详见shape.Base
+   }
+ */
+define('echarts/util/shape/GaugePointer',['require','zrender/shape/Base','zrender/tool/util','./normalIsCover'],function (require) {
+    var Base = require('zrender/shape/Base');
+    var zrUtil = require('zrender/tool/util');
+
+    function GaugePointer(options) {
+        Base.call(this, options);
+    }
+
+    GaugePointer.prototype =  {
+        type: 'gauge-pointer',
+        /**
+         * 创建矩形路径
+         * @param {Context2D} ctx Canvas 2D上下文
+         * @param {Object} style 样式
+         */
+        buildPath : function (ctx, style) {
+            var r = style.r;
+            var width = style.width;
+            var angle = style.angle;
+            var x = style.x - Math.cos(angle) * width * (width >= r / 3 ? 1 : 2);
+            var y = style.y + Math.sin(angle) * width * (width >= r / 3 ? 1 : 2);
+
+            angle = style.angle - Math.PI / 2;
+            ctx.moveTo(x, y);
+            ctx.lineTo(
+                style.x + Math.cos(angle) * width,
+                style.y - Math.sin(angle) * width
+            );
+            ctx.lineTo(
+                style.x + Math.cos(style.angle) * r,
+                style.y - Math.sin(style.angle) * r
+            );
+            ctx.lineTo(
+                style.x - Math.cos(angle) * width,
+                style.y + Math.sin(angle) * width
+            );
+            ctx.lineTo(x, y);
+            return;
+        },
+
+        /**
+         * 返回矩形区域，用于局部刷新和文字定位
+         * @param {Object} style
+         */
+        getRect : function(style) {
+            if (style.__rect) {
+                return style.__rect;
+            }
+
+            var width = style.width * 2;
+            var xStart = style.x;
+            var yStart = style.y;
+            var xEnd = xStart + Math.cos(style.angle) * style.r;
+            var yEnd = yStart - Math.sin(style.angle) * style.r;
+
+            style.__rect = {
+                x : Math.min(xStart, xEnd) - width,
+                y : Math.min(yStart, yEnd) - width,
+                width : Math.abs(xStart - xEnd) + width,
+                height : Math.abs(yStart - yEnd) + width
+            };
+            return style.__rect;
+        },
+
+        isCover : require('./normalIsCover')
+    };
+
+    zrUtil.inherits(GaugePointer, Base);
+
+    return GaugePointer;
+});
+
+/**
+ * echarts图表类：仪表盘
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/chart/gauge',['require','../component/base','./base','../util/shape/GaugePointer','zrender/shape/Text','zrender/shape/Line','zrender/shape/Rectangle','zrender/shape/Circle','zrender/shape/Sector','../config','../util/ecData','../util/accMath','zrender/tool/util','../chart'],function (require) {
+    var ComponentBase = require('../component/base');
+    var ChartBase = require('./base');
+    
+    // 图形依赖
+    var GaugePointerShape = require('../util/shape/GaugePointer');
+    var TextShape = require('zrender/shape/Text');
+    var LineShape = require('zrender/shape/Line');
+    var RectangleShape = require('zrender/shape/Rectangle');
+    var CircleShape = require('zrender/shape/Circle');
+    var SectorShape = require('zrender/shape/Sector');
+
+    var ecConfig = require('../config');
+    var ecData = require('../util/ecData');
+    var accMath = require('../util/accMath');
+    var zrUtil = require('zrender/tool/util');
+    
+    /**
+     * 构造函数
+     * @param {Object} messageCenter echart消息中心
+     * @param {ZRender} zr zrender实例
+     * @param {Object} series 数据
+     * @param {Object} component 组件
+     */
+    function Gauge(ecTheme, messageCenter, zr, option, myChart){
+        // 基类
+        ComponentBase.call(this, ecTheme, messageCenter, zr, option, myChart);
+        // 图表基类
+        ChartBase.call(this);
+        this.refresh(option);
+    }
+    
+    Gauge.prototype = {
+        type: ecConfig.CHART_TYPE_GAUGE,
+        /**
+         * 绘制图形
+         */
+        _buildShape: function () {
+            var series = this.series;
+            // 复用参数索引
+            this._paramsMap = {};
+            for (var i = 0, l = series.length; i < l; i++) {
+                if (series[i].type === ecConfig.CHART_TYPE_GAUGE) {
+                    series[i] = this.reformOption(series[i]);
+                    this._buildSingleGauge(i);
+                    this.buildMark(i);
+                }
+            }
+
+            this.addShapeList();
+        },
+        
+        /**
+         * 构建单个仪表盘
+         *
+         * @param {number} seriesIndex 系列索引
+         */
+        _buildSingleGauge: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+
+            this._paramsMap[seriesIndex] = {
+                center: this.parseCenter(this.zr, serie.center),
+                radius: this.parseRadius(this.zr, serie.radius),
+                startAngle: serie.startAngle.toFixed(2) - 0,
+                endAngle: serie.endAngle.toFixed(2) - 0
+            };
+            this._paramsMap[seriesIndex].totalAngle = this._paramsMap[seriesIndex].startAngle
+                                                    - this._paramsMap[seriesIndex].endAngle;
+            
+            this._colorMap(seriesIndex);
+            
+            this._buildAxisLine(seriesIndex);
+            
+            this._buildSplitLine(seriesIndex);
+            
+            this._buildAxisTick(seriesIndex);
+            
+            this._buildAxisLabel(seriesIndex);
+            
+            this._buildPointer(seriesIndex);
+            
+            this._buildTitle(seriesIndex);
+            
+            this._buildDetail(seriesIndex);
+        },
+        
+        // 轴线
+        _buildAxisLine: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.axisLine.show) {
+                return;
+            }
+            var min         = serie.min;
+            var total       = serie.max - min;
+            var params      = this._paramsMap[seriesIndex];
+            var center      = params.center;
+            var startAngle  = params.startAngle;
+            var totalAngle  = params.totalAngle;
+            var colorArray  = params.colorArray;
+            var lineStyle   = serie.axisLine.lineStyle;
+            var lineWidth   = this.parsePercent(lineStyle.width, params.radius[1]);
+            var r           = params.radius[1];
+            var r0          = r - lineWidth;
+            
+            var sectorShape;
+            var lastAngle = startAngle;
+            var newAngle;
+            for (var i = 0, l = colorArray.length; i < l; i++) {
+                newAngle = startAngle - totalAngle * (colorArray[i][0] - min) / total;
+                sectorShape = this._getSector(
+                    center, r0, r, 
+                    newAngle,           // startAngle
+                    lastAngle,          // endAngle
+                    colorArray[i][1],   // color
+                    lineStyle
+                );
+                lastAngle = newAngle;
+                sectorShape._animationAdd = 'r';
+                ecData.set(sectorShape, 'seriesIndex', seriesIndex);
+                ecData.set(sectorShape, 'dataIndex', i);
+                this.shapeList.push(sectorShape);
+            }
+        },
+        
+        // 坐标轴分割线
+        _buildSplitLine: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.splitLine.show) {
+                return;
+            }
+            
+            var params = this._paramsMap[seriesIndex];
+            var splitNumber = serie.splitNumber;
+            var min         = serie.min;
+            var total       = serie.max - min;
+            var splitLine   = serie.splitLine;
+            var length      = this.parsePercent(
+                                  splitLine.length, params.radius[1]
+                              );
+            var lineStyle   = splitLine.lineStyle;
+            var color       = lineStyle.color;
+            var center = params.center;
+            var startAngle = params.startAngle * Math.PI / 180;
+            var totalAngle = params.totalAngle * Math.PI / 180;
+            var r = params.radius[1];
+            var r0 = r - length;
+            
+            var angle;
+            var sinAngle;
+            var cosAngle;
+            for (var i = 0; i <= splitNumber; i++) {
+                angle = startAngle - totalAngle / splitNumber * i;
+                sinAngle = Math.sin(angle);
+                cosAngle = Math.cos(angle);
+                this.shapeList.push(new LineShape({
+                    zlevel: this._zlevelBase + 1,
+                    hoverable: false,
+                    style: {
+                        xStart: center[0] + cosAngle * r,
+                        yStart: center[1] - sinAngle * r,
+                        xEnd: center[0] + cosAngle * r0,
+                        yEnd: center[1] - sinAngle * r0,
+                        strokeColor: color === 'auto' 
+                                     ? this._getColor(seriesIndex, min + total / splitNumber * i)
+                                     : color,
+                        lineType: lineStyle.type,
+                        lineWidth: lineStyle.width,
+                        shadowColor: lineStyle.shadowColor,
+                        shadowBlur: lineStyle.shadowBlur,
+                        shadowOffsetX: lineStyle.shadowOffsetX,
+                        shadowOffsetY: lineStyle.shadowOffsetY
+                    }
+                }));
+            }
+        },
+        
+        // 小标记
+        _buildAxisTick: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.axisTick.show) {
+                return;
+            }
+            
+            var params = this._paramsMap[seriesIndex];
+            var splitNumber = serie.splitNumber;
+            var min         = serie.min;
+            var total       = serie.max - min;
+            var axisTick    = serie.axisTick;
+            var tickSplit   = axisTick.splitNumber;
+            var length      = this.parsePercent(
+                                  axisTick.length, params.radius[1]
+                              );
+            var lineStyle   = axisTick.lineStyle;
+            var color       = lineStyle.color;
+            
+            var center = params.center;
+            var startAngle = params.startAngle * Math.PI / 180;
+            var totalAngle = params.totalAngle * Math.PI / 180;
+            var r = params.radius[1];
+            var r0 = r - length;
+            
+            var angle;
+            var sinAngle;
+            var cosAngle;
+            for (var i = 0, l = splitNumber * tickSplit; i <= l; i++) {
+                if (i % tickSplit === 0) {   // 同splitLine
+                    continue;
+                }
+                angle = startAngle - totalAngle / l * i;
+                sinAngle = Math.sin(angle);
+                cosAngle = Math.cos(angle);
+                this.shapeList.push(new LineShape({
+                    zlevel: this._zlevelBase + 1,
+                    hoverable: false,
+                    style: {
+                        xStart: center[0] + cosAngle * r,
+                        yStart: center[1] - sinAngle * r,
+                        xEnd: center[0] + cosAngle * r0,
+                        yEnd: center[1] - sinAngle * r0,
+                        strokeColor: color === 'auto' 
+                                     ? this._getColor(seriesIndex, min + total / l * i)
+                                     : color,
+                        lineType: lineStyle.type,
+                        lineWidth: lineStyle.width,
+                        shadowColor: lineStyle.shadowColor,
+                        shadowBlur: lineStyle.shadowBlur,
+                        shadowOffsetX: lineStyle.shadowOffsetX,
+                        shadowOffsetY: lineStyle.shadowOffsetY
+                    }
+                }));
+            }
+        },
+        
+        // 坐标轴文本
+        _buildAxisLabel: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.axisLabel.show) {
+                return;
+            }
+            
+            var splitNumber = serie.splitNumber;
+            var min         = serie.min;
+            var total       = serie.max - min;
+            var textStyle   = serie.axisLabel.textStyle;
+            var textFont    = this.getFont(textStyle);
+            var color       = textStyle.color;
+            
+            var params = this._paramsMap[seriesIndex];
+            var center = params.center;
+            var startAngle = params.startAngle;
+            var totalAngle = params.totalAngle;
+            var r0 = params.radius[1] 
+                     - this.parsePercent(
+                         serie.splitLine.length, params.radius[1]
+                     ) - 10;
+            
+            var angle;
+            var sinAngle;
+            var cosAngle;
+            var value;
+            for (var i = 0; i <= splitNumber; i++) {
+                value = accMath.accAdd(
+                            min , accMath.accMul(accMath.accDiv(total , splitNumber), i)
+                        );
+                angle = startAngle - totalAngle / splitNumber * i;
+                sinAngle = Math.sin(angle * Math.PI / 180);
+                cosAngle = Math.cos(angle * Math.PI / 180);
+                angle = (angle + 360) % 360;
+                this.shapeList.push(new TextShape({
+                    zlevel: this._zlevelBase + 1,
+                    hoverable: false,
+                    style: {
+                        x: center[0] + cosAngle * r0,
+                        y: center[1] - sinAngle * r0,
+                        color: color === 'auto' ? this._getColor(seriesIndex, value) : color,
+                        text: this._getLabelText(serie.axisLabel.formatter, value),
+                        textAlign: (angle >= 110 && angle <= 250)
+                                   ? 'left' 
+                                   : (angle <= 70 || angle >= 290)
+                                       ? 'right'
+                                       : 'center',
+                        textBaseline: (angle >= 10 && angle <= 170)
+                                      ? 'top' 
+                                      : (angle >= 190 && angle <= 350)
+                                          ? 'bottom'
+                                          : 'middle',
+                        textFont: textFont,
+                        shadowColor: textStyle.shadowColor,
+                        shadowBlur: textStyle.shadowBlur,
+                        shadowOffsetX: textStyle.shadowOffsetX,
+                        shadowOffsetY: textStyle.shadowOffsetY
+                    }
+                }));
+            }
+        },
+        
+        _buildPointer: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.pointer.show) {
+                return;
+            }
+            var total = serie.max - serie.min;
+            var pointer = serie.pointer;
+            
+            var params = this._paramsMap[seriesIndex];
+            var length = this.parsePercent(pointer.length, params.radius[1]);
+            var width = this.parsePercent(pointer.width, params.radius[1]);
+            var center = params.center;
+            var value = this._getValue(seriesIndex);
+            value = value < serie.max ? value : serie.max;
+            
+            var angle  = (params.startAngle - params.totalAngle / total * (value - serie.min)) * Math.PI / 180;
+            var color = pointer.color === 'auto' 
+                        ? this._getColor(seriesIndex, value) : pointer.color;
+            
+            var pointShape = new GaugePointerShape({
+                zlevel: this._zlevelBase + 1,
+                style: {
+                    x: center[0],
+                    y: center[1],
+                    r: length,
+                    startAngle: params.startAngle * Math.PI / 180,
+                    angle: angle,
+                    color: color,
+                    width: width,
+                    shadowColor: pointer.shadowColor,
+                    shadowBlur: pointer.shadowBlur,
+                    shadowOffsetX: pointer.shadowOffsetX,
+                    shadowOffsetY: pointer.shadowOffsetY
+                },
+                highlightStyle: {
+                    brushType: 'fill',
+                    width: width > 2 ? 2 : (width / 2),
+                    color: '#fff'
+                }
+            });
+            ecData.pack(
+                pointShape,
+                this.series[seriesIndex], seriesIndex,
+                this.series[seriesIndex].data[0], 0,
+                this.series[seriesIndex].data[0].name,
+                value
+            );
+            this.shapeList.push(pointShape);
+            
+            this.shapeList.push(new CircleShape({
+                zlevel: this._zlevelBase + 2,
+                hoverable: false,
+                style: {
+                    x: center[0],
+                    y: center[1],
+                    r: pointer.width / 2.5,
+                    color: '#fff'
+                }
+            }));
+        },
+        
+        _buildTitle: function(seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.title.show) {
+                return;
+            }
+            
+            var data = serie.data[0];
+            var name = data.name != null ? data.name : '';
+            if (name !== '') { // 不要帮我代码规范
+                var title           = serie.title;
+                var offsetCenter    = title.offsetCenter;
+                var textStyle       = title.textStyle;
+                var textColor       = textStyle.color;
+                var params          = this._paramsMap[seriesIndex];
+                var x = params.center[0] + this.parsePercent(offsetCenter[0], params.radius[1]);
+                var y = params.center[1] + this.parsePercent(offsetCenter[1], params.radius[1]);
+                this.shapeList.push(new TextShape({
+                    zlevel: this._zlevelBase
+                             + (Math.abs(x - params.center[0]) + Math.abs(y - params.center[1])) 
+                               < textStyle.fontSize * 2 ? 2 : 1,
+                    hoverable: false,
+                    style: {
+                        x: x,
+                        y: y,
+                        color: textColor === 'auto' ? this._getColor(seriesIndex) : textColor,
+                        text: name,
+                        textAlign: 'center',
+                        textFont: this.getFont(textStyle),
+                        shadowColor: textStyle.shadowColor,
+                        shadowBlur: textStyle.shadowBlur,
+                        shadowOffsetX: textStyle.shadowOffsetX,
+                        shadowOffsetY: textStyle.shadowOffsetY
+                    }
+                }));
+            }
+        },
+        
+        _buildDetail: function(seriesIndex) {
+            var serie = this.series[seriesIndex];
+            if (!serie.detail.show) {
+                return;
+            }
+            
+            var detail          = serie.detail;
+            var offsetCenter    = detail.offsetCenter;
+            var color           = detail.backgroundColor;
+            var textStyle       = detail.textStyle;
+            var textColor       = textStyle.color;
+                
+            var params = this._paramsMap[seriesIndex];
+            var value = this._getValue(seriesIndex);
+            var x = params.center[0] - detail.width / 2 
+                    + this.parsePercent(offsetCenter[0], params.radius[1]);
+            var y = params.center[1] 
+                    + this.parsePercent(offsetCenter[1], params.radius[1]);
+            this.shapeList.push(new RectangleShape({
+                zlevel: this._zlevelBase 
+                        + (Math.abs(x+detail.width/2 - params.center[0]) 
+                        + Math.abs(y+detail.height/2 - params.center[1])) < textStyle.fontSize 
+                          ? 2 : 1,
+                hoverable: false,
+                style: {
+                    x: x,
+                    y: y,
+                    width: detail.width,
+                    height: detail.height,
+                    brushType: 'both',
+                    color: color === 'auto' ? this._getColor(seriesIndex, value) : color,
+                    lineWidth: detail.borderWidth,
+                    strokeColor: detail.borderColor,
+                    
+                    shadowColor: detail.shadowColor,
+                    shadowBlur: detail.shadowBlur,
+                    shadowOffsetX: detail.shadowOffsetX,
+                    shadowOffsetY: detail.shadowOffsetY,
+                    
+                    text: this._getLabelText(detail.formatter, value),
+                    textFont: this.getFont(textStyle),
+                    textPosition: 'inside',
+                    textColor: textColor === 'auto' ? this._getColor(seriesIndex, value) : textColor
+                }
+            }));
+        },
+        
+        _getValue: function(seriesIndex) {
+            var data = this.series[seriesIndex].data[0];
+            return data.value != null ? data.value : data;
+        },
+        
+        /**
+         * 颜色索引 
+         */
+        _colorMap: function (seriesIndex) {
+            var serie = this.series[seriesIndex];
+            var min = serie.min;
+            var total = serie.max - min;
+            var color = serie.axisLine.lineStyle.color;
+            if (!(color instanceof Array)) {
+                color = [[1, color]];
+            }
+            var colorArray = [];
+            for (var i = 0, l = color.length; i < l; i++) {
+                colorArray.push([color[i][0] * total + min, color[i][1]]);
+            }
+            this._paramsMap[seriesIndex].colorArray = colorArray;
+        },
+        
+        /**
+         * 自动颜色 
+         */
+        _getColor: function (seriesIndex, value) {
+            if (value == null) {
+                value = this._getValue(seriesIndex);
+            }
+            
+            var colorArray = this._paramsMap[seriesIndex].colorArray;
+            for (var i = 0, l = colorArray.length; i < l; i++) {
+                if (colorArray[i][0] >= value) {
+                    return colorArray[i][1];
+                }
+            }
+            return colorArray[colorArray.length - 1][1];
+        },
+        
+        /**
+         * 构建扇形
+         */
+        _getSector: function (center, r0, r, startAngle, endAngle, color, lineStyle) {
+            return new SectorShape ({
+                zlevel: this._zlevelBase,
+                hoverable: false,
+                style: {
+                    x: center[0],      // 圆心横坐标
+                    y: center[1],      // 圆心纵坐标
+                    r0: r0,            // 圆环内半径
+                    r: r,              // 圆环外半径
+                    startAngle: startAngle,
+                    endAngle: endAngle,
+                    brushType: 'fill',
+                    color: color,
+                    shadowColor: lineStyle.shadowColor,
+                    shadowBlur: lineStyle.shadowBlur,
+                    shadowOffsetX: lineStyle.shadowOffsetX,
+                    shadowOffsetY: lineStyle.shadowOffsetY
+                }
+            });
+        },
+
+        /**
+         * 根据lable.format计算label text
+         */
+        _getLabelText: function (formatter, value) {
+            if (formatter) {
+                if (typeof formatter === 'function') {
+                    return formatter.call(this.myChart, value);
+                }
+                else if (typeof formatter === 'string') {
+                    return formatter.replace('{value}', value);
+                }
+            }
+            return value;
+        },
+        
+        /**
+         * 刷新
+         */
+        refresh: function (newOption) {
+            if (newOption) {
+                this.option = newOption;
+                this.series = newOption.series;
+            }
+            
+            this.backupShapeList();
+            this._buildShape();
+        }
+    };
+    
+    zrUtil.inherits(Gauge, ChartBase);
+    zrUtil.inherits(Gauge, ComponentBase);
+    
+    // 图表注册
+    require('../chart').define('gauge', Gauge);
+    
+    return Gauge;
+});
+/**
+ * echarts图表类：漏斗图
+ *
+ * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @author Kener (@Kener-林峰, linzhifeng)
+ *
+ */
+define('echarts/chart/funnel',['require','../component/base','./base','zrender/shape/Text','zrender/shape/Line','zrender/shape/Polygon','../config','../util/ecData','../util/number','zrender/tool/util','zrender/tool/color','zrender/tool/area','../chart'],function (require) {
+    var ComponentBase = require('../component/base');
+    var ChartBase = require('./base');
+    
+    // 图形依赖
+    var TextShape = require('zrender/shape/Text');
+    var LineShape = require('zrender/shape/Line');
+    var PolygonShape = require('zrender/shape/Polygon');
+
+    var ecConfig = require('../config');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var ecData = require('../util/ecData');
     var number = require('../util/number');
     var zrUtil = require('zrender/tool/util');
@@ -34391,7 +47955,11 @@ define('echarts/component/categoryAxis',['require','./base','zrender/shape/Text'
     
     var ecConfig = require('../config');
     var zrUtil = require('zrender/tool/util');
+<<<<<<< HEAD
     var zrArea = require('zl/area');
+=======
+    var zrArea = require('zrender/tool/area');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     
     /**
      * 构造函数
@@ -34400,6 +47968,7 @@ define('echarts/component/categoryAxis',['require','./base','zrender/shape/Text'
      * @param {Object} option 类目轴参数
      * @param {Grid} component 组件
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     function CategoryAxis(messageCenter, zr, option,) {
         var Base = require('./base');
@@ -34477,6 +48046,39 @@ define('echarts/component/categoryAxis',['require','./base','zrender/shape/Text'
                 else if (typeof formatter == 'string') {
                     data = formatter.replace('{value}', data);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function CategoryAxis(ecTheme, messageCenter, zr, option, myChart, axisBase) {
+        if (option.data.length < 1) {
+            console.error('option.data.length < 1.');
+            return;
+        }
+        
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+        
+        this.grid = this.component.grid;
+        
+        for (var method in axisBase) {
+            this[method] = axisBase[method];
+        }
+        
+        this.refresh(option);
+    }
+    
+    CategoryAxis.prototype = {
+        type : ecConfig.COMPONENT_TYPE_AXIS_CATEGORY,
+        _getReformedLabel : function (idx) {
+            var data = typeof this.option.data[idx].value != 'undefined'
+                       ? this.option.data[idx].value
+                       : this.option.data[idx];
+            var formatter = this.option.data[idx].formatter 
+                            || this.option.axisLabel.formatter;
+            if (formatter) {
+                if (typeof formatter == 'function') {
+                    data = formatter.call(this.myChart, data);
+                }
+                else if (typeof formatter == 'string') {
+                    data = formatter.replace('{value}', data);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
                 }
             }
             return data;
@@ -35141,6 +48743,7 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
 
     /**
      * 构造函数
+<<<<<<< HEAD
      * @param {Object} messageCenter ec    * @param {ZRender} zr zrender实例
      * @param {Object} option 类目轴参数
      * @param {Object} component 组件
@@ -35159,6 +48762,21 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
         
         Base.call(this, ecTheme, messageCenter, zr, option, myChart);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+     * @param {Object} messageCenter echart消息中心
+     * @param {ZRender} zr zrender实例
+     * @param {Object} option 类目轴参数
+     * @param {Object} component 组件
+     * @param {Array} series 数据对象
+     */
+    function ValueAxis(ecTheme, messageCenter, zr, option, myChart, axisBase, series) {
+        if (!series || series.length === 0) {
+            console.err('option.series.length == 0.');
+            return;
+        }
+        
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         this.series = series;
         this.grid = this.component.grid;
@@ -35677,6 +49295,7 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
          * by linzhifeng 2013-1-8
          * --------
 <<<<<<< HEAD
+<<<<<<< HEAD
              _valueList = [];
              option = {splitNumber:5,power:100,precision:0};
              _min = 1; _max = 123; console.log(_min, _max); _reformValue();
@@ -35694,59 +49313,137 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : 0 150 [0, 30, 60, 90, 120, 150]',
                     (this._min == 0 && this._max == 150) ? 'success' : 'failed');
+=======
+         this._valueList = [];
+         this.option = {splitNumber:5,power:100,precision:0};
+         this._min = 1; this._max = 123; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : 0 150 [0, 30, 60, 90, 120, 150]',
+                    (this._min == 0 && this._max == 150) ? 'success' : 'failed');
 
+         this._min = 10; this._max = 1923; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : 0 2000 [0, 400, 800, 1200, 1600, 2000]',
+                    (this._min == 0 && this._max == 2000) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
          this._min = 10; this._max = 1923; console.log(this._min, this._max); this._reformValue();
          console.log('result is :'n, this._max, this._valueList);
          console.log('should be : 0 2000 [0, 400, 800, 1200, 1600, 2000]',
                     (this._min == 0 && this._max == 2000) ? 'success' : 'failed');
 >>>>>>> refs/heads/branch_1.1.0
-
+=======
          this._min = 10; this._max = 78; console.log(this._min, this._max); this._reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : 0 100 [0, 20, 40, 60, 80, 100]',
                     (this._min == 0 && this._max == 100) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this._min = 10; this._max = 78; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : 0 100 [0, 20, 40, 60, 80, 100]',
+                    (this._min == 0 && this._max == 100) ? 'success' : 'failed');
+=======
          this._min = -31; this._max = -3; console.log(this._min, this._max); this._reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : -35 0 [-35, -28, -21, -14, -7, 0]',
                     (this._min == -35 && this._max == 0) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this._min = -31; this._max = -3; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : -35 0 [-35, -28, -21, -14, -7, 0]',
+                    (this._min == -35 && this._max == 0) ? 'success' : 'failed');
+=======
          this._min = -51; this._max = 203; console.log(this._min, this._max); this._reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : -60 240 [-60, 0, 60, 120, 180, 240]',
                     (this._min == -60 && this._max == 240) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this._min = -51; this._max = 203; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : -60 240 [-60, 0, 60, 120, 180, 240]',
+                    (this._min == -60 && this._max == 240) ? 'success' : 'failed');
+=======
          this._min = -251; this._max = 23; console.log(this._min, this._max); this._reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : -280 70 [-280, -210, -140, -70, 0, 70]',
                     (this._min == -280 && this._max == 70) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this._min = -251; this._max = 23; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : -280 70 [-280, -210, -140, -70, 0, 70]',
+                    (this._min == -280 && this._max == 70) ? 'success' : 'failed');
+=======
          this.option.precision = 2;
          this._min = 0.23; this._max = 0.78; console.log(this._min, this._max); this._reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : 0.00 1.00'
              + '["0.00", "0.20", "0.40", "0.60", "0.80", "1.00"]',
             (this._min == 0.00 && this._max == 1.00) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this.option.precision = 2;
+         this._min = 0.23; this._max = 0.78; console.log(this._min, this._max); this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : 0.00 1.00'
+             + '["0.00", "0.20", "0.40", "0.60", "0.80", "1.00"]',
+            (this._min == 0.00 && this._max == 1.00) ? 'success' : 'failed');
+=======
          this._min = -12.23; this._max = -0.78; console.log(this._min, this._max);
          this._reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : -15.00 0.00'
              + '["-15.00", "-12.00", "-9.00", "-6.00", "-3.00", "0.00"]',
             (this._min == -15.00 && this._max == 0.00) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this._min = -12.23; this._max = -0.78; console.log(this._min, this._max);
+         this._reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : -15.00 0.00'
+             + '["-15.00", "-12.00", "-9.00", "-6.00", "-3.00", "0.00"]',
+            (this._min == -15.00 && this._max == 0.00) ? 'success' : 'failed');
+=======
          this._min = -0.23; this._max = 0.78; console.log(this._min, this._max); this._reformValue()
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : -0.30 1.20'
              + '["-0.30", "0.00", "0.30", "0.60", "0.90", "1.20"]',
             (this._min == -0.30 && this._max == 1.20) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
+<<<<<<< HEAD
+         this._min = -0.23; this._max = 0.78; console.log(this._min, this._max); this._reformValue()
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : -0.30 1.20'
+             + '["-0.30", "0.00", "0.30", "0.60", "0.90", "1.20"]',
+            (this._min == -0.30 && this._max == 1.20) ? 'success' : 'failed');
+=======
+         this._min = -1.23; this._max = 0.78; console.log(this._min, this._max); _reformValue();
+         console.log('result is :', this._min, this._max, this._valueList);
+         console.log('should be : -1.50 1.00'
+             + '["-1.50", "-1.00", "-0.50", "0.00", "0.50", "1.00"]',
+            (this._min == -1.50 && this._max == 1.00) ? 'success' : 'failed');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
+
+<<<<<<< HEAD
          this._min = -1.23; this._max = 0.78; console.log(this._min, this._max); _reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
          console.log('should be : -1.50 1.00'
              + '["-1.50", "-1.00", "-0.50", "0.00", "0.50", "1.00"]',
             (this._min == -1.50 && this._max == 1.00) ? 'success' : 'failed');
 
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
          this.option.precision = 1;
          this._min = -2.3; this._max = 0.5; console.log(this._min, this._max); _reformValue();
          console.log('result is :', this._min, this._max, this._valueList);
@@ -36020,6 +49717,7 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
  *
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
 define('echarts/component/axis',['require','./base','../config','./categoryAxis','./valueAxis','../component'],function (
 =======
 define('echarts/component/axis',['require','./base','zrender/shape/Line','../config','../util/ecData','zrender/tool/util','zrender/tool/color','./categoryAxis','./valueAxis','../component'],function (require) {
@@ -36032,6 +49730,18 @@ define('echarts/component/axis',['require','./base','zrender/shape/Line','../con
     var zrColor = require('zrender/tool/color');
     
 >>>>>>> refs/heads/branch_1.1.0
+=======
+define('echarts/component/axis',['require','./base','zrender/shape/Line','../config','../util/ecData','zrender/tool/util','zrender/tool/color','./categoryAxis','./valueAxis','../component'],function (require) {
+    var Base = require('./base');
+    
+    var LineShape = require('zrender/shape/Line');
+    
+    var ecConfig = require('../config');
+    var ecData = require('../util/ecData');
+    var zrUtil = require('zrender/tool/util');
+    var zrColor = require('zrender/tool/color');
+    
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     /**
      * 构造函数
      * @param {Object} messageCenter echart消息中心
@@ -36545,6 +50255,7 @@ define('echarts/component/dataZoom',['require','./base','zrender/shape/Rectangle
      * @param {Object} component 组件
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     function DataZoom(messageCenter, zr, option, component) {
         var Base = require('./base');
        (this, zr);
@@ -36554,6 +50265,10 @@ define('echarts/component/dataZoom',['require','./base','zrender/shape/Rectangle
     function DataZoom(ecTheme, messageCenter, zr, option, myChart) {
         Base.call(this, ecTheme, messageCenter, zr, option, myChart);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function DataZoom(ecTheme, messageCenter, zr, option, myChart) {
+        Base.call(this, ecTheme, messageCenter, zr, option, myChart);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         var self = this;
         self._ondrift = function (dx, dy) {
@@ -37640,6 +51355,7 @@ define('echarts/component/dataZoom',['require','./base','zrender/shape/Rectangle
  * shape类：handlePolygon，dataRange手柄
  */
 <<<<<<< HEAD
+<<<<<<< HEAD
 define('echarts/component/legend',['require','./base','../config','zrender/tool/area','zrender/shape','zrender/shape','zrender/shape','zrender/shape','zrender/shape','../component'],function (require) {
     /**
      * 构造函数
@@ -37656,6 +51372,12 @@ define('echarts/util/shape/HandlePolygon',['require','zrender/shape/Base','zrend
     var PolygonShape = require('zrender/shape/Polygon');
     var zrUtil = require('zrender/tool/util');
 >>>>>>> refs/heads/branch_1.1.0
+=======
+define('echarts/util/shape/HandlePolygon',['require','zrender/shape/Base','zrender/shape/Polygon','zrender/tool/util'],function (require) {
+    var Base = require('zrender/shape/Base');
+    var PolygonShape = require('zrender/shape/Polygon');
+    var zrUtil = require('zrender/tool/util');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
     function HandlePolygon(options) {
         Base.call(this, options);
@@ -37668,7 +51390,11 @@ define('echarts/util/shape/HandlePolygon',['require','zrender/shape/Base','zrend
          * @param {Context2D} ctx Canvas 2D上下文
          * @param {Object} style 样式
          */
+<<<<<<< HEAD
         buildPtion (ctx, style) {
+=======
+        buildPath : function (ctx, style) {
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             PolygonShape.prototype.buildPath(
                 ctx, style
             );
@@ -37715,7 +51441,11 @@ define('echarts/component/dataRange',['require','./base','zrender/shape/Text','z
 
     var ecConfig = require('../config');
     var zrUtil = require('zrender/tool/util');
+<<<<<<< HEAD
     var zrArea = require('zrender/t;
+=======
+    var zrArea = require('zrender/tool/area');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var zrColor = require('zrender/tool/color');
 
     /**
@@ -37725,6 +51455,7 @@ define('echarts/component/dataRange',['require','./base','zrender/shape/Text','z
      * @param {Object} option 图表参数
      * @param {Object=} selected 用于状态保持
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     function DataRange(messageCenter, zr, option) {
         var Base = require('./base');
@@ -37750,6 +51481,15 @@ define('echarts/component/dataRange',['require','./base','zrender/shape/Text','z
             return;
         }
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function DataRange(ecTheme, messageCenter, zr, option, myChart) {
+        if (typeof this.query(option, 'dataRange.min') == 'undefined'
+            || typeof this.query(option, 'dataRange.max') == 'undefined'
+        ) {
+            console.error('option.dataRange.min or option.dataRange.max has not been defined.');
+            return;
+        }
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         
         Base.call(this, ecTheme, messageCenter, zr, option, myChart);
         
@@ -39002,7 +52742,12 @@ define('echarts/chart/scatter',['require','../component/base','./base','../util/
     require('../component/dataZoom');
     require('../component/dataRange');
     
+<<<<<<< HEAD
     var ecConfig = require('../confvar zrUtil = require('zrender/tool/util');
+=======
+    var ecConfig = require('../config');
+    var zrUtil = require('zrender/tool/util');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     var zrColor = require('zrender/tool/color');
     
     /**
@@ -39012,6 +52757,7 @@ define('echarts/chart/scatter',['require','../component/base','./base','../util/
      * @param {Object} series 数据
      * @param {Object} component 组件
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     function TooltCenter, zr, option, dom) {
         var Base = require('./base');
@@ -39023,6 +52769,13 @@ define('echarts/chart/scatter',['require','../component/base','./base','../util/
         // 图表基类
         ChartBase.call(this);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function Scatter(ecTheme, messageCenter, zr, option, myChart){
+        // 基类
+        ComponentBase.call(this, ecTheme, messageCenter, zr, option, myChart);
+        // 图表基类
+        ChartBase.call(this);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         this.refresh(option);
     }
@@ -39242,6 +52995,7 @@ define('echarts/chart/scatter',['require','../component/base','./base','../util/
             ];
             
 <<<<<<< HEAD
+<<<<<<< HEAD
             _axisLineWidth = option.tooltip.axisPointer.lineStyle.width;
         }
         
@@ -39460,6 +53214,23 @@ define('echarts/component/toolbox',['require','./base','../config','zrender/conf
                 [gridXend, xMarkMap.maxY1]
             ];
 >>>>>>> refs/heads/branch_1.1.0
+=======
+            xMarkMap.average1 = (xMarkMap.sum1 / xMarkMap.counter1).toFixed(2) - 0;
+            var y = yAxis.getCoord(xMarkMap.average1);
+            // 纵轴平均横向
+            xMarkMap.averageLine1 = [
+                [gridX, y],
+                [gridXend, y]
+            ];
+            xMarkMap.minLine1 = [
+                [gridX, xMarkMap.minY1],
+                [gridXend, xMarkMap.minY1]
+            ];
+            xMarkMap.maxLine1 = [
+                [gridX, xMarkMap.maxY1],
+                [gridXend, xMarkMap.maxY1]
+            ];
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             
             return xMarkMap;
         },
@@ -39656,7 +53427,11 @@ define('echarts/chart/k',['require','../component/base','./base','../util/shape/
     
     var ecConfig = require('../config');
     var ecData = require('../util/ecData');
+<<<<<<< HEAD
     var zrUtil = require('zrender/);
+=======
+    var zrUtil = require('zrender/tool/util');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     
     /**
      * 构造函数
@@ -39683,6 +53458,7 @@ define('echarts/chart/k',['require','../component/base','./base','../util/shape/
             var series = this.series;
             this.selectedMap = {};
 
+<<<<<<< HEAD
 <<<<<<< HEAD
         var self = t   self.type = ecConfig.COMPONENT_TYPE_DATAVIEW;
 
@@ -39727,6 +53503,12 @@ define('echarts/chart/k',['require','../component/base','./base','../util/shape/
                 top: [ ],
                 bottom: [ ]
 >>>>>>> refs/heads/branch_1.1.0
+=======
+            // 水平垂直双向series索引 ，position索引到seriesIndex
+            var _position2sIndexMap = {
+                top: [ ],
+                bottom: [ ]
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
             };
             var xAxis;
             for (var i = 0, l = series.length; i < l; i++) {
@@ -40234,7 +54016,11 @@ define('echarts/component/polar',['require','./base','zrender/shape/Text','zrend
 
     var ecConfig = require('../config');
     var zrUtil = require('zrender/tool/util');
+<<<<<<< HEAD
     var ecCo= require('../util/coordinates');
+=======
+    var ecCoordinates = require('../util/coordinates');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
     function Polar(ecTheme, messageCenter, zr, option, myChart) {
         Base.call(this, ecTheme, messageCenter, zr, option, myChart);
@@ -40258,11 +54044,15 @@ define('echarts/component/polar',['require','./base','zrender/shape/Text','zrend
                 this._buildSpiderWeb(i);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             var self = this;
             seecConfig.COMPONENT_TYPE_POLAR;
 =======
                 this._buildText(i);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+                this._buildText(i);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
                 this._adjustIndicatorValue(i);
                 this._addAxisLabel(i);
@@ -41084,6 +54874,7 @@ define('echarts/component/polar',['require','./base','zrender/shape/Text','zrend
                 }
             }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             /**
              * 获取每个指标上某个value对应的坐标
@@ -41400,6 +55191,9 @@ define('echarts/echarts',['require','./config','./config','zrender','zrender/too
 =======
         },
 >>>>>>> refs/heads/branch_1.1.0
+=======
+        },
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         /**
          * 获取每个指标上某个value对应的坐标
@@ -41535,6 +55329,7 @@ define('echarts/echarts',['require','./config','./config','zrender','zrender/too
         },
 
          /**
+<<<<<<< HEAD
 <<<<<<< HEAD
          * 悬浮事件，响应zrender事件，包装后分发到Echarts层
          */
@@ -43157,6 +56952,8 @@ define('echarts/chart/scatter',['require','../component/base','./calculableBase'
         /**
 =======
 >>>>>>> refs/heads/branch_1.1.0
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
          * 刷新
          */
         refresh : function (newOption) {
@@ -43172,6 +56969,7 @@ define('echarts/chart/scatter',['require','../component/base','./calculableBase'
     
     zrUtil.inherits(Polar, Base);
     
+<<<<<<< HEAD
 <<<<<<< HEAD
     // 自注册
     require('../chart').define('scatter', Scatter);
@@ -43899,6 +57697,11 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
  
     return Polar;
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    require('../component').define('polar', Polar);
+ 
+    return Polar;
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 });
 /**
  * echarts图表类：雷达图
@@ -43931,6 +57734,7 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
      * @exports Radar
      */
 <<<<<<< HEAD
+<<<<<<< HEAD
     function Radar(messageCenter, zr, option, component) {
         // 基类装饰
         var ComponentBase = require('../component/base');
@@ -43945,6 +57749,13 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
         // 图表基类
         ChartBase.call(this);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function Radar(ecTheme, messageCenter, zr, option, myChart) {
+        // 基类
+        ComponentBase.call(this, ecTheme, messageCenter, zr, option, myChart);
+        // 图表基类
+        ChartBase.call(this);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         this.refresh(option);
     }
@@ -49809,6 +63620,7 @@ define('echarts/chart/force',['require','../component/base','./base','../data/Gr
        style  : {
            pointList     : {Array},   // 必须，多边形各个顶角坐标
 <<<<<<< HEAD
+<<<<<<< HEAD
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color}'#000'，填充颜色，支持rgba
@@ -49834,6 +63646,8 @@ define('echarts/chart/force',['require','../component/base','./base','../data/Gr
                                       // 'inside' ? '#fff' : color
 =======
 >>>>>>> refs/heads/branch_1.1.0
+=======
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
        },
 
        // 样式属性，高亮样式属性，当不存在highlightStyle时使用基于默认样式扩展显示
@@ -49936,7 +63750,12 @@ define('echarts/chart/line',['require','../component/base','./base','zrender/sha
     var HalfSmoothPolygonShape = require('../util/shape/HalfSmoothPolygon');
     // 组件依赖
     require('../component/axis');
+<<<<<<< HEAD
     require('../component/g require('../component/dataZoom');
+=======
+    require('../component/grid');
+    require('../component/dataZoom');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     
     var ecConfig = require('../config');
     var ecData = require('../util/ecData');
@@ -49950,6 +63769,7 @@ define('echarts/chart/line',['require','../component/base','./base','zrender/sha
      * @param {Object} series 数据
      * @param {Object} component 组件
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     function Line(messageCenter, zr, option, component){
         // 基类装饰
@@ -49965,6 +63785,13 @@ define('echarts/chart/line',['require','../component/base','./base','zrender/sha
         // 图表基类
         ChartBase.call(this);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function Line(ecTheme, messageCenter, zr, option, myChart){
+        // 基类
+        ComponentBase.call(this, ecTheme, messageCenter, zr, option, myChart);
+        // 图表基类
+        ChartBase.call(this);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
 
         this.refresh(option);
     }
@@ -51017,7 +64844,11 @@ define('echarts/chart/bar',['require','../component/base','./base','zrender/shap
     var ecConfig = require('../config');
     var ecData = require('../util/ecData');
     var zrUtil = require('zrender/tool/util');
+<<<<<<< HEAD
     var zrColor('zrender/tool/color');
+=======
+    var zrColor = require('zrender/tool/color');
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
     
     /**
      * 构造函数
@@ -51026,6 +64857,7 @@ define('echarts/chart/bar',['require','../component/base','./base','zrender/shap
      * @param {Object} series 数据
      * @param {Object} component 组件
      */
+<<<<<<< HEAD
 <<<<<<< HEAD
     function Bar(messageCenter, zr, option, component){
         // 基类装饰
@@ -51044,6 +64876,13 @@ define('echarts/chart/bar',['require','../component/base','./base','zrender/shap
         // 图表基类
         ChartBase.call(this);
 >>>>>>> refs/heads/branch_1.1.0
+=======
+    function Bar(ecTheme, messageCenter, zr, option, myChart){
+        // 基类
+        ComponentBase.call(this, ecTheme, messageCenter, zr, option, myChart);
+        // 图表基类
+        ChartBase.call(this);
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
         
         this.refresh(option);
     }

@@ -1,6 +1,10 @@
 /**
  * @file 表格组件的配置数据信息
+<<<<<<< HEAD
  * @author 赵晓强(longze_xq@163.com)
+=======
+ * @author 赵晓强(v_zhaoxiaoqiang)
+>>>>>>> branch 'master' of https://github.com/Baidu-ecom/bi-platform.git
  * @date 2014-9-10
  */
 define([
