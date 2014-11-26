@@ -31,7 +31,7 @@ import com.google.common.collect.Sets;
  * 
  * 事实表定义：用来描述事实表基本信息以及指标列信息以及不能确定的维度列信息 不能确定的列多用来作为自定义维度、退化维度的参考列，默认当作指标列处理
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class FactTableMetaDefine implements Serializable {

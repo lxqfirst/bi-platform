@@ -21,13 +21,13 @@ package com.baidu.rigel.biplatform.ma.rt.query.service.impl;
 import java.util.Map;
 
 import com.baidu.rigel.biplatform.ac.query.model.QuestionModel;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryAction;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
 import com.baidu.rigel.biplatform.ma.rt.query.service.QuestionModelBuildService;
 import com.baidu.rigel.biplatform.ma.rt.utils.QueryUtils;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QuestionModelBuildServiceImpl implements QuestionModelBuildService {

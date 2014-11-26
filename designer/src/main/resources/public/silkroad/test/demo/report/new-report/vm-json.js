@@ -93,6 +93,10 @@ define(function () {
                                 {
                                     "value": "Q",
                                     "text": "季"
+                                },
+                                {
+                                    "value": "Y",
+                                    "text": "年"
                                 }
                             ],
                             "timeTypeOpt": {
@@ -111,6 +115,22 @@ define(function () {
                                             "text": "单选",
                                             "value": "SINGLE",
                                             "prompt": "单项选择"
+                                        }
+                                    ]
+                                },
+                                "Y": {
+                                    "selMode": "SINGLE",
+                                    "date": [
+                                        "2011",
+                                        "2013"
+                                    ],
+                                    "range": [
+                                        "2001",
+                                        "2014"
+                                    ],
+                                    "selModeList": [
+                                        {
+                                            "text": "单选"
                                         }
                                     ]
                                 },

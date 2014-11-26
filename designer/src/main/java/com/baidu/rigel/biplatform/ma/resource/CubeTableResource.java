@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
 /**
  * CubeTable的页面交互
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-30
  */

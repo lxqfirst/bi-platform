@@ -34,16 +34,17 @@ import com.baidu.rigel.biplatform.ac.query.model.MetaCondition;
 import com.baidu.rigel.biplatform.ac.query.model.QueryData;
 import com.baidu.rigel.biplatform.ac.query.model.QuestionModel;
 import com.baidu.rigel.biplatform.ma.model.service.PositionType;
+import com.baidu.rigel.biplatform.ma.report.model.ExtendAreaType;
 import com.baidu.rigel.biplatform.ma.report.model.Item;
-import com.baidu.rigel.biplatform.ma.report.utils.ReportDesignModelUtils;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryAction;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryStrategy;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryStrategy;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 /**
  * 
  * QueryUtils
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public final class QueryUtils {
@@ -88,74 +89,125 @@ public final class QueryUtils {
      * @return Map<String, MetaCondition> 查询条件
      */
     private static Map<String, MetaCondition> buildQueryConditions(QueryAction action) {
-        Map<String, MetaCondition> rs = new HashMap<String, MetaCondition>();
-        Map<Item, Object> items = new HashMap<Item, Object>();
-        boolean chartQuery = action.getQueryStrategy() == QueryStrategy.CHART_QUERY;
-        items.putAll(action.getColumns());
-        items.putAll(action.getRows());
-        items.putAll(action.getSlices());
-        Cube cube = action.getCube();
-//        items.keySet().stream().filter(item -> {
-//           return  OlapElementQueryUtils.queryElementById(cube, item.getOlapElementId()) != null;
-//        }).
-//        for (Map.Entry<Item, Object> entry : items.entrySet()) {
-//            Item item = entry.getKey();
-//            OlapElement olapElement = OlapElementQueryUtils.queryElementById(cube, item.getOlapElementId());
-//            if (olapElement == null) {
-//                continue;
-//            }
-//            
-//            if (olapElement instanceof Dimension) {
-//                DimensionCondition condition = new DimensionCondition(olapElement.getName());
-//                Object valueObj = entry.getValue();
-//                if (valueObj != null) {
-//                    List<String> values = Lists.newArrayList();
-//                    if (valueObj instanceof String[]) {
-//                        values = Lists.newArrayList();
-//                        CollectionUtils.addAll(values, (String[]) valueObj);
-//                    } else {
-//                        values.add(valueObj.toString());
-//                    }
-//                   
-//                    List<QueryData> datas = Lists.newArrayList();
-//                    // TODO QeuryData value如何处理
-//                    for (String value : values) {
-//                        if (!chartQuery && value.toLowerCase().contains("all")) {
-//                            datas.clear();
-//                            break;
-//                        }
-//                        QueryData data = new QueryData(value);
-//                        Object drillValue = queryAction.getDrillDimValues().get(item);
-//                        if (drillValue != null && valueObj.equals(drillValue)) {
-//                            data.setExpand(true);
-//                        } else if (item.getPositionType() == PositionType.X && chartQuery) {
-//                            data.setExpand(true);
-//                            data.setShow(false);
-//                        }
-//                        datas.add(data);
-//                    }
-//                    condition.setQueryDataNodes(datas);
-//                } else {
-//                    List<QueryData> datas = new ArrayList<QueryData>();
-//                    Dimension dim = (Dimension) olapElement;
-//                    if (item.getPositionType() == PositionType.X && chartQuery) {
-//                        QueryData data = new QueryData(dim.getAllMember().getUniqueName());
-//                        data.setExpand(true);
-//                        data.setShow(false);
-//                        datas.add(data);
-//                    }
-//                    condition.setQueryDataNodes(datas);
-//                }
-//                rs.put(condition.getMetaName(), condition);
-//            }
-//        }
+        Map<String, MetaCondition> rs = Maps.newConcurrentMap();
+        Map<Item, Object> items = collectQueryItems(action);
+        final Cube cube = action.getCube();
+        items.keySet().parallelStream().filter(item -> {
+	        	OlapElement olapElement = OlapElementQueryUtils.queryElementById(cube,  item.getOlapElementId());
+	        	return olapElement != null && olapElement instanceof Dimension;
+        }).forEach(item -> {
+        		Dimension dim = (Dimension) OlapElementQueryUtils.queryElementById(cube,  item.getOlapElementId());
+        		DimensionCondition condition = buildDimCondition(action, items.get(item), item, dim);
+        		rs.put(condition.getMetaName(), condition);
+        });
         return rs;
     }
 
+	/**
+	 * 构建维度查询条件
+	 * @param action 查询请求
+	 * @param filterVal 过滤条件
+	 * @param item 当前查询条目
+	 * @param dim 当前查询维度
+	 * @return DimensionCondition 维度查询条件
+	 */
+	private static DimensionCondition buildDimCondition(QueryAction action, Object filterVal, Item item, Dimension dim) {
+		final boolean chartQuery = action.getQueryStrategy() == QueryStrategy.CHART_QUERY;
+		DimensionCondition condition = new DimensionCondition(dim.getName());
+		List<QueryData> datas = Lists.newArrayList();
+		if (filterVal != null) {
+			List<String> values = collectFilterValues(filterVal);
+			boolean isDrilledItem = filterVal.equals(action.getDrillDimValues().get(item));
+			boolean changeStatus = (item.getPositionType() == PositionType.X) && chartQuery;
+			datas = buildQueryDatas(action, chartQuery,changeStatus, isDrilledItem, values);
+		} else {
+			datas = genDefaultCondition(chartQuery, item, dim);
+		}
+		condition.setQueryDataNodes(datas);
+		return condition;
+	}
+
+	/**
+	 * @param action  QueryAction
+	 * @param chartQuery 是否是图查询
+	 * @param changeStatus 是否是图查询并且查询条件在x轴
+	 * @param isDrilledItem 是否是下钻的条目
+	 * @param values 过滤条件集合
+	 * @return List<QueryData> 查询条件
+	 */
+	private static List<QueryData> buildQueryDatas(QueryAction action, boolean chartQuery, boolean changeStatus, 
+			    boolean isDrilledItem, List<String> values) {
+		List<QueryData> datas = Lists.newArrayList();
+		for (String value : values) {
+			if (!chartQuery && value.toLowerCase().contains("all")) {
+				datas.clear();
+				break;
+			}
+			QueryData data = new QueryData(value);
+			if (isDrilledItem) {
+				data.setExpand(true);
+			} else if (changeStatus) {
+				data.setExpand(true);
+				data.setShow(false);
+			}
+			datas.add(data);
+		}
+		return datas;
+	}
+
+	/**
+	 * @param valueObject
+	 * @return List<String>
+	 */
+	private static List<String> collectFilterValues(Object valueObject) {
+		List<String> values = Lists.newArrayList();
+		if (valueObject instanceof String[]) {
+			CollectionUtils.addAll(values, (String[]) valueObject); 
+		} else {
+			values.add(valueObject.toString());
+		}
+		return values;
+	}
+
+	/**
+	 * 构建查询请求数据以及节点状态
+	 * @param chartQuery 是否是图表查询
+	 * @param item 查询条目
+	 * @param dim 查询维度
+	 * @return List<QueryData> 查询请求数据状态以及节点状态
+	 */
+	private static List<QueryData> genDefaultCondition(boolean chartQuery, Item item, Dimension dim) {
+		List<QueryData> datas = new ArrayList<QueryData>();
+		if (item.getPositionType() == PositionType.X && chartQuery) {
+				QueryData data = new QueryData(dim.getAllMember().getUniqueName());
+				data.setExpand(true);
+				data.setShow(false);
+				datas.add(data);
+		}
+		return datas;
+	}
+
     /**
+     * 
+     * 收集查询条目
+     * @param action 查询动作
+     * @return Map<Item, Object> 查询条目集合
+     * 
+     */
+	private static Map<Item, Object> collectQueryItems(QueryAction action) {
+		Map<Item, Object> items = Maps.newConcurrentMap();
+        items.putAll(action.getColumns());
+        items.putAll(action.getRows());
+        items.putAll(action.getSlices());
+		return items;
+	}
+
+    /**
+     * 
      * 根据查询请求构建问题模型查询原数据信息
      * @param action 查询动作
      * @return Map<AxisType, AxisMeta> 查询问题模型元数据
+     * 
      */
     private static Map<AxisType, AxisMeta> buildAxisMeta(QueryAction action) {
         Map<Item, Object> columns = action.getColumns();
@@ -196,5 +248,28 @@ public final class QueryUtils {
         return meta;
     }
     
-    
+    /**
+     * 
+     * 依据区域的类型，生成查询策略
+     * 注意：此方法不能覆盖所有查询策略，比如：下钻，上卷等，此类查询策略需要针对具体业务具体处理
+     * @param type ExtendAreaType 查询区域类型
+     * @return QueryStrategy 查询策略
+     */
+    public static QueryStrategy genQueryStrategyWithAreaType(ExtendAreaType type) {
+    		switch(type) {
+	    		case TABLE:
+	    			return QueryStrategy.TABLE_QUERY;
+	    		case CHART:
+	    			return QueryStrategy.CHART_QUERY;
+	    		case LITEOLAP_TABLE:
+	    			return QueryStrategy.LITE_OLAP_TABLE_QUERY;
+	    		case LITEOLAP_CHART:
+	    			return QueryStrategy.LITE_OLAP_CHART_QUERY;
+	    		case TIME_COMP:
+	    		case QUERY_COMP:
+	    			return QueryStrategy.CONTEXT_UPDATE;
+    			default:
+    				return QueryStrategy.UNKNOW;
+    		}
+    }
 }

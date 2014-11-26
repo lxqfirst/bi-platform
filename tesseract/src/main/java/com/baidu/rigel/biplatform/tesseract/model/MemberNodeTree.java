@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.ac.annotation.GsonIgnore;
 /**
  * 维值树
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MemberNodeTree implements Serializable, Comparable<MemberNodeTree> {
@@ -79,6 +79,11 @@ public class MemberNodeTree implements Serializable, Comparable<MemberNodeTree> 
      * hasChildren 是否有孩子
      */
     private boolean hasChildren;
+    
+    /**
+     * isSummary 是否是汇总节点
+     */
+    private boolean isSummary;
 
     /**
      * 节点实际查询使用的叶子ID列表
@@ -280,6 +285,20 @@ public class MemberNodeTree implements Serializable, Comparable<MemberNodeTree> 
     public void setHasChildren(boolean hasChildren) {
         this.hasChildren = hasChildren;
     }
+
+	/**
+	 * @return the isSummary
+	 */
+	public boolean isSummary() {
+		return isSummary;
+	}
+
+	/**
+	 * @param isSummary the isSummary to set
+	 */
+	public void setSummary(boolean isSummary) {
+		this.isSummary = isSummary;
+	}
 
 
 }

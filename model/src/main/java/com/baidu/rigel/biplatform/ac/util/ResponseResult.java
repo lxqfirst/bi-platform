@@ -23,8 +23,8 @@ import java.util.Map;
  * 
  * Rest Service结果集对象，封装rest返回值
  * 
- * @author wangyuxue 将返回的数据转换成String类型，设置对象的时候自动用json转成String
- * @version 0.2 chenxiaoming01@baidu.com
+ * @author david.wang 将返回的数据转换成String类型，设置对象的时候自动用json转成String
+ * @version 0.2 xiaoming.chen
  */
 public class ResponseResult implements Serializable {
 

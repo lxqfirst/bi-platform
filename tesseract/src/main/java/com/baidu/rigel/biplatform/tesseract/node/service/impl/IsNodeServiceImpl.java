@@ -122,7 +122,7 @@ public class IsNodeServiceImpl extends AbstractMetaService implements IsNodeServ
         Map<Node, Integer> result = new HashMap<Node, Integer>();
         sortNodeListByFreeBlockCount(existNodeList);
         int blockCountLeft = blockCount;
-        for (int i = existNodeList.size() - 1; (i >= 0 && blockCountLeft >= 0); i--) {
+        for (int i = existNodeList.size() - 1; (i >= 0 && blockCountLeft > 0); i--) {
             if (existNodeList.get(i).getFreeBlockNum() > 0
                     && existNodeList.get(i).getNodeState().equals(NodeState.NODE_AVAILABLE)) {
                 Node currNode = existNodeList.get(i);

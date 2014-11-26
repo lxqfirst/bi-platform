@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.ma.rt.query.service;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryException extends Exception {

@@ -31,6 +31,7 @@ import com.baidu.rigel.biplatform.ma.auth.service.ProductLineRegisterService;
 import com.baidu.rigel.biplatform.ma.auth.service.ProductLineManageService;
 import com.baidu.rigel.biplatform.ma.file.client.service.FileService;
 import com.baidu.rigel.biplatform.ma.file.client.service.FileServiceException;
+import com.baidu.rigel.biplatform.ma.resource.BaseResource;
 
 /**
  * 产品线注册服务实现
@@ -38,7 +39,7 @@ import com.baidu.rigel.biplatform.ma.file.client.service.FileServiceException;
  * 
  */
 @Service("productLineRegisterService")
-public class ProductLineRegisterServiceImpl implements ProductLineRegisterService {
+public class ProductLineRegisterServiceImpl extends BaseResource implements ProductLineRegisterService {
     
     /**
      * 日志对象
@@ -153,7 +154,7 @@ public class ProductLineRegisterServiceImpl implements ProductLineRegisterServic
         String pwd = user.getPwd();
         // 对用户密码进行解密，以便发送给管理员查看
         try {
-            pwd = AesUtil.getInstance().decodeAnddecrypt(pwd);
+            pwd = AesUtil.getInstance().decodeAnddecrypt(pwd, securityKey);
         } catch (Exception e) {
             throw new IllegalArgumentException("decrypt password happened exception "
                      + "when send email to administrator");
@@ -258,7 +259,7 @@ public class ProductLineRegisterServiceImpl implements ProductLineRegisterServic
         String serviceTypeStr = "线上服务";
         String pwd = user.getPwd();
         try {
-            pwd = AesUtil.getInstance().decodeAnddecrypt(pwd);
+            pwd = AesUtil.getInstance().decodeAnddecrypt(pwd, securityKey);
             stringBuilder.append("   密码:" + pwd);
             if (serviceType == 0) {
                 serviceTypeStr = "线下服务";

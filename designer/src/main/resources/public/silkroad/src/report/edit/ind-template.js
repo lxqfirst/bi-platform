@@ -2,7 +2,7 @@ define(['template'], function (template) {
     function anonymous($data,$filename) {
         'use strict';
         $data=$data||{};
-        var $utils=template.utils,$helpers=$utils.$helpers,$each=$utils.$each,indList=$data.indList,$value=$data.$value,$index=$data.$index,$escape=$utils.$escape,$out='';$out+='<div class="title">\r\n    指标\r\n    <span class="icon-data-sources j-setting-derive-inds" title="管理衍生指标"></span>\r\n</div>\r\n<div class="j-con-org-ind con-org-ind">\r\n    ';
+        var $utils=template.utils,$helpers=$utils.$helpers,$each=$utils.$each,indList=$data.indList,$value=$data.$value,$index=$data.$index,$escape=$utils.$escape,$out='';$out+='<div class="title">\r\n    指标\r\n    <span class="icon-data-sources j-setting-derive-inds derivative-ind-setting" title="管理衍生指标"></span>\r\n</div>\r\n<div class="j-con-org-ind con-org-ind">\r\n    ';
         $each(indList.data,function($value,$index){
         $out+=' ';
         if($value.type == "COMMON" && $value.visible == true){

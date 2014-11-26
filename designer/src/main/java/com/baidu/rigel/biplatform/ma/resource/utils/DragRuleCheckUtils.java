@@ -30,7 +30,7 @@ import com.baidu.rigel.biplatform.ma.report.model.ExtendArea;
 /**
  * 拖拽规则检查
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class DragRuleCheckUtils {

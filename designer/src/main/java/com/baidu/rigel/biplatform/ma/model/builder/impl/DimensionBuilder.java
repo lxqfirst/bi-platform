@@ -53,7 +53,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
  * 
  * 维度构建器，构建维度模型
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 class DimensionBuilder {
@@ -104,6 +104,8 @@ class DimensionBuilder {
             }
             String caption = StringUtils.isEmpty(column.getCaption()) ? column.getName() : column
                     .getCaption();
+            // modify by jiangyichao at 2014-11-06
+            String dataTimeType = column.getName();
             String name = generateDimName(dimTable, column);
             TimeDimension dimension = new TimeDimension(name);
             dimension.setCaption(caption);
@@ -117,8 +119,9 @@ class DimensionBuilder {
             /**
              * TODO 自定义时间维度可能要修改这里
              */
-            dimension.setDataTimeType(TimeTypeAdaptorUtils.parseToTimeType(dimTable.getReference()
-                    .getSalveColumn()));
+//            dimension.setDataTimeType(TimeTypeAdaptorUtils.parseToTimeType(dimTable.getReference()
+//                    .getSalveColumn()));
+            dimension.setDataTimeType(TimeTypeAdaptorUtils.parseToTimeType(dataTimeType));
             dimension.setTimeFormat(((TimeDimTableMetaDefine) dimTable).getFormat());
             LevelType type = TimeTypeAdaptorUtils.parseToLevelType(TimeType.valueOf(column.getName()));
             List<Level> levels = buildLevels(dimTable, column, type, dimension);
@@ -133,7 +136,9 @@ class DimensionBuilder {
                     dimension.addLevel(level);
                 }
             }
-            rs.add(dimension);
+            if (dimension.getDataTimeType() != TimeType.TimeYear) {
+                rs.add(dimension);
+            }
         }
         if (rs.size() == 0) {
             return new TimeDimension[0];

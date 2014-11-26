@@ -23,7 +23,7 @@ import org.junit.Test;
 /**
  * AES加密测试
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class AesUtilTest {

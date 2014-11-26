@@ -40,7 +40,7 @@ import com.google.common.collect.Maps;
 /**
  * 根据TesseractResultSet和查询上下文构建DataModel
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DataModelBuilder {

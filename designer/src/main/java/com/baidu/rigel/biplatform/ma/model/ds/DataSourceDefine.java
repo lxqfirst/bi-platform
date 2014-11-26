@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.GsonUtils;
  * 
  * 数据源定义
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class DataSourceDefine implements Serializable {

@@ -27,8 +27,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baidu.rigel.biplatform.ac.util.AesUtil;
 import com.baidu.rigel.biplatform.ma.auth.bo.ProductlineInfo;
-import com.baidu.rigel.biplatform.ma.auth.service.ProductLineRegisterService;
 import com.baidu.rigel.biplatform.ma.auth.service.ProductLineManageService;
+import com.baidu.rigel.biplatform.ma.auth.service.ProductLineRegisterService;
+import com.baidu.rigel.biplatform.ma.resource.BaseResource;
 import com.baidu.rigel.biplatform.ma.resource.ResponseResult;
 
 /**
@@ -38,7 +39,7 @@ import com.baidu.rigel.biplatform.ma.resource.ResponseResult;
  */
 @RestController
 @RequestMapping("/silkroad/register")
-public class RegisterController {
+public class RegisterController extends BaseResource {
     /**
      * 日志对象
      */
@@ -176,7 +177,7 @@ public class RegisterController {
         if (needEncryptPwd) {
             // 对用户密码进行加密
             try {
-                pwd = AesUtil.getInstance().encryptAndUrlEncoding(pwd);
+                pwd = AesUtil.getInstance().encryptAndUrlEncoding(pwd, securityKey);
             } catch (Exception e) {
                 throw new IllegalArgumentException("user's password encryt throw exception");
             }

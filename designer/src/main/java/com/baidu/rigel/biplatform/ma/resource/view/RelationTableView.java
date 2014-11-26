@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ma.model.meta.ColumnInfo;
 /**
  * 
  * 关联表定义
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

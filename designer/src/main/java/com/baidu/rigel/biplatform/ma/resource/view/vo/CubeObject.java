@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * Cube view object
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class CubeObject implements Serializable {

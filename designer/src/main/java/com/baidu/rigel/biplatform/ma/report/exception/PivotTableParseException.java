@@ -21,7 +21,7 @@ package com.baidu.rigel.biplatform.ma.report.exception;
 /**
  * PivotTable转换异常
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class PivotTableParseException extends RuntimeException {

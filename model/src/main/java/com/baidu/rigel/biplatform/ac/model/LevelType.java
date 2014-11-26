@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ac.model;
 /**
  * 层级类型
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public enum LevelType {

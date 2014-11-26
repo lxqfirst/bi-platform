@@ -30,7 +30,7 @@ import com.google.common.collect.Lists;
 /**
  * 数据源管理实例创建工厂
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DataSourceManagerFactoryTest {

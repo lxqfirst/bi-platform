@@ -97,7 +97,7 @@ define(['template'], function (template) {
         }
         $out+='\r\n        </div>\r\n        ';
         });
-        $out+='\r\n    </div>\r\n</div>';
+        $out+='\r\n    </div>\r\n    <div class="data-axis-line data-axis-line-48 data-btn-line">\r\n        <span class="letter">设置:</span>\r\n        <span class="icon-letter icon-letter-btn j-set-data-format">数据格式</span>\r\n    </div>\r\n</div>';
         return $out;
     }
     return { render: anonymous };

@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
  * 时间范围表示闭区间，为计算与表示方便，起至时间均用字符串表示，对于任何时间粒度的时间值，均表示为一个闭区间，如果表示当前
  * 起至时间一致
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class TimeRangeDetail {
@@ -151,7 +151,7 @@ public class TimeRangeDetail {
         }
         
         List<String> days = Lists.newArrayList();
-        if (beginYear - endYear >= 1) {
+        if (endYear - beginYear >= 1) {
             String[] allDays = getDaysMoreThanOneYear(beginYear, beginMonth, 
                     beginDay, endYear, endMonth, endDay);
             Collections.addAll(days, allDays); 
@@ -211,7 +211,8 @@ public class TimeRangeDetail {
      */
     private String[] getDaysToDayFromBeginOfYear(int endYear, int endMonth, int endDay) {
         List<String> days = Lists.newArrayList();
-        Collections.addAll(days, getDayOfMonth(endYear, endMonth, endDay));
+        // modify by jiangyichao at 2014-11-12 获取截止月到截止日期
+        Collections.addAll(days, getDayOfMonth(endYear, endMonth, 1, endDay));
         for (int begin = endMonth - 1; begin >= 1; --begin) {
             Collections.addAll(days, getDayOfMonth(endYear, begin));
         }

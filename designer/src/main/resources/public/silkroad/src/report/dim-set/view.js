@@ -1,5 +1,5 @@
 /**
- * @file: 报表新建（编辑）--  维度设置模块View
+ * @file: 报表新建（编辑）-- 维度设置模块View
  * @author: lizhantong(lztlovely@126.com)
  * @depend:
  * @date: 2014-07-07
@@ -37,7 +37,6 @@ define(
         // 引用
         //------------------------------------------
 
-        var alert = dialog.alert;
         var confirm = dialog.confirm;
 
         //------------------------------------------
@@ -514,7 +513,7 @@ define(
                 var $threePart;
 
                 // 改变后，如果是内置表
-                if (data.tableId === 'ownertable') {
+                if (data.tableId === 'ownertable' || data.tableId === '0') {
                     $lineBox
                         .removeClass('date-relation-normal')
                         .addClass('date-relation-owner');
@@ -565,7 +564,7 @@ define(
                     // 如果被关联表是请选择，那么
                     if (children.relationTable === '0') {
                         selects = $dateMainBox
-                            .find('.date-relation-normal')
+                            .find('.date-relation-owner')
                             .find('.j-date-two-part')
                             .find('select');
                         if ($(selects[0]).val() === '0'
@@ -574,7 +573,8 @@ define(
                          ) {
                             targetDatas.push(targetData);
                             continue;
-                        } else {
+                        }
+                        else {
                             me._changeTab($('#j-tab-date'));
                             $errorMsg.html(errorMsg + DATE_MSG.RELATION_TABLE_MSG).show();
                             return false;
@@ -592,15 +592,18 @@ define(
                             me._changeTab($('#j-tab-date'));
                             $errorMsg.html(errorMsg + DATE_MSG.DATE_FIELD_MSG).show();
                             return false;
-                        } else if (children.field === '0') {
+                        }
+                        else if (children.field === '0') {
                             me._changeTab($('#j-tab-date'));
                             $errorMsg.html(errorMsg + DATE_MSG.LEVEL_MSG).show();
                             return false;
-                        } else if (children.format === '0') {
+                        }
+                        else if (children.format === '0') {
                             me._changeTab($('#j-tab-date'));
                             $errorMsg.html(errorMsg + DATE_MSG.FORMAT_MSG).show();
                             return false;
-                        } else {
+                        }
+                        else {
                             $errorMsg.html('').hide();
                         }
 
@@ -616,11 +619,13 @@ define(
                             me._changeTab($('#j-tab-date'));
                             $errorMsg.html(errorMsg + DATE_MSG.RELATION_FIELD_MSG).show();
                             return false;
-                        } else if (children.field === '0') {
+                        }
+                        else if (children.field === '0') {
                             me._changeTab($('#j-tab-date'));
                             $errorMsg.html(errorMsg + DATE_MSG.RELATION_FIELD_MSG).show();
                             return false;
-                        } else {
+                        }
+                        else {
                             $errorMsg.html('').hide();
                         }
                         children.dateLevel = {};
@@ -638,7 +643,8 @@ define(
                                 me._changeTab($('#j-tab-date'));
                                 $errorMsg.html(errorMsg + DATE_MSG.FORMAT_MSG).show();
                                 return false;
-                            } else {
+                            }
+                            else {
                                 $errorMsg.html('').hide();
                             }
                         }

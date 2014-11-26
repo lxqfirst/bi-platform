@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * 统计图服务实现
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-12
  */

@@ -18,10 +18,12 @@ package com.baidu.rigel.biplatform.ma.report.model;
 import java.io.Serializable;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
 /**
  * 格式定义
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FormatModel implements Serializable {
@@ -34,12 +36,12 @@ public class FormatModel implements Serializable {
     /**
      * 数据格式
      */
-    private Map<String, String> dataFormat;
+    private Map<String, String> dataFormat = Maps.newHashMap();
     
     /**
      * 条件格式
      */
-    private Map<String, String> conditionFormat;
+    private Map<String, String> conditionFormat = Maps.newHashMap();
 
     /**
      * @return the dataFormat
@@ -49,25 +51,10 @@ public class FormatModel implements Serializable {
     }
 
     /**
-     * @param dataFormat the dataFormat to set
-     */
-    public void setDataFormat(Map<String, String> dataFormat) {
-        this.dataFormat = dataFormat;
-    }
-
-    /**
      * @return the conditionFormat
      */
     public Map<String, String> getConditionFormat() {
         return conditionFormat;
     }
 
-    /**
-     * @param conditionFormat the conditionFormat to set
-     */
-    public void setConditionFormat(Map<String, String> conditionFormat) {
-        this.conditionFormat = conditionFormat;
-    }
-    
-    
 }

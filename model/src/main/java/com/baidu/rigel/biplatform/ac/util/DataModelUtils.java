@@ -41,7 +41,7 @@ import com.baidu.rigel.biplatform.ac.query.model.SortRecord.SortType;
 /**
  * DataModel操作工具类
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DataModelUtils {

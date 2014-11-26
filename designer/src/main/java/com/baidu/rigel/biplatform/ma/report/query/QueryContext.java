@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 /**
  * 请求上下文
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-5
  */

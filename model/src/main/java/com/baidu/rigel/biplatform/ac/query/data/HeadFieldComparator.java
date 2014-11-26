@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.query.model.SortRecord.SortType;
 /**
  * 返回表头结构排序比较实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class HeadFieldComparator implements Comparator<HeadField> {

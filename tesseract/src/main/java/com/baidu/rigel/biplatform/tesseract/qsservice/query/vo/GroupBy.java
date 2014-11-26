@@ -27,7 +27,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * query model group by condition
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class GroupBy implements Serializable {

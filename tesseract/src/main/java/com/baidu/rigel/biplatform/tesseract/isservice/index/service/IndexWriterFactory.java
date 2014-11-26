@@ -64,6 +64,7 @@ public class IndexWriterFactory {
      * idxWriterMaps
      */
     private ConcurrentHashMap<String, IndexWriter> idxWriterMaps = new ConcurrentHashMap<String, IndexWriter>();
+    private ConcurrentHashMap<String, Integer> idxMaps=new ConcurrentHashMap<String, Integer>();
     
     /**
      * INSTANCE
@@ -94,11 +95,40 @@ public class IndexWriterFactory {
             IndexWriterConfig indexWriterConfig = new IndexWriterConfig(
                     Version.LUCENE_4_10_1, new StandardAnalyzer());
             indexWriterConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
+            indexWriterConfig.setRAMBufferSizeMB(64.0);
+            indexWriterConfig.setMaxBufferedDocs(IndexWriterConfig.DISABLE_AUTO_FLUSH);
             indexWriter = new IndexWriter(directory, indexWriterConfig);
+            
             INSTANCE.idxWriterMaps.put(idxPath, indexWriter);
             LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_PROCESS_NO_PARAM,
                 "getIndexWriter", "create new IndexWriter "));
         }
+        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_END, "getIndexWriter",
+            "[idxPath:" + idxPath + "]"));
+        return indexWriter;
+    }
+    
+    
+    public static synchronized IndexWriter getIndexWriterWithSingleSlot(String idxPath) throws IOException {
+        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_BEGIN, "getIndexWriter",
+            "[idxPath:" + idxPath + "]"));
+        IndexWriter indexWriter = null;
+        Integer maxSlot=0;
+        if (INSTANCE.idxMaps.containsKey(idxPath)) {
+        	maxSlot=INSTANCE.idxMaps.get(idxPath);            
+        	maxSlot++;
+        } 
+        
+        File indexFile = new File(idxPath+File.separator+maxSlot);
+        Directory directory = FSDirectory.open(indexFile);
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(
+                Version.LUCENE_4_10_1, new StandardAnalyzer());
+        indexWriterConfig.setOpenMode(OpenMode.CREATE_OR_APPEND);
+        indexWriterConfig.setRAMBufferSizeMB(48.0);
+        indexWriter = new IndexWriter(directory, indexWriterConfig);
+        
+        INSTANCE.idxMaps.put(idxPath, maxSlot);
+        
         LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_END, "getIndexWriter",
             "[idxPath:" + idxPath + "]"));
         return indexWriter;

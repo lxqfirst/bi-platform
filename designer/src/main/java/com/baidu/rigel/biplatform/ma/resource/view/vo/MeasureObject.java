@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.model.MeasureType;
 
 /**
  * Measure View Object
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class MeasureObject implements Serializable {

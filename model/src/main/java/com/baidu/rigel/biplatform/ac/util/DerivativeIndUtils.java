@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.ac.model.MeasureType;
 /**
  * 衍生指标的工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class DerivativeIndUtils {

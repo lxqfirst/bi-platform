@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.file.serv.service;
 /**
  * 文件存储路径：文件服务器指定的用于存储文件的跟路径
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FileLocation {

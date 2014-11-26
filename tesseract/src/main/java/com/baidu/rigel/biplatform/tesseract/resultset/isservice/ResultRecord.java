@@ -108,7 +108,7 @@ public class ResultRecord implements Serializable {
      * @throws NoSuchFieldException
      *             ,可能抛出异常
      */
-    public Object getField(int columnIndex) throws NoSuchFieldException {
+    public Serializable getField(int columnIndex) throws NoSuchFieldException {
         if (this.fieldArray != null && columnIndex < this.fieldArray.length) {
             return fieldArray[columnIndex];
         }
@@ -125,7 +125,7 @@ public class ResultRecord implements Serializable {
      * @throws NoSuchFieldException
      *             ,可能抛出异常
      */
-    public Object getField(String columnLable) throws NoSuchFieldException {
+    public Serializable getField(String columnLable) throws NoSuchFieldException {
         Integer columnIndex = this.meta.getFieldNames().get(columnLable);
         if (columnIndex == null) {
             throw new NoSuchFieldException("FieldName:" + columnLable);
@@ -224,14 +224,10 @@ public class ResultRecord implements Serializable {
         this.fieldArray = fieldList.toArray(new Serializable[0]);
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
-        return "ResultRecord [fieldArray=" + Arrays.toString(fieldArray) + ", meta=" + meta + "]";
+        return "ResultRecord [fieldArray=" + Arrays.toString(fieldArray) + ", meta=" + meta + ", groupBy=" + groupBy
+                + "]";
     }
     
     /*

@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ma.report.model.LogicModel;
 /**
  * 
  * 图形构建服务
- * @author peizhongyi01
+ * @author zhongyi
  *
  * 2014-8-12
  */

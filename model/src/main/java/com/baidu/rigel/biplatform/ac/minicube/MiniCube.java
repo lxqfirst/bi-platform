@@ -33,7 +33,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * cube的实现定义
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @JsonIgnoreProperties

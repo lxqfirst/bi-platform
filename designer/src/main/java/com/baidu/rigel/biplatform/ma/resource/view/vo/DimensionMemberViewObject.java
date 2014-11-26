@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 /**
  * 维度成员VO类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class DimensionMemberViewObject implements Serializable {

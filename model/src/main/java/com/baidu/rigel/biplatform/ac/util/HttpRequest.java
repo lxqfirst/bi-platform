@@ -19,9 +19,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
@@ -34,13 +34,30 @@ import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.config.Lookup;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.cookie.CookieOrigin;
+import org.apache.http.cookie.CookieSpec;
+import org.apache.http.cookie.CookieSpecProvider;
+import org.apache.http.cookie.MalformedCookieException;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.cookie.BestMatchSpecFactory;
+import org.apache.http.impl.cookie.BrowserCompatSpec;
+import org.apache.http.impl.cookie.BrowserCompatSpecFactory;
+import org.apache.http.impl.cookie.IgnoreSpecFactory;
+import org.apache.http.impl.cookie.NetscapeDraftSpecFactory;
+import org.apache.http.impl.cookie.RFC2109SpecFactory;
+import org.apache.http.impl.cookie.RFC2965SpecFactory;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +65,15 @@ import org.slf4j.LoggerFactory;
 /**
  * httpclient 4.3 的post和get实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class HttpRequest {
+
+    /**
+     * NO_CHECK_COOKIES
+     */
+    public static final String NO_CHECK_COOKIES = "NO_CHECK_COOKIES";
 
     /**
      * COOKIE_PARAM_NAME cookie参数的名称，参数如果是这个名称，自动放到请求的头信息中
@@ -72,7 +94,38 @@ public class HttpRequest {
         Header header = new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json");
         List<Header> headers = new ArrayList<Header>(1);
         headers.add(header);
-        return HttpClients.custom().setDefaultHeaders(headers).build();
+        
+        CookieSpecProvider cookieSpecProvider = new CookieSpecProvider() {
+
+            @Override
+            public CookieSpec create(HttpContext context) {
+                return new BrowserCompatSpec() {
+                    
+                    @Override
+                    public void validate(Cookie cookie, CookieOrigin origin) throws MalformedCookieException{
+                        //no check cookie
+                    }
+                };
+            }
+        };
+        
+        Lookup<CookieSpecProvider> cookieSpecRegistry = RegistryBuilder.<CookieSpecProvider>create()
+                .register(CookieSpecs.BEST_MATCH, new BestMatchSpecFactory())
+                .register(CookieSpecs.STANDARD, new RFC2965SpecFactory())
+                .register(CookieSpecs.BROWSER_COMPATIBILITY, new BrowserCompatSpecFactory())
+                .register(CookieSpecs.NETSCAPE, new NetscapeDraftSpecFactory())
+                .register(CookieSpecs.IGNORE_COOKIES, new IgnoreSpecFactory())
+                .register("rfc2109", new RFC2109SpecFactory())
+                .register("rfc2965", new RFC2965SpecFactory())
+                .register(NO_CHECK_COOKIES, cookieSpecProvider)
+                .build();
+        // 设置默认的cookie的安全策略为不校验
+        RequestConfig requestConfigBuilder = RequestConfig.custom().setCookieSpec(NO_CHECK_COOKIES).build();
+        HttpClient client = HttpClients.custom()
+                .setDefaultCookieSpecRegistry(cookieSpecRegistry)
+                .setDefaultRequestConfig(requestConfigBuilder)
+                .setDefaultHeaders(headers).build();
+        return client;
     }
 
     /**
@@ -112,8 +165,15 @@ public class HttpRequest {
      * @return URL 所代表远程资源的响应结果
      */
     public static String sendGet(HttpClient client, String url, Map<String, String> params) {
+        if(client == null || StringUtils.isBlank(url)) {
+            throw new IllegalArgumentException("client is null");
+        }
+        if(params == null) {
+            params = new HashMap<String, String>(1);
+        }
+        
         String newUrl = processPlaceHolder(url, params);
-        String cookie = params != null ? (String) params.remove(COOKIE_PARAM_NAME) : null;
+        String cookie = params.remove(COOKIE_PARAM_NAME);
 
         List<String> paramList = checkUrlAndWrapParam(newUrl, params, true);
         String urlNameString = "";
@@ -174,8 +234,16 @@ public class HttpRequest {
      * @return URL 所代表远程资源的响应结果
      */
     public static String sendPost(HttpClient client, String url, Map<String, String> params) {
+        if(client == null) {
+            throw new IllegalArgumentException("client is null");
+        }
+        
+        if(params == null) {
+            params = new HashMap<String, String>(1);
+        }
         String requestUrl = processPlaceHolder(url, params);
-        String cookie = params != null ? (String) params.remove(COOKIE_PARAM_NAME) : null;
+        
+        String cookie = params.remove(COOKIE_PARAM_NAME);
         if (requestUrl.contains("?")) {
             String[] urls = requestUrl.split("?");
             requestUrl = urls[0];
@@ -252,8 +320,8 @@ public class HttpRequest {
         try {
             StatusLine statusLine = response.getStatusLine();
             // 301 ，302 重定向支持
-            if (statusLine.getStatusCode() == 302
-                    || statusLine.getStatusCode() == 301) {
+            if (statusLine.getStatusCode() == 301
+                    || statusLine.getStatusCode() == 302) {
                 Header header = response.getFirstHeader(HttpHeaders.LOCATION);
                 LOGGER.info("get status code:" + statusLine.getStatusCode() + " redirect:" + header.getValue());
                 if (isGet) {

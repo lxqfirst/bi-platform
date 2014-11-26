@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * 维度绑定关系定义
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

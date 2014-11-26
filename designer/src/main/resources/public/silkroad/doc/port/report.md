@@ -4,11 +4,11 @@
 
 ### 获取报表列表
 
-请求路径
+Address
 
     GET:reports
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -23,11 +23,11 @@
 
 ### 获取某一报表
 
-请求路径
+Address
 
     GET:reports/[id]
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -41,11 +41,11 @@
 
 ### 发布报表
 
-请求路径
+Address
 
     GET:reports/[id]/publish
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -55,16 +55,16 @@
 
 ### 保存报表
 
-请求路径
+Address
 
     POST:reports/[id]
 
-前台模拟
+Form Data
 
     vm: ''
     json: ''
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -73,16 +73,16 @@
     }
 ### 保存json与vm报表
 
-请求路径
+Address
 
     POST:reports/[id]/json_vm
 
-前台模拟
+Form Data
 
     vm: ''
     json: ''
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -92,11 +92,11 @@
 
 ### 预览报表
 
-请求路径
+Address
 
     GET:reports/[id]/preview_info
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -106,11 +106,11 @@
 	
 ### 删除一报表
 
-请求路径
+Address
 
     DELETE:reports/[id]
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -119,15 +119,15 @@
 
 ### 复制一报表(创建报表副本)
 
-请求路径
+Address
 
     POST:reports/[id]/duplicate   // id:被复制报表的id；name:新报表的名称
 
-前台模拟
+Form Data
 
     name: "报表名称"
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -136,15 +136,15 @@
 
 ### 新建报表（第一步：命名）
 
-请求路径
+Address
 
     POST:/reports/
 
-前端模拟
+Form Data
 
     name: "name"
 
-后端模拟
+Response
 
     {
         "status": 0, 
@@ -156,17 +156,17 @@
 
 ### 增加报表数据模型的cube （第二步：建cube）
 
-请求路径
+Address
 
      POST:/reports/[id]/start_models
 
-前端模拟
+Form Data
 
     "datasourcesId": 1,
     "selectedTables": [id1,id2], // 选中表
     "regexps":["regepx123","regepx2344", "rege456"] //正则表达式  
 
-后端模拟
+Response
 
     {
         "status": 0, 
@@ -177,11 +177,11 @@
 
 ### 获取报表所用数据源的选中的表的列表 ###
 
-请求路径
+Address
 
     GET:/reports/[id]/start_models
 
-后台模拟数据
+Response
 
     {
         "status": 0,
@@ -227,11 +227,11 @@
 
 ### 更改衍生指标 ###
 
- 请求路径
+Address
 
       PUT:reports/[id]/cubes/[id]/derive-inds
 
- 前台模拟
+Form Data
 
      data = [
          {
@@ -244,7 +244,7 @@
          }
      ];
 
- 后台模拟
+Response
 
      {
          "status": 0,
@@ -255,11 +255,11 @@
 
 ### 获取cube列表 ###
 
-请求路径
+Address
 
     GET:/reports/[id]/cubes
 
-后台模拟数据
+Response
 
     {
         "data": [
@@ -278,11 +278,11 @@
 
 ### 获取特定cube的指标列表 ###
 
-请求路径
+Address
 
     GET:reports/[id]/cubes/[id]/inds
 
-后台模拟
+Response
 
     {
         "data": [
@@ -302,11 +302,11 @@
 
 ### 获取指定cube的维度列表 ###
 
-请求路径
+Address
 
     GET:reports/[id]/cubes/[id]/dims
 
-后台模拟
+Response
 
     {
         "data": {
@@ -339,11 +339,11 @@
 
 ### 获取特定cube的信息 ###
 
-请求路径
+Address
 
     GET:reports/[id]/cubes/[id]
 
-后台模拟
+Response
 
     // 原始指标
     "oriInd": [
@@ -362,11 +362,11 @@
 
 ### 修改“筛选显示数据”的数据 ###
 
-请求路径
+Address
 
     PUT:reports/[id]/cubes/[id]
 
-前台模拟
+Form Data
 
     "oriInd": [
         {
@@ -384,15 +384,15 @@
 
 ### 设置指标汇总方式
 
-请求路径
+Address
 
     PUT:reports/[id]/cubes/[id]/inds/[id]
 
-前台数据模拟
+Form Data
 
     aggregator: "1" 
 
-后台数据模拟
+Response
 
     {
         "status": 0,
@@ -401,15 +401,15 @@
 
 ### 修改指标名称
     
-请求路径
+Address
 
     PUT:reports/[id]/cubes/[id]/inds/[id]
 
-前台数据模拟
+Form Data
 
     name: ""
 
-后台数据模拟
+Response
 
     {
         "status": 0,
@@ -418,15 +418,15 @@
 
 ### 修改维度,维度组 的名称
 
-请求路径
+Address
 
     PUT:reports/[id]/cubes/[id]/dims/[id]
 
-前台数据模拟
+Form Data
 
     name: ""
 
-后台数据模拟
+Response
 
     {
         "status": 0,
@@ -435,17 +435,17 @@
      
 ### 指标转换到维度
  
-请求路径
+Address
 
     PUT:reports/[id]/cubes/[id]/ind_to_dim/[id]
 
-前台数据模拟
+Form Data
 
     // 可能将来要做的功能参数
     dimId: 1 // 如果拖到维度组有此参数
     prevDimId: 2  // 前一个维度的id，如果是第一个值为-1 
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -454,11 +454,11 @@
      
 ### 维度转换到指标
  
-请求路径
+Address
 
       PUT:reports/[id]/cubes/[id]/dim_to_ind/[id]
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -467,15 +467,15 @@
 
 ### 维度拖到维度组
 
-请求路径
+Address
 
       POST:reports/[id]/cubes/[id]/dim-groups/[dim-group-id]/dim
 
-前台模拟
+Form Data
 
     dimId: 1
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -487,17 +487,17 @@
 
 ### 对维度组中的维度排序
 
-请求路径
+Address
      
       POST:reports/[id]/cubes/[cubeId]/dim_groups/[dimGroupId]/dim_sorting
 
-前台模拟
+Form Data
 
     groupId:5         // 维度组id
     dimId:1           // 维度id
     beforeDimId:-1    // 落点的前一个维度的id，如果被拖到第一个此值为-1
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -506,11 +506,11 @@
 
 ### 删除维度组中的维度
 
-请求路径
+Address
 
      DELETE:reports/[id]/cubes/[id]/dim-groups/[dim-group-id]/dims/[dim-id]
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -519,11 +519,11 @@
 
 ### 删除维度组
 
-请求路径
+Address
        
     DELETE:reports/[id]/cubes/[id]/dim-groups/[id]  
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -532,15 +532,15 @@
 
 ### 创建维度组
 
-请求路径
+Address
 
     POST:reports/[id]/cubes/[id]/dim-groups
 
-前端模拟
+Form Data
 
     name: "维度组名"
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -551,11 +551,11 @@
 
 ### 获取一个报表的json
 
-请求路径
+Address
 
     GET:/reports/{reportId}/json
     
-后台模拟
+Response
 
     {
        "status": 0,
@@ -565,11 +565,11 @@
 
 ### 获取一个报表的vm
 
-请求路径
+Address
 
     GET:/reports/{reportId}/vm
 
-后台模拟
+Response
 
     {
        "status": 0,
@@ -579,15 +579,15 @@
 
 ### 添加一个组件
 
-请求路径
+Address
 
     POST: reports/[report_id]/extend_area/
     
-前台模拟
+Form Data
     
     type: "TABLE"
     
-后台模拟
+Response
 
     {
         "status": 0,
@@ -599,11 +599,11 @@
 
 ### 获取某一组件的数据配置
 
-请求路径
+Address
 
     GET: reports/[report_id]/extend_area/[extend_area_id]
 
-后端模拟
+Response
 
     {
         "status": 0,
@@ -625,17 +625,17 @@
 
 ### 添加某一组件的数据项
 
-请求路径
+Address
     
     POST: reports/[report_id]/extend_area/[extend_area_id]/item
 
-前台模拟
+Form Data
 
     cubeId: "",
     oLapElementId: "", // 维度或指标的id
     axisType: "x" // x,s
 
-后台模拟
+Response
 
      {
          "status": 0,
@@ -651,11 +651,11 @@
 
 ### 删除某一组件的数据配置项
 
-请求路径
+Address
 
     DELETE: reports/[report_id]/extend_area/[extend_area_id]/item/[id]/[axisType]
 
-后台模拟
+Response
 
     {
         "status": 0,
@@ -664,19 +664,60 @@
     
 ### 调整数据配置项顺序
 
-请求路径
+Address
 
     POST: reports/[report_id]/extend_area/[areaId]/item_sorting  //areaId 组件ID
 
-前台模拟
+Form Data
 
     type: 'x'          // 轴类型，只有x、y周
     source: 1          // 起始位，第一个为0
     target: 0          // 落点的位置，第一个为0
 
-后台模拟
+Response
 
     {
         "status": 0,
         "statusInfo": ""
+    }
+
+
+### 设置--数据格式-请求数据格式信息
+
+Address
+
+    GET: reports/[report_id]/extend_area/[areaId]/dataformat  //areaId 组件ID
+
+Response
+
+    {
+        "status": 0,
+        "statusInfo": ""
+        "data": {
+             "defaultFormat": "I,III",
+             "chechi_guo":  "I,III.DD",
+             "nver_guo": "HH:mm:ss"
+        }
+    }
+
+### 设置--数据格式--保存数据格式
+
+Address
+
+    POST: reports/[report_id]/extend_area/[areaId]/dataformat
+
+Form Data
+
+    dataFormat: {
+         "defaultFormat": "I,III",
+         "chechi_guo":  "I,III.DD",
+         "nver_guo": "HH:mm:ss"
+    }
+
+Response
+
+    {
+        "status": 0,
+        "statusInfo": ""
+        "data": {}
     }

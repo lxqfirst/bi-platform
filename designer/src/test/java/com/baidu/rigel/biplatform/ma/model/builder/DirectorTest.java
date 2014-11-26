@@ -39,7 +39,7 @@ import com.google.common.collect.Lists;
  * 
  * test class
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class DirectorTest {

@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.tesseract.exception.DataSourceException;
 /**
  * 管理数据源接口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 public interface DataSourceManager {

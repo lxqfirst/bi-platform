@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * 
- */
 package com.baidu.rigel.biplatform.ma.rt.query.result.trans;
 
 import com.baidu.rigel.biplatform.ac.query.data.DataModel;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryAction;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryResult;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryStrategy;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryResult;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryStrategy;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryChartResultBuilder extends AbsQueryResultBuilder {

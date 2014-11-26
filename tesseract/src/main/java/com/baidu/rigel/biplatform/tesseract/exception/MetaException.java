@@ -17,7 +17,7 @@ package com.baidu.rigel.biplatform.tesseract.exception;
 
 /**
  * 元数据相关的异常信息
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MetaException extends Exception {

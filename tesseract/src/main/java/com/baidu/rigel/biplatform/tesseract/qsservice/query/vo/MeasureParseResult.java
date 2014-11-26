@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 对每个指标进行解析
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MeasureParseResult implements Serializable {

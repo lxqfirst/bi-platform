@@ -20,7 +20,7 @@ import com.baidu.rigel.biplatform.ma.auth.bo.ProductlineInfo;
 /**
  * 用户管理服务
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface ProductLineManageService {

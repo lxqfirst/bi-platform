@@ -34,7 +34,7 @@ import com.baidu.rigel.biplatform.ma.model.meta.StarModel;
  * @see com.baidu.rigel.biplatform.ma.model.meta.StarModel
  * @since JDK1.8 or after
  * @version Silkroad 1.0.1
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface Director {

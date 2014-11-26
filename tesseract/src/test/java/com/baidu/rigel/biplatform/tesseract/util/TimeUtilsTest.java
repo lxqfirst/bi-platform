@@ -28,7 +28,7 @@ import com.baidu.rigel.biplatform.ac.util.TimeRangeDetail;
  * 
  * 测试类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class TimeUtilsTest {

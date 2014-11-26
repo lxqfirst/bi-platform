@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * 立方体构建服务
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-1
  */

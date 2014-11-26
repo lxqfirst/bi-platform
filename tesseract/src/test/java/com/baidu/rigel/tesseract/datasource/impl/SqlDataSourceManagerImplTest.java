@@ -34,7 +34,7 @@ import com.google.common.collect.Lists;
 /**
  * sql数据源管理单测
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class SqlDataSourceManagerImplTest {

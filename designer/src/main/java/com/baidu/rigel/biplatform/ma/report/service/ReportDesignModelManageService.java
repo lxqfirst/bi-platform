@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
  * 报表定义模型管理服务： 报表定义模型的管理操作接口，包括扩展区的创建，扩展区的管理，扩展区的编辑(添加列、删除列，添加参数等)等管理工作。
  * 
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public interface ReportDesignModelManageService {

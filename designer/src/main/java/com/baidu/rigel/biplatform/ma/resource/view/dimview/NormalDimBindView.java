@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 /**
  * BO类：普通维度与视图定义的映射关系定义
  *
- * @author peizhongyi01
+ * @author zhongyi
  * @version 1.0.0.1
  */
 public class NormalDimBindView implements Serializable {

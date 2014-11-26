@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
 /**
  * Mock工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class MockUtils {

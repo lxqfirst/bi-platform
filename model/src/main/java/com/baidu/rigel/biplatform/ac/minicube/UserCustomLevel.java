@@ -20,14 +20,13 @@ package com.baidu.rigel.biplatform.ac.minicube;
 
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
-
 import com.baidu.rigel.biplatform.ac.annotation.GsonIgnore;
 import com.baidu.rigel.biplatform.ac.exception.MiniCubeException;
 import com.baidu.rigel.biplatform.ac.model.Dimension;
 import com.baidu.rigel.biplatform.ac.model.Level;
 import com.baidu.rigel.biplatform.ac.model.LevelType;
 import com.baidu.rigel.biplatform.ac.query.MiniCubeConnection.DataSourceType;
+import com.baidu.rigel.biplatform.ac.util.DeepcopyUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -40,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *      SQL：在select中必须有name,caption 如：select trade_id name,trade_name caption from table where xxxx
  *      FILE:文件按列获取，第一列表示维值的唯一标识，第二列为显示名称，如果只有一列显示名称和唯一名称一致， 输入文件地址，如：http://abc.dd.com/aa.txt、/home/work/local/dim.txt
  *      CUSTOM:待实现，用户自定义取数逻辑
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @JsonIgnoreProperties
@@ -189,10 +188,8 @@ public class UserCustomLevel extends OlapElementDef implements Level {
      * {@inheritDoc}
      */
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        UserCustomLevel target = new UserCustomLevel(this.getName());
-        BeanUtils.copyProperties(this, target);
-        return target;
+    public UserCustomLevel clone() throws CloneNotSupportedException {
+        return DeepcopyUtils.deepCopy(this);
     }
 
     @Override

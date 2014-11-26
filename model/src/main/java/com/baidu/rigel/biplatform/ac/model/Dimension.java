@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 维度接口：描述同一业务主题的不同的角度（该主题的属性）。 如：在某一时间范围内某一线上产品的访问量。该业务主题拥有三个属性： 时间、产品、以及访问量。访问量可以量化的评价产品的好坏，因此，在多维分析中
  * 将访问量定义为特殊的维度Measures（指标或者度量），而时间、产品则是确定 衡量标准的前置条件，也即问题模型中的维度定义。
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * @see java.lang.Cloneable
  */
 @JsonIgnoreProperties

@@ -17,13 +17,13 @@ package com.baidu.rigel.biplatform.ma.rt.query.request.trans;
 
 import org.springframework.util.StringUtils;
 
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryAction;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryRequest;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryRequest;
 
 /**
  * 查询请求转换服务类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public final class QueryRequestTransService {
@@ -49,10 +49,6 @@ public final class QueryRequestTransService {
         
         if (request.getQueryStrategy() == null) {
             throw new IllegalArgumentException("查询请求异常，未指定正确请求策略。当前策略为null");
-        }
-        
-        if (StringUtils.isEmpty(request.getReportId())) {
-            throw new IllegalArgumentException("查询请求异常，未指定正确报表id。当前报表ID为nulll");
         }
         
         if (StringUtils.isEmpty(request.getAreaId())) {

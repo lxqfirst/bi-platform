@@ -27,7 +27,7 @@ import com.google.gson.JsonParseException;
 /**
  * Measure对象反序列化
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MeasureDeserialize implements JsonDeserializer<Measure> {

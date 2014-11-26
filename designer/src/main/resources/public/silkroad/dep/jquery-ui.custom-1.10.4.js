@@ -1667,6 +1667,13 @@ $.widget("ui.draggable", $.ui.mouse, {
 			this.helper[0].style.left = this.position.left+"px";
 		}
 		if(!this.options.axis || this.options.axis !== "x") {
+			// 晓强修改 Start  为了修正遇到滚动条被拖拽元素的不跟随bug
+			this.position.top += this.helper.parent().scrollTop();
+			var startScrrolTop = this.helper.attr('data-sort-startScrrolTop');
+			if (startScrrolTop) {
+				this.position.top -= startScrrolTop;
+			}
+			// 晓强修改 End
 			this.helper[0].style.top = this.position.top+"px";
 		}
 		if($.ui.ddmanager) {

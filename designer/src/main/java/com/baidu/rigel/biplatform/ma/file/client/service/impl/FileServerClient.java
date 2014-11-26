@@ -35,7 +35,7 @@ import com.baidu.rigel.biplatform.ma.common.file.protocol.ResponseStatus;
 /**
  * 文件服务客户端
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FileServerClient {

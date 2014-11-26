@@ -16,6 +16,8 @@
 package com.baidu.rigel.biplatform.tesseract.dataquery.service.impl;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,19 +27,25 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.baidu.rigel.biplatform.tesseract.dataquery.service.DataQueryService;
 import com.baidu.rigel.biplatform.tesseract.isservice.meta.SqlQuery;
+import com.baidu.rigel.biplatform.tesseract.isservice.search.agg.AggregateCompute;
+import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryRequest;
 import com.baidu.rigel.biplatform.tesseract.resultset.TesseractResultSet;
+import com.baidu.rigel.biplatform.tesseract.resultset.isservice.Meta;
 import com.baidu.rigel.biplatform.tesseract.resultset.isservice.ResultRecord;
 import com.baidu.rigel.biplatform.tesseract.resultset.isservice.SearchResultSet;
 import com.baidu.rigel.biplatform.tesseract.util.isservice.LogInfoConstants;
+import com.google.common.collect.Lists;
 
 /**
  * 
@@ -106,46 +114,60 @@ public class SqlDataQueryServiceImpl implements DataQueryService {
      * javax.sql.DataSource, long, long)
      */
     @Override
-    public TesseractResultSet queryForDocListWithSQLQuery(SqlQuery sqlQuery, DataSource dataSource,
-        long limitStart, long limitEnd) {
-        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_BEGIN,
-            "queryForDocListWithSQLQuery", "[sqlQuery:" + sqlQuery + "][dataSource:" + dataSource
-                + "][limitStart:" + limitStart + "][limitEnd:" + limitEnd + "]"));
+    public TesseractResultSet queryForDocListWithSQLQuery(SqlQuery sqlQuery, DataSource dataSource, long limitStart,
+            long limitEnd) {
+        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_BEGIN, "queryForDocListWithSQLQuery",
+                "[sqlQuery:" + sqlQuery + "][dataSource:" + dataSource + "][limitStart:" + limitStart + "][limitEnd:"
+                        + limitEnd + "]"));
+        long current = System.currentTimeMillis();
+
+        TesseractResultSet result = new SearchResultSet(querySqlList(sqlQuery, dataSource, limitStart, limitEnd));
+        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_END, "queryForDocListWithSQLQuery",
+                "[sqlQuery:" + sqlQuery + "][dataSource:" + dataSource + "][limitStart:" + limitStart + "][limitEnd:"
+                        + limitEnd + "] cost" + (System.currentTimeMillis() - current + "ms!")));
+        return result;
+    }
+    
+    
+    /**
+     * 通过数据库查询指定SQL，并转换成resultRecord list
+     * @param sqlQuery
+     * @param dataSource
+     * @param limitStart
+     * @param limitEnd
+     * @return
+     */
+    private LinkedList<ResultRecord> querySqlList(SqlQuery sqlQuery, DataSource dataSource, long limitStart,
+            long limitEnd) {
+        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_BEGIN, "querySqlList", "[sqlQuery:" + sqlQuery.toSql()
+                + "][dataSource:" + dataSource + "][limitStart:" + limitStart + "][limitEnd:" + limitEnd + "]"));
+        long current = System.currentTimeMillis();
         if (sqlQuery == null || dataSource == null || limitEnd < 0) {
             throw new IllegalArgumentException();
         }
-        
+
         sqlQuery.setLimitMap(limitStart, limitEnd);
-        
+
         this.initJdbcTemplate(dataSource);
-        
-        LinkedList<ResultRecord> resultList = new LinkedList<ResultRecord>();
-        
-        jdbcTemplate.query(sqlQuery.toSql(), new RowCallbackHandler() {
+
+        LinkedList<ResultRecord> resultList = Lists.newLinkedList();
+
+        Meta meta = new Meta(sqlQuery.getSelectList().toArray(new String[0]));
+
+        jdbcTemplate.query(new PreparedStatementCreator() {
+
+            @Override
+            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                PreparedStatement pstmt =
+                        con.prepareStatement(sqlQuery.toSql(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                pstmt.setFetchSize(Integer.MIN_VALUE);
+                return pstmt;
+            }
+        }, new RowCallbackHandler() {
+
             @Override
             public void processRow(ResultSet rs) throws SQLException {
-                
-                /**
-                 * QUESTION：？？？
-                 * TODO ResultSet指针不移动，如何取得已经查询的结果
-                 * 如果selectList 大于一个值，单一维度数组能够支持？如Select a， b from c
-                 * 原有逻辑如下：
-                 * for (String select : sqlQuery.getSelectList()) {
-                 *      fieldValues.add(rs.getObject(select));
-                 *   }
-                 *   ResultRecord record = new ResultRecord(fieldValues.toArray(new Serializable[0]),
-                 *   sqlQuery.getSelectList().toArray(new String[0]));
-                 *   resultList.add(record);
-                 */
                 List<Object> fieldValues = new ArrayList<Object>();
-//                while (rs.next()) {
-//                    for (String select : sqlQuery.getSelectList()) {
-//                        fieldValues.add(rs.getObject(select));
-//                    }
-//                    ResultRecord record = new ResultRecord(fieldValues.toArray(new Serializable[0]),
-//                            sqlQuery.getSelectList().toArray(new String[0]));
-//                    resultList.add(record);
-//                }
                 String groupBy = "";
                 for (String select : sqlQuery.getSelectList()) {
                     fieldValues.add(rs.getObject(select));
@@ -153,19 +175,16 @@ public class SqlDataQueryServiceImpl implements DataQueryService {
                         groupBy += rs.getString(select) + ",";
                     }
                 }
-                
-                ResultRecord record = new ResultRecord(fieldValues.toArray(new Serializable[0]),
-                        sqlQuery.getSelectList().toArray(new String[0]));
+
+                ResultRecord record = new ResultRecord(fieldValues.toArray(new Serializable[0]), meta);
                 record.setGroupBy(groupBy);
                 resultList.add(record);
-                // }
             }
         });
-        TesseractResultSet result = new SearchResultSet(resultList);
-        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_END,
-            "queryForDocListWithSQLQuery", "[sqlQuery:" + sqlQuery + "][dataSource:" + dataSource
-                + "][limitStart:" + limitStart + "][limitEnd:" + limitEnd + "]"));
-        return result;
+        LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_END, "querySqlList", "[sqlQuery:" + sqlQuery
+                + "][dataSource:" + dataSource + "][limitStart:" + limitStart + "][limitEnd:" + limitEnd + "] cost"
+                + (System.currentTimeMillis() - current + "ms!")));
+        return resultList;
     }
     
     /*
@@ -190,5 +209,26 @@ public class SqlDataQueryServiceImpl implements DataQueryService {
             "queryForListWithSql", "[sql:" + sql + "][dataSource:" + dataSource + "]"));
         return result;
     }
-    
+
+    @Override
+    public TesseractResultSet queryForListWithSQLQueryAndGroupBy(SqlQuery sqlQuery, DataSource dataSource,
+            long limitStart, long limitEnd, QueryRequest queryRequest) {
+
+        long current = System.currentTimeMillis();
+
+        LinkedList<ResultRecord> resultList = querySqlList(sqlQuery, dataSource, limitStart, limitEnd);
+        
+        LOGGER.info("query sql:" + sqlQuery.toSql() + "result size: " + resultList.size() + " cost:" + (System.currentTimeMillis() - current));
+        current = System.currentTimeMillis();
+        
+        if (CollectionUtils.isEmpty(resultList)) {
+            LOGGER.warn("no result from sql query:" + sqlQuery.toSql());
+            return new SearchResultSet(null);
+        }
+        TesseractResultSet result = new SearchResultSet(AggregateCompute.aggregate(resultList, queryRequest));
+        LOGGER.info("group by cost:" + (System.currentTimeMillis() - current));
+
+        return result;
+    }
+
 }

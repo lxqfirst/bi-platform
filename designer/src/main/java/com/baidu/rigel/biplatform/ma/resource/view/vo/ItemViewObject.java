@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 
  * ItemViewObject
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ItemViewObject implements Serializable {
@@ -60,6 +60,11 @@ public class ItemViewObject implements Serializable {
      * used，是否已经用在横轴、纵轴、条件上，供前端展现使用
      */
     private boolean used;
+    
+    /**
+     * 指标对应的图类型，纬度属性值为null
+     */
+    private String chartType;
 
     /**
      * @return the id
@@ -144,6 +149,20 @@ public class ItemViewObject implements Serializable {
     public void setUsed(boolean used) {
         this.used = used;
     }
+
+	/**
+	 * @return the chartType
+	 */
+	public String getChartType() {
+		return chartType;
+	}
+
+	/**
+	 * @param chartType the chartType to set
+	 */
+	public void setChartType(String chartType) {
+		this.chartType = chartType;
+	}
     
     
 }

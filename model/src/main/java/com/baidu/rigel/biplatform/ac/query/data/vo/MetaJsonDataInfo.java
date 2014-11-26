@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 元数据传递的json信息
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MetaJsonDataInfo implements Serializable {
@@ -95,7 +95,7 @@ public class MetaJsonDataInfo implements Serializable {
     /**
      * json对应数据信息类型
      * 
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      *
      */
     public enum MetaType {

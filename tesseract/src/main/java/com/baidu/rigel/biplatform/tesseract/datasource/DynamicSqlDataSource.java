@@ -47,7 +47,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 /**
  * 动态数据源
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DynamicSqlDataSource {

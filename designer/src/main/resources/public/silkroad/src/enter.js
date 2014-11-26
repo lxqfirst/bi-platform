@@ -30,6 +30,7 @@ define(['url', 'backbone', 'dialog'], function (Url, Backbone, dialog) {
 
                 // 后台返回数据失败
                 if (result.status && result.status !== 0) {
+                    // 异常情况，不返回response，jquery会捕获异常，进入error
                     if (result.statusInfo === '') {
                         result.statusInfo = '后台错误';
                     }
@@ -37,15 +38,14 @@ define(['url', 'backbone', 'dialog'], function (Url, Backbone, dialog) {
                         status: result.status,
                         textStatus: result.statusInfo
                     };
-                    // 抛出错误为了终止success的执行，以免扩大错误范围
-                    this.error(ajaxError, result.statusInfo);
                 }
                 else {
                     ajaxError = undefined;
+                    // 正常情况下，返回response
+                    return response;
                 }
-            }
 
-            return response;
+            }
         },
         // 如果具体调用时配置了 error，会覆盖此error
         error: function (XMLHttpRequest, textStatus, errorThrown) {

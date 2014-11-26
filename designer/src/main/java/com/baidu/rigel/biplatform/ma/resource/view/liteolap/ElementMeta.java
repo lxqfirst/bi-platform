@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * 元素的视图类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ElementMeta implements Serializable {

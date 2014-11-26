@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 行上的属性定义。
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class RowDefine implements Serializable {

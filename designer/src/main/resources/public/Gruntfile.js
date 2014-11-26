@@ -195,6 +195,10 @@ module.exports = function(grunt) {
                         ]
                     },
                     createSilkRoadBiz: {
+                        beautify: {
+                            //中文ascii化，非常有用！防止中文乱码的神配置
+                            ascii_only: true
+                        },
                         files: [
                             {
                                 src: [

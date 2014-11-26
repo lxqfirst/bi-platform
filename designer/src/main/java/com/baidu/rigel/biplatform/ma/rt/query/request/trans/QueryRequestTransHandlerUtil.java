@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.ma.rt.query.request.trans;
  * 工具类：查询请求转换处理器工具类，负载组装查询请求处理器
  * 目前提供默认支持，后续支持动态创建
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryRequestTransHandlerUtil {

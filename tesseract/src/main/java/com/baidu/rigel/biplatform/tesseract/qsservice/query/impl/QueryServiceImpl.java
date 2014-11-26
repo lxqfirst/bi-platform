@@ -71,7 +71,7 @@ import com.google.common.collect.Sets;
 /**
  * 查询接口实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service
@@ -416,6 +416,7 @@ public class QueryServiceImpl implements QueryService {
             boolean isCallBack = member.getLevel().getType().equals(LevelType.CALL_BACK);
             // 如果接到设置了下钻 或者 当前维度在行上第一个并且只有一个选中节点
             if (queryData.isExpand() || isCallBack) {
+            	memberNode.setSummary(true);
                 List<MiniCubeMember> children = metaDataService.getChildren(dataSourceInfo, cube, member, params);
                 if (CollectionUtils.isNotEmpty(children)) {
                     children.forEach((child) -> {

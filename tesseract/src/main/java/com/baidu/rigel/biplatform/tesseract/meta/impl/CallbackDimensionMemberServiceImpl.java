@@ -44,7 +44,7 @@ import com.google.common.collect.Sets;
 /**
  * callback获取member的实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service(DimensionMemberService.CALLBACK_MEMBER_SERCICE)

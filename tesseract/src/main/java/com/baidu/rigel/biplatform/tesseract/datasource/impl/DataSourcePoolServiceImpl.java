@@ -35,7 +35,7 @@ import com.baidu.rigel.biplatform.tesseract.store.service.StoreManager;
 /**
  * 数据源信息实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service

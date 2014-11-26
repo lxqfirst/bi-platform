@@ -15,6 +15,7 @@
  */
 package com.baidu.rigel.biplatform.tesseract.meta.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -30,16 +31,16 @@ import com.baidu.rigel.biplatform.ac.model.LevelType;
 import com.baidu.rigel.biplatform.ac.model.Member;
 import com.baidu.rigel.biplatform.ac.query.data.DataSourceInfo;
 import com.baidu.rigel.biplatform.ac.util.TimeRangeDetail;
+import com.baidu.rigel.biplatform.ac.util.TimeUtils;
 import com.baidu.rigel.biplatform.tesseract.exception.MetaException;
 import com.baidu.rigel.biplatform.tesseract.meta.DimensionMemberService;
-import com.baidu.rigel.biplatform.tesseract.util.TimeUtils;
 import com.google.common.collect.Lists;
 
 /**
  * 
  * 时间维度成员计算实现类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 @Service(DimensionMemberService.TIME_MEMBER_SERVICE)
@@ -48,19 +49,15 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
     /**
      * 季度名称
      */
-    private static final String[] QUARTER_NAMES = new String[]{"Q1", "Q2", "Q3", "Q4"};
-    
+    private static final String[] QUARTER_NAMES = new String[] { "Q1", "Q2", "Q3", "Q4" };
+
     /**
      * 季度月份对应关系
      */
-    private static final String[][] QUARTER_MONTH_MAPPING =
-            new String[][]{
-                new String[]{"0101", "0201", "0301"},
-                new String[]{"0401", "0501", "0601"},
-                new String[]{"0701", "0801", "0901"},
-                new String[]{"1001", "1101", "1201"}
-            };
-    
+    private static final String[][] QUARTER_MONTH_MAPPING = new String[][] { new String[] { "0101", "0201", "0301" },
+            new String[] { "0401", "0501", "0601" }, new String[] { "0701", "0801", "0901" },
+            new String[] { "1001", "1101", "1201" } };
+
     /**
      * 
      * @param cube
@@ -70,14 +67,13 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
      * @param parentMember
      * @param params
      * @return
-     * @throws MetaException 
+     * @throws MetaException
      */
-    private List<MiniCubeMember> getMembers(Cube cube, String name, Level level,
-            DataSourceInfo dataSourceInfo, MiniCubeMember parentMember, 
-            Map<String, String> params) throws MetaException {
+    private List<MiniCubeMember> getMembers(Cube cube, String name, Level level, DataSourceInfo dataSourceInfo,
+            MiniCubeMember parentMember, Map<String, String> params) throws MetaException {
         List<MiniCubeMember> members = Lists.newArrayList();
         // 判断是否依据父节点获取成员信息
-        
+
         if (parentMember != null) {
             return getMembers(cube, level, dataSourceInfo, parentMember, params);
         }
@@ -95,11 +91,11 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
      * {@inheritDoc}
      */
     @Override
-    public List<MiniCubeMember> getMembers(Cube cube, Level level, DataSourceInfo dataSourceInfo,
-            Member parentMember, Map<String, String> params) throws MetaException {
+    public List<MiniCubeMember> getMembers(Cube cube, Level level, DataSourceInfo dataSourceInfo, Member parentMember,
+            Map<String, String> params) throws MetaException {
         List<MiniCubeMember> members = Lists.newArrayList();
         // 判断是否依据父节点获取成员信息
-        
+
         if (parentMember != null) {
             switch (parentMember.getLevel().getType()) {
                 case TIME_YEARS:
@@ -123,8 +119,8 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
                     members.addAll(membersWithDayParent);
                     return members;
                 default:
-                    throw new IllegalArgumentException("Invalidate time dimension level type : " 
-                            + parentMember.getLevel().getType()); 
+                    throw new IllegalArgumentException("Invalidate time dimension level type : "
+                            + parentMember.getLevel().getType());
             }
         }
         // 如果父成员为空，根据level获取默认成员信息
@@ -140,76 +136,417 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
      * @return
      */
     private List<MiniCubeMember> genMembersWithDayParent(Level level, Member parentMember) {
-        try {
-            return genDayMembersWithParent(level, parentMember, TimeUtils.getMonthDays(null));
-        } catch (Exception e) {
-            return Lists.newArrayList();
+        // 如果为All节点，取本年到当前日期的所有天
+        if (parentMember.isAll()) {
+            return genMembersWithDayParentForAll(level, parentMember);
+        } else {
+            // 如果为非All，取当前月份的所有天
+            try {
+                return genDayMembersWithParent(level, parentMember, TimeUtils.getMonthDays(null));
+            } catch (Exception e) {
+                return Lists.newArrayList();
+            }
         }
     }
 
     /**
+     * 获取当前年份第一天到当前天的所有日期
+     * 
+     * @param level
+     * @param parentMember
+     * @return
+     */
+    private List<MiniCubeMember> genMembersWithDayParentForAll(Level level, Member parentMember) {
+        List<MiniCubeMember> members = Lists.newArrayList();
+        Calendar calNow = Calendar.getInstance();
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MONTH, Calendar.JANUARY);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        while (cal.before(calNow) || (cal.compareTo(calNow) == 0)) {
+            String day = sf.format(cal.getTime());
+            MiniCubeMember dayMember = new MiniCubeMember(day);
+            dayMember.setCaption(day);
+            dayMember.setLevel(level);
+            dayMember.setParent(parentMember);
+            dayMember.setName(day);
+            dayMember.setVisible(true);
+            dayMember.getQueryNodes().add(day);
+            members.add(dayMember);
+            cal.add(Calendar.DATE, 1);
+        }
+        return members;
+    }
+
+    /**
      * 获取成员信息（父成员为星期）
+     * 
      * @param level
      * @param parentMember
      * @return
      */
     private List<MiniCubeMember> genMembersWithWeekParent(Level level, Member parentMember) {
-        switch (level.getType()) {
-            case TIME_DAYS:
-                try {
-                    String name = parentMember.getName();
-                    Date date = TimeRangeDetail.getTime(name);
-                    TimeRangeDetail monthRange = TimeUtils.getWeekDays(date);
-                    return genDayMembersWithParent(level, parentMember, monthRange);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            case TIME_MONTHS:
-            case TIME_YEARS:
-            case TIME_QUARTERS:
-            case TIME_WEEKS:
-            default:
-                throw new IllegalArgumentException("Invalidate level type : " + level.getType() 
-                        + " with parent type : " + parentMember.getLevel().getType());
+        // 如果为All节点，取当年起始星期到当前星期
+        if (parentMember.isAll()) {
+            try {
+                // TODO 默认取当前年 jiangyichao at 2014-11-11
+                return genDayMembersWithWeekParentForAll(level, parentMember);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        } else {
+            // 获取该星期所在的所有天
+            switch (level.getType()) {
+                case TIME_DAYS:
+                    try {
+                        String name = parentMember.getName();
+                        Date date = TimeRangeDetail.getTime(name);
+                        TimeRangeDetail monthRange = TimeUtils.getWeekDays(date);
+                        return genDayMembersWithParent(level, parentMember, monthRange);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                case TIME_MONTHS:
+                case TIME_YEARS:
+                case TIME_QUARTERS:
+                case TIME_WEEKS:
+                default:
+                    throw new IllegalArgumentException("Invalidate level type : " + level.getType()
+                            + " with parent type : " + parentMember.getLevel().getType());
+            }
         }
     }
 
     /**
+     * 获取某一年的所有星期所在的第一天
+     * 
+     * @param year
+     * @return
+     */
+    private List<MiniCubeMember> genDayMembersWithWeekParentForAll(Level level, Member parentMember) throws Exception {
+        List<MiniCubeMember> members = Lists.newArrayList();
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int weekNow = cal.get(Calendar.WEEK_OF_YEAR);
+        cal.set(Calendar.MONTH, Calendar.JANUARY);
+        cal.set(Calendar.DATE, 1);
+        Date firstWeek = getFirstDayOfWeek(cal.getTime());
+        cal.setTime(firstWeek);
+        int week = 1;
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        while (week <= weekNow) {
+            String day = sf.format(cal.getTime());
+            MiniCubeMember dayMember = new MiniCubeMember(day);
+            String caption = year + "年第" + week + "周-" + day;
+            dayMember.setCaption(caption);
+            dayMember.setLevel(level);
+            dayMember.setParent(parentMember);
+            dayMember.setName(day);
+            dayMember.setVisible(true);
+            for (int i = 0; i <= 6; i++) {
+                day = sf.format(cal.getTime());
+                dayMember.getQueryNodes().add(day);
+                cal.add(Calendar.DATE, 1);
+            }
+            members.add(dayMember);
+            // cal.add(Calendar.DATE, 1);
+            week++;
+        }
+        return members;
+    }
+
+    /**
+     * 获取某个日期所在周的第一天
+     * 
+     * @param date
+     * @return
+     */
+    private Date getFirstDayOfWeek(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+        return cal.getTime();
+    }
+
+    /**
      * 获取成员信息（父成员为月份）
+     * 
      * @param level
      * @param parentMember
      * @return
      */
     private List<MiniCubeMember> genMembersWithMonthParent(Level level, Member parentMember) {
-        // [Time].[year].[month]"
-        // eg:[Time].[2014].[01]
-        String parentName = parentMember.getName();
-        String[] tmpArray = parentName.split(".");
-        if (tmpArray.length != 3) {
-            throw new IllegalStateException("parent member name is invalidate : " + parentName);
+        if (parentMember.isAll()) {
+            return genMembersWithMonthParentForAll(level, parentMember);
+        } else {
+            // [Time].[year].[month]"
+            // eg:[Time].[2014].[01]
+            String parentName = parentMember.getName();
+            switch (level.getType()) {
+            // 获取当前月的所有天数
+                case TIME_DAYS:
+                    String year = parentName.substring(0, 4);
+                    String month = parentName.substring(4, 6);
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.YEAR, Integer.valueOf(year));
+                    cal.set(Calendar.MONTH, Integer.valueOf(month) - 1);
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    TimeRangeDetail monthRange = TimeUtils.getMonthDays(cal.getTime(), 0, 0);
+                    try {
+                        return genDayMembersWithParent(level, parentMember, monthRange);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    // TODO 支持粒度由小到大
+                case TIME_MONTHS:
+                case TIME_YEARS:
+                case TIME_QUARTERS:
+                case TIME_WEEKS:
+                    // TODO 获取当前月份的所有星期
+                    return genMembersFromOtherToWeek(level, parentMember);
+                default:
+                    throw new IllegalArgumentException("Invalidate level type : " + level.getType()
+                            + " with parent type : " + parentMember.getLevel().getType());
+            }
         }
+    }
+
+    /**
+     * 
+     * @param level
+     * @param parentMember
+     * @param members
+     * 
+     */
+    private List<MiniCubeMember> genMembersWithMonthParentForAll(Level level, Member parentMember) {
+        List<MiniCubeMember> members = Lists.newArrayList();
+        Calendar cal = Calendar.getInstance();
+        int nowMonth = cal.get(Calendar.MONTH); // 当前月份-1
+        int year = cal.get(Calendar.YEAR); // 当前年份
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        for (int i = 0; i <= nowMonth; i++) {
+            cal.set(year, i, 1); // 设置每月第一天
+            String day = sf.format(cal.getTime());
+            String month = day.substring(4, 6);
+            String caption = year + "年" + month + "月";
+            MiniCubeMember firstDayOfMonth = new MiniCubeMember(day);
+            firstDayOfMonth.setCaption(caption);
+            firstDayOfMonth.setLevel(level);
+            firstDayOfMonth.setParent(parentMember);
+            firstDayOfMonth.setName(day);
+            firstDayOfMonth.setVisible(true);
+            int daysOfMonth = cal.getActualMaximum(Calendar.DATE);
+            for (int j = 0; j < daysOfMonth; j++) {
+                firstDayOfMonth.getQueryNodes().add(sf.format(cal.getTime()));
+                cal.add(Calendar.DATE, 1);
+            }
+            members.add(firstDayOfMonth);
+        }
+        return members;
+    }
+
+    /**
+     * 通过父成员获取成员信息（父成员为季度）
+     * 
+     * @param level
+     * @param parentMember
+     * @return
+     * 
+     */
+    private List<MiniCubeMember> genMembersWithQuarterParent(Level level, Member parentMember) {
+        if (parentMember.isAll()) {
+            return genMembersWithQuarterParentForAll(level, parentMember);
+        } else {
+            // [Time].[year].[quarter]"
+            // eg:[Time].[2014].[Q1]
+            String name = parentMember.getName();
+            String year = name.substring(0, 4);
+            String month = name.substring(4, 6);
+            String quarterStr = "Q" + (Integer.valueOf(month) / 3 + 1);
+            String[] tmpArray = { "[Time]", "[" + year + "]", "[" + quarterStr + "]" };
+            int quarterIndex = Integer.valueOf(tmpArray[2].substring(2, 3)) - 1;
+            switch (level.getType()) {
+                case TIME_MONTHS:
+                    return genMonthMemberWithQuarterParent(level, parentMember, name, tmpArray, quarterIndex);
+                case TIME_DAYS:
+                    String time = tmpArray[1].substring(1, 5) + QUARTER_MONTH_MAPPING[quarterIndex][1];
+                    try {
+                        TimeRangeDetail monthRange = TimeUtils.getMonthDays(TimeRangeDetail.getTime(time), 1, 1);
+                        try {
+                            return genDayMembersWithParent(level, parentMember, monthRange);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                case TIME_YEARS:
+                case TIME_QUARTERS:
+                case TIME_WEEKS:
+                    return genMembersFromOtherToWeek(level, parentMember);
+                default:
+                    throw new IllegalArgumentException("Invalidate level type : " + level.getType()
+                            + " with parent type : " + parentMember.getLevel().getType());
+            }
+        }
+    }
+
+    /**
+     * 获取当前年的所有季度
+     * 
+     * @param level
+     * @param parentMember
+     * @return
+     */
+    private List<MiniCubeMember> genMembersWithQuarterParentForAll(Level level, Member parentMember) {
+        List<MiniCubeMember> members = Lists.newArrayList();
+        Calendar cal = Calendar.getInstance(); // 当前日期
+        cal.set(Calendar.DAY_OF_MONTH, 1); // 设置1号
+        int nowMonth = cal.get(Calendar.MONTH) + 1; // 当前月份
+        int quarterIndex = nowMonth / 3; // 季度索引
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        for (int i = 0; i <= quarterIndex; i++) {
+            cal.set(Calendar.MONTH, i * 3);// 设置季度所在的首月
+            cal.set(Calendar.DATE, 1);
+            Calendar calEnd = Calendar.getInstance();
+            calEnd.setTime(cal.getTime());
+            calEnd.add(Calendar.MONTH, 2);
+            calEnd.add(Calendar.DATE, calEnd.getActualMaximum(Calendar.DATE)-1); // 截止日期
+            String day = sf.format(cal.getTime());
+            String year = day.substring(0, 4);
+            String caption = year + "年第" + (i + 1) + "季度";
+            MiniCubeMember firstDayOfQuarter = new MiniCubeMember(day);
+            firstDayOfQuarter.setCaption(caption);
+            firstDayOfQuarter.setLevel(level);
+            firstDayOfQuarter.setParent(parentMember);
+            firstDayOfQuarter.setName(day);
+            firstDayOfQuarter.setVisible(true);
+            while (cal.before(calEnd) || (cal.compareTo(calEnd) == 0)) {
+                firstDayOfQuarter.getQueryNodes().add(sf.format(cal.getTime()));
+                cal.add(Calendar.DATE, 1);
+            }
+            members.add(firstDayOfQuarter);
+        }
+        return members;
+    }
+
+    /**
+     * 获取天成员信息
+     * 
+     * @param level
+     * @param parentMember
+     * @param time
+     * @return
+     * @throws Exception
+     * 
+     */
+    private List<MiniCubeMember> genDayMembersWithParent(Level level, Member parentMember, TimeRangeDetail range)
+            throws Exception {
+        String[] days = range.getDays();
+        List<MiniCubeMember> members = Lists.newArrayList();
+        for (String day : days) {
+            MiniCubeMember dayMember = new MiniCubeMember(day);
+            dayMember.setCaption(day);
+            dayMember.setLevel(level);
+            dayMember.setParent(parentMember);
+            dayMember.setName(day);
+            dayMember.setVisible(true);
+            dayMember.getQueryNodes().add(day);
+            members.add(dayMember);
+        }
+        return members;
+    }
+
+    /**
+     * 通过父成员获取月成员信息（父成员为季度）
+     * 
+     * @param level
+     * @param parentMember
+     * @param name
+     * @param tmpArray
+     * @param quarterIndex
+     * 
+     */
+    private List<MiniCubeMember> genMonthMemberWithQuarterParent(Level level, Member parentMember, String name,
+            String[] tmpArray, int quarterIndex) {
+        List<MiniCubeMember> members = Lists.newArrayList();
+        Calendar cal = Calendar.getInstance();
+        String[] months = QUARTER_MONTH_MAPPING[quarterIndex];
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        for (String month : months) {
+            String memberName = "[Time]." + tmpArray[1] + ".[" + month.substring(0, 2) + "]";
+            MiniCubeMember monthMember = new MiniCubeMember(memberName);
+            monthMember.setCaption(tmpArray[1].substring(1, 5) + "年" + month.substring(0, 2) + "月");
+            monthMember.setLevel(level);
+            monthMember.setName(tmpArray[1].substring(1, 5) + month);
+            monthMember.setParent(parentMember);
+            monthMember.setVisible(true);
+            cal.set(Calendar.YEAR, Integer.valueOf(tmpArray[1].substring(1, 5)));
+            cal.set(Calendar.MONTH, Integer.valueOf(month.substring(0, 2))-1);
+            cal.set(Calendar.DATE, 1);
+            int daysOfMonth = cal.getActualMaximum(Calendar.DATE);
+            for (int i = 0; i<daysOfMonth; i++) {
+                String day = sf.format(cal.getTime());
+                monthMember.getQueryNodes().add(day);
+                cal.add(Calendar.DATE, 1);
+            }
+            members.add(monthMember);
+        }
+        return members;
+    }
+
+    /**
+     * 通过父成员获取成员信息（父成员为年）
+     * 
+     * @param level
+     * @param parentMember
+     */
+    private List<MiniCubeMember> genMembersWithYearParent(Level level, Member parentMember) {
+        int year = Integer.valueOf(parentMember.getCaption());
         switch (level.getType()) {
-            case TIME_DAYS:
-                String year = tmpArray[1].substring(1, 5);
-                String month = tmpArray[2].substring(1, 3);
-                Calendar cal = Calendar.getInstance();
-                cal.set(Calendar.YEAR, Integer.valueOf(year));
-                cal.set(Calendar.MONTH, Integer.valueOf(month) - 1);
-                cal.set(Calendar.DAY_OF_MONTH, 1);
-                TimeRangeDetail monthRange = TimeUtils.getMonthDays(cal.getTime(), 0, 0);
-                try {
-                    return genDayMembersWithParent(level, parentMember, monthRange);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            case TIME_MONTHS:
-            case TIME_YEARS:
             case TIME_QUARTERS:
+                return genQuarterMembersWithYear(year, level, parentMember);
+            case TIME_MONTHS:
+                return genMonthMembersWithYear(year, level, parentMember);
+            case TIME_DAYS:
+                return genDayOfYearMembers(level, parentMember, year);
             case TIME_WEEKS:
+            case TIME_YEARS:
             default:
-                throw new IllegalArgumentException("Invalidate level type : " + level.getType() 
+                throw new IllegalArgumentException("Invalidate level type : " + level.getType()
                         + " with parent type : " + parentMember.getLevel().getType());
+
         }
+    }
+
+    /**
+     * 
+     * @param level
+     * @param parentMember
+     * @param year
+     * @return
+     * 
+     */
+    private List<MiniCubeMember> genDayOfYearMembers(Level level, Member parentMember, int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, 0);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        TimeRangeDetail yearDays = TimeUtils.getYearDays(cal.getTime());
+        String[] days = yearDays.getDays();
+        List<MiniCubeMember> members = Lists.newArrayList();
+        for (String day : days) {
+            MiniCubeMember dayMember = new MiniCubeMember(day);
+            dayMember.setCaption(day);
+            dayMember.setLevel(level);
+            dayMember.setParent(parentMember);
+            dayMember.setName(day);
+            dayMember.setVisible(true);
+            members.add(dayMember);
+        }
+        return members;
     }
 
     /**
@@ -249,150 +586,6 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
     }
 
     /**
-     * 通过父成员获取成员信息（父成员为季度）
-     * @param level
-     * @param parentMember
-     * @return
-     * 
-     */
-    private List<MiniCubeMember> genMembersWithQuarterParent(Level level, Member parentMember) {
-        // [Time].[year].[quarter]"
-        // eg:[Time].[2014].[Q1]
-        String name = parentMember.getName();
-        String[] tmpArray = name.split(".");
-        if (tmpArray.length != 3) {
-            throw new IllegalArgumentException("parent member name is invalidate : " + name);
-        }
-        int quarterIndex = Integer.valueOf(tmpArray[2].substring(2, 3)) - 1;
-        switch (level.getType()) {
-            case TIME_MONTHS:
-                return genMonthMemberWithQuarterParent(level, parentMember, 
-                        name, tmpArray, quarterIndex);
-            case TIME_DAYS:
-                String time = tmpArray[1].substring(1, 5) 
-                        + QUARTER_MONTH_MAPPING[quarterIndex];
-                try {
-                    TimeRangeDetail monthRange = TimeUtils.getMonthDays(TimeRangeDetail.getTime(time), 0, 0);
-                    try {
-                        return genDayMembersWithParent(level, parentMember, monthRange);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            case TIME_YEARS:
-            case TIME_QUARTERS:
-            case TIME_WEEKS:
-            default:
-                throw new IllegalArgumentException("Invalidate level type : " + level.getType() 
-                        + " with parent type : " + parentMember.getLevel().getType());
-        }
-    }
-
-    /**
-     * 通过父成员获取天成员信息（父成员为季度）
-     * @param level
-     * @param parentMember
-     * @param time
-     * @return
-     * @throws Exception
-     * 
-     */
-    private List<MiniCubeMember> genDayMembersWithParent(Level level, Member parentMember, TimeRangeDetail range)
-            throws Exception {
-        String[] days = range.getDays();
-        List<MiniCubeMember> members = Lists.newArrayList();
-        for (String day : days) {
-            MiniCubeMember dayMember = new MiniCubeMember(day);
-            dayMember.setCaption(day);
-            dayMember.setLevel(level);
-            dayMember.setParent(parentMember);
-            dayMember.setName(day);
-            dayMember.setVisible(true);
-            members.add(dayMember);
-        }
-        return members;
-    }
-
-    /**
-     * 通过父成员获取月成员信息（父成员为季度）
-     * @param level
-     * @param parentMember
-     * @param name
-     * @param tmpArray
-     * @param quarterIndex
-     * 
-     */
-    private List<MiniCubeMember> genMonthMemberWithQuarterParent(Level level, Member parentMember, String name,
-        String[] tmpArray, int quarterIndex) {
-        List<MiniCubeMember> members = Lists.newArrayList();
-        String[] months = QUARTER_MONTH_MAPPING[quarterIndex];
-        for (String month : months) {
-            String memberName = "[Time]." + tmpArray[1] + ".[" + month.substring(0, 2) + "]";
-            MiniCubeMember monthMember = new MiniCubeMember(memberName);
-            monthMember.setCaption(month.substring(0, 2) + "月");
-            monthMember.setLevel(level);
-            monthMember.setName(name);
-            monthMember.setParent(parentMember);
-            monthMember.setVisible(true);
-            members.add(monthMember);
-        }
-        return members;
-    }
-
-    /**
-     * 通过父成员获取成员信息（父成员为年）
-     * @param level
-     * @param parentMember
-     */
-    private List<MiniCubeMember> genMembersWithYearParent(Level level, Member parentMember) {
-        int year = Integer.valueOf(parentMember.getCaption());
-        switch (level.getType()) {
-            case TIME_QUARTERS:
-                return genQuarterMembersWithYear(year, level, parentMember);
-            case TIME_MONTHS:
-                return genMonthMembersWithYear(year, level, parentMember);
-            case TIME_DAYS:
-                return genDayOfYearMembers(level, parentMember, year);
-            case TIME_WEEKS:
-            case TIME_YEARS:
-            default:
-                throw new IllegalArgumentException("Invalidate level type : " + level.getType() 
-                        + " with parent type : " + parentMember.getLevel().getType());
-                
-        }
-    }
-
-    /**
-     * 
-     * @param level
-     * @param parentMember
-     * @param year
-     * @return
-     * 
-     */
-    private List<MiniCubeMember> genDayOfYearMembers(Level level, Member parentMember, int year) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.MONTH, 0);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        TimeRangeDetail yearDays = TimeUtils.getYearDays(cal.getTime());
-        String[] days = yearDays.getDays();
-        List<MiniCubeMember> members = Lists.newArrayList();
-        for (String day : days) {
-            MiniCubeMember dayMember = new MiniCubeMember(day);
-            dayMember.setCaption(day);
-            dayMember.setLevel(level);
-            dayMember.setParent(parentMember);
-            dayMember.setName(day);
-            dayMember.setVisible(true);
-            members.add(dayMember);
-        }
-        return members;
-    }
-
-    /**
      * 
      * @param level
      * @param parentMember
@@ -421,11 +614,10 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
         String firstDayOfWeek = TimeUtils.getWeekDays(null).getStart();
         MiniCubeMember weekMember = new MiniCubeMember(firstDayOfWeek);
         try {
-            weekMember.setCaption(firstDayOfWeek.substring(0, 4) +  "-" 
-                    + TimeUtils.getWeekIndex(firstDayOfWeek) + "W");
+            weekMember.setCaption(firstDayOfWeek.substring(0, 4) + "-" + TimeUtils.getWeekIndex(firstDayOfWeek) + "W");
         } catch (Exception e) {
-            throw new RuntimeException("Invalidate date formate, expected [yyyyMMdd] "
-                    + "partten, but was : " + firstDayOfWeek);
+            throw new RuntimeException("Invalidate date formate, expected [yyyyMMdd] " + "partten, but was : "
+                    + firstDayOfWeek);
         }
         weekMember.setLevel(level);
         weekMember.setParent(parentMember);
@@ -467,7 +659,7 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
     private List<MiniCubeMember> genQuarterMembersWithYear(int year, Level level, Member parentMember) {
         List<MiniCubeMember> rs = Lists.newArrayList();
         for (int i = 0; i < 4; ++i) {
-            String name = "[Time].[" + year + "].[" + QUARTER_NAMES[i] + "]"; 
+            String name = "[Time].[" + year + "].[" + QUARTER_NAMES[i] + "]";
             MiniCubeMember quarterMember = new MiniCubeMember(name);
             quarterMember.setCaption(QUARTER_NAMES[i]);
             quarterMember.setLevel(level);
@@ -482,6 +674,7 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
     /**
      * 
      * 依据当前时间生成时间维度成员（适用于年粒度，返回当前年）
+     * 
      * @param level
      * @param parentMember
      * @return
@@ -502,9 +695,8 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
      * {@inheritDoc}
      */
     @Override
-    public MiniCubeMember getMemberFromLevelByName(DataSourceInfo dataSourceInfo, Cube cube,
-            Level level, String name, MiniCubeMember parent, Map<String, String> params)
-            throws MetaException {
+    public MiniCubeMember getMemberFromLevelByName(DataSourceInfo dataSourceInfo, Cube cube, Level level, String name,
+            MiniCubeMember parent, Map<String, String> params) throws MetaException {
         if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("name can not be null");
         }
@@ -529,64 +721,67 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
         return null;
     }
 
-
     /**
      * 
      * @param level
      * @param name
      * @param members
-     * @throws Exception 
+     * @throws Exception
      */
     private void getMembersByStartDate(Level level, String name, List<MiniCubeMember> members) throws Exception {
         Date date = TimeRangeDetail.getTime(name);
         switch (level.getType()) {
             case TIME_YEARS:
                 TimeRangeDetail detail = TimeUtils.getYearDays(date);
+                MiniCubeMember yearDayMember = new MiniCubeMember(detail.getStart());
+                yearDayMember.setCaption(detail.getStart());
+                yearDayMember.setLevel(level);
+                yearDayMember.setParent(null);
+                yearDayMember.setName(detail.getStart());
+                yearDayMember.setVisible(true);
                 for (String day : detail.getDays()) {
-                    MiniCubeMember yearDayMember = new MiniCubeMember(day);
-                    yearDayMember.setCaption(day);
-                    yearDayMember.setLevel(level);
-                    yearDayMember.setParent(null);
-                    yearDayMember.setName(day);
-                    yearDayMember.setVisible(true);
-                    members.add(yearDayMember);
+                    yearDayMember.getQueryNodes().add(day);
                 }
+                members.add(yearDayMember);
                 break;
             case TIME_QUARTERS:
                 TimeRangeDetail qurterDetail = TimeUtils.getQuarterDays(date);
+                MiniCubeMember quarterDayMember = new MiniCubeMember(qurterDetail.getStart());
+                quarterDayMember.setCaption(name);
+                quarterDayMember.setLevel(level);
+                quarterDayMember.setParent(null);
+                quarterDayMember.setName(name);
+                quarterDayMember.setVisible(true);
                 for (String day : qurterDetail.getDays()) {
-                    MiniCubeMember quarterDayMember = new MiniCubeMember(day);
-                    quarterDayMember.setCaption(name);
-                    quarterDayMember.setLevel(level);
-                    quarterDayMember.setParent(null);
-                    quarterDayMember.setName(name);
-                    quarterDayMember.setVisible(true);
-                    members.add(quarterDayMember);
+                    quarterDayMember.getQueryNodes().add(day);
                 }
+                members.add(quarterDayMember);
                 break;
             case TIME_MONTHS:
                 TimeRangeDetail monthDetail = TimeUtils.getMonthDays(date);
+                MiniCubeMember monthDayMember = new MiniCubeMember(monthDetail.getStart());
+                monthDayMember.setCaption(monthDetail.getStart());
+                monthDayMember.setLevel(level);
+                monthDayMember.setParent(null);
+                monthDayMember.setName(monthDetail.getStart());
+                monthDayMember.setVisible(true);
                 for (String day : monthDetail.getDays()) {
-                    MiniCubeMember monthDayMember = new MiniCubeMember(day);
-                    monthDayMember.setCaption(day);
-                    monthDayMember.setLevel(level);
-                    monthDayMember.setParent(null);
-                    monthDayMember.setName(day);
-                    monthDayMember.setVisible(true);
-                    members.add(monthDayMember);
-                }               
+                    monthDayMember.getQueryNodes().add(day);
+                }
+                members.add(monthDayMember);
                 break;
             case TIME_WEEKS:
                 TimeRangeDetail weekDetail = TimeUtils.getWeekDays(date);
+                MiniCubeMember weekDayMember = new MiniCubeMember(weekDetail.getStart());
+                weekDayMember.setLevel(level);
+                weekDayMember.setVisible(true);
+                weekDayMember.setParent(null);
+                weekDayMember.setCaption(weekDetail.getStart());
+                weekDayMember.setName(weekDetail.getStart());
                 for (String day : weekDetail.getDays()) {
-                    MiniCubeMember weekDayMember = new MiniCubeMember(day);
-                    weekDayMember.setCaption(day);
-                    weekDayMember.setLevel(level);
-                    weekDayMember.setParent(null);
-                    weekDayMember.setName(day);
-                    weekDayMember.setVisible(true);
-                    members.add(weekDayMember);
-                }               
+                    weekDayMember.getQueryNodes().add(day);
+                }
+                members.add(weekDayMember);
                 break;
             case TIME_DAYS:
                 MiniCubeMember dayMember = new MiniCubeMember(name);
@@ -600,5 +795,104 @@ public class TimeDimensionMemberServiceImpl implements DimensionMemberService {
             default:
                 throw new IllegalStateException("Invalidate time dimension level type : " + level.getType());
         }
+    }
+
+    /**
+     * 当从其他时间维度下钻到周粒度时的处理措施
+     * 
+     * @param level
+     * @param parentMember
+     * @return
+     */
+    private List<MiniCubeMember> genMembersFromOtherToWeek(Level level, Member parentMember) {
+        List<MiniCubeMember> members = Lists.newArrayList();
+        String parentName = parentMember.getName();
+        String year = parentName.substring(0, 4);
+        String month = parentName.substring(4, 6);
+        int quarterIndex = Integer.valueOf(month) - 1; // 季度索引
+        Calendar cal = Calendar.getInstance();
+        Date now = cal.getTime(); // 当前日期
+        Date nowWeek = this.getFirstDayOfWeek(now); // 当前日期所在的周一
+
+        cal.set(Calendar.YEAR, Integer.valueOf(year));
+        cal.set(Calendar.MONTH, Integer.valueOf(month) - 1);
+        cal.set(Calendar.DATE, 1);
+        cal.setFirstDayOfWeek(Calendar.MONDAY);
+
+        SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd");
+        int count = 1; // 周计数
+        Date firstDay = cal.getTime();
+        Date firstWeek = this.getFirstDayOfWeek(firstDay); // 当前季度第一天所在周的第一天
+        Date lastDay;
+        Date lastWeek;
+        int daysOfMonth;
+        switch (parentMember.getLevel().getType()) {
+            case TIME_YEARS:
+                break;
+            case TIME_QUARTERS:
+                cal.add(Calendar.MONTH, 2); // 当前季度的最后一个月份
+                daysOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH); // 最后一个月天数
+                cal.add(Calendar.DATE, daysOfMonth);
+                lastDay = cal.getTime(); // 截止日期
+                lastWeek = this.getFirstDayOfWeek(lastDay); // 截止日期所在的周一
+                // 将当月最后一天的所在的周一同当前日期比较
+                if (nowWeek.before(lastWeek) || (nowWeek.compareTo(lastWeek) == 0)) {
+                    lastWeek = nowWeek;
+                }
+                cal.setTime(firstWeek); // 将日期设置为当前月第一天所在的周一
+                while (cal.getTime().before(lastWeek) || (cal.getTime().compareTo(lastWeek) == 0)) {
+                    String day = sf.format(cal.getTime());
+                    String caption = "第" + (quarterIndex + 1) + "季度第" + count + "周";
+                    caption = caption + day;
+                    MiniCubeMember dayMember = new MiniCubeMember(day);
+                    dayMember.setCaption(caption);
+                    dayMember.setLevel(level);
+                    dayMember.setParent(parentMember);
+                    dayMember.setName(day);
+                    dayMember.setVisible(true);
+                    for (int i = 0; i <= 6; i++) {
+                        dayMember.getQueryNodes().add(sf.format(cal.getTime()));
+                        cal.add(Calendar.DATE, 1);
+                    }
+                    members.add(dayMember);
+                    // cal.add(Calendar.DATE, 1);
+                    count++;
+                }
+                break;
+            case TIME_MONTHS:
+                daysOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH); // 本月一共有多少天
+                cal.add(Calendar.DATE, daysOfMonth);
+                lastDay = cal.getTime(); // 截止日期
+                lastWeek = this.getFirstDayOfWeek(lastDay); // 截止日期所在的周一
+                // 将当月最后一天的所在的周一同当前日期比较
+                if (nowWeek.before(lastWeek) || (nowWeek.compareTo(lastWeek) == 0)) {
+                    lastWeek = nowWeek;
+                }
+                cal.setTime(firstWeek); // 将日期设置为当前月第一天所在的周一
+                while (cal.getTime().before(lastWeek) || (cal.getTime().compareTo(lastWeek) == 0)) {
+                    String day = sf.format(cal.getTime());
+                    String caption = month + "月第" + count + "周";
+                    MiniCubeMember dayMember = new MiniCubeMember(day);
+                    dayMember.setCaption(caption);
+                    dayMember.setLevel(level);
+                    dayMember.setParent(parentMember);
+                    dayMember.setName(day);
+                    dayMember.setVisible(true);
+                    for (int i = 0; i <= 6; i++) {
+                        dayMember.getQueryNodes().add(sf.format(cal.getTime()));
+                        cal.add(Calendar.DATE, 1);
+                    }
+                    members.add(dayMember);
+                    // cal.add(Calendar.DATE, 1);
+                    count++;
+                }
+                break;
+            case TIME_WEEKS:
+                break;
+            case TIME_DAYS:
+                break;
+            default:
+        }
+        return members;
     }
 }

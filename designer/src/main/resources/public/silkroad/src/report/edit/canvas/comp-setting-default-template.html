@@ -1,12 +1,12 @@
-<div class="con-comp-setting-type1 j-comp-setting" data-comp-id="{{compId}}">
+<div class="con-comp-setting-type1 j-comp-setting" data-comp-id="{{compId}}" data-comp-type="{{compType}}">
     <div class="data-axis-line data-axis-line-34 j-comp-setting-line j-line-x" data-axis-type="x">
         <span class="letter">横轴:</span>
         {{each xAxis as item}}
         <div class="item hover-bg j-root-line c-m" data-id="{{item.id}}">
-            <span class="item-text j-item-text" title="{{item.caption}}（{{item.name}}）">
+            <span class="item-text j-item-text icon-font" title="{{item.caption}}（{{item.name}}）">
             {{item.caption}}{{if item.name}}（{{item.name}}）{{/if}}
             </span>
-            <span class="icon-letter j-delete" title="删除">×</span>
+            <span class="icon hide j-delete" title="删除">×</span>
         </div>
         {{/each}}
     </div>
@@ -14,10 +14,15 @@
         <span class="letter">纵轴:</span>
         {{each yAxis as item}}
         <div class="item hover-bg j-root-line c-m" data-id="{{item.id}}">
-            <span class="item-text j-item-text" title="{{item.caption}}（{{item.name}}）">
+            {{if item.chartType === null}}
+                <span class="icon-chart bar j-icon-chart" chart-type="bar" ></span>
+            {{else}}
+                <span class="icon-chart {{item.chartType}} j-icon-chart" chart-type="{{item.chartType}}" ></span>
+            {{/if}}
+            <span class="item-text j-item-text icon-font" title="{{item.caption}}（{{item.name}}）">
             {{item.caption}}{{if item.name}}（{{item.name}}）{{/if}}
             </span>
-            <span class="icon-letter j-delete" title="删除">×</span>
+            <span class="icon hide j-delete" title="删除">×</span>
         </div>
         {{/each}}
     </div>
@@ -31,5 +36,9 @@
             <span class="icon-letter j-delete" title="删除">×</span>
         </div>
         {{/each}}
+    </div>
+    <div class="data-axis-line data-axis-line-48 data-btn-line">
+        <span class="letter">设置:</span>
+        <span class="icon-letter icon-letter-btn j-set-data-format">数据格式</span>
     </div>
 </div>

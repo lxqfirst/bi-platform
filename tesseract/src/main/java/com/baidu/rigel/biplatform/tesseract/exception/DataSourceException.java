@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.tesseract.exception;
 
 /**
  * 数据源
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DataSourceException extends Exception {

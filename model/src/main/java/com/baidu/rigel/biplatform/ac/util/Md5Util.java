@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * md5加密工具类
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Md5Util {

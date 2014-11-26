@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.resource.view.dimdetail;
 import java.io.Serializable;
 
 /**
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

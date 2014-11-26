@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.ac.query.model.AxisMeta.AxisType;
 /**
  * 问题模型
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QuestionModel implements Serializable {

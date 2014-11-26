@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
 /**
  * 时间维度类型定义：包括内置时间维度和用户自定义时间维度
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public enum TimeDimType implements DimType {

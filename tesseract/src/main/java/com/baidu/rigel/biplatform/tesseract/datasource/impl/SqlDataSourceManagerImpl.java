@@ -43,7 +43,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 /**
  * 数据库的数据源管理实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  */
 public class SqlDataSourceManagerImpl implements DataSourceManager {
 

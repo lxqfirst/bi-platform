@@ -21,7 +21,7 @@ import java.util.Set;
 /**
  * 
  * 衍生指标（计算成员）定义：衍生指标（计算成员）是指在原有基础指标基础之上通过一定的计算表达式完成的计算指标
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ExtendMinicubeMeasure extends MiniCubeMeasure {

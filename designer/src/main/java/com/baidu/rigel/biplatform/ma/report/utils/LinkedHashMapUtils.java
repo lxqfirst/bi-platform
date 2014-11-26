@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 /**
  * 处理LinkedHashMap的工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class LinkedHashMapUtils {

@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
 /**
  * 数据库信息获取工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  * 
  *         2014-7-29
  */

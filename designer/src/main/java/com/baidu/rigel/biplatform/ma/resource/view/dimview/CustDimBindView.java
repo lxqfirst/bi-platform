@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * BO类：用户自定义维度与定义视图的映射关系
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

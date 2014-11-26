@@ -24,7 +24,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
  * 文件服务状态检查http请求支持，主要为了配合ps做服务状态检查
  * 
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FileServerStatusCheckedHandler extends SimpleChannelInboundHandler<FullHttpRequest> {

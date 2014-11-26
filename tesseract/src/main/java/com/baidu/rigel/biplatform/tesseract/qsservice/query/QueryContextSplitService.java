@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryContextSplit
 /**
  * 根据查询上下文进行拆分任务
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface QueryContextSplitService {
@@ -30,7 +30,7 @@ public interface QueryContextSplitService {
     /**
      * 拆分策略
      * 
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      */
     public static enum QueryContextSplitStrategy {
         MeasureType, Column, Row;

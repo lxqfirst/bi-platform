@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 /**
  * 分页信息
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class PageInfo implements Serializable {

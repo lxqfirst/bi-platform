@@ -79,9 +79,9 @@ define([
             data[0].id = id;
             data[0].vuiRef = {
                 "mainTable": id + "-vu-table",
-                "breadcrumb": id + "-vu-table-breadcrumb",
-                "download": id + "-vu-table-download",
-                "countInfo": id + "-vu-table-count"
+                "breadcrumb": id + "-vu-table-breadcrumb"
+//                "download": id + "-vu-table-download",
+//                "countInfo": id + "-vu-table-count"
             };
 
             // 如果有拖拽区域
@@ -97,8 +97,8 @@ define([
 
             data[1].id = id + '-vu-table';
             data[2].id = id + '-vu-table-breadcrumb';
-            data[3].id = id + '-vu-table-download';
-            data[4].id = id + '-vu-table-count';
+//            data[3].id = id + '-vu-table-download';
+//            data[4].id = id + '-vu-table-count';
 
             return data;
         };

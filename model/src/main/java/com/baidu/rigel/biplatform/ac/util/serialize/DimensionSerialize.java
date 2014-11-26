@@ -28,7 +28,7 @@ import com.google.gson.JsonSerializer;
 /**
  * 维度序列化
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DimensionSerialize implements JsonSerializer<Dimension> {

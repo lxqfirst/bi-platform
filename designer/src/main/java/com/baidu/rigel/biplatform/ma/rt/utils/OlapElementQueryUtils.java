@@ -15,13 +15,16 @@
  */
 package com.baidu.rigel.biplatform.ma.rt.utils;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import com.baidu.rigel.biplatform.ac.model.Cube;
 import com.baidu.rigel.biplatform.ac.model.OlapElement;
 
 /**
  * 
  * OlapElementQueryUtils
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  * 
  */
@@ -35,12 +38,38 @@ public class OlapElementQueryUtils {
 
     /**
      * 依据OlapElement的id查询OlapElement
-     * @param defineCube 
+     * @param cube 
      * @param id olapelement's id
      * @return OlapElement is not exist return null
      */
-    public static OlapElement queryElementById(Cube defineCube, String id) {
-        return null;
+    public static OlapElement queryElementById(Cube cube, String id) {
+    		OlapElement rs = null;
+    		if (cube.getDimensions() != null) {
+    			rs  = filterElement(id, cube.getDimensions().values());
+    		}
+    		if (rs == null && cube.getMeasures() != null) {
+    			return filterElement(id, cube.getMeasures().values());
+    		}
+        return rs;
     }
+
+    /**
+     * 根据id过滤维度或者指标
+     * @param id olapelement id
+     * @param Collection<OlapElement>
+     * @return OlapElement
+     */
+	private static OlapElement filterElement(String id, Collection<? extends OlapElement> collection) {
+		if (collection == null || collection.isEmpty()) {
+			return null;
+		}
+		Stream<? extends OlapElement> stream = collection.parallelStream().filter(dim -> {
+			return dim.getId().equals(id);
+		});
+		if (stream.count() == 1) {
+			return (OlapElement) stream.toArray()[0];
+		}
+		return null;
+	}
     
 }

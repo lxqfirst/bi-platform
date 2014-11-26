@@ -24,7 +24,7 @@ import java.util.Map;
  * 我们可以认为一张报表由扩展区域组成。每一扩展区域包含区域的定义信息（逻辑模型） 参数信息（参数定义）格式样式信息（格式模型）以及扩展区域类型。
  * 通常一种扩展区域类型对应一类数据模型（待验证）
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ExtendArea implements Serializable {
@@ -64,6 +64,12 @@ public class ExtendArea implements Serializable {
      * TODO 扩展区域包含的部件
      */
     private Widget widget;
+    
+    /**
+     * 数据格式定义
+     */
+    private FormatModel formatModel = new FormatModel();;
+    
     
     public String getId() {
         return id;
@@ -175,4 +181,15 @@ public class ExtendArea implements Serializable {
     public Item getItem(String itemId) {
         return this.logicModel.getItem(itemId);
     }
+
+	/**
+	 * @return the formatModel
+	 */
+	public FormatModel getFormatModel() {
+	    if (this.formatModel == null) {
+	        this.formatModel = new FormatModel();
+	    }
+		return formatModel;
+	}
+
 }

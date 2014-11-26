@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.GsonUtils;
  * 
  * 引用关系定义：用于定义事实表和维度表之间的关联关系，在星型模型中描述引用参照关系
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ReferenceDefine implements Serializable {

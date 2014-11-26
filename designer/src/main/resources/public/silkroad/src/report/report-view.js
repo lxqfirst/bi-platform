@@ -36,6 +36,7 @@ define([
              * @public
              */
             publishReport: function (type, reportId) {
+                var that = this;
                 // 列表调用需要动态传递id
                 reportId = reportId || this.id;
 
@@ -77,6 +78,10 @@ define([
                                         }
                                     );
                                 });
+                                //window.setTimeout(that.initCopy, 2000);
+                                that.initCopy('copyUrlBtn');
+                                that.initCopy('copyTiledBtn');
+                                that.initCopy('copyEmbeddedBtn');
                             },
                             buttons: {
                                 '确定': function () {
@@ -87,6 +92,33 @@ define([
                     });
 
                 });
+            },
+
+            /**
+             * 初始化复制功能
+             *
+             * @public
+             */
+            initCopy: function (btnId) {
+                //var copyContent = '哈哈，复制成功！';
+                var clip = null;
+                clip = new ZeroClipboard.Client();
+                clip.setHandCursor(true);
+                clip.addEventListener('load', function (client) {
+                    //debugstr("Flash movie loaded and ready.");
+                });
+                clip.addEventListener('mouseOver', function (client) {
+                    // update the text on mouse over
+                    var contentId = btnId + 'CopyContent';
+                    var copyContent = $('#' + contentId).html();
+                    copyContent = copyContent.replace('&lt;', '<');
+                    copyContent = copyContent.replace('&gt;', '>');
+                    clip.setText(copyContent);
+                });
+                clip.addEventListener('complete', function (client, text) {
+                    clip.setText(copyContent);
+                });
+                clip.glue(btnId, btnId + 'Container');
             }
         });
     }

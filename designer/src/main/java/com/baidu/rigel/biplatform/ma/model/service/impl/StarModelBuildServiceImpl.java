@@ -62,7 +62,7 @@ import com.google.common.collect.Lists;
 /**
  * 星型模型构建的实现类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-29
  */
@@ -466,6 +466,11 @@ public class StarModelBuildServiceImpl implements StarModelBuildService {
     @Override
     public NormalDimDetail generateNormalDimBindView(StandardDimTableMetaDefine dimTable) {
         NormalDimDetail dim = new NormalDimDetail();
+        if (StringUtils.isEmpty(dimTable.getReference().getMajorColumn()) 
+        		    || StringUtils.isEmpty(dimTable.getReference().getSalveColumn())
+        		    || StringUtils.isEmpty(dimTable.getName())) {
+        		return null;
+        }
         dim.setCurrDim(dimTable.getReference().getMajorColumn());
         dim.setField(dimTable.getReference().getSalveColumn());
         dim.setRelationTable(dimTable.getName());

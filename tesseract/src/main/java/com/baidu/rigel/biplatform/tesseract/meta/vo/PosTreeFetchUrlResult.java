@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.tesseract.model.PosTreeNode;
 /**
  * 新的岗位树结果
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class PosTreeFetchUrlResult extends FetchUrlResult {

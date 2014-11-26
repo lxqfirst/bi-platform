@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ac.model;
 /**
  * 指标汇总类型
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public enum Aggregator {

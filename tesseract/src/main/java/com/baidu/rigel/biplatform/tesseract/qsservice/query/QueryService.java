@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryContext;
 /**
  * 结果集查询服务接口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface QueryService {

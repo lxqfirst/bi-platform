@@ -21,7 +21,7 @@ package com.baidu.rigel.biplatform.ma.model.exception;
 /**
  * HttpUrl处理异常
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class HttpUrlException extends RuntimeException {

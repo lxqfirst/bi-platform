@@ -42,7 +42,7 @@ import com.google.common.collect.Maps;
 /**
  * liteOlap的视图工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class LiteOlapViewUtils {

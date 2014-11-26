@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.ac.exception;
 
 /**
  * minicube exception
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MiniCubeException extends RuntimeException {

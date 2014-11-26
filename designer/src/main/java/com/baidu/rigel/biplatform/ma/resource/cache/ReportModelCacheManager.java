@@ -25,12 +25,13 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
 import com.baidu.rigel.biplatform.ma.report.query.ReportRuntimeModel;
 import com.baidu.rigel.biplatform.ma.report.service.ReportDesignModelService;
 import com.baidu.rigel.biplatform.ma.report.utils.ContextManager;
+import com.baidu.rigel.biplatform.ma.rt.ExtendAreaContext;
 
 /**
  * 
  * 报表缓存管理服务
  * 
- * @author peizhongyi01
+ * @author zhongyi
  * 
  *         2014-7-31
  */
@@ -209,4 +210,46 @@ public class ReportModelCacheManager {
     protected void setCacheManagerForResource(CacheManagerForResource resource) {
         this.cacheManagerForReource = resource;
     }
+    
+    /**
+     * 更新区域上下文
+     * @param areaId 区域id
+     * @param context 区域上下文
+     */
+    public void updateAreaContext(String areaId, ExtendAreaContext context) {
+    		int key = genAreaKey(areaId);
+    		cacheManagerForReource.setToCache(String.valueOf(key), context);
+    }
+
+	/**
+	 * 区域id
+	 * @param areaId
+	 * @return int
+	 */
+	private int genAreaKey(String areaId) {
+		int key = new StringBuilder()
+			    .append(areaId)
+			    .append("_^-^_")
+			    .append(ContextManager.getSessionId())
+			    .append("_^-^_")
+			    .append(ContextManager.getProductLine())
+			    .toString().hashCode();
+		return key;
+	}
+    
+    /**
+     * 
+     * 依据区域id获取区域上下文
+     * @param areaId 区域id
+     * @return ExtendAreaContext
+     * 
+     */
+    public ExtendAreaContext getAreaContext(String areaId) {
+	    	int key = genAreaKey(areaId);
+		if (cacheManagerForReource.getFromCache(String.valueOf(key)) == null) {
+			return new ExtendAreaContext();
+		}
+		return (ExtendAreaContext) cacheManagerForReource.getFromCache(String.valueOf(key));
+    }
+    
 }

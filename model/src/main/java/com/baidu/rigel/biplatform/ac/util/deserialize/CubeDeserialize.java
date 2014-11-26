@@ -27,7 +27,7 @@ import com.google.gson.JsonParseException;
 /**
  * cubef反序列化实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class CubeDeserialize implements JsonDeserializer<Cube> {

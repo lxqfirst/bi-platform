@@ -27,7 +27,7 @@ import com.baidu.rigel.biplatform.ac.model.Schema;
  * 逻辑模型查询服务，提供对逻辑模型的查询操作的支持，包括： 查询schema，查询schema包含的cube，查询cube中的维度
  * 指标信息以及获取维度、指标的成员信息等
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface LogicModelQueryService {

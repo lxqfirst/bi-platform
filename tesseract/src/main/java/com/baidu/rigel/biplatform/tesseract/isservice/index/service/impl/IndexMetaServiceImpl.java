@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -669,17 +670,18 @@ public class IndexMetaServiceImpl extends AbstractMetaService implements IndexMe
             LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_PROCESS_NO_PARAM,
                 "assignIndexShard", "assign node end"));
             
-            // 拼indexShard的分片名前缀：dataSourceKey+"_"+facttable+"_shard"+shardId
+            // 拼indexShard的分片名前缀：indexMetaId+"_shard"+shardId
             StringBuffer sb = new StringBuffer();
-            sb.append(idxMeta.getDataSourceInfo().getDataSourceKey());
+            //sb.append(idxMeta.getDataSourceInfo().getDataSourceKey());
+            sb.append(idxMeta.getIndexMetaId());
             sb.append("_");
-            if (!idxMeta.getDataDescInfo().isSplitTable()) {
-                sb.append(idxMeta.getDataDescInfo().getTableName());
-            } else {
-                // FIXME Jin 临时写法，后续要改
-                sb.append(idxMeta.getDataDescInfo().getTableName().split("_")[0]);
-            }
-            sb.append("_");
+//            if (!idxMeta.getDataDescInfo().isSplitTable()) {
+//                sb.append(idxMeta.getDataDescInfo().getTableName());
+//            } else {
+//                // FIXME Jin 临时写法，后续要改
+//                sb.append(idxMeta.getDataDescInfo().getTableName().split("_")[0]);
+//            }
+//            sb.append("_");
             sb.append("shard");
             sb.append("_");
             LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_PROCESS_NO_PARAM,
@@ -687,9 +689,12 @@ public class IndexMetaServiceImpl extends AbstractMetaService implements IndexMe
             
             // 获取 shardId，shardId是以事实表为基础进行分配，有可能同一事实表的多个Indexmeta中的索引分片的ID是连续的
             Long shardId = 0L;
-            List<IndexMeta> idxMetaList = this.getIndexMetasByFactTableName(
-                idxMeta.getFacttableName(), idxMeta.getStoreKey());
-            if (idxMetaList != null && idxMetaList.size() > 0) {
+//            List<IndexMeta> idxMetaList = this.getIndexMetasByFactTableName(
+//                idxMeta.getFacttableName(), idxMeta.getStoreKey());
+            List<IndexMeta> idxMetaList=new ArrayList<IndexMeta>();
+            idxMetaList.add(idxMeta);
+            
+            if (idxMetaList != null && idxMetaList.size() > 0 && !CollectionUtils.isEmpty(idxMeta.getIdxShardList())) {
                 shardId = getIndexShardListFromIndexMetaListOrderbyShardId(idxMetaList).get(0)
                     .getShardId();
                 shardId++;

@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 获得结果的状态
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class FetchUrlResult implements Serializable {

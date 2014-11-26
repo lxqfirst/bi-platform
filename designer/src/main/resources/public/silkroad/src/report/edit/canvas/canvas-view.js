@@ -158,12 +158,15 @@ define([
                         $realComp.attr('data-comp-id', id);
                         return $realComp.clone();
                     },
-                    // 已经拖入后初始化编辑功能
                     function () {
                         that.$el.find('[data-o_o-di="snpt"]').append($realComp);
                         that.initDrag($realComp);
                         that.initResize($realComp);
                         that.addEditBtns($realComp);
+                        $realComp.find('.j-con-edit-btns').css({
+                            'width': 'auto',
+                            'height': 'auto'
+                        }).find('.j-fold').html('－');
                         that.editCompView.hideEditBar();
                     }
                 );
@@ -201,11 +204,12 @@ define([
                 $component.draggable({
                     helper: "original",
                     scroll: true,
+                    scrollSensitivity: 100,
                     containment: this.$el.find('.j-report'),
                     opacity: 0.8, // 被拖拽元素的透明度
                     handle: ".j-drag", // 拖拽触发点
                     start: function (event, ui) {
-                        //that.addGuides(ui.helper);
+                        ui.helper.attr('data-sort-startScrrolTop', ui.helper.parent().scrollTop());
                     },
                     stop: function (event, ui) {
                         //that.removeGuides(ui.helper);

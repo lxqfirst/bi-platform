@@ -61,7 +61,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
  * @see com.baidu.rigel.biplatform.ac.model.Schema 
  * @since jdk1.8.5 or after
  * @version Silkroad1.0.1
- * @author wangyuxue
+ * @author david.wang
  * 
  * 
   */
@@ -197,6 +197,8 @@ public class SchemaManageServiceImpl implements SchemaManageService {
         level.setPrimaryKey(measure.getDefine());
         level.setVisible(true);
         level.setType(LevelType.REGULAR);
+        level.setSource(measure.getDefine());
+        level.setFactTableColumn(measure.getDefine());
         dim.addLevel(level);
         Map<String, Dimension> newDims = new LinkedHashMap<String, Dimension>();
         newDims.putAll(cube.getDimensions());

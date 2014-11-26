@@ -40,7 +40,7 @@ import com.baidu.rigel.biplatform.ac.util.ResponseResult;
  * 
  * 数据立方体接口。多维分析中的逻辑模型，通常是由对特定业务的衡量标准（指标）以及指标的属性组成（维度）。 指标构成立方体中的KPI属性，而属性则为分析KPI的角度。
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 public interface Cube extends OlapElement {

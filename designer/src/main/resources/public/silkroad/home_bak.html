@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=UTF-8">
+<title>用户登录</title>
+<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.min.js"></script>
+<script type="text/javascript">
+	$(function sub() {
+		$(document).ready(function() {
+			$('#btnlogin').click(function() {
+				name= $("#username").val();
+				pwd = $("#userpass").val();
+				if (name.length == 0) {
+					alert('请输入用户名');
+					$("#username").focus();
+				}
+                else if(pwd.length == 0) {
+					alert('请输入密码');
+					$("#userpass").focus();
+				} else {
+					dologin();
+				}
+			})
+		})
+
+		function dologin() {
+			$.ajax({
+				//客户端向服务器发送请求时采取的方式
+				type : "post",
+				cache : false,
+				//服务器返回的数据类型，可选 XML, Json, jsonp, script, html, text。
+				dataType : 'Json',
+				//指明客户端要向哪个页面里面的哪个方法发送请求
+				url : "/silkroad/login",
+				data : {
+					name : $("#username").val(),
+					pwd : $("#userpass").val(),
+				},
+				//客户端调用服务器端方法成功后执行的回调函数
+				success : function(msg) {
+					window.location="/silkroad/index.html"
+				   //$.get('www.baidu.com');
+					//$("#resText").html(msg);
+					/*
+					if (result.d=="success") {
+					    alert("登陆成功");
+					} else {
+					    alert("登录失败");
+					}*/
+				}
+			})
+		}
+	});
+</script>
+</head>
+<body>
+	<table align="center">
+		<tr>
+			<td><br> 登录名：</td>
+			<td><input type="text" id="username" value="" name="name" /></td>
+		</tr>
+		<tr>
+			<td><span></span> 密&nbsp;&nbsp;码：</td>
+			<td><input type="password" id="userpass" value="" name="pwd" />
+			</td>
+		</tr>
+		<tr>
+		<td></td>
+		<td>
+			<input type="button" id="btnlogin" value="登 录" />
+			&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="button" value="注 册" onclick="window.open('register_productline.html','_self')" />
+		</td>
+		</tr>
+	</table>
+</body>
+</html>

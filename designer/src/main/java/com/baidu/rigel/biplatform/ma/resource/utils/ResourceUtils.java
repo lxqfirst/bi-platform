@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
 /**
  * REST工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         
  */
@@ -152,6 +152,7 @@ public class ResourceUtils {
             obj.setCubeId(cubeId);
             obj.setId(item.getId());
             obj.setOlapElementId(item.getOlapElementId());
+            obj.setChartType((String) item.getParams().get("chartType"));
             if (usedItemOlapIdSet != null) {
                 obj.setUsed(usedItemOlapIdSet.contains(item.getOlapElementId()));
             }

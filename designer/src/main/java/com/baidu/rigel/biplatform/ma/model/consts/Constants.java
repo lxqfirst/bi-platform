@@ -19,7 +19,7 @@
 package com.baidu.rigel.biplatform.ma.model.consts;
 
 /**
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public interface Constants {

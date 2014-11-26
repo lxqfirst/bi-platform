@@ -133,6 +133,30 @@ public class FileUtils {
     }
     
     /**
+     * 删除目标文件
+     * @param target 待删除的文件
+     */
+	public static void deleteFile(File target) {
+		if (target.isFile() && target.exists()) {
+			target.delete();
+			return;
+		}
+		File[] fileArr = target.listFiles();
+		if(fileArr!=null && fileArr.length>0){
+			for (File file : fileArr) {
+				deleteFile(file);
+
+			}
+		}
+		if(target.exists()){
+			target.delete();
+		}
+		
+		
+		
+	}
+    
+    /**
      * 复制整个文件夹内容
      * 
      * @param oldPath

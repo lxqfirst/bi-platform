@@ -45,7 +45,7 @@ import com.baidu.rigel.biplatform.ma.report.utils.ContextManager;
  * 
  * 数据源服务实现类
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @Service("dsService")

@@ -22,7 +22,7 @@ import java.util.Properties;
  * 
  * 配置信息工具类
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ConfigUtil {

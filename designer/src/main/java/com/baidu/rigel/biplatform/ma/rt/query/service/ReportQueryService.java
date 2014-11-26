@@ -15,12 +15,15 @@
  */
 package com.baidu.rigel.biplatform.ma.rt.query.service;
 
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryRequest;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryResult;
+
 
 /**
  * 
  *  报表查询服务
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public interface ReportQueryService {

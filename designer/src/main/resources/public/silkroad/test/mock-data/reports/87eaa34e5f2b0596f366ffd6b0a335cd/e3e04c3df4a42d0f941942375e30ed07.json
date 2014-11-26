@@ -1,0 +1,37 @@
+{"statusInfo": "Success", "status": 0, "data": {
+    "reportChart": {
+        "title": "趋势图",
+        "subTitle": "",
+        "xAxisType": "category",
+        "xAxisCategories": ["包装", "印刷", "工艺品", "广告", "广告及包装其他", "广播电视服务"],
+        "yAxises": [
+            {
+                "name": "纵轴",
+                "unitName": "单位"
+            }
+        ],
+        "seriesData": [
+            {
+                "data": [210, 222, 234, 245, 356, 212],
+                "format": null,
+                "name": "展现",
+                "type": "bar",
+                "yAxisName": "test_axis"
+            },
+            {
+                "data": [1023, 1122, 987, 879, 789, 777],
+                "format": null,
+                "name": "自增ID",
+                "type": "bar",
+                "yAxisName": "test_axis"
+            },
+            {
+                "data": [567, 678, 789, 606, 555, 450],
+                "format": null,
+                "name": "点击消费",
+                "type": "bar",
+                "yAxisName": "test_axis"
+            }
+        ]
+    }
+}, "properties": {}}

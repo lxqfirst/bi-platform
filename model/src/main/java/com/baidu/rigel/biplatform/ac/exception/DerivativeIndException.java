@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.ac.exception;
 
 /**
  * 衍生指标的异常
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class DerivativeIndException extends RuntimeException {

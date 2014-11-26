@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 标准维度定义元数据描述：描述标准维度的维度表定义信息。 标准维度指：除内置时间维度，callback维度、退化维度、自定义维度之外的维度定义
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class StandardDimTableMetaDefine extends DimTableMetaDefine implements Serializable {

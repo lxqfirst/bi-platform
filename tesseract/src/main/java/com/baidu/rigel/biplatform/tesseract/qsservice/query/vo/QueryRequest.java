@@ -27,7 +27,7 @@ import com.baidu.rigel.biplatform.ac.query.data.DataSourceInfo;
 /**
  * 问题查询模型
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryRequest implements Serializable {

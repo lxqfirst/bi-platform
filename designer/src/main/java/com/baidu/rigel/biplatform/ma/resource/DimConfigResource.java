@@ -76,7 +76,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * CubeTable的页面交互
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-30
  */
@@ -205,7 +205,9 @@ public class DimConfigResource {
                 } else {
                     NormalDimDetail dateDim = starModelBuildService
                         .generateNormalDimBindView((StandardDimTableMetaDefine) dimTable);
-                    normal.getChildren().add(dateDim);
+                    if (dateDim != null) {
+                    		normal.getChildren().add(dateDim);
+                    }
                 }
             }
             

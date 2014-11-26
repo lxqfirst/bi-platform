@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * 查询分页信息
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Limit implements Serializable {
@@ -41,7 +41,7 @@ public class Limit implements Serializable {
     /**
      * size 查询的记录数
      */
-    private int size = Integer.MAX_VALUE;
+    private int size = -1;
 
     /**
      * construct with

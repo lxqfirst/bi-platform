@@ -35,7 +35,7 @@ import com.baidu.rigel.biplatform.ac.util.ResponseResult;
 /**
  * minicube sql 连接
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MiniCubeSqlConnection implements MiniCubeConnection {

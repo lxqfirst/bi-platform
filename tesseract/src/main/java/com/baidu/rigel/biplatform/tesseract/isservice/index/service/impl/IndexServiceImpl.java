@@ -395,22 +395,7 @@ public class IndexServiceImpl implements IndexService {
             } else if (!idxMeta.getIdxState().equals(IndexState.INDEX_UNAVAILABLE)) {
                 LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_PROCESS_NO_PARAM,
                     "doIndex", "process update before index"));
-                // 正常更新
-                // FIXME:更新的时候怎么快速的得到数据的增量？目前是通过要求业务系统有自增ID解决
-                // FIXME:现有实现中，只支持分表的情况，对于分库，暂不支持
-                for (String tableName : idxMeta.getDataDescInfo().getTableNameList()) {
-                    List<String> whereList = sqlQueryMap.get(tableName).getWhereList();
-                    if (whereList == null) {
-                        whereList = new ArrayList<String>();
-                    }
-                    BigDecimal maxId = idxMeta.getDataDescInfo().getMaxDataId(tableName);
-                    if (!maxId.equals(BigDecimal.ZERO)) {
-                        String where = idxMeta.getDataDescInfo().getIdStr() + " > "
-                            + maxId.longValue();
-                        whereList.add(where);
-                    }
-                    sqlQueryMap.get(tableName).setWhereList(whereList);
-                }
+                // 正常更新               
                 
                 isUpdate = Boolean.TRUE;
                 
@@ -436,6 +421,11 @@ public class IndexServiceImpl implements IndexService {
         // s4. get data & write index
         Map<String, BigDecimal> maxDataIdMap = new HashMap<String, BigDecimal>();
         
+        //8888888888888888888888888888888888888888888888
+        long startIndex=System.nanoTime();
+        
+        long totalTime=0;
+        IndexShard currIdxShard = getFreeIndexShardForIndex(idxMeta);
         for (String tableName : sqlQueryMap.keySet()) {
             SqlQuery sqlQuery = sqlQueryMap.get(tableName);
             long total = 0;
@@ -448,7 +438,13 @@ public class IndexServiceImpl implements IndexService {
             
             boolean isLastPiece = false;
             boolean isInit = true;
-            BigDecimal currMaxId = null;
+            BigDecimal currMaxId = BigDecimal.ZERO;
+            
+            //初始化maxId
+            if(idxMeta.getDataDescInfo().getMaxDataId(tableName)!=null){
+            	currMaxId=idxMeta.getDataDescInfo().getMaxDataId(tableName);
+            }
+            
             long pcount = IndexFileSystemConstants.FETCH_SIZE_FROM_DATASOURCE;
             // 目前是跟据数据量进行划分
             if (pcount > total) {
@@ -458,12 +454,21 @@ public class IndexServiceImpl implements IndexService {
                     && !CollectionUtils.isEmpty(sqlQuery.getSelectList())) {
                 sqlQuery.getSelectList().add(sqlQuery.getIdName());
             }
+            
+            String currWhereStr="";
             for (int i = 0; i * pcount < total; i++) {
-                long limitStart = i * pcount;
+                long limitStart = 0;
                 long limitEnd = pcount;
                 if ((i + 1) * pcount >= total) {
                     isLastPiece = true;
                 }
+                
+                if(sqlQuery.getWhereList().contains(currWhereStr)){
+                	sqlQuery.getWhereList().remove(currWhereStr);
+                }
+                
+                currWhereStr=sqlQuery.getIdName() + " > " + currMaxId.longValue();
+				sqlQuery.getWhereList().add(currWhereStr);
                 
                 TesseractResultSet currResult = this.dataQueryService.queryForDocListWithSQLQuery(
                     sqlQuery, dataSourceWrape, limitStart, limitEnd);
@@ -472,19 +477,27 @@ public class IndexServiceImpl implements IndexService {
                 
                 while (currResult.size() != 0) {
                     // 向索引分片中写入数据
-                    IndexShard idxShard = getFreeIndexShardForIndex(idxMeta);
-                    Map<String, Object> result = writeIndex(currResult, isInit, isUpdate, idxShard,
+					if (currIdxShard == null) {
+						currIdxShard = getFreeIndexShardForIndex(idxMeta);
+					}
+                    long startWriteIndex=System.nanoTime();
+                    Map<String, Object> result = writeIndex(currResult, isInit, isUpdate, currIdxShard,
                         isLastPiece, sqlQuery.getIdName());
+                    long endWriteIndex=System.nanoTime();
+                    
+                    totalTime=totalTime+(endWriteIndex-startWriteIndex);
+                    System.out.println("******************************************write index cost : "+(endWriteIndex-startWriteIndex)+" ns ******************************************");
                     currResult = (TesseractResultSet) result.get(RESULT_KEY_DATA);
                     currMaxId = (BigDecimal) result.get(RESULT_KEY_MAXID);
                     // 更新数据
-                    idxShard = (IndexShard) result.get(RESULT_KEY_INDEXSHARD);
+                    currIdxShard = (IndexShard) result.get(RESULT_KEY_INDEXSHARD);
                     
-                    if (idxShard.isFull() || isLastPiece) {
+                    if (currIdxShard.isFull() || isLastPiece) {
                         // 当一个分片更新后，整个cube数据存在不一致的情况，这个状态会持续到所有分片都更新完成后
                         // 这时，需要设置cube数据不可用
                         idxMeta.setIdxState(IndexState.INDEX_UNAVAILABLE);
-                        idxMeta = saveIndexShardIntoIndexMeta(idxShard, idxMeta);
+                        idxMeta = saveIndexShardIntoIndexMeta(currIdxShard, idxMeta);
+						currIdxShard = null;
                     }
                     
                     if (isInit) {
@@ -501,6 +514,10 @@ public class IndexServiceImpl implements IndexService {
             maxDataIdMap.put(tableName, currMaxId);
             
         }
+        //8888888888888888888888888888888888888888888888
+        long endIndex=System.nanoTime();
+        System.out.println("******************************************index cost : "+(endIndex-startIndex)+" ns ******************************************");
+        System.out.println("******************************************write index cost : "+totalTime +" ns ***************************************");
         idxMeta.getDataDescInfo().setMaxDataIdMap(maxDataIdMap);
         if (idxMeta.getIdxState().equals(IndexState.INDEX_AVAILABLE_NEEDMERGE)) {
             idxMeta.getCubeIdSet().addAll(idxMeta.getCubeIdMergeSet());

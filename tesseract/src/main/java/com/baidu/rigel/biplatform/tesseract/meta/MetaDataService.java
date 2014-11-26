@@ -33,7 +33,7 @@ import com.baidu.rigel.biplatform.tesseract.exception.MetaException;
 /**
  * 元数据实际查询操作接口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface MetaDataService {

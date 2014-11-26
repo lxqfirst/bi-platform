@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * MetaData视图
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class MetaData implements Serializable {

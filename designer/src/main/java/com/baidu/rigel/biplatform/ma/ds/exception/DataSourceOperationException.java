@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.ds.exception;
 /**
  * 数据源操作异常
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class DataSourceOperationException extends Exception {

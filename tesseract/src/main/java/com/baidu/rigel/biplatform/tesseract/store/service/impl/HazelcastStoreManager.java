@@ -41,7 +41,7 @@ import com.hazelcast.spring.cache.HazelcastCacheManager;
  * @author lijin
  */
 
-// TODO 需要通过factory返回StoryManager的实例，不要直接用Spring的注解 --Add by chenxiaoming01
+// TODO 需要通过factory返回StoryManager的实例，不要直接用Spring的注解 --Add by xiaoming.chen
 @Service("hazelcastStoreManager")
 public class HazelcastStoreManager implements StoreManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(HazelcastStoreManager.class);

@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * 查询来源
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class From implements Serializable {

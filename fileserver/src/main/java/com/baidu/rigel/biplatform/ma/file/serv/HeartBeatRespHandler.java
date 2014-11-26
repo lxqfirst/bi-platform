@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * 心跳检测：用于检测文件服务客户端和服务端能否正常通信
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class HeartBeatRespHandler extends ChannelHandlerAdapter {

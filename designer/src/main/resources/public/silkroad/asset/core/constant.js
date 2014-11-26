@@ -1,0 +1,1 @@
+define(function(){var a={"I,III":"千分位整数（18,383）","I,III.DD":"千分位两位小数（18,383.88）","I.DD%":"百分比两位小数（34.22%）","HH:mm:ss":"时间（13:23:22）","D天HH:mm:ss":"时间格式（2天1小时23分45秒）"},b={bar:!1,pie:!1,line:!1};return{DATA_FORMAT_OPTIONS:a,CHART_TYPES:b}});

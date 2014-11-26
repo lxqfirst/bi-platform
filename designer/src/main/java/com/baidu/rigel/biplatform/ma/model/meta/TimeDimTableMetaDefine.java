@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 
  * 时间维度表定义
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class TimeDimTableMetaDefine extends DimTableMetaDefine implements Serializable {

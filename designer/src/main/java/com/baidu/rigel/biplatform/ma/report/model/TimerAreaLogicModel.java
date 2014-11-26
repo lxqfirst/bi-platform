@@ -27,7 +27,7 @@ import com.google.common.collect.Maps;
  *  时间控件逻辑模型需要粒度信息描述
  *  
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class TimerAreaLogicModel extends LogicModel {
@@ -87,7 +87,7 @@ public class TimerAreaLogicModel extends LogicModel {
     /**
      * 时间粒度单位
      *
-     * @author wangyuxue
+     * @author david.wang
      * @version 1.0.0.1
      */
     public static enum TimeUnit {
@@ -123,7 +123,7 @@ public class TimerAreaLogicModel extends LogicModel {
      * 
      * 时间控件表示范围：如果表示当天，起止时间一致，时间范围表示完整的时间闭区间
      *
-     * @author wangyuxue
+     * @author david.wang
      * @version 1.0.0.1
      */
     public static class TimeRange implements Serializable {

@@ -30,18 +30,18 @@ import com.baidu.rigel.biplatform.ac.query.MiniCubeConnection;
 import com.baidu.rigel.biplatform.ac.query.MiniCubeDriverManager;
 import com.baidu.rigel.biplatform.ac.query.data.DataModel;
 import com.baidu.rigel.biplatform.ac.query.model.QuestionModel;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryRequest;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryResult;
 import com.baidu.rigel.biplatform.ma.rt.query.request.trans.QueryRequestTransService;
 import com.baidu.rigel.biplatform.ma.rt.query.result.trans.QueryResultBuildService;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryAction;
 import com.baidu.rigel.biplatform.ma.rt.query.service.QueryException;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryRequest;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryResult;
 import com.baidu.rigel.biplatform.ma.rt.query.service.QuestionModelBuildService;
 import com.baidu.rigel.biplatform.ma.rt.query.service.ReportQueryService;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ReportQueryServiceImpl  implements ReportQueryService {

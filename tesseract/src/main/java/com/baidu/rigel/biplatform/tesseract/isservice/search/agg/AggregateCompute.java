@@ -15,6 +15,7 @@
  */
 package com.baidu.rigel.biplatform.tesseract.isservice.search.agg;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +27,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baidu.rigel.biplatform.ac.model.Aggregator;
+import com.baidu.rigel.biplatform.ac.util.DeepcopyUtils;
 import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryMeasure;
 import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryRequest;
 import com.baidu.rigel.biplatform.tesseract.resultset.Aggregate;
+import com.baidu.rigel.biplatform.tesseract.resultset.isservice.Meta;
 import com.baidu.rigel.biplatform.tesseract.resultset.isservice.ResultRecord;
+import com.google.common.base.Splitter;
 
 /**
  * 
@@ -58,15 +61,6 @@ public class AggregateCompute {
     }
     
     /**
-     * 统计内部类耗时
-     * @author chenxiaoming01
-     *
-     */
-    static class Cost{
-        static long reduceCost = 0;
-    }
-    
-    /**
      * 聚集计算
      * 
      * @param dataList
@@ -75,58 +69,75 @@ public class AggregateCompute {
      *            原始查询请求
      * @return LinkedList<ResultRecord> 计算后的数据
      */
-    public static LinkedList<ResultRecord> aggregate(List<ResultRecord> dataList,
+    public static LinkedList<ResultRecord> aggregate(LinkedList<ResultRecord> dataList,
         int dimSize, List<QueryMeasure> queryMeasures) {
-        Stream<ResultRecord> stream = dataList.parallelStream();
+        
+        if (CollectionUtils.isEmpty(queryMeasures) || CollectionUtils.isEmpty(dataList) ||dataList.size() == 1) {
+            LOGGER.info("no need to group.");
+            return dataList;
+        }
         LinkedList<ResultRecord> result = new LinkedList<ResultRecord>();
         
+//        Set<Integer> countIndex = Sets.newHashSet();
+//        for (int i = 0 ; i < queryMeasures.size() ; i++) {
+//            if (queryMeasures.get(i).getAggregator().equals(Aggregator.COUNT)) {
+//                countIndex.add(dimSize + i);
+//            }
+//        }
         
-        Cost.reduceCost = 0;
-        
+        Meta meta = dataList.get(0).getMeta();
         long current = System.currentTimeMillis();
-        Map<String, ResultRecord> groupResult = stream.collect(Collectors.groupingBy(ResultRecord::getGroupBy,
-                Collectors.reducing(null, (x,y) ->{
-                    long reduceCurrent = System.currentTimeMillis();
-                    if(x == null){
-                        for(int i = 0; i< queryMeasures.size(); i++){
+        Map<String, ResultRecord> groupResult = dataList.parallelStream().collect(Collectors.groupingByConcurrent(ResultRecord::getGroupBy,
+                Collectors.reducing(new ResultRecord(new Serializable[meta.getFieldNameArray().length], DeepcopyUtils.deepCopy(meta)), (x,y) ->{
+                    ResultRecord var = new ResultRecord(new Serializable[meta.getFieldNameArray().length], meta);
+                    var.setGroupBy(y.getGroupBy());
+                    try {
+                        for(int i = 0; i < queryMeasures.size(); i++){
                             QueryMeasure measure = queryMeasures.get(i);
-                            //初始化 count的初始值
-                            if(measure.getAggregator().equals(Aggregator.COUNT)){
-                                ((ResultRecord) y).setField(i+dimSize, 1);
-                            }
+                            int index = i + dimSize;
+                            var.setField(i+dimSize, Aggregate.aggregate(x.getField(index), y.getField(index), measure.getAggregator()));
                         }
-                        return y;
-                    }else if(y == null){
-                        return x;
-                    } else {
-                        if(CollectionUtils.isNotEmpty(queryMeasures)){
-                            for(int i = 0; i< queryMeasures.size(); i++){
-                                QueryMeasure measure = queryMeasures.get(i);
-                                try {
-                                  Object src1 = ((ResultRecord) x).getField(i+dimSize);
-                                  Object src2 = ((ResultRecord) y).getField(i+dimSize);
-                                  ((ResultRecord) x).setField(i+dimSize, Aggregate.aggregate(src1 == null ? null:src1.toString(),src2 == null ? null:src2.toString(),measure.getAggregator()));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
-                    Cost.reduceCost += (System.currentTimeMillis() - reduceCurrent);
-                    return x;
+                    return var;
                 })));
+        LOGGER.info("group agg(sum) cost: {}ms!", (System.currentTimeMillis() - current));
+//        if (CollectionUtils.isNotEmpty(countIndex)) {
+//            current = System.currentTimeMillis();
+//           countRes = dataList.parallelStream().collect(Collectors.groupingBy(ResultRecord::getGroupBy,Collectors.counting()));
+//           LOGGER.info("group count cost:" + (System.currentTimeMillis() - current) + "ms!");
+//        }
         
-        LOGGER.info("group cost:" + (System.currentTimeMillis() - current) + "ms!,reduce cost:" + Cost.reduceCost);
+        for(String key : groupResult.keySet()) {
+            int i = 0 ;
+            for(String value : Splitter.on(',').omitEmptyStrings().split(key)) {
+                groupResult.get(key).setField(i, value);
+                i++;
+            }
+//            for (int index : countIndex) {
+//                groupResult.get(key).setField(index, countRes.get(key));
+//            }
+        }
         result.addAll(groupResult.values());
+        
         return result;
     }
 
+    /**
+     * @param resultQ
+     * @param query
+     * @return
+     */
     public static Queue<ResultRecord> aggregate(LinkedList<ResultRecord> resultQ, QueryRequest query) {
-        int dimSize = query.getSelect().getQueryProperties().size();
-        List<QueryMeasure> queryMeasures = query.getSelect().getQueryMeasures();
-        return aggregate(resultQ, dimSize, queryMeasures);
+        if (query.getGroupBy() != null && CollectionUtils.isNotEmpty(resultQ)) {
+            int dimSize = query.getSelect().getQueryProperties().size();
+            List<QueryMeasure> queryMeasures = query.getSelect().getQueryMeasures();
+            return aggregate(resultQ, dimSize, queryMeasures);
+        } else {
+            return resultQ;
+        }
     }
-    
-    
     
 }

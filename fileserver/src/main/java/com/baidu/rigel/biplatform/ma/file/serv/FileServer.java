@@ -34,9 +34,9 @@ import io.netty.handler.logging.LoggingHandler;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import com.baidu.rigel.biplatform.ma.common.file.protocol.Request;
 import com.baidu.rigel.biplatform.ma.common.file.protocol.Response;
@@ -50,7 +50,7 @@ import com.baidu.rigel.biplatform.ma.file.serv.util.LocalFileOperationUtils;
  * 
  * 文件服务器server端， 用于提供对文件服务器的文件以及目录的写操作
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FileServer extends ChannelHandlerAdapter {

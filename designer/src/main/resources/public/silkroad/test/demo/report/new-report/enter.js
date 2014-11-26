@@ -57,7 +57,7 @@ define(['backbone', 'dialog'], function (Backbone, dialog) {
     function initProduct() {
         var vmJsonPath = '../test/demo/report/new-report/vm-json';
         require(['report/component-combination/enter', vmJsonPath], function(component, VmJson) {
-            var vmJsomObject = VmJson.dateEChart;
+            var vmJsomObject = VmJson.date;
             //var vmJsomObject = VmJson.dateChart;
             //var vmJsomObject = VmJson.table;
             //var vmJsomObject = VmJson.twoTable;

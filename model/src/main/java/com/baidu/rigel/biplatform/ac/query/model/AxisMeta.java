@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * query meta in row axis
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class AxisMeta implements Serializable {
@@ -62,7 +62,7 @@ public class AxisMeta implements Serializable {
     /**
      * 查询的轴的类型
      * 
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      */
     public enum AxisType {
         /**

@@ -53,7 +53,7 @@ import com.google.common.collect.Maps;
 /**
  * 报表数据查询服务实现
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 @Service("reportModelQueryService")

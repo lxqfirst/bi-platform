@@ -216,7 +216,7 @@ public class SqlQuery {
                     sb.append(" ");
                     sb.append(where);
                     if (i < whereList.size() - 1) {
-                        sb.append("and");
+                        sb.append(" and ");
                     }
                 }
                 
@@ -224,7 +224,7 @@ public class SqlQuery {
             if (this.limitMap != null) {
                 // 处理limit
                 StringBuffer limitStringBuffer = new StringBuffer();
-                limitStringBuffer.append(" limit ");
+                
                 long limitStart = 0;
                 if (this.limitMap.get(LIMITMAP_KEY_LIMITSTART) != null) {
                     limitStart = this.limitMap.get(LIMITMAP_KEY_LIMITSTART);
@@ -233,18 +233,20 @@ public class SqlQuery {
                 if (this.limitMap.get(LIMITMAP_KEY_LIMITEND) != null) {
                     limitEnd = this.limitMap.get(LIMITMAP_KEY_LIMITEND);
                 }
-                if (limitStart >= 0) {
+                if (limitStart >= 0 && limitEnd > 0) {
+                	limitStringBuffer.append(" limit ");
                     limitStringBuffer.append(limitStart);
-                }
-                if (limitEnd > 0) {
                     limitStringBuffer.append(",");
                     limitStringBuffer.append(limitEnd);
-                }
+				} else if (limitEnd > 0) {
+					limitStringBuffer.append(" limit ");
+					limitStringBuffer.append(limitEnd);
+				}
+                
                 
                 sb.append(limitStringBuffer);
             }
         }
-        System.out.println("query sql:" + sb.toString());
         return sb.toString();
     }
     

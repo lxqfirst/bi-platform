@@ -162,10 +162,14 @@ public class SearchIndexServiceImpl implements SearchService {
             long limitSize = 0;
             if (query.getLimit() != null) {
                 limitStart = query.getLimit().getStart();
-                limitSize = query.getLimit().getSize();
+				if (query.getLimit().getSize() > 0) {
+					limitSize = query.getLimit().getSize();
+				}
+                
             }
             TesseractResultSet currResult =
-                    this.dataQueryService.queryForDocListWithSQLQuery(sqlQuery, dataSourceWrape, limitStart, limitSize);
+                    this.dataQueryService.queryForListWithSQLQueryAndGroupBy(sqlQuery, dataSourceWrape, limitStart,
+                            limitSize, query);
             LOGGER.info(String.format(LogInfoConstants.INFO_PATTERN_FUNCTION_PROCESS_NO_PARAM, "query", "db return "
                     + currResult.size() + " records"));
             result = currResult;

@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 /**
  * Meta common method
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface OlapElement extends Serializable {

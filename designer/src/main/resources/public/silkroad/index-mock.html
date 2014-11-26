@@ -4,28 +4,29 @@
     <meta charset="UTF-8">
     <title>报表平台-配置端-mock</title>
     <link type="text/css" rel="stylesheet" href="src/css/all.css"/>
-    <link rel="stylesheet" href="/silkroad/asset/css/-di-product-min.css"/>
+    <link rel="stylesheet" href="asset/css/-di-product-min.css"/>
 </head>
 <body>
 <div class="nav j-nav"></div>
+<div class="nav-placeholder"></div>
 <div class="main j-main"></div>
 <div class="foot ta-c j-foot">&copy; 版权信息</div>
 <script type="text/javascript" src="dep/require-2.1.11.js"></script>
-<script src="/silkroad/asset/-di-product-min.js"></script>
+<script src="asset/-di-product-min.js"></script>
 <script type="text/javascript">
 
     require.config({
         baseUrl: 'src/',  //本地模拟为src，线上版问asset
         paths: {
             'underscore': '../dep/underscore-1.6.0.min',
-            'jquery': '../dep/jquery-1.11.1.min',
+            'jquery': '../dep/jquery-1.11.1',
             'backbone': '../dep/backbone-1.1.2.min',
-            'template': '../dep/template-3.0.0.min',
+            'template': '../dep/template-3.0.0',
             'jqueryui': '../dep/jquery-ui.custom-1.10.4',
             'jquerydi': 'common/jquery.di',
             'dialog': 'core/dialog',
             'url': 'core/url',
-
+            'constant': 'core/constant',
             'processUrl': '../test/process-url'
         },
         shim: {
@@ -57,7 +58,7 @@
 
     require(['enter', 'processUrl'], function (main, processUrl) {
         var option = {
-            webRoot: '/silkroad/test/mock-data'
+            webRoot: 'test/mock-data'
         };
         var temp = $.ajax;
 

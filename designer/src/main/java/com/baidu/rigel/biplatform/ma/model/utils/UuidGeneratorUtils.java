@@ -22,7 +22,7 @@ import java.util.UUID;
  * 
  * UUID 生成工具类
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class UuidGeneratorUtils {

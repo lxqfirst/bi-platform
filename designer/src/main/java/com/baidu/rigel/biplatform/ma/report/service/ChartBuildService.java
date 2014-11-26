@@ -21,7 +21,7 @@ import com.baidu.rigel.biplatform.ma.report.query.pivottable.PivotTable;
 /**
  * 
  * 图形构建服务
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-14
  */
@@ -32,5 +32,5 @@ public interface ChartBuildService {
      * @param tableResult
      * @return
      */
-    DIReportChart parseToChart(PivotTable tableResult, boolean isTimeOnX);
+    DIReportChart parseToChart(PivotTable tableResult, String[] chartType, boolean isTimeChart);
 }

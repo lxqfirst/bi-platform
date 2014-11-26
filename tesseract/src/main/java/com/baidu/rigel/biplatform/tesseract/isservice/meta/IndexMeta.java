@@ -449,7 +449,7 @@ public class IndexMeta extends StoreMeta implements Serializable {
      */
     public String getFacttableName() {
         String factTable = "";
-        if (this.dataDescInfo != null && StringUtils.isEmpty(this.dataDescInfo.getTableName())) {
+        if (this.dataDescInfo != null && !StringUtils.isEmpty(this.dataDescInfo.getTableName())) {
             factTable = this.dataDescInfo.getTableName();
             if (this.dataDescInfo.isSplitTable()) {
                 factTable = this.dataDescInfo.getTableName().split(FACTTABLE_REGEX_SPLITTER)[0];

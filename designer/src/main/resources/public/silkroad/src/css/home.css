@@ -1,0 +1,310 @@
+body
+{
+    width: 100%;
+    margin:0;
+}
+/*背景图片填充区域*/
+.cover
+{
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: -10;
+    _position: absolute;
+    _top: expression(eval(document.body.scrollTop));
+    _left: expression(eval(document.body.scrollLeft));
+}
+.cover img
+{
+    width:100%;
+    height:100%;
+    border:0;
+    z-index: -9;
+}
+/* 文字居中样式 */
+.text-align {
+    text-align: center;
+}
+/* 居中样式 */
+.margin-0-auto {
+    margin: 0 auto;
+}
+/* 行内元素转换为块级元素 */
+.display-inline {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+/*主页元素框体区域*/
+.home-body {
+    position: relative;
+    width: 1200px;
+    height: 600px;
+    margin: 0 auto;
+}
+/*主页标题样式*/
+.home-title {
+    position: absolute;
+    width:50%;
+    color: white;
+    top: 120px;
+    left: 300px;
+    font-size: 40px;
+    font-family: '幼圆';
+}
+/*标题下放文字说明样式*/
+.home-content {
+    position: absolute;
+    top: 190px;
+    left: 475px;
+    width: 20%;
+    color: white;
+    font-size: 20px;
+    font-family: 'Calibri';
+}
+/*登录注册按钮框体样式*/
+.home-button {
+    position: absolute;
+    top: 230px;
+    left: 360px;
+    width: 40%;
+    padding-top: 20px;
+    text-align: center;
+    color: white;
+    font-size: 20px;
+    font-family: 'Calibri';
+}
+/*登录注册按钮样式*/
+.home-button div {
+    width: 180px;
+    height: 45px;
+    color: white;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+    font-family: "微软雅黑";
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+}
+.home-button div a{
+    line-height: 200%;
+    font-size: 20px;
+    color: white;
+    font-family: "微软雅黑";
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    height:100%;
+    padding: 0;
+    margin: 0;
+}
+.registration {
+    margin-right: 10px;
+    background-color: green;
+}
+.experience {
+    margin-left: 10px;
+    background-color: deepskyblue;
+}
+/*报表图片区域样式*/
+.home-pic {
+    position: absolute;
+    left: 100px;
+    bottom: 0;
+    width: 1000px;
+}
+.pic-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 325px;
+    width:350px;
+    height:176px;
+    background: url("img/pivbar.png");
+    z-index: 2;
+}
+.pic-table {
+    position: absolute;
+    bottom: 0;
+    left: 155px;
+    width:350px;
+    height:176px;
+    background: url("img/pictable.png");
+}
+.pic-pie {
+    position: absolute;
+    bottom: 0;
+    right: 155px;
+    width:350px;
+    height:176px;
+    background: url("img/picpie.png");
+}
+.infor-margin-top {
+    margin-top: 24px;
+}
+/*信息错误提示区域*/
+.prompt {
+    width: 250px;
+    height: 24px;
+    margin-left: 36px;
+    color: red;
+    font-family: '微软雅黑';
+    font-size: 13px;
+}
+/*注册区域标题*/
+.home-register-title {
+    position: absolute;
+    color: white;
+    top: 270px;
+    left: 200px;
+    font-size: 40px;
+    font-family: '幼圆';
+    display: none;
+}
+/*注册区域下划线*/
+.home-register-line {
+    position: absolute;
+    height: 2px;
+    width: 0;
+    background: #FFF;
+    color: white;
+    top: 320px;
+    left: 200px;
+}
+/*登录区域标题*/
+.home-sign-title {
+    position: absolute;
+    color: white;
+    top: 270px;
+    right: 240px;
+    font-size: 40px;
+    font-family: '幼圆';
+    display: none;
+}
+/*登录区域下划线*/
+.home-sign-line {
+    position: absolute;
+    height: 2px;
+    width: 0px;
+    background: #FFF;
+    color: white;
+    top: 320px;
+    right: 240px;
+}
+.register-top {
+    display: none;
+    top: 80px;
+    left: 607px;
+}
+/*登录注册框体样式*/
+.home-register-sign {
+    position: absolute;
+    width: 380px;
+    padding-bottom: 10px;
+    background: #FFF;
+    z-index: 2;
+}
+/*登录注册框体标题*/
+.register-title {
+    background: #784727;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    width: 100%;
+    color: #FFF;
+    font-family: '微软雅黑';
+    font-size: 19px;
+    font-weight: 500;
+}
+/*登录注册框体关闭按钮*/
+.register-title div {
+    width: 20px;
+    height: 20px;
+    background: url("img/close.png");
+    float: right;
+    margin-top: 1px;
+    margin-right: 20px;
+}
+.register-title div a {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+/*信息输入区域框体*/
+.register-box {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+/*输入条样式*/
+.register-infor {
+    width: 310px;
+    margin-left: 30px;
+    height: 30px;
+    border: 1px solid #919191;
+    color: #919191;
+    font-family: '微软雅黑';
+    padding-left: 5px;
+    border-radius: 3px;
+}
+/*下拉框样式*/
+.register-box span {
+    width: 310px;
+    margin-left: 30px;
+    height: 25px;
+    color: #919191;
+    font-family: '微软雅黑';
+    padding-left: 5px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+.register-box span select{
+    width: 240px;
+    height: 30px;
+    color: #919191;
+    font-family: '微软雅黑';
+    padding-left: 5px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+.term-service a {
+    text-decoration: none;
+}
+/*登录注册提交按钮*/
+.register-btn {
+    width: 220px;
+    background: royalblue;
+    border-radius: 5px;
+    margin: 0 auto;
+}
+.register-btn a {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    color: #ffffff;
+    font-family: '微软雅黑';
+    text-decoration: none;
+}
+/*登录区域标题*/
+.sign-top{
+    left: 220px;
+    top: 170px;
+    display: none;
+}
+/*下次自动登录样式*/
+.sign-next {
+    width: 200px;
+    margin-bottom:15px;
+    margin-left: 103px;
+    color: #919191;
+}
+.sign-next a {
+    color: #919191;
+    text-align: center;
+    font-family: '微软雅黑';
+    font-size: 12px;
+    text-decoration: none;
+}

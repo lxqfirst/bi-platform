@@ -513,6 +513,25 @@ define(function () {
 
     /**
      * 报表新建（编辑）-edit-canvas
+     * 更换组件的中维度图形种类
+     *
+     * @param {string} reportId 报表id
+     * @param {string} compId 报表组件id
+     * @param {string} chartType 图形种类
+     * @public
+     * @return {string} url
+     */
+    Url.changeCompItemChartType = function (reportId, componentId, olapId, chartType) {
+        return ''
+            + getExtendAreaBaseUrl(reportId, componentId)
+            + '/item/'
+            + olapId
+            + '/chart/'
+            + chartType;
+    };
+
+    /**
+     * 报表新建（编辑）-edit-canvas
      * 调序组件的数据关联配置（横轴，纵轴）
      *
      * @param {string} reportId 报表id
@@ -714,6 +733,20 @@ define(function () {
             + '/extend_measures'
             + '/'
             + measureId;
+    };
+
+    /**
+     * 报表新建（编辑）-edit-setting
+     * 获取数据格式信息
+     *
+     * @param {string} reportId 报表id
+     * @param {string} compId 组建区域的id
+     * @public
+     * @return {string} url
+     */
+    Url.getDataFormatList = function (reportId, compId) {
+        return getExtendAreaBaseUrl(reportId, compId)
+            + '/dataformat';
     };
 
     return Url;

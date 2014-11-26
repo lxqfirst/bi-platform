@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * 查询的节点属性
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryObject implements Serializable {
@@ -40,6 +40,11 @@ public class QueryObject implements Serializable {
      * leafValues 每个值对应的叶子节点
      */
     private Set<String> leafValues;
+    
+    /**
+     * isSummary 是否是汇总节点
+     */
+    private boolean isSummary;
 
     /**
      * constructor
@@ -49,6 +54,12 @@ public class QueryObject implements Serializable {
     public QueryObject(String value, Set<String> leafValues) {
         this.value = value;
         this.leafValues = leafValues;
+    }
+    
+    
+    public QueryObject(String value, Set<String> leafValues, boolean isSummary) {
+        this(value, leafValues);
+        this.isSummary = isSummary;
     }
 
     /**
@@ -145,5 +156,19 @@ public class QueryObject implements Serializable {
     public String toString() {
         return "QueryObject [value=" + value + ", leafValues=" + leafValues + "]";
     }
+
+	/**
+	 * @return the isSummary
+	 */
+	public boolean isSummary() {
+		return isSummary;
+	}
+
+	/**
+	 * @param isSummary the isSummary to set
+	 */
+	public void setSummary(boolean isSummary) {
+		this.isSummary = isSummary;
+	}
 
 }

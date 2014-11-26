@@ -57,13 +57,14 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
 import com.baidu.rigel.biplatform.ma.report.query.QueryAction;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * 
  * 
  * 查询工具类，负责将QueryAction转化城QuestionModel
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryUtils {
@@ -103,7 +104,10 @@ public class QueryUtils {
         questionModel.setCubeId(area.getCubeId());
         ((MiniCube) cube).setProductLine(dsDefine.getProductLine());
         // TODO 动态更新cube 针对查询过程中动态添加的属性 需要仔细考虑此处逻辑
-        updateLogicCubeWithSlices(cube, queryAction.getSlices().keySet(),
+        Set<Item> tmp = Sets.newHashSet();
+        tmp.addAll(queryAction.getSlices().keySet());
+        tmp.addAll(queryAction.getRows().keySet());
+        updateLogicCubeWithSlices(cube, tmp,
                 reportModel.getSchema().getCubes().get(area.getCubeId()));
         questionModel.setCube(cube);
         questionModel.setDataSourceInfo(buidDataSourceInfo(dsDefine));
@@ -241,7 +245,7 @@ public class QueryUtils {
      * @param reportModel
      * @param area
      * @param queryAction
-     * @return
+     * @return Map<AxisType, AxisMeta>
      */
     private static Map<AxisType, AxisMeta> buildAxisMeta(Schema schema,
         ExtendArea area, QueryAction queryAction) throws QueryModelBuildException {
@@ -329,6 +333,7 @@ public class QueryUtils {
     public static Cube getCubeWithExtendArea(ReportDesignModel reportModel, ExtendArea area)
             throws QueryModelBuildException {
         Cube oriCube = getCubeFromReportModel(reportModel, area);
+        Map<String, List<Dimension>> filterDims = collectFilterDim(reportModel);
         MiniCube cube = new MiniCube(area.getCubeId());
         LogicModel logicModel = area.getLogicModel();
         if (area.getType() == ExtendAreaType.SELECTION_AREA
@@ -383,13 +388,17 @@ public class QueryUtils {
                 measures.put(element.getName(), (Measure) element);
             }
         }
+        if (filterDims != null && filterDims.get(area.getCubeId()) != null) {
+        		List<Dimension> dims = filterDims.get(area.getCubeId());
+        		for(Dimension dim : dims) {
+        			dimensions.put(dim.getName(), dim);
+        		}
+        }
         cube.setDimensions(dimensions);
         cube.setMeasures(measures);
         cube.setSource(((MiniCube) oriCube).getSource());
         cube.setPrimaryKey(((MiniCube) oriCube).getPrimaryKey());
-        if (StringUtils.isEmpty(cube.getId())) {
-            cube.setId(area.getCubeId());
-        }
+        cube.setId(oriCube.getId() + "_" + area.getId());
         return cube;
     }
 
@@ -418,5 +427,28 @@ public class QueryUtils {
         rs.setLevels(levels);
         return rs;
     }
+
+    /**
+     * 
+     * @param model
+     * @return Map<String, List<Dimension>>
+     */
+    private static Map<String, List<Dimension>> collectFilterDim(ReportDesignModel model) {
+		Map<String, List<Dimension>> rs = Maps.newHashMap();
+		for (ExtendArea area : model.getExtendAreaList()) {
+			if (area.getType() == ExtendAreaType.TIME_COMP) {
+				Cube cube = model.getSchema().getCubes().get(area.getCubeId());
+				if (rs.get(area.getCubeId()) == null) {
+					List<Dimension> dims = Lists.newArrayList();
+					area.getAllItems().values().forEach(key -> {
+						dims.add(cube.getDimensions().get(key.getId()));
+					});
+					rs.put(area.getCubeId(), dims);
+				}
+	    		} 
+		}
+		return rs;
+	}
+    
 
 }

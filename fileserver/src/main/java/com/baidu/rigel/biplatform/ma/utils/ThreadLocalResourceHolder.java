@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.util.ObjectUtils;
 
 /**
  * Thread-local resource holder class, for pass data on the thread.
@@ -130,12 +129,4 @@ public abstract class ThreadLocalResourceHolder {
         LOG.debug("Removed key [" + key + "] from thread [" + Thread.currentThread().getName() + "]");
     }
 
-    /**
-     * 
-     * @return
-     */
-    public static String printAll() {
-
-        return ObjectUtils.getDisplayString(getThreadMap());
-    }
 }

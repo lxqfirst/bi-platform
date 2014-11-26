@@ -38,7 +38,7 @@ import com.baidu.rigel.biplatform.ac.query.data.vo.MetaJsonDataInfo.MetaType;
 /**
  * 对于一些对象，通过json反序列化以后，需要重新把节点的 父节点等冗余属性设置进去
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class JsonUnSeriallizableUtils {

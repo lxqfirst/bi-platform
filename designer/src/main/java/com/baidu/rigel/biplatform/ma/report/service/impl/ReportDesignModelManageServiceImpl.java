@@ -15,6 +15,7 @@
  */
 package com.baidu.rigel.biplatform.ma.report.service.impl;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -31,13 +32,14 @@ import com.baidu.rigel.biplatform.ma.report.model.LiteOlapExtendArea;
 import com.baidu.rigel.biplatform.ma.report.model.LogicModel;
 import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
 import com.baidu.rigel.biplatform.ma.report.model.TimerAreaLogicModel;
+import com.baidu.rigel.biplatform.ma.report.model.TimerAreaLogicModel.TimeRange;
 import com.baidu.rigel.biplatform.ma.report.service.ReportDesignModelManageService;
 
 /**
  * 
  * 报表模型管理接口
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 @Service("manageService")
@@ -141,9 +143,9 @@ public class ReportDesignModelManageServiceImpl implements ReportDesignModelMana
                     logger.debug("can not get item with item id : " + item.getOlapElementId());
                     return null;
                 }
-                if (item.getFormatModel() != null) {
-                    oldItem.setFormatModel(item.getFormatModel());
-                }
+//                if (item.getFormatModel() != null) {
+//                    oldItem.setFormatModel(item.getFormatModel());
+//                }
                 if (item.getParams() != null) {
                     oldItem.setParams(item.getParams());
                 }
@@ -213,6 +215,7 @@ public class ReportDesignModelManageServiceImpl implements ReportDesignModelMana
         if (area.getType() == ExtendAreaType.TIME_COMP) {
             TimerAreaLogicModel logicModel = (TimerAreaLogicModel) area.getLogicModel();
             logicModel.addTimeDimension(item, null);
+            logicModel.addRow(item);
             return;
         }
         switch (position) {
@@ -255,7 +258,19 @@ public class ReportDesignModelManageServiceImpl implements ReportDesignModelMana
             String olapElementId = itemId;
             switch (position) {
                 case X:
-                    area.getLogicModel().removeRow(olapElementId);
+                	if (area.getType() == ExtendAreaType.TIME_COMP) {
+                        TimerAreaLogicModel logicModel = (TimerAreaLogicModel) area.getLogicModel();
+                        LinkedHashMap<Item, TimeRange> items = logicModel.getTimeDimensions();
+                        for (Item item : items.keySet()) {
+                        	if (item.getId().equals(itemId)) {
+                        		logicModel.getTimeDimensions().remove(item);
+                        		break;
+                        	}
+                        }
+                        area.getLogicModel().removeRow(olapElementId);
+                	} else {
+                        area.getLogicModel().removeRow(olapElementId);
+                	}
                     break;
                 case Y:
                     area.getLogicModel().removeColumn(olapElementId);
@@ -306,6 +321,12 @@ public class ReportDesignModelManageServiceImpl implements ReportDesignModelMana
                     Item[] rows = logicModel.getRows();
                     moveItem(rows, first, second);
                     logicModel.resetRows(rows);
+                    // 如果为日期控件，修改日期维度中的顺序
+                    if (area.getType() ==ExtendAreaType.TIME_COMP) {
+                    	 TimerAreaLogicModel timerLogicModel = (TimerAreaLogicModel) logicModel;
+                         LinkedHashMap<Item, TimeRange> newTimeItems = this.moveItem(rows, timerLogicModel.getTimeDimensions());
+                         timerLogicModel.setTimeDimensions(newTimeItems);
+                    }
                     return model;
                 case Y:
                     Item[] columns = logicModel.getColumns();
@@ -349,6 +370,20 @@ public class ReportDesignModelManageServiceImpl implements ReportDesignModelMana
             }
             rows[target] = tmp;
         }
+    }
+    
+    /**
+     * 对日期维度进行重新排序
+     * @param rows  已经排序好的rows
+     * @param old   原有时间维度
+     * @return
+     */
+    private LinkedHashMap<Item, TimeRange> moveItem(Item[] rows, LinkedHashMap<Item, TimeRange> old) {
+    	LinkedHashMap<Item, TimeRange> newTimeItems = new LinkedHashMap<Item, TimeRange>();
+    	for (int i = 0; i<rows.length; i++) {
+    		newTimeItems.put(rows[i], old.get(rows[i]));
+    	}
+    	return newTimeItems;
     }
     
 }

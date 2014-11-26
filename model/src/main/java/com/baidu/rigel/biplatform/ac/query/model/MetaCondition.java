@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * 元数据的查询条件
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface MetaCondition extends Serializable {
@@ -45,7 +45,7 @@ public interface MetaCondition extends Serializable {
     /**
      * 元数据类型
      * 
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      *
      */
     public enum MetaType {

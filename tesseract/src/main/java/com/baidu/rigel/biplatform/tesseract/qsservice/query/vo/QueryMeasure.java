@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * 
- */
 package com.baidu.rigel.biplatform.tesseract.qsservice.query.vo;
 
 import java.io.Serializable;
@@ -25,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.model.Aggregator;
 /**
  * 查询的指标信息
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryMeasure implements Serializable {

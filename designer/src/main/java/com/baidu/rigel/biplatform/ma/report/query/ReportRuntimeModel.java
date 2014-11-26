@@ -18,7 +18,6 @@ package com.baidu.rigel.biplatform.ma.report.query;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +44,7 @@ import com.google.common.collect.Sets;
  * 
  * 报表运形态模型定义：用于描述运行时报表数据状态、操作状态等信息 提供报表区域更新、报表刷新操作等
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ReportRuntimeModel implements Serializable {
@@ -68,7 +67,7 @@ public class ReportRuntimeModel implements Serializable {
     /**
      * 报表数据信息key为由单次QueryAction生成的唯一id为该区域对应的数据
      */
-    private Map<String, ResultSet> datas = null;
+    private Map<String, LinkedList<ResultSet>> datas = null;
     
     /**
      * context信息：包括报表参数、过滤信息以及一些单张报表共享的全局信息
@@ -114,7 +113,7 @@ public class ReportRuntimeModel implements Serializable {
      * 
      * 
      */
-    private List<QueryAction> queryActions = null;
+    private Map<String, LinkedList<QueryAction>> queryActions = null;
     
 //    /**
 //     * 报表数据查询服务
@@ -130,8 +129,8 @@ public class ReportRuntimeModel implements Serializable {
      */
     public ReportRuntimeModel(String reportModelId) {
         this.reportModelId = reportModelId;
-        this.datas = new LinkedHashMap<String, ResultSet>();
-        queryActions = new LinkedList<QueryAction>();
+        this.datas = Maps.newConcurrentMap();
+        queryActions = Maps.newConcurrentMap();
         this.localContext = Maps.newConcurrentMap();
         this.context = new QueryContext();
     }
@@ -149,18 +148,8 @@ public class ReportRuntimeModel implements Serializable {
      * 
      * @return the datas
      */
-    public Map<String, ResultSet> getDatas() {
+    public Map<String, LinkedList<ResultSet>> getDatas() {
         return datas;
-    }
-    
-    /**
-     * set the datas
-     * 
-     * @param datas
-     *            the datas to set
-     */
-    public void setDatas(Map<String, ResultSet> datas) {
-        this.datas = datas;
     }
     
     /**
@@ -177,10 +166,7 @@ public class ReportRuntimeModel implements Serializable {
      * 
      * @return the queryActions
      */
-    public List<QueryAction> getQueryActions() {
-        if (queryActions == null) {
-            queryActions = Lists.newArrayList();
-        }
+    public Map<String, LinkedList<QueryAction>>  getQueryActions() {
         return queryActions;
     }
     
@@ -404,9 +390,22 @@ public class ReportRuntimeModel implements Serializable {
      * 
      */
     public ResultSet updateDatas(QueryAction action, ResultSet rs) {
-        this.queryActions.add(action);
+        if (this.queryActions.get(action.getExtendAreaId()) == null){
+        		LinkedList<QueryAction> actions = Lists.newLinkedList();
+        		actions.add(action);
+        		this.queryActions.put(action.getExtendAreaId(), actions);
+        } else {
+        		this.queryActions.get(action.getExtendAreaId()).add(action);
+        }
         // 缓存查询状态以及结果
-        this.datas.put(action.getDistinctId(), rs);
+        if (this.datas.get(action.getExtendAreaId()) == null) {
+        		LinkedList<ResultSet> results = Lists.newLinkedList();
+        		results.add(rs);
+        		this.datas.put(action.getExtendAreaId(), results);
+        } else {
+        		this.datas.get(action.getExtendAreaId()).add(rs);
+        }
+//        this.datas.put(action.getDistinctId(), rs);
         return rs;
     }
     
@@ -480,10 +479,15 @@ public class ReportRuntimeModel implements Serializable {
      * @return
      */
     public ResultSet getPreviousQueryResult(QueryAction previousAction) {
-        if (this.datas == null || this.datas.isEmpty()) {
-            return null;
+        if (previousAction == null) {
+        		return null;
         }
-        return this.datas.get(previousAction.getDistinctId());
+        LinkedList<ResultSet> resultList = this.datas.get(previousAction.getExtendAreaId());
+		if (resultList == null) {
+        		return null;
+        }
+        
+        return resultList.isEmpty() ? null : resultList.getLast();
     }
     
     /**
@@ -494,15 +498,17 @@ public class ReportRuntimeModel implements Serializable {
     }
     
     public QueryAction getPreviousQueryAction(String areaId) {
-        if (this.queryActions.isEmpty()) {
+        if (this.queryActions.get(areaId) == null) {
             return null;
         }
-        for (int i = queryActions.size() - 1; i >= 0; --i) {
-            if (this.queryActions.get(i).getExtendAreaId().equals(areaId)) {
-                return this.queryActions.get(i);
-            }
-        }
-        return null;
+//        for (int i = queryActions.size() - 1; i >= 0; --i) {
+//            if (this.queryActions.get(i).getExtendAreaId().equals(areaId)) {
+//                return this.queryActions.get(i);
+//            }
+//        }
+        
+        LinkedList<QueryAction> actionList = this.getQueryActions().get(areaId);
+		return actionList.isEmpty() ? null : actionList.getLast();
     }
 
     public Map<String, QueryContext> getLocalContext() {

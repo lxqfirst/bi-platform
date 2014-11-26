@@ -119,7 +119,8 @@
 
 /* 报表编辑 - 组件箱*/
 .con-report-edit .con-component-box {
-    width: 160px;
+    width: 25px;
+    height: 25px;
     overflow: hidden;
     border: 2px solid #cccccc;
     padding: 5px;
@@ -167,7 +168,6 @@
 
 /* 报表的实时展示区*/
 .canvas .report {
-    overflow: hidden;
     margin: 5px 5px 0 1px;
     overflow: auto;
     min-height: 200px;
@@ -298,12 +298,47 @@
 }
 .comp-setting .item {
     display: inline-block;
-    background: #e6e3e3;
+    background: white;
     font-size: 12px;
-    padding: 2px 23px 2px 3px;
+    padding: 2px 18px 2px 3px;
     margin: 3px;
     position: relative;
     border-radius: 3px;
+    border: 1px solid #e6e3e3;
+    height: 20px
+}
+.comp-setting .item:hover .icon{
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    display: block;
+    padding: 2px 4px;
+    border-radius: 3px;
+    background: #65b0fa;
+    color: #ffffff;
+    font-weight: normal;
+    cursor: pointer;
+}
+.comp-setting .item .icon-font {
+    /*float: left;*/
+    display: inline-block;
+    margin-top: 2px;
+}
+.comp-setting .item .icon-chart {
+    float: left;
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    cursor: pointer;
+}
+.comp-setting .item .bar {
+    background: url(../img/bar.png) no-repeat;
+}
+.comp-setting .item .pie {
+    background: url(../img/pie.png) no-repeat;
+}
+.comp-setting .item .line {
+    background: url(../img/line.png) no-repeat;
 }
 .comp-setting .icon-letter {
     right: 3px;
@@ -311,6 +346,45 @@
 }
 .canvas .active {
     border: 1px solid #65b0fa;
+}
+/*Y轴图标列表选项*/
+.comp-setting-charticons {
+    background-color: white;
+    border: 1px solid #e6e3e3;
+}
+.comp-setting-charticons .icon {
+    margin: 5px 0 5px 10px;
+    width: 30px;
+    height: 20px;
+    cursor: pointer;
+    display: block;
+}
+.comp-setting-charticons .bar {
+    background: url(../img/bar.png) no-repeat;
+}
+.comp-setting-charticons .line {
+    background: url(../img/line.png) no-repeat;
+}
+.comp-setting-charticons .pie {
+    background: url(../img/pie.png) no-repeat;
+}
+.comp-setting-charticons .bar:hover {
+    background: url(../img/bar-hover.png) no-repeat;
+}
+.comp-setting-charticons .line:hover {
+    background: url(../img/line-hover.png) no-repeat;
+}
+.comp-setting-charticons .pie:hover {
+    background: url(../img/pie-hover.png) no-repeat;
+}
+.comp-setting-charticons .bar-focus {
+    background: url(../img/bar-hover.png) no-repeat;
+}
+.comp-setting-charticons .line-focus {
+    background: url(../img/line-hover.png) no-repeat;
+}
+.comp-setting-charticons .pie-focus{
+    background: url(../img/pie-hover.png) no-repeat;
 }
 /* 保存/发布按钮 */
 .canvas .button-save-report {
@@ -405,6 +479,7 @@
 }
 /* 表1的按钮部分 */
 .con-url-a {
+    position: relative;
     float: right;
     list-style: none;
     height: 20px;
@@ -416,7 +491,7 @@
     width: 78px;
     height: 25px;
     text-align: center;
-    line-height: 22px;
+    line-height: 24px;
     background-color: #2976A4;
     margin-left: 10px;
 }
@@ -454,7 +529,7 @@
     background-color: #2976A4;
     margin-top: 100px;
     text-align: center;
-    line-height: 22px;
+    line-height: 24px;
 }
 /* 按钮连接颜色 */
 .conspan {
@@ -465,4 +540,52 @@
     word-wrap : break-word ;
     word-break: break-all;
     overflow: auto;
+}
+
+/**
+ * @name                      :数据格式设置
+ * @author                    :lizhantong
+ * @email                     :lztlovely@126.com
+ * @version                   :1.0
+ * @type                      :扩展类
+ * @explain                   :数据格式设置模块
+ * @relating                  :暂无
+ * @dependent                 :暂无
+ */
+.data-format {
+    width: 300px;
+}
+.data-format select {
+    width: 150px;
+    height: 25px;
+    margin-left: 5px;
+}
+.data-format .data-format-default {
+    padding: 10px 10px;
+    border-bottom: 1px solid #C5C5C5;
+}
+.data-format .data-format-alone {
+    padding: 10px 10px;
+}
+.data-format-alone > span {
+    float: left;
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+.data-format-alone .data-format-alone-dim {
+    float: left;
+    margin-top: 10px;
+}
+.data-format-alone-dim > span {
+    width: 110px;
+    float: left;
+    text-align: right;
+    line-height: 25px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.data-format-alone-dim > select {
+    float: left;
 }

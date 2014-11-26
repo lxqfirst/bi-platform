@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 /**
  * BO类：回调维度与回调维度定义视图之间的映射关系
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class CallbackDimBindView implements Serializable {

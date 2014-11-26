@@ -2,7 +2,7 @@ define(['template'], function (template) {
     function anonymous($data,$filename) {
         'use strict';
         $data=$data||{};
-        var $utils=template.utils,$helpers=$utils.$helpers,$each=$utils.$each,componentList=$data.componentList,group=$data.group,$index=$data.$index,$escape=$utils.$escape,item=$data.item,$out='';$out+='<div class="con-component-box j-con-component-box">\r\n    <span class="icon-letter j-component-box-fold">-</span>\r\n    <span class="icon-letter-placeholder j-component-box-fold"></span>\r\n\r\n    <select id="component-group-selector">\r\n        ';
+        var $utils=template.utils,$helpers=$utils.$helpers,$each=$utils.$each,componentList=$data.componentList,group=$data.group,$index=$data.$index,$escape=$utils.$escape,item=$data.item,$out='';$out+='<div class="con-component-box j-con-component-box">\r\n    <span class="icon-letter j-component-box-fold">+</span>\r\n    <span class="icon-letter-placeholder"></span>\r\n\r\n    <select id="component-group-selector">\r\n        ';
         $each(componentList,function(group,$index){
         $out+='\r\n        <option value="';
         $out+=$escape(group.id);

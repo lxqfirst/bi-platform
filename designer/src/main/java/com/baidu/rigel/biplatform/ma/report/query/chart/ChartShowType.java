@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.report.query.chart;
 /**
  * 图形展示的类型
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public enum ChartShowType {

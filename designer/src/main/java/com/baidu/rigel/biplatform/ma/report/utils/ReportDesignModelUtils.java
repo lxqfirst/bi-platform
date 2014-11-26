@@ -39,7 +39,7 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
  * 
  * 报表模型操作工具类，提供操作报表模型的通用方法
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ReportDesignModelUtils {
@@ -164,7 +164,7 @@ public class ReportDesignModelUtils {
      * @param cubeId
      * @return 存在返回定义，否则返回null
      */
-    public static OlapElement getDimOrIndDefineWithId(Schema schema, String cubeId, String dimOrIndId) {
+    public static OlapElement getDimOrIndDefineWithId(Schema schema, String cubeId, final String dimOrIndId) {
         if (schema == null) {
             logger.info("schema is empty");
             return null;
@@ -182,21 +182,27 @@ public class ReportDesignModelUtils {
         }
         
         if (cube.getDimensions() != null) {
-            OlapElement dim = cube.getDimensions().get(dimOrIndId);
-            if (dim != null) {
+//            OlapElement dim = cube.getDimensions().get(dimOrIndId);
+            Object[] tmp =  cube.getDimensions().values().stream().filter(dim -> {
+            		return dimOrIndId.equals(dim.getId()) || dimOrIndId.equals(dim.getName());
+            }).toArray();
+            if (tmp != null && tmp.length == 1) {
                 logger.info("get dimension for cube [{}] with id [{}]", cube, dimOrIndId);
-                return dim;
+                return (OlapElement) tmp[0];
             }
             logger.info("can not get dim from cube [{}] with id [{}]", cube, dimOrIndId);
         }
         
         if (cube.getMeasures() != null) {
-            OlapElement measure = cube.getMeasures().get(dimOrIndId);
-            if (measure != null) {
+//            OlapElement measure = cube.getMeasures().get(dimOrIndId);
+            Object[] tmp= cube.getMeasures().values().stream().filter(m ->{
+            		return dimOrIndId.equals(m.getId()) || dimOrIndId.equals(m.getName());
+            }).toArray();
+            if (tmp != null && tmp.length == 1) {
                 logger.info("get measuer for cube [{}] with id [{}]", cube, dimOrIndId);
-                return measure;
+                return (OlapElement) tmp[0];
             }
-            logger.info("can not get dim from cube [{}] with id [{}]", cube, dimOrIndId);
+            logger.info("can not get measuer from cube [{}] with id [{}]", cube, dimOrIndId);
         }
         
         logger.info("current cube [{}] 's dimensions and measurs define are empty", cube);

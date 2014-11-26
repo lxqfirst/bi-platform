@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
 /**
  * 列信息
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  * 2014-7-29
  */
@@ -29,5 +29,44 @@ public class ColumnInfo extends BaseInfo {
      * description:
      */
     private static final long serialVersionUID = 4845678017613334617L;
+    
+    /**
+     * 当前列的数据类型,后续考虑提供中立的数据类型模型
+     */
+    private String dataType;
+
+	/**
+	 * @return the dataType
+	 */
+	public String getDataType() {
+		return dataType;
+	}
+
+	/**
+	 * @param dataType the dataType to set
+	 */
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+    
+    
     
 }

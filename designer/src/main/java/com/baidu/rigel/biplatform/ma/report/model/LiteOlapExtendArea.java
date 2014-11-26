@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * liteOlap区域的对象
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class LiteOlapExtendArea extends ExtendArea {

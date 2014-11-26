@@ -14,7 +14,12 @@ define(function () {
      */
     var FloatWindow = function (options) {
         var me = this;
-        this.options = options;
+        var defaultOptions = {
+            direction: 'align', // align:水平方向; vertical: 垂直方向
+            html: ''
+        };
+        $.extend(defaultOptions, options);
+        this.options = defaultOptions;
         this.render();
         bindEvents(me.el);      
     };
@@ -46,7 +51,9 @@ define(function () {
      * @param {HTMLElement} target Element 触发点击事件的dom元素
      */
     FloatWindow.prototype.show = function (target) {
+        // TODO:目前支持左右下拉框，扩展上下下拉框
         var me = this;
+        var options = me.options;
         var $el = $(me.el);
         var elWidth = $el.outerWidth();
         var elHeight = $el.outerHeight();
@@ -68,51 +75,64 @@ define(function () {
         // 触发者的上距 + 触发者高度
         var h = topTarget + targetHeight;
 
-        // 如果     body的距离  -  (触发者的左间距 +宽度) < 浮窗的宽度 ，
-        // 那么，就在触发者左边显示
-        // left值为 ：触发者的左距 - 浮窗的宽度
-        if ((bodyWidth - w) < elWidth) {
+        // 水平对齐
+        if (options.direction === 'align') {
+            // 如果     body的距离  -  (触发者的左间距 +宽度) < 浮窗的宽度 ，
+            // 那么，就在触发者左边显示
+            // left值为 ：触发者的左距 - 浮窗的宽度
+            if ((bodyWidth - w) < elWidth) {
 
-            // 如果 body高度 - 触发者的top < 浮窗高度 ，那么，就在触发者上面显示
-            // top值为：触发者的上距 + 触发者高度 -触发者高度  
-            if ((bodyHeight - topTarget) < elHeight) {
-                $el.css({ 
-                    'top': (h - elHeight) + 'px', 
-                    'left': (leftTarget - elWidth) + 'px' 
-                }).show();
+                // 如果 body高度 - 触发者的top < 浮窗高度 ，那么，就在触发者上面显示
+                // top值为：触发者的上距 + 触发者高度 -触发者高度
+                if ((bodyHeight - topTarget) < elHeight) {
+                    $el.css({
+                        'top': (h - elHeight) + 'px',
+                        'left': (leftTarget - elWidth) + 'px'
+                    }).show();
+                }
+                // 如果在下面显示 ,top值为：触发者top
+                else {
+                    $el.css({
+                        'top': topTarget + 'px',
+                        'left': (leftTarget - elWidth) + 'px'
+                    }).show();
+                }
+
             }
-            // 如果在下面显示 ,top值为：触发者top
+            // 如果在右边显示， left值为 ：触发者的左距 + 浮窗宽度
             else {
-                $el.css({ 
-                    'top': topTarget + 'px', 
-                    'left': (leftTarget - elWidth) + 'px' 
-                }).show();
+                // body的距离  -  (触发者的上间距 ) < 浮窗的高度 ，那么，就在上边显示
+                // top值为：触发者的上距 + 触发者高度 -触发者高度
+                if ((bodyHeight - topTarget) < elHeight) {
+
+                    $el.css({
+                        'top': (h - elHeight) + 'px',
+                        'left': w + 'px'
+                    }).show();
+                }
+                // 如果在下面显示 ,top值为：触发者top
+                else {
+                    $el.css({
+                        'top': topTarget + 'px',
+                        'left': w + 'px'
+                    }).show();
+                }
+
             }
-            
-        } 
-        // 如果在右边显示， left值为 ：触发者的左距 + 浮窗宽度
-        else {
-            // body的距离  -  (触发者的上间距 ) < 浮窗的高度 ，那么，就在上边显示
-            // top值为：触发者的上距 + 触发者高度 -触发者高度  
-            if ((bodyHeight - topTarget) < elHeight) {
-                
-                $el.css({
-                    'top': (h - elHeight) + 'px', 
-                    'left': w + 'px' 
-                }).show();
-            }
-            // 如果在下面显示 ,top值为：触发者top
-            else {
-                $el.css({ 
-                    'top': topTarget + 'px', 
-                    'left': w + 'px' 
-                }).show();
-            }
-            
         }
-        //TODO:超出下面：注意获取body高度，可能有问题
+        // 垂直对齐
+        else {
+            $el.css({
+                'top': h + 'px',
+                'left': leftTarget + 'px'
+            }).show();
+        }
+
     };
 
+    FloatWindow.prototype.showAlign = function () {
+
+    };
     /**
      * 隐藏浮窗
      *
@@ -165,6 +185,6 @@ define(function () {
             }
         });
     };
-    
+
     return FloatWindow;
 });

@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * 图的数据输入对象
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ChartDataInput implements Serializable {

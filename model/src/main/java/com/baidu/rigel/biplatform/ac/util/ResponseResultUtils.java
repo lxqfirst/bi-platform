@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ac.util;
 /**
  * REST工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  * 
  */

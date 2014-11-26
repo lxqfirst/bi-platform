@@ -115,6 +115,83 @@ public class IndexServerHandler extends AbstractChannelInboundHandler {
         }
     }
     
+    
+    public void messageReceived_00(ChannelHandlerContext ctx, Object msg) throws Exception {
+        logger.info(String.format(LogInfoConstants.INFO_PATTERN_MESSAGE_RECEIVED_BEGIN,
+            "IndexServerHandler"));
+        IndexMessage indexMsg = (IndexMessage) msg;
+        // 从消息中获取索引路径
+        File idxFile = new File(indexMsg.getIdxPath());
+        File idxServiceFile = new File(indexMsg.getIdxServicePath());
+        
+        if (indexMsg.getMessageHeader().getAction().equals(NettyAction.NETTY_ACTION_UPDATE)
+                || indexMsg.getMessageHeader().getAction().equals(NettyAction.NETTY_ACTION_INITINDEX)) {
+            // 如果是索引更新、初始化过程
+            // 清理写索引路径
+            FileUtils.deleteFile(idxFile);
+            if (indexMsg.getMessageHeader().getAction().equals(NettyAction.NETTY_ACTION_UPDATE)
+                    && idxServiceFile.exists()) {
+                // 索引更新，复制索引目录
+                FileUtils.copyFolder(indexMsg.getIdxServicePath(), indexMsg.getIdxPath());
+            }
+        }     
+        
+        
+        IndexWriter idxWriter = IndexWriterFactory.getIndexWriterWithSingleSlot(indexMsg.getIdxPath());
+        
+        TesseractResultSet data = indexMsg.getDataBody();
+        long currDiskSize = FileUtils.getDiskSize(indexMsg.getIdxPath());
+        BigDecimal currMaxId = null;
+        // 读取数据建索引
+        if (currDiskSize < indexMsg.getBlockSize()) {
+            while (data.next() && currDiskSize < indexMsg.getBlockSize()) {
+                Document doc = new Document();
+                String[] fieldNameArr = data.getFieldNameArray();
+                for (String select : fieldNameArr) {
+                    if (select.equals(indexMsg.getIdName())) {
+                        currMaxId = data.getBigDecimal(select);
+                    }
+
+                    doc.add(new StringField(select, data.getString(select), Field.Store.NO));
+                }
+                
+                idxWriter.addDocument(doc);
+            }
+            idxWriter.commit();
+            idxWriter.close();
+            
+        }
+        
+        String feedBackIndexServicePath = null;
+        String feedBackIndexFilePath = null;
+        
+        // 如果当前分片写满了 or 是当前数据的最后一片，释放indexWriter\设置服务路径
+        long totalDiskSize = FileUtils.getDiskSize(indexMsg.getIdxPath());
+        if (totalDiskSize > indexMsg.getBlockSize() || indexMsg.isLastPiece()) {
+            IndexWriterFactory.destoryWriters(indexMsg.getIdxPath());
+            feedBackIndexServicePath = indexMsg.getIdxPath();
+            feedBackIndexFilePath = indexMsg.getIdxServicePath();
+        } else {
+            feedBackIndexServicePath = indexMsg.getIdxServicePath();
+            feedBackIndexFilePath = indexMsg.getIdxPath();
+        }
+        
+        
+        MessageHeader messageHeader = new MessageHeader(NettyAction.NETTY_ACTION_INDEX_FEEDBACK);
+        
+        IndexMessage indexFeedbackMsg = new IndexMessage(messageHeader, indexMsg.getDataBody());
+        indexFeedbackMsg.setBlockSize(indexMsg.getBlockSize());
+        indexFeedbackMsg.setDiskSize(totalDiskSize);
+        indexFeedbackMsg.setIdxServicePath(feedBackIndexServicePath);
+        indexFeedbackMsg.setIdxPath(feedBackIndexFilePath);
+        indexFeedbackMsg.setIdName(indexMsg.getIdName());
+        indexFeedbackMsg.setMaxId(currMaxId);
+        ctx.writeAndFlush(indexFeedbackMsg);
+        ctx.channel().close();
+        logger.info(String.format(LogInfoConstants.INFO_PATTERN_MESSAGE_RECEIVED_END,
+            "IndexServerHandler"));
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -136,7 +213,7 @@ public class IndexServerHandler extends AbstractChannelInboundHandler {
                 || indexMsg.getMessageHeader().getAction().equals(NettyAction.NETTY_ACTION_INITINDEX)) {
             // 如果是索引更新、初始化过程
             // 清理写索引路径
-            idxFile.deleteOnExit();
+            FileUtils.deleteFile(idxFile);
             if (indexMsg.getMessageHeader().getAction().equals(NettyAction.NETTY_ACTION_UPDATE)
                     && idxServiceFile.exists()) {
                 // 索引更新，复制索引目录
@@ -179,7 +256,8 @@ public class IndexServerHandler extends AbstractChannelInboundHandler {
         String feedBackIndexServicePath = null;
         String feedBackIndexFilePath = null;
         // 如果当前分片写满了 or 是当前数据的最后一片，释放indexWriter\设置服务路径
-        if (currDiskSize > indexMsg.getBlockSize() || indexMsg.isLastPiece()) {
+        long totalDiskSize = FileUtils.getDiskSize(indexMsg.getIdxPath());
+        if (totalDiskSize > indexMsg.getBlockSize() || indexMsg.isLastPiece()) {
             IndexWriterFactory.destoryWriters(indexMsg.getIdxPath());
             feedBackIndexServicePath = indexMsg.getIdxPath();
             feedBackIndexFilePath = indexMsg.getIdxServicePath();
@@ -188,7 +266,7 @@ public class IndexServerHandler extends AbstractChannelInboundHandler {
             feedBackIndexFilePath = indexMsg.getIdxPath();
         }
         
-        long totalDiskSize = FileUtils.getDiskSize(indexMsg.getIdxPath());
+        
         MessageHeader messageHeader = new MessageHeader(NettyAction.NETTY_ACTION_INDEX_FEEDBACK);
         
         IndexMessage indexFeedbackMsg = new IndexMessage(messageHeader, indexMsg.getDataBody());

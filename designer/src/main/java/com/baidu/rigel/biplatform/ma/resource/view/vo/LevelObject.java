@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.util.DeepcopyUtils;
 /**
  * Level View Object
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class LevelObject implements Serializable {

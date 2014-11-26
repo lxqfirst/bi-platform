@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.ac.query.model.SortRecord.SortType;
 /**
  * 排序信息
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Order implements Serializable {

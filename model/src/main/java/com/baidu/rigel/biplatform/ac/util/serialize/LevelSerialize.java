@@ -29,7 +29,7 @@ import com.google.gson.JsonSerializer;
 /**
  * level序列化器
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class LevelSerialize implements JsonSerializer<Level> {

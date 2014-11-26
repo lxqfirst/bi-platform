@@ -40,7 +40,7 @@ import com.google.common.collect.Maps;
 /**
  * 查询维值相关的接口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface DimensionMemberService extends BeanFactoryAware {

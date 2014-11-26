@@ -39,7 +39,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
 /**
  * 
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 class CubeBuilder {

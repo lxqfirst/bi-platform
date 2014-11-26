@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.service;
 /**
  * 条目所在位置定义
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public enum PositionType {

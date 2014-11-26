@@ -30,7 +30,7 @@ import com.baidu.rigel.biplatform.ma.file.client.service.FileServiceException;
  *
  * test class
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FileServiceTest {

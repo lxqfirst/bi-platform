@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 维度条件
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DimensionCondition implements MetaCondition {

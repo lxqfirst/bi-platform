@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ac.model;
 /**
  * 
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface TimeDimCommonKeystore {

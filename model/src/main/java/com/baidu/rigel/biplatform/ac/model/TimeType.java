@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.ac.model;
 /**
  * 时间粒度类型
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 public enum TimeType {

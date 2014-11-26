@@ -30,7 +30,7 @@ import com.baidu.rigel.biplatform.tesseract.model.PosTreeNode;
 /**
  * 类DIPosTreeCallbackServiceImpl.java的实现描述：TODO 类实现描述
  * 
- * @author chenxiaoming01 2013-12-19 下午10:11:56
+ * @author xiaoming.chen 2013-12-19 下午10:11:56
  */
 @Service
 public class DIPosTreeCallbackServiceImpl extends DICallBackServiceFetch<List<PosTreeNode>> implements Serializable {

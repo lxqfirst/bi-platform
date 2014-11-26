@@ -76,23 +76,22 @@ define([
                     //revert: "invalid",
                     appendTo: mainSelector,
                     helper: "clone",
+                    scroll: true,
+                    scrollSensitivity: 100,
                     opacity: 1, // 被拖拽元素的透明度
                     // 修正由于滚动条产生的偏移
                     drag: function (event, ui) {
 
-                        //
-                        //// 矫正值
-                        //var correctVal = $report.scrollTop() - startScrollTop;
+                        // 矫正值
+                        //var correctVal = $report.scrollTop()/1 - startScrollTop/1;
                         //var topValue = parseInt(ui.helper.css('top')) + correctVal;
-
-
-
-                        //ui.helper.css({top: topValue + 'px'});
                         //
-                        //if (correctVal > 400) {
+                        //if (correctVal > 4) {
                         //    // 矫正后的值
+                        //    console.log('矫正前的值:' + ui.position.top);
                         //    console.log('矫正后的值:' + topValue);
-                        //    //ui.position.top = topValue;
+                        //    //ui.helper[0].style.top = topValue+"px";
+                        //    //ui.position.top = 0; //如果0生效了那么
                         //}
                     },
                     start: function (event, ui) {
@@ -108,6 +107,7 @@ define([
                         }).addClass('active shell-component');
                         ui.helper.attr('data-default-width', compData.defaultWidth);
                         ui.helper.attr('data-default-height', compData.defaultHeight);
+                        ui.helper.attr('data-sort-startScrrolTop', ui.helper.parent().scrollTop());
                         $('.j-report').addClass('active');
 
                         // 添加参考线

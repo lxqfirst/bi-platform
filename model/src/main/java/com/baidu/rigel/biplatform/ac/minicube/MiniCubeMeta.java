@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.ac.util.MetaNameUtil;
 
 /**
  * MiniCube的元数据
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public abstract class MiniCubeMeta implements OlapElement {

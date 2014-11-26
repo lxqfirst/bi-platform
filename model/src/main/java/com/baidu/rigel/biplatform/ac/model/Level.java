@@ -47,7 +47,7 @@ import com.google.gson.reflect.TypeToken;
  * 拿时间维度为例，把维度（时间）看作向量的起点，描述角度（年、季度、月份）看作向量的终点， 则年、季度、月份对应向量的长度均相等，只不过向量的方向不同。但是在业务处理过程中，通常统计
  * 季度、月份会增加定语：哪一年的哪个季度、哪个月份，从而确定了物理存储模型中的父子关系。
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * @see java.lang.Cloneable
  */
 public interface Level extends OlapElement, Cloneable {

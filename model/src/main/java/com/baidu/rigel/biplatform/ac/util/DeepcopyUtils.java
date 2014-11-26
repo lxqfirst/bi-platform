@@ -21,7 +21,7 @@ import org.springframework.util.SerializationUtils;
  * 
  * 深度拷贝工具类
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class DeepcopyUtils {

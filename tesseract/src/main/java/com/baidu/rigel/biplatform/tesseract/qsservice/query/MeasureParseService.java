@@ -21,7 +21,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.MeasureParseResul
 /**
  * 指标解析
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface MeasureParseService {

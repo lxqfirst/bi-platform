@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.baidu.rigel.biplatform.tesseract.isservice.meta.SqlQuery;
+import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryRequest;
 import com.baidu.rigel.biplatform.tesseract.resultset.TesseractResultSet;
 
 /**
@@ -61,6 +62,19 @@ public interface DataQueryService {
      */
     TesseractResultSet queryForDocListWithSQLQuery(SqlQuery sqlQuery, DataSource dataSource,
         long limitStart, long limitEnd);
+    
+    
+    /**
+     * 
+     * @param sqlQuery
+     * @param dataSource
+     * @param limitStart
+     * @param limitEnd
+     * @param queryRequest
+     * @return
+     */
+    TesseractResultSet queryForListWithSQLQueryAndGroupBy(SqlQuery sqlQuery, DataSource dataSource,
+            long limitStart, long limitEnd, QueryRequest queryRequest);
     
     /**
      * 

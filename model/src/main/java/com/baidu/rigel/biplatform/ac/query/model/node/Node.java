@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 
 /**
  * 计算节点
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface Node extends Serializable {

@@ -17,20 +17,19 @@ package com.baidu.rigel.biplatform.ac.minicube;
 
 import java.util.Map;
 
-import org.springframework.beans.BeanUtils;
-
 import com.baidu.rigel.biplatform.ac.annotation.GsonIgnore;
 import com.baidu.rigel.biplatform.ac.exception.MiniCubeException;
 import com.baidu.rigel.biplatform.ac.model.Dimension;
 import com.baidu.rigel.biplatform.ac.model.Level;
 import com.baidu.rigel.biplatform.ac.model.LevelType;
+import com.baidu.rigel.biplatform.ac.util.DeepcopyUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Callback的层级
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 @JsonIgnoreProperties
@@ -189,10 +188,8 @@ public class CallbackLevel extends OlapElementDef implements Level {
      * {@inheritDoc}
      */
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        CallbackLevel target = new CallbackLevel(this.getName(), this.getCallbackUrl());
-        BeanUtils.copyProperties(this, target);
-        return target;
+    public CallbackLevel clone() throws CloneNotSupportedException {
+        return DeepcopyUtils.deepCopy(this);
     }
 
     /**

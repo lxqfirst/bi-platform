@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.tesseract.exception.DataSourceException;
 /**
  * 数据源信息池，保证每个数据源初始化成功以后保持数据源信息方便调用
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface DataSourcePoolService {

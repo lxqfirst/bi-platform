@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * 指标条件
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MeasureCondition implements MetaCondition {

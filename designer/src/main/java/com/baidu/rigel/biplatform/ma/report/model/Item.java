@@ -16,7 +16,6 @@
 package com.baidu.rigel.biplatform.ma.report.model;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.util.StringUtils;
@@ -28,7 +27,7 @@ import com.google.common.collect.Maps;
  * 
  * 报表行或列的元定义
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class Item implements Serializable {
@@ -68,10 +67,10 @@ public class Item implements Serializable {
      */
     private String areaId;
     
-    /**
-     * 格式定义
-     */
-    private FormatModel formatModel;
+//    /**
+//     * 格式定义
+//     */
+//    private FormatModel formatModel;
     
     /**
      * 参数定义 key 为 参数名称 value为默认值
@@ -123,20 +122,20 @@ public class Item implements Serializable {
         this.areaId = areaId;
     }
     
-    public FormatModel getFormatModel() {
-        return formatModel;
-    }
-    
-    public void setFormatModel(FormatModel formatModel) {
-        this.formatModel = formatModel;
-    }
+//    public FormatModel getFormatModel() {
+//        return formatModel;
+//    }
+//    
+//    public void setFormatModel(FormatModel formatModel) {
+//        this.formatModel = formatModel;
+//    }
     
     public Map<String, Object> getParams() {
         if (params != null) {
-            return Collections.unmodifiableMap(this.params);
+            return this.params;
         }
         params = Maps.newHashMap();
-        return Collections.unmodifiableMap(this.params);
+        return this.params;
     }
     
     public void setParams(Map<String, Object> params) {

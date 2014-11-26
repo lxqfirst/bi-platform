@@ -10,7 +10,7 @@ define(['template'], function (template) {
         $out+=$escape(item.id);
         $out+='" data-name="';
         $out+=$escape(item.name);
-        $out+='">\r\n            <span class="item-text j-item-text" title="';
+        $out+='">\r\n            <span class="item-text j-item-text icon-font" title="';
         $out+=$escape(item.caption);
         $out+='（';
         $out+=$escape(item.name);
@@ -18,9 +18,9 @@ define(['template'], function (template) {
         $out+=$escape(item.caption);
         $out+='（';
         $out+=$escape(item.name);
-        $out+='）\r\n            </span>\r\n            <span class="icon-letter j-delete" title="删除">×</span>\r\n        </div>\r\n        ';
+        $out+='）\r\n            </span>\r\n            <span class="icon hide j-delete" title="删除">×</span>\r\n        </div>\r\n        ';
         });
-        $out+='\r\n    </div>\r\n    <div class="data-axis-line data-axis-line-48 data-btn-line">\r\n        <span class="letter">相关设置:</span>\r\n        <span class="icon-letter icon-letter-btn j-set-default-time">设置默认选中时间</span>\r\n        <span class="icon-letter icon-letter-btn j-set-time-region">设置可选时间范围(开发中...)</span>\r\n    </div>\r\n</div>';
+        $out+='\r\n    </div>\r\n    <div class="data-axis-line data-axis-line-48 data-btn-line">\r\n        <span class="letter">设置:</span>\r\n        <span class="icon-letter icon-letter-btn j-set-default-time">默认选中时间</span>\r\n    </div>\r\n</div>';
         return $out;
     }
     return { render: anonymous };

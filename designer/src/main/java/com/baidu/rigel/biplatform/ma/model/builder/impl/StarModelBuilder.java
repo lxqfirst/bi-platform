@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
  * 
  * 星型模型构建器，用来构建星型模型
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 class StarModelBuilder {

@@ -51,7 +51,7 @@ import com.google.common.collect.Lists;
 /**
  * 元数据实际查询操作实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service
@@ -180,14 +180,17 @@ public class MetaDataServiceImpl implements MetaDataService, BeanFactoryAware {
                     break;
                 }
             }
-            if (levelIndex == -1 || (levelIndex + 1) >= levels.size()) {
+            if (level.getType().equals(LevelType.PARENT_CHILD)) {
+                level = levels.get(levelIndex);
+            } else if (levelIndex == -1 || (levelIndex + 1) >= levels.size()) {
                 return Lists.newArrayList();
                 // LOG.error("can not get level :" + member.getLevel().getName() + " in dimension:" + dimension);
                 // throw new MetaException("can not get level :" + member.getLevel().getName() + " in dimension:" +
                 // dimension);
+            } else {
+                // 取当前层级的下一层级
+                level = levels.get(levelIndex + 1);
             }
-            // 取当前层级的下一层级
-            level = levels.get(levelIndex + 1);
         }
 
         return DimensionMemberService.getDimensionMemberServiceByLevelType(level.getType()).getMembers(cube, level,

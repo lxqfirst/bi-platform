@@ -15,6 +15,7 @@
  */
 package com.baidu.rigel.biplatform.tesseract.resultset;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import org.apache.commons.lang.StringUtils;
@@ -24,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.model.Aggregator;
 /**
  * 聚集计算
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Aggregate {
@@ -51,21 +52,24 @@ public class Aggregate {
      * @param aggregator 聚集方式
      * @return 结果
      */
-    public static String aggregate(String src1, String src2, Aggregator aggregator) {
-        if (StringUtils.isBlank(src2)) {
-            return src1;
-        }
+    public static Serializable aggregate(Serializable src1, Serializable src2, Aggregator aggregator) {
         switch (aggregator.name()) {
             case AGGREGATE_SUM:
-                if (StringUtils.isBlank(src1)) {
+                if(src2 == null || StringUtils.isBlank(src2.toString())) {
+                    return src1; 
+                }
+                if(src1 == null) {
                     return src2;
                 }
-                BigDecimal arg1 = new BigDecimal(src1);
-                BigDecimal arg2 = new BigDecimal(src2);
-                return arg1.add(arg2).toString();
+                BigDecimal arg1 = new BigDecimal(src1.toString());
+                BigDecimal arg2 = new BigDecimal(src2.toString());
+                return arg1.add(arg2);
             case AGGREGATE_COUNT:
-                int count = Integer.parseInt(src1);
-                return count++ + "";
+                if(src1 == null || src2 == null) {
+                    return 1;
+                }else {
+                    return Integer.parseInt(src1.toString()) + 1;
+                }
             default:
                 throw new UnsupportedOperationException("unsupported aggregator:" + aggregator);
         }

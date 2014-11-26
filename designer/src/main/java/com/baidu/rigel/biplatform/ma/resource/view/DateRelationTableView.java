@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.ma.resource.view;
 /**
  * 
  * 日期关联关系表定义
- * @author peizhongyi01
+ * @author zhongyi
  *
  * 2014-7-31
  */

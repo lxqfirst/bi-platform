@@ -33,7 +33,7 @@ import com.google.common.collect.Lists;
  * 
  * DataModel操作工具测试类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class DataModelUtilsTest {

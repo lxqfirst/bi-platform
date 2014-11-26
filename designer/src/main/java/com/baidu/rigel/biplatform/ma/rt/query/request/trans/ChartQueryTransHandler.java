@@ -15,14 +15,14 @@
  */
 package com.baidu.rigel.biplatform.ma.rt.query.request.trans;
 
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryAction;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryRequest;
-import com.baidu.rigel.biplatform.ma.rt.query.service.QueryStrategy;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryRequest;
+import com.baidu.rigel.biplatform.ma.rt.query.model.QueryStrategy;
 
 /**
  * 
  * ChartQueryTransHandler
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 class ChartQueryTransHandler extends QueryRequestTransHandler {

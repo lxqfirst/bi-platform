@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
  * 
  * 数据源定义工具类：用于生成存储文件id
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class DataSourceDefineUtil {

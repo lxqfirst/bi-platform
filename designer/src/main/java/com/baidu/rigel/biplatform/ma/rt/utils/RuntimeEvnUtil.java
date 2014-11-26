@@ -15,12 +15,29 @@
  */
 package com.baidu.rigel.biplatform.ma.rt.utils;
 
+import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
+import com.baidu.rigel.biplatform.ma.rt.Context;
+
 /**
  * 工具类：用于提供运行时环境初始化、运行时上下文操作等
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public final class RuntimeEvnUtil {
     
+	/**
+	 * 构造函数
+	 */
+	private RuntimeEvnUtil () {
+	}
+	
+	/**
+	 * 根据报表id初始化报表对应运行时啥下文
+	 * @param designModel 报表模型
+	 * @return Context 运行时上下文
+	 */
+	public static final Context initContext(ReportDesignModel designModel) {
+		return null;
+	}
 }

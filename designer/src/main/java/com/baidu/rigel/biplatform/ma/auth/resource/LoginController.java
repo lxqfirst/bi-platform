@@ -31,18 +31,19 @@ import com.baidu.rigel.biplatform.ma.auth.bo.ProductlineInfo;
 import com.baidu.rigel.biplatform.ma.auth.service.ProductLineManageService;
 import com.baidu.rigel.biplatform.ma.model.consts.Constants;
 import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
+import com.baidu.rigel.biplatform.ma.resource.BaseResource;
 import com.baidu.rigel.biplatform.ma.resource.ResponseResult;
 
 /**
  * 
  * 登录控制服务 为测试环境提供，后续提供产品线管理功能
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @RestController
 @RequestMapping("/silkroad/login")
-public class LoginController {
+public class LoginController extends BaseResource {
     /**
      * 日志对象
      */
@@ -73,9 +74,9 @@ public class LoginController {
         // 对产品线信息进行加密
         try {            
             // 加密产品线
-            productLineEncrypt = AesUtil.getInstance().encrypt(productLine);
+            productLineEncrypt = AesUtil.getInstance().encrypt(productLine, securityKey);
             // 加密密码
-            pwdEncrypt = AesUtil.getInstance().encryptAndUrlEncoding(pwd);
+            pwdEncrypt = AesUtil.getInstance().encryptAndUrlEncoding(pwd, securityKey);
         } catch (Exception e) {
             // 加密过程发生异常
             LOG.warn(e.getMessage(), e);

@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * 用来进行AES的加密和解密程序
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 public class AesUtil {

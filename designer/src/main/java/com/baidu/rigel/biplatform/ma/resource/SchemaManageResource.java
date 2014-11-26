@@ -69,7 +69,7 @@ import com.google.gson.internal.StringMap;
  * </p>
  * @see com.baidu.rigel.biplatform.ma.resource.ResponseResult
  * @since jdk1.8.5 or after Spring 4.0 or after
- * @author wangyuxue
+ * @author david.wang
  * @version Silkroad 1.0.1
  */
 @RestController
