@@ -27,7 +27,7 @@ import org.apache.commons.collections.CollectionUtils;
 /**
  * 查询表达式，查询限定都是一个个维值 比如一个查询一级行业A 那么queryValues里面的对象就是value为A，leafValues为A对应的2级行业节点
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Expression implements Serializable {

@@ -18,13 +18,10 @@ package com.baidu.rigel.biplatform.tesseract.model;
 import java.util.List;
 
 /**
- * 类PosTreeNode.java的实现描述：岗位CALL_BACK接口返回对象元素 Callback接口请求参数:
- * http://icrm-off.baidu.com:8080/crm-portal/reportauth/dataAuth2
- * .action?appId=57&parentPosIds=32288&levelToRoot=3&needCsPosition=1 parentPosIds 请求的岗位ID列表，多个ID用逗号分隔 levelToRoot
- * 请求的岗位树和请求的岗位ID的层级，0表示只需要显示请求的岗位ID的信息，如1 表示当前ID和当前ID有 直接管辖关系的一层孩子节点的信息 needCsPosition 1表示需要显示当前节点的一线岗位ID，0则不需要，不传默认为0
- * appId 产品线的appid
  * 
- * @author chenxiaoming01 2013-12-15 下午8:49:10
+ * 类PosTreeNode.java的实现描述
+ * 
+ * @author xiaoming.chen 2013-12-15 下午8:49:10
  */
 public class PosTreeNode implements TreeModel {
 

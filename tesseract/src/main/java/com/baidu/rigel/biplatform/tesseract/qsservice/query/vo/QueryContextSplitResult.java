@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.QueryContextSplitSer
 /**
  * 查询上下文拆分结果
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryContextSplitResult {

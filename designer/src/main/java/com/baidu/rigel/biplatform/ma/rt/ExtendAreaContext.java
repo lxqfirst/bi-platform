@@ -33,7 +33,7 @@ import com.google.common.collect.Sets;
 
 /**
  * 扩展区域对应上下文：存储当前区域的参数、面包屑、查询结果纪录、下钻／上卷纪录，区域定义信息
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ExtendAreaContext implements Serializable {

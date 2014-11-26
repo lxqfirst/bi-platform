@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 
  * 报表设计态模型定义： 报表模型由多个扩展区域组成，每个扩展区域包含逻辑模型定义，参数定义 格式定义以及数据模型定义等
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @JsonIgnoreProperties

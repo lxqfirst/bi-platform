@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.exception;
 /**
  * 数据源信息读取异常
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-29
  */

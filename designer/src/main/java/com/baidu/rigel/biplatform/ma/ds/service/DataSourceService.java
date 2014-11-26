@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ma.model.ds.DataSourceDefine;
  * 
  * 数据源管理服务
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface DataSourceService {

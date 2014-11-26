@@ -25,7 +25,7 @@ import org.springframework.context.annotation.ImportResource;
 /**
  * Tesseract项目启动入口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Configuration

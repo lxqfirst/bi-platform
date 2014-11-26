@@ -21,7 +21,7 @@ import java.io.Serializable;
  * 
  * 部件定义：描述部件定义
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class Widget implements Serializable {

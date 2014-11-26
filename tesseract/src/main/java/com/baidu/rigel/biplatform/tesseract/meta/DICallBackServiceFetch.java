@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.util.HttpRequest;
 /**
  * 类DICallBackServiceFetch.java的实现描述：默认获取callBack接口
  * 
- * @author chenxiaoming01 2013-12-19 下午10:16:32
+ * @author xiaoming.chen 2013-12-19 下午10:16:32
  */
 public abstract class DICallBackServiceFetch<T> implements DICallbackService<T> {
 

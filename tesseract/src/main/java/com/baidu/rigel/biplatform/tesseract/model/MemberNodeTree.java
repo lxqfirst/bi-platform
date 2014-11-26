@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.ac.annotation.GsonIgnore;
 /**
  * 维值树
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MemberNodeTree implements Serializable, Comparable<MemberNodeTree> {

@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 
 /**
  * Bigdecimal操作相关工具方法
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class BigDecimalUtils {

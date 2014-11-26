@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.baidu.rigel.biplatform</groupId>
+  <artifactId>fileserver</artifactId>
+  <versioning>
+    <versions>
+      <version>0.0.1-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20141117101216</lastUpdated>
+  </versioning>
+</metadata>

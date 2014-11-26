@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 产品线定义
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ProductlineInfo implements Serializable {

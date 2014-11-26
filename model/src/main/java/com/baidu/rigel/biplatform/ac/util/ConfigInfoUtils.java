@@ -23,7 +23,7 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 /**
  * 服务器配置信息，暂时只有Tesseract服务器地址配置
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class ConfigInfoUtils {

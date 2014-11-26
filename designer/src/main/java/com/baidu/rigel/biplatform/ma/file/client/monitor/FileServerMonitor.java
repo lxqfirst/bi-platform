@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * 文件服务器监控器类，要求在启动配置端服务时启动该监控服务 监控文件服务器状态，如果状态异常，及时报警
  * 如果由于文件服务器宕机导致不能正常连接文件服务器，当文件服务器回复工作后，需要重新尝试连接并检测
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FileServerMonitor extends ChannelHandlerAdapter {
@@ -165,7 +165,7 @@ public class FileServerMonitor extends ChannelHandlerAdapter {
      * 
      * 心跳信息工作线程
      * 
-     * @author wangyuxue
+     * @author david.wang
      * @version 1.0.0.1
      */
     private class HeartBeatTask implements Runnable {

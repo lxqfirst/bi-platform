@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
  * 
  * 星型模型：构建报表逻辑模型的基础，做为报表逻辑模型(Schema)与数据库元数据定转换的桥梁。
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class StarModel implements Serializable {

@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 
 /**
  * 数据节点
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DataNode implements Node {

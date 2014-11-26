@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
 /**
  * 列信息
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  * 2014-7-29
  */

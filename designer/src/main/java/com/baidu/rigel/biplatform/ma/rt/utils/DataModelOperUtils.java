@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 
 /**
  * 数据模型操作工具类，提供针对数据模型的元数据查询操作，比如：数据模型的行信息，列信息等
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public final class DataModelOperUtils {

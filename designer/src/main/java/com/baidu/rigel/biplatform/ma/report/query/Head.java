@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 /**
  * 类HeadFiled.java的实现描述：datamodel头部元素信息
  * 
- * @author chenxiaoming01 2013-12-5 下午12:01:58
+ * @author xiaoming.chen 2013-12-5 下午12:01:58
  */
 public class Head implements Serializable {
     

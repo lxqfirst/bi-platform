@@ -31,7 +31,7 @@ import com.google.common.collect.Maps;
 /**
  * HttpUrl处理工具
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class HttpUrlUtils {

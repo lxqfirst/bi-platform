@@ -16,9 +16,11 @@
 package com.baidu.rigel.biplatform.ma.rt.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 
@@ -44,7 +46,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * QueryUtils
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public final class QueryUtils {
@@ -195,11 +197,23 @@ public final class QueryUtils {
      * 
      */
 	private static Map<Item, Object> collectQueryItems(QueryAction action) {
-		Map<Item, Object> items = Maps.newConcurrentMap();
-        items.putAll(action.getColumns());
-        items.putAll(action.getRows());
-        items.putAll(action.getSlices());
-		return items;
+		Map<Item, Object> items = new HashMap<Item, Object>();
+		Map<Item, Object> cols = action.getColumns();
+		Map<Item, Object> rows = action.getRows();
+		Map<Item, Object> slices = action.getSlices();
+		action.getColumns().keySet().forEach(item -> {
+		    items.put(item, cols.get(item));
+		});
+		action.getRows().keySet().forEach(item -> {
+		    items.put(item, rows.get(item));
+		});
+		action.getSlices().keySet().forEach(item -> {
+		    items.put(item, slices.get(item));
+		});
+//        items.putAll(action.getColumns());
+//        items.putAll(action.getRows());
+//        items.putAll(action.getSlices());
+		return Collections.synchronizedMap(items);
 	}
 
     /**

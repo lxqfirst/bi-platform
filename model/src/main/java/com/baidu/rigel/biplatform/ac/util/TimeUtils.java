@@ -14,7 +14,7 @@ import com.baidu.rigel.biplatform.ac.model.TimeType;
  * 
  * 时间计算工具类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class TimeUtils {

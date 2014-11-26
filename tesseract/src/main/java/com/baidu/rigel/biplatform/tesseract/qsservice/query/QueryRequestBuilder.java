@@ -43,7 +43,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.Select;
 /**
  * build一个查询请求
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryRequestBuilder {

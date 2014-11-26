@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.ma.report.model;
  * 
  * 扩展区域类型定义
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public enum ExtendAreaType {

@@ -27,7 +27,7 @@ import com.baidu.rigel.biplatform.ma.report.query.ResultSet;
 /**
  * 查询请求动作
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryAction implements Serializable {
@@ -58,17 +58,21 @@ public class QueryAction implements Serializable {
     private QueryStrategy queryStrategy;
     
     /**
-     * 查询行轴信息 key item's id
+     * 报表ID
+     */
+    private String reportId;
+    /**
+     * 查询列轴信息 key item's id
      */
     private LinkedHashMap<Item, Object> columns = new LinkedHashMap<Item, Object>();
     
     /**
-     * 下载的维度值
+     * 下钻的维度值
      */
     private LinkedHashMap<Item, Object> drillDimValues = new LinkedHashMap<Item, Object>();
     
     /**
-     * 查询列轴信息 key为具体 item's id
+     * 查询行轴信息 key为具体 item's id
      */
     private LinkedHashMap<Item, Object> rows = new LinkedHashMap<Item, Object>();
     
@@ -82,6 +86,9 @@ public class QueryAction implements Serializable {
      */
     private LinkedHashMap<Item, OrderType> orders = new LinkedHashMap<Item, OrderType>();
     
+    /**
+     * 请求参数
+     */
     private Map<String, Object> requestParams;
 
     /**
@@ -222,6 +229,28 @@ public class QueryAction implements Serializable {
      */
     public void setRequestParams(Map<String, Object> requestParams) {
         this.requestParams = requestParams;
+    }
+
+    
+    /** 
+     * 获取 reportId 
+     * @return the reportId 
+     */
+    public String getReportId() {
+        
+        return reportId;
+        
+    }
+
+    
+    /** 
+     * 设置 reportId 
+     * @param reportId the reportId to set 
+     */
+    public void setReportId(String reportId) {
+        
+        this.reportId = reportId;
+        
     }
     
 }

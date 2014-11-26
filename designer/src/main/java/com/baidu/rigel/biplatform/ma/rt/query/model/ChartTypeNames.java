@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.ma.rt.query.model;
  * 
  * 图类型名称
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public interface ChartTypeNames {

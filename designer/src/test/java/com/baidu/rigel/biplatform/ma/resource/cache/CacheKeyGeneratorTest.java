@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * 测试类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class CacheKeyGeneratorTest {

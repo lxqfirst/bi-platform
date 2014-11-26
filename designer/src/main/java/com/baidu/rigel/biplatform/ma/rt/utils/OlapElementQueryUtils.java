@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.ac.model.OlapElement;
 /**
  * 
  * OlapElementQueryUtils
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  * 
  */
@@ -64,10 +64,11 @@ public class OlapElementQueryUtils {
 			return null;
 		}
 		Stream<? extends OlapElement> stream = collection.parallelStream().filter(dim -> {
-			return dim.getId().equals(id);
+		    return dim.getId().equals(id);
 		});
-		if (stream.count() == 1) {
-			return (OlapElement) stream.toArray()[0];
+		Object [] objects = stream.toArray();
+		if (objects.length == 1) {
+		    return (OlapElement) objects[0];
 		}
 		return null;
 	}

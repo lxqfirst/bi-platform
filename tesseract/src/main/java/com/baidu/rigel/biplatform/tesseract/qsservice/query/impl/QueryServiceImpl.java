@@ -71,7 +71,7 @@ import com.google.common.collect.Sets;
 /**
  * 查询接口实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service

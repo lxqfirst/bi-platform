@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 /**
  * 类TreeModel.java的实现描述：abstract tree model
  * 
- * @author chenxiaoming01 2013-12-22 上午12:15:46
+ * @author xiaoming.chen 2013-12-22 上午12:15:46
  */
 public interface TreeModel extends Serializable {
 

@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * mini cube measure define
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @JsonIgnoreProperties

@@ -61,7 +61,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
  * @see com.baidu.rigel.biplatform.ac.model.Schema 
  * @since jdk1.8.5 or after
  * @version Silkroad1.0.1
- * @author wangyuxue
+ * @author david.wang
  * 
  * 
   */

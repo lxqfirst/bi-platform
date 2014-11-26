@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.ma.rt.query.model.QueryStrategy;
 
 /**
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 abstract class QueryRequestTransHandler {
@@ -74,7 +74,7 @@ abstract class QueryRequestTransHandler {
         if (isSupportedQueryStrategy(request.getQueryStrategy())) {
             return transRequest(request);
         } else if (this.handler != null) {
-            this.handler.transRequest2Action(request);
+            return handler.transRequest2Action(request);
         }
         throw new IllegalStateException("未知的查询请求 ："  + request.getQueryStrategy());
     }

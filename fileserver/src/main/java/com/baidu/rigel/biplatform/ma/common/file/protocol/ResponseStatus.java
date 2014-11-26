@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.ma.common.file.protocol;
  * 
  * 响应状态
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public enum ResponseStatus {

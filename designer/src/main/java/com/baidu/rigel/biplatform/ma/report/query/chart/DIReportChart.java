@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * HighCharts图表对象
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class DIReportChart implements Serializable {

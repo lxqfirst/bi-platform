@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * SelectedItem 选中元素视图
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class SelectedItem implements Serializable {

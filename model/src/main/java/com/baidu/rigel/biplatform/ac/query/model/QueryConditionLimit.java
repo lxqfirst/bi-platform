@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * 查询条件限制（查询的维值乘积大于指定额度报警设置）
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryConditionLimit implements Serializable {

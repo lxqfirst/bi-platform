@@ -34,7 +34,7 @@ import com.mchange.v2.c3p0.DriverManagerDataSource;
 /**
  * H2内存数据库测试专用工具
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class H2Util {

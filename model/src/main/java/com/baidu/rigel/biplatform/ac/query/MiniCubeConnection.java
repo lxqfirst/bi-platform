@@ -32,7 +32,7 @@ import com.baidu.rigel.biplatform.ac.util.ResponseResult;
 /**
  * minicube的查询接口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface MiniCubeConnection {
@@ -124,7 +124,7 @@ public interface MiniCubeConnection {
     /**
      * connnection type
      * 
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      *
      */
     public enum DataSourceType {

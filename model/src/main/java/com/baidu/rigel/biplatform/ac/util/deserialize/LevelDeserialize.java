@@ -31,7 +31,7 @@ import com.google.gson.JsonParseException;
 /**
  * level对象反序列
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class LevelDeserialize implements JsonDeserializer<Level> {

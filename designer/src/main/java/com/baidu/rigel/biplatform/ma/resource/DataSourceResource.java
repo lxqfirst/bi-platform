@@ -48,7 +48,7 @@ import com.google.common.collect.Maps;
  * 
  * 数据源管理Rest服务接口：提供对客户端进行数据源管理操作的支持
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @RestController

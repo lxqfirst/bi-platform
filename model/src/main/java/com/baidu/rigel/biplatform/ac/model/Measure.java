@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * 指标：作为多维分析模型中特殊的维度，通常对应的成员均是数字类型。 指标的主要作用是从量化的角度反映一个或者几个属性（维度）对整体分析结果的影响程度。
  * 比如：要统计同一广告在不同页面中的点击次数从而来为精准投放广告提供必要的决策支持。这一业务模型中 页面、广告构成了统计点次数的属性，而点击率就是从量化角度上来体现不同属性的情况下， 投放效果的好坏。
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @JsonIgnoreProperties

@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ac.query.data.DataSourceInfo;
 /**
  * 问题模型(配置端专用，临时传递一个未发布的cube和数据源)
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class ConfigQuestionModel extends QuestionModel implements Serializable {

@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ma.resource.view.dimdetail.DateLevel;
 /**
  * 
  * 时间维度明细定义
- * @author peizhongyi01
+ * @author zhongyi
  * @version 1.0.0.1
  */
 public class DateDimDetail implements Serializable {

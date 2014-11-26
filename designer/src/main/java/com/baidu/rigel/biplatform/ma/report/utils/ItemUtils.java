@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.ma.report.model.Item;
 
 /**
  * Item 的工具类
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ItemUtils {

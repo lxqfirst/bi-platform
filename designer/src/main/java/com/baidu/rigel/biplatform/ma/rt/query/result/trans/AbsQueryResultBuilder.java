@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ma.rt.query.model.QueryStrategy;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 abstract class AbsQueryResultBuilder {
@@ -60,7 +60,7 @@ abstract class AbsQueryResultBuilder {
         if (isCanBuildResult(action.getQueryStrategy())) {
             return innerBuild(action, model);
         } else if (this.nextBuilder != null) {
-            nextBuilder.build(action, model);
+            return nextBuilder.build(action, model);
         }
         throw new IllegalArgumentException("未知错误");
     }

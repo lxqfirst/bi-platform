@@ -32,7 +32,7 @@ import com.baidu.rigel.biplatform.tesseract.datasource.DataSourceWrap;
 /**
  * SQL数据源的封装
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class SqlDataSourceWrap implements DataSourceWrap, DataSource {

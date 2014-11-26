@@ -21,7 +21,7 @@ package com.baidu.rigel.biplatform.ac.exception;
 /**
  * AS-query exception
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MiniCubeQueryException extends Exception {

@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.ac.util.DeepcopyUtils;
  * 
  * 多维对象基础定义：包含名称、标识名称、显示名称、描述 以及可见性
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public abstract class OlapElementDef implements OlapElement, Serializable, Cloneable {

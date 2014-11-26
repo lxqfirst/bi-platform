@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ma.rt.query.model.QueryStrategy;
 
 /**
  * 展开下钻结果集处理操作
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ExpandQueryResultBuilder extends AbsQueryResultBuilder {

@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
  * 时间范围表示闭区间，为计算与表示方便，起至时间均用字符串表示，对于任何时间粒度的时间值，均表示为一个闭区间，如果表示当前
  * 起至时间一致
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class TimeRangeDetail {

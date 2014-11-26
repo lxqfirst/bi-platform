@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * 
  * 维度配置绑定关系
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

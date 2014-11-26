@@ -64,7 +64,7 @@ import com.google.common.collect.Maps;
  * 
  * ReportModel服务接口实现
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @Service("reportDesignModelService")

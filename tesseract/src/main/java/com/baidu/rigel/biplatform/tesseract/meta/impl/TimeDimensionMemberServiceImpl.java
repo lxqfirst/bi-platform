@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
  * 
  * 时间维度成员计算实现类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 @Service(DimensionMemberService.TIME_MEMBER_SERVICE)

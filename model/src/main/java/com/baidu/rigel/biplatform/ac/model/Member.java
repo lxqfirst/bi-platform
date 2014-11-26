@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.util.MetaNameUtil;
 /**
  * 维度或者指标成员：维度或者指标的一个取值。 如某年某月某天 或者某年某月某天的某个链接被点击的次数
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface Member extends OlapElement {

@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.model.Schema;
 /**
  * minicube schema implemention
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MiniCubeSchema extends OlapElementDef implements Schema { // ,Externalizable{

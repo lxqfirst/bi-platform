@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
 /**
  * 字段类型定义：用于描述业务数据元数据中表的字段数据类型
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public enum DataType {

@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 
  * 时间维度定义
- * @author peizhongyi01
+ * @author zhongyi
  *
  * 2014-7-31
  */

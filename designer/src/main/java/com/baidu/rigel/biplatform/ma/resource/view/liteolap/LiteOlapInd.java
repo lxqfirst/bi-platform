@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * LiteOlap指标视图类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class LiteOlapInd implements Serializable {

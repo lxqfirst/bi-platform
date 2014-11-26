@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.report.query.chart;
 /**
  * 分析类型
  * 
- * @author peizhongyi01
+ * @author zhongyi
  * @since 2013.12.17
  * @version 1.0.0.0
  */

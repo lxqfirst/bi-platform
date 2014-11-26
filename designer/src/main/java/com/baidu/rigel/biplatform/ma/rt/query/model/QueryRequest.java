@@ -30,7 +30,7 @@ import com.google.common.collect.Maps;
  *
  * 查询请求对象：封装用户的查询请求
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryRequest implements Serializable {
@@ -54,18 +54,18 @@ public class QueryRequest implements Serializable {
     /**
      * 行轴字段
      */
-    private Map<String, String[]> rows;
+    private Map<String, String[]> rows = Maps.newHashMap();;
     
     /**
      * 列轴字段
      */
-    private Map<String, String[]> cols;
+    private Map<String, String[]> cols = Maps.newHashMap();;
     
     
     /**
      * 过滤字段以及默认值
      */
-    private Map<String, String[]> filter;
+    private Map<String, String[]> filter = Maps.newHashMap();;
     
     /**
      * 查询条件，如果时LiteOlap查询策略，忽略该属性
@@ -88,16 +88,23 @@ public class QueryRequest implements Serializable {
     private ExtendAreaContext context;
     
     /**
-     * 数据源定义
+     * 全局参数定义
      */
-
+    private final Map<String, Object> globalParams;
+    
+    /**
+     * 报表ID
+     */
+    private String reportId;
     
     /**
      * 构造函数
      * @param queryStrategy 查询策略
      * QueryRequest
      */
-    public QueryRequest(QueryStrategy queryStrategy, ExtendAreaContext context) {
+    public QueryRequest(QueryStrategy queryStrategy, ExtendAreaContext context, 
+    		    Map<String, Object> globalParams) {
+        this.globalParams = globalParams;
         this.queryStrategy = queryStrategy;
         this.context = context;
     }
@@ -249,4 +256,33 @@ public class QueryRequest implements Serializable {
 		return context.getDefaultDsInfo();
 	}
 
+	/**
+	 * @return the globalParams
+	 */
+	public Map<String, Object> getGlobalParams() {
+		return globalParams;
+	}
+
+    
+    /** 
+     * 获取 reportId 
+     * @return the reportId 
+     */
+    public String getReportId() {
+        
+        return reportId;
+        
+    }
+
+    
+    /** 
+     * 设置 reportId 
+     * @param reportId the reportId to set 
+     */
+    public void setReportId(String reportId) {
+        
+        this.reportId = reportId;
+        
+    }
+	
 }

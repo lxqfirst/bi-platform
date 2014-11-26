@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
  * 
  * utility class : validate the method input parameters is null or not
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public final class ParamValidateUtils {

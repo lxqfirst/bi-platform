@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * sort info
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class SortRecord implements Serializable {

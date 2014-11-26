@@ -39,7 +39,7 @@ import com.baidu.rigel.biplatform.ma.report.service.ReportDesignModelManageServi
  * 
  * 报表模型管理接口
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 @Service("manageService")

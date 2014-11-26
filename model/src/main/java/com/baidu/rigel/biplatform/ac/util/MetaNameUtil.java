@@ -31,7 +31,7 @@ import com.baidu.rigel.biplatform.ac.model.OlapElement;
 /**
  * 元数据名称操作的工具类
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 public class MetaNameUtil {

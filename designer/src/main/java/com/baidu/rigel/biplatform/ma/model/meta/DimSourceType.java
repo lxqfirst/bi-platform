@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
  * 
  * 用户自定义维度 维度来源。 维度来源可以是SQL, 问本文件、Excel、或者固定值 目前指支持SQL
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public enum DimSourceType {

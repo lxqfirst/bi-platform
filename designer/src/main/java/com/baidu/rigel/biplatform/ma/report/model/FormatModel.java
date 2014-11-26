@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 /**
  * 格式定义
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class FormatModel implements Serializable {

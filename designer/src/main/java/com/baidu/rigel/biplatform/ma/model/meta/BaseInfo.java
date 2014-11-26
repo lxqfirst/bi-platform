@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 基本信息
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-29
  */

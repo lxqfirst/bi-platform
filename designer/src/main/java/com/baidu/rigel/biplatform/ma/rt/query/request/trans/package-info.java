@@ -18,7 +18,7 @@
  * 
  * 查询请求转换包：将用户的查询请求按照不用的查询策略转换成action
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 package com.baidu.rigel.biplatform.ma.rt.query.request.trans;

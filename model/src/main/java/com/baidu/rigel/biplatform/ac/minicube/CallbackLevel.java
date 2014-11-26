@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * Callback的层级
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 @JsonIgnoreProperties

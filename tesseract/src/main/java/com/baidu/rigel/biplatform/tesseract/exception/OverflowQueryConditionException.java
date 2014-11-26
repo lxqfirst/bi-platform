@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.tesseract.exception;
 /**
  * 查询条件超出指定大小异常
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class OverflowQueryConditionException extends RuntimeException {

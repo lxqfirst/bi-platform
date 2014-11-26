@@ -26,7 +26,7 @@ import com.google.common.collect.Maps;
 /**
  * 图数据输入的工厂类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ChartDataInputFactory {

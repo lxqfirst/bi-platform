@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * MetaStatusData视图
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class MetaStatusData implements Serializable {

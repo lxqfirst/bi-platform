@@ -28,7 +28,7 @@ import com.baidu.rigel.biplatform.ma.report.utils.LinkedHashMapUtils;
  * 报表逻辑模型定义：逻辑模型用来描述一张数据表或者一种统计图或者数据部件的基本组成。 逻辑模型包含行轴、列轴、过滤轴(切片轴)但不需要完全包含所有定义信息。
  * 如：对于提供过滤条件的部件，值需要提供行轴信息即可，也可以提供所有信息
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class LogicModel implements Serializable {

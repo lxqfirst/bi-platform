@@ -62,7 +62,7 @@ import com.google.common.collect.Lists;
 /**
  * 星型模型构建的实现类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-29
  */

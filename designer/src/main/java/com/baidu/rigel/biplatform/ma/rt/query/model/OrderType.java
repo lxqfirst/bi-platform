@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.ma.rt.query.model;
 
 /**
  * 排序方式
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public enum OrderType {

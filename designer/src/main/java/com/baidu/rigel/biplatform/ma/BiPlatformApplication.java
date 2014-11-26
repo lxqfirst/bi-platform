@@ -31,7 +31,7 @@ import com.baidu.rigel.biplatform.ma.resource.filter.UniversalContextSettingFilt
  * 
  * 平台服务入口 提供脱离tomcat容器提供restservice的能力
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 @Configuration

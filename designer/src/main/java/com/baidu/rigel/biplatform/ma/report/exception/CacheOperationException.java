@@ -21,7 +21,7 @@ package com.baidu.rigel.biplatform.ma.report.exception;
 /**
  * 缓存操作异常
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class CacheOperationException extends RuntimeException {

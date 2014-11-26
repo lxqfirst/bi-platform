@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * LiteOlap的维度视图
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class LiteOlapDim implements Serializable {

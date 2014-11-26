@@ -28,7 +28,7 @@ import com.google.gson.JsonParseException;
 /**
  * 数据源信息接口反序列化
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DataSourceInfoDeserialize implements JsonDeserializer<DataSourceInfo> {

@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 
  * 用户自定义维度明细定义
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

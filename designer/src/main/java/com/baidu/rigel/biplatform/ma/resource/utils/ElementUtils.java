@@ -36,7 +36,7 @@ import com.google.common.collect.Sets;
 /**
  * 判断指标、维度的改变状态
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ElementUtils {

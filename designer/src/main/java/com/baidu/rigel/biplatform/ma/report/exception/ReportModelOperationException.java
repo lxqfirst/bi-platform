@@ -17,7 +17,7 @@ package com.baidu.rigel.biplatform.ma.report.exception;
 
 /**
  * ReportModelOperationException
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ReportModelOperationException extends Exception {

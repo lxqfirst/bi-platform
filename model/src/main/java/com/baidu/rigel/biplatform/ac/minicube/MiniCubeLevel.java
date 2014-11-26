@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * general cube level
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 @JsonIgnoreProperties

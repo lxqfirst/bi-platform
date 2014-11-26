@@ -22,7 +22,7 @@ import java.util.Map;
  * 
  * 请求对象
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class Request implements Serializable {

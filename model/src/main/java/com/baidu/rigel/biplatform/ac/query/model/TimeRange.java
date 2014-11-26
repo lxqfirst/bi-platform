@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.model.TimeType;
 /**
  * time range define
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class TimeRange implements Serializable {

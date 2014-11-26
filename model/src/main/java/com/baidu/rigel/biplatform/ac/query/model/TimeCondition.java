@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.model.TimeType;
  * start:2014-07-28 timeRange : -2D 时间范围就是： start 2014-07-26 end 2014-07-28</li>
  * <li>end timeRange同上</li>
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class TimeCondition implements Serializable {

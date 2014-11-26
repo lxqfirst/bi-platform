@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ma.resource.ResponseResult;
 /**
  * Rest 结果封装工具测试类
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ResourceUtilsTest {

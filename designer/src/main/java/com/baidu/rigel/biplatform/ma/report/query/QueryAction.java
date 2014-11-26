@@ -28,7 +28,7 @@ import com.baidu.rigel.biplatform.ma.report.model.Item;
  * 查询操作，由查询服务创建action，将action传递给运行时模型 作为操作备忘，运行时模型依据查询action创建问题模型，调用查询接口查询数据
  * 
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryAction implements Serializable {

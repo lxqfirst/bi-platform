@@ -24,7 +24,7 @@ import com.google.common.collect.Lists;
 /**
  * SeriesInputInfo
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class SeriesInputInfo implements Serializable {
@@ -39,7 +39,7 @@ public class SeriesInputInfo implements Serializable {
     /**
      * SeriesUnitType
      *
-     * @author wangyuxue
+     * @author david.wang
      * @version 1.0.0.1
      */
     public enum SeriesUnitType {

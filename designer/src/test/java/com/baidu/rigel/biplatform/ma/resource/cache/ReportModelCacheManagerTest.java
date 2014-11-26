@@ -24,7 +24,7 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
 /**
  * test class
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ReportModelCacheManagerTest {

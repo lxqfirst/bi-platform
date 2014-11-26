@@ -44,7 +44,7 @@ import com.google.common.collect.Sets;
  * 
  * 报表运形态模型定义：用于描述运行时报表数据状态、操作状态等信息 提供报表区域更新、报表刷新操作等
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ReportRuntimeModel implements Serializable {

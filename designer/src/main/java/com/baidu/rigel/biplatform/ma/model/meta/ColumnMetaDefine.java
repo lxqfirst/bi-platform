@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.GsonUtils;
  * 
  * 列元数据定义信息：定义列的属性信息，用于描述逻辑模型(Cube的维度定义)中列的定义描述
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ColumnMetaDefine implements Serializable {

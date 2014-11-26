@@ -26,7 +26,7 @@ import com.google.gson.JsonSerializer;
 /**
  * cube序列化
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class CubeSerialize implements JsonSerializer<Cube> {

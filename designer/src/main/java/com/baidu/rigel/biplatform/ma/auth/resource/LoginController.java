@@ -38,7 +38,7 @@ import com.baidu.rigel.biplatform.ma.resource.ResponseResult;
  * 
  * 登录控制服务 为测试环境提供，后续提供产品线管理功能
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @RestController

@@ -50,7 +50,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * minicube Member实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @JsonIgnoreProperties

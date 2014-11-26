@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
  * 
  * 度量模型构造器
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 class MeasureBuilder {

@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ac.model;
 /**
  * 维度枚举类型
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  * 
  */
 public enum DimensionType {

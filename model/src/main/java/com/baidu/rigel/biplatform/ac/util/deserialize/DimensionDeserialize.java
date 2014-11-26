@@ -33,7 +33,7 @@ import com.google.gson.JsonParseException;
 /**
  * dimension 反序列化
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DimensionDeserialize implements JsonDeserializer<Dimension> {

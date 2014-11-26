@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 /**
  * 
  * 查询结果集封装
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryResult implements Serializable {

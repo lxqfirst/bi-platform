@@ -28,7 +28,7 @@ import com.google.common.collect.Lists;
 
 /**
  * 扩展区的工具类
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ExtendAreaUtils {

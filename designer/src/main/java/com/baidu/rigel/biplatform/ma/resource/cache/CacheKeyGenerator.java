@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * 缓存key的生成方式
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-6
  */

@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.model.Aggregator;
 /**
  * 聚集计算
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Aggregate {

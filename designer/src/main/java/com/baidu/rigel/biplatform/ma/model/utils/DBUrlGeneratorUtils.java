@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.ma.model.exception.DBInfoReadException;
 /**
  * DB的url工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class DBUrlGeneratorUtils {

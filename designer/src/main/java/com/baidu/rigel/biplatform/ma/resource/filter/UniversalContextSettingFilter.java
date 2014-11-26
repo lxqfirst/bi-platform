@@ -45,7 +45,7 @@ import com.google.common.collect.Lists;
 /**
  * 
  * 过滤器
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-13
  */

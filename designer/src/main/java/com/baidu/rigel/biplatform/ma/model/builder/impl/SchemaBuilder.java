@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
 /**
  * schema构建器
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 class SchemaBuilder {

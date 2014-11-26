@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta.exception;
 /**
  * 星型模型操作异常类：对星型模型进行处理过程中会有此异常产生，包括创建、修改、删除模型过程。 实现对底层异常的封装
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class StarModelOperationException extends Exception {

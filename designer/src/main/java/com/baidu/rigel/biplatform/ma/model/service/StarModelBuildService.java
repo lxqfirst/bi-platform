@@ -38,7 +38,7 @@ import com.baidu.rigel.biplatform.ma.resource.view.dimview.NormalDimBindView;
 /**
  * 
  * 星型模型构建服务
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-31
  */

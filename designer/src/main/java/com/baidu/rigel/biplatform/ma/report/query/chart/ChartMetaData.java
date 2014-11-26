@@ -25,7 +25,7 @@ import com.google.common.collect.Maps;
 
 /**
  * ChartMetaData
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class ChartMetaData implements Serializable {

@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.tesseract.resultset.exception;
 /** 
  *  
  * 查询结果异常
- * @author chenxiaoming01 
+ * @author xiaoming.chen 
  * @version  2014年11月20日 
  * @since jdk 1.8 or after
  */

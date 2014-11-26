@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.tesseract.model.MemberNodeTree;
 /**
  * 查询上下文
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryContext implements Serializable {

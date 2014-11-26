@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ma.report.utils.ContextManager;
 
 /**
  * cache名称检查工具类
- * @author peizhongyi01
+ * @author zhongyi
  * 
  *         2014-7-31
  */

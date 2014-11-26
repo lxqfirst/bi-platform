@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ac.query.data.DataModel;
 /**
  * 
  * 报表查询结果集
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ResultSet implements Serializable {

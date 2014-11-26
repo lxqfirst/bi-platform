@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    点击查询按钮输入查询参数
- * @author:  chenxiaoming01(chenxiaoming01@baidu.com)
+ * @author:  xiaoming.chen(xiaoming.chen@baidu.com)
  * @depend:  xui, xutil
  */
 $namespace('di.console.editor.ui');

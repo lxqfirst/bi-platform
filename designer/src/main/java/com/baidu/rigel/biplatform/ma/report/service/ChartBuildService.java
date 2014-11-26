@@ -21,7 +21,7 @@ import com.baidu.rigel.biplatform.ma.report.query.pivottable.PivotTable;
 /**
  * 
  * 图形构建服务
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-14
  */

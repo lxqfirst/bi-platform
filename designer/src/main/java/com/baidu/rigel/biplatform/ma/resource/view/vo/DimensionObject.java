@@ -27,7 +27,7 @@ import com.google.common.collect.Lists;
 /**
  * Dimension View Object
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class DimensionObject implements Serializable {

@@ -32,7 +32,7 @@ import com.google.common.collect.Sets;
  * 
  * CalMeasureViewBo
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class CalMeasureViewBo implements Serializable {

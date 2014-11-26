@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * 用户自定义维度表
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class UserDefineDimTableMetaDefine extends DimTableMetaDefine implements Serializable {
@@ -147,7 +147,7 @@ public class UserDefineDimTableMetaDefine extends DimTableMetaDefine implements 
      * 
      * 配置信息默认可选择的key值列表，主要为来自于SQL的维度配置提供支持
      * 
-     * @author wangyuxue
+     * @author david.wang
      *
      */
     public static interface DefaultConfigKey {

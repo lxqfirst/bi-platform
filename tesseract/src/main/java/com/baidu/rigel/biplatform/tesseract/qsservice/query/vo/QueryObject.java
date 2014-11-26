@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * 查询的节点属性
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryObject implements Serializable {

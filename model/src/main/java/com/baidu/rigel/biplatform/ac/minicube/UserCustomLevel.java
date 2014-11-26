@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  *      SQL：在select中必须有name,caption 如：select trade_id name,trade_name caption from table where xxxx
  *      FILE:文件按列获取，第一列表示维值的唯一标识，第二列为显示名称，如果只有一列显示名称和唯一名称一致， 输入文件地址，如：http://abc.dd.com/aa.txt、/home/work/local/dim.txt
  *      CUSTOM:待实现，用户自定义取数逻辑
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @JsonIgnoreProperties

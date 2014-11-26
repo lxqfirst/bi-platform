@@ -33,7 +33,7 @@ import com.baidu.rigel.biplatform.ma.report.query.ResultSet;
  * 
  * 报表模型数据查询服务接口
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public interface ReportModelQueryService {

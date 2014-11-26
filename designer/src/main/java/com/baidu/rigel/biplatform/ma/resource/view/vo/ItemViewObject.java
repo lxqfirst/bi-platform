@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * 
  * ItemViewObject
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ItemViewObject implements Serializable {

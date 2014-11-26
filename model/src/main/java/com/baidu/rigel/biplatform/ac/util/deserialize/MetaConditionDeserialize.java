@@ -30,7 +30,7 @@ import com.google.gson.JsonParseException;
 /**
  * 元数据条件反序列化实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MetaConditionDeserialize implements JsonDeserializer<MetaCondition> {

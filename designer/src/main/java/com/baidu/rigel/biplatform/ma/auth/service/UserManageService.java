@@ -20,7 +20,7 @@ import com.baidu.rigel.biplatform.ma.auth.bo.User;
 /**
  * 用户管理服务
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface UserManageService {

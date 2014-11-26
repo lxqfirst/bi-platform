@@ -17,7 +17,7 @@
 /**
  * 
  * 查询请求对外访问rest资源包，提供基于http请求的查询服务
- * @author wangyuxue
+ * @author david.wang
  *
  */
 package com.baidu.rigel.biplatform.ma.rt.resource;

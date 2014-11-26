@@ -28,7 +28,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * 过滤条件
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Where implements Serializable {

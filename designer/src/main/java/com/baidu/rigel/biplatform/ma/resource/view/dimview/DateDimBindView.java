@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 /**
  * BO类：日期维度与视图之间的映射关系
  *
- * @author peizhongyi01
+ * @author zhongyi
  * @version 1.0.0.1
  */
 public class DateDimBindView implements Serializable {

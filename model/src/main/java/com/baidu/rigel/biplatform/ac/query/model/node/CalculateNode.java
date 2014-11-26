@@ -23,7 +23,7 @@ import org.apache.commons.lang.NotImplementedException;
 /**
  * 需要进行计算的节点
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class CalculateNode implements Node {
@@ -50,7 +50,7 @@ public class CalculateNode implements Node {
 
     /**
      * 计算的方式
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      *
      */
     public enum CalculateOperation {

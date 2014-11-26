@@ -27,7 +27,7 @@ import com.baidu.rigel.biplatform.ac.model.TimeType;
  * 
  * 时间维度
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class TimeDimension extends MiniCubeDimension {

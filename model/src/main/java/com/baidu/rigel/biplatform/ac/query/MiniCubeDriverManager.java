@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.query.data.impl.SqlDataSourceInfo;
 /**
  * 接入接口
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MiniCubeDriverManager {

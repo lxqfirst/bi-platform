@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 /**
  * YAxis
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class YAxis implements Serializable {

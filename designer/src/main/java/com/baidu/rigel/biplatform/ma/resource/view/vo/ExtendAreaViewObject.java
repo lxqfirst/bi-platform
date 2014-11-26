@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * 
  * 扩展区域映射定义
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ExtendAreaViewObject implements Serializable {

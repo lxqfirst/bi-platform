@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
 /**
  * 非时间维度类型定义：指定维度表中维度类型 该类型指与表关联，同一张维度表中维度类型一致
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public enum StandardDimType implements DimType {

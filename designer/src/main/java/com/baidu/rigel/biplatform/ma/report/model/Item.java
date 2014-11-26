@@ -27,7 +27,7 @@ import com.google.common.collect.Maps;
  * 
  * 报表行或列的元定义
  * 
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class Item implements Serializable {

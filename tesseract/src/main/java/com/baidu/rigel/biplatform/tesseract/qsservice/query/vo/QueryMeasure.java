@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.model.Aggregator;
 /**
  * 查询的指标信息
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryMeasure implements Serializable {

@@ -62,7 +62,7 @@ import com.baidu.rigel.biplatform.ma.resource.view.vo.ExtendAreaViewObject;
  * 
  * 报表模型管理rest接口
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @RestController

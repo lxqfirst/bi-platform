@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.report.query.chart;
 /**
  * XAxisType X轴的类型信息，给前段用作时间优化
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public enum XAxisType {

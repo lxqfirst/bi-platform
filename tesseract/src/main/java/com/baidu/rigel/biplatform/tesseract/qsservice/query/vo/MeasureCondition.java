@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * 基础指标和对应的偏移条件
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class MeasureCondition implements Serializable {

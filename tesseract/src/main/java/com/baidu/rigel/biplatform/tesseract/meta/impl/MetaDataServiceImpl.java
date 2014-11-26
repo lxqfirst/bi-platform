@@ -51,7 +51,7 @@ import com.google.common.collect.Lists;
 /**
  * 元数据实际查询操作实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service

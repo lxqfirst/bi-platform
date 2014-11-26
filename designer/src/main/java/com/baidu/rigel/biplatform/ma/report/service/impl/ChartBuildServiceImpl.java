@@ -41,7 +41,7 @@ import com.google.common.collect.Lists;
  * 
  * 透视表转换成报表图形服务实现
  * 
- * @author peizhongyi01
+ * @author zhongyi
  * 
  *         2014-8-14
  */

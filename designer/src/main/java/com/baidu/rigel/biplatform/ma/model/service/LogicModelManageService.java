@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.model.Schema;
  * 
  * 逻辑模型管理服务接口，用户管理逻辑模型，包括： 模型的持久化服务、模型的更新、删除服务以及对维度、指标的修改服务
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface LogicModelManageService {

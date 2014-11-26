@@ -21,7 +21,7 @@ import com.baidu.rigel.biplatform.ma.utils.ThreadLocalResourceHolder;
  * 
  * 上下文管理器
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-8-13
  */

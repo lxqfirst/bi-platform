@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 响应
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class Response implements Serializable {

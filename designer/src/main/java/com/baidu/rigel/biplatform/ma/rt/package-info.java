@@ -15,7 +15,7 @@
  */
 /**
  * 运行时基础包
- *  @author wangyuxue
+ *  @author david.wang
  * @version 1.0.0.1
  */
 package com.baidu.rigel.biplatform.ma.rt;

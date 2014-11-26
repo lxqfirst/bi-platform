@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * query dim data
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryData implements Serializable {

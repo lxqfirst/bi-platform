@@ -53,7 +53,7 @@ import com.baidu.rigel.biplatform.tesseract.resultset.isservice.ResultRecord;
 /**
  * sql类型维度维值获取实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service(DimensionMemberService.SQL_MEMBER_SERVICE)

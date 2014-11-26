@@ -16,7 +16,7 @@
 
 /**
  * QueryRequest构建包，用于构建查询请求
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 package com.baidu.rigel.biplatform.ma.rt.request.build;

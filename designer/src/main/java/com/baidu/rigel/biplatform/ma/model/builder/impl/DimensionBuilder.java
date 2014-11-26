@@ -53,7 +53,7 @@ import com.baidu.rigel.biplatform.ma.model.utils.UuidGeneratorUtils;
  * 
  * 维度构建器，构建维度模型
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 class DimensionBuilder {

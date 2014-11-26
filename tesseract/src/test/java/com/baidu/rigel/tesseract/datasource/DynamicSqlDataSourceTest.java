@@ -35,7 +35,7 @@ import com.mchange.v2.c3p0.DriverManagerDataSource;
 /**
  * 动态数据源管理单测
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class DynamicSqlDataSourceTest {

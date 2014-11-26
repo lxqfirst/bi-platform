@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.impl.SqlDimensionTre
 /**
  * 维度维值树构建服务
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface DimensionTreeService<T extends DataSourceInfo> {

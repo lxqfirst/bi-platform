@@ -21,7 +21,7 @@ import java.util.Map;
  * 
  * 查询策略：用户此次查询请求的策略，比如：更新全局上下文、查询不同报表、查询图形等
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public enum QueryStrategy {

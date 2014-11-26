@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.query.MiniCubeConnection.DataSourceType;
 
 /**
  * 返回的数据源封装接口
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface DataSourceWrap {

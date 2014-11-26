@@ -38,7 +38,7 @@ import com.google.common.collect.Lists;
 /**
  * REST工具类
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         
  */

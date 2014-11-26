@@ -25,7 +25,7 @@ import com.baidu.rigel.biplatform.ac.util.MetaNameUtil;
 /**
  * 用户配置的数据建模对象：无具体业务含义，可以认为一个schema对应一个多维数据库
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface Schema extends OlapElement {

@@ -22,7 +22,7 @@ import com.baidu.rigel.biplatform.ac.model.Level;
  * 
  * 标准维度定义
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class StandardDimension extends MiniCubeDimension {

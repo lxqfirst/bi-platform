@@ -16,7 +16,7 @@
 
 /**
  * 查询服务接口实现
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 package com.baidu.rigel.biplatform.ma.rt.query.service.impl;

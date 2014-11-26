@@ -25,7 +25,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * 
  * Rest Service结果集对象，封装rest返回值
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public class ResponseResult implements Serializable {

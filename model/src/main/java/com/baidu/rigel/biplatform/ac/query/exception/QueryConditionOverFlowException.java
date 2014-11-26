@@ -20,7 +20,7 @@ package com.baidu.rigel.biplatform.ac.query.exception;
 
 /**
  * 查询条件超出限制异常
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class QueryConditionOverFlowException extends RuntimeException {

@@ -30,7 +30,7 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
  * @see com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel
  * @since jdk1.8 or after
  * @version silkroad 1.0.1
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface ReportDesignModelService {

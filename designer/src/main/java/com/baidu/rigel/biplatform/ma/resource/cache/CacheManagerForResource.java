@@ -30,7 +30,7 @@ import com.baidu.rigel.biplatform.ma.report.exception.CacheOperationException;
 /**
  * REST层的cacheManager
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-30
  */

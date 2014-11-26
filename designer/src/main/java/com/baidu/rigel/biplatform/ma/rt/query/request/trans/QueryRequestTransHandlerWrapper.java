@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ma.rt.query.model.QueryRequest;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryRequestTransHandlerWrapper {

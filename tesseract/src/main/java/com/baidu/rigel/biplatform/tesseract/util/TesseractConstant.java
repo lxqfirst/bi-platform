@@ -19,7 +19,7 @@ package com.baidu.rigel.biplatform.tesseract.util;
 /**
  * Tesseract定义的公共常量
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class TesseractConstant {

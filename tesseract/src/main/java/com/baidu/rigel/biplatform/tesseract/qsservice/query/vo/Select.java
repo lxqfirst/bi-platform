@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * 查询的属性
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Select implements Serializable {

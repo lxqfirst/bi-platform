@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 
 /**
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  */
 public class SeriesDataUnit implements Serializable {

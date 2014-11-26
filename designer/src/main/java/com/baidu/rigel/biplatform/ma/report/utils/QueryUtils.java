@@ -64,7 +64,7 @@ import com.google.common.collect.Sets;
  * 
  * 查询工具类，负责将QueryAction转化城QuestionModel
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class QueryUtils {

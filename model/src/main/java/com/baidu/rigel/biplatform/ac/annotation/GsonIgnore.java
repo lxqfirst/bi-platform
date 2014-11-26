@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 /**
  * 配置gson不序列化的注解 添加了该注解的属性不会被初始化
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Target(ElementType.FIELD)

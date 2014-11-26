@@ -23,7 +23,7 @@ import java.io.Serializable;
 /**
  * 查询分页信息
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Limit implements Serializable {

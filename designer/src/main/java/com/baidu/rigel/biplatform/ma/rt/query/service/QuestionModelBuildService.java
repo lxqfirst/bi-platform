@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ma.rt.query.model.QueryAction;
 
 /**
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public interface QuestionModelBuildService {
@@ -33,6 +33,6 @@ public interface QuestionModelBuildService {
      * @param action query action
      * @return 问题模型
      */
-    QuestionModel buildQuestionModel (QueryAction action);
+    public QuestionModel buildQuestionModel (QueryAction action);
     
 }

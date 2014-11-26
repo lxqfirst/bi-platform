@@ -32,7 +32,7 @@ import com.baidu.rigel.biplatform.ac.util.AesUtil;
 /**
  * sql data source info ,include connection infos
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class SqlDataSourceInfo implements DataSourceInfo {
@@ -132,7 +132,7 @@ public class SqlDataSourceInfo implements DataSourceInfo {
     /**
      * 数据库类型
      * 
-     * @author chenxiaoming01
+     * @author xiaoming.chen
      *
      */
     public enum DataBase {

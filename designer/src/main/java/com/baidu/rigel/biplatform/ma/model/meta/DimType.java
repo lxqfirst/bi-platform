@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.meta;
 /**
  * 维度类型标记接口:统一维度表getDimType方法调用门面
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface DimType {

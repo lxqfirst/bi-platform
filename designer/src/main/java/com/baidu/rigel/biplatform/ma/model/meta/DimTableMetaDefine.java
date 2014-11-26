@@ -29,7 +29,7 @@ import com.google.common.collect.Sets;
  * 维度表元数据定义：用于描述星型模型中维度表的定义信息，包含：维度表的列信息， 维度表的属性信息，维度表的扩展信息等
  * 
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public abstract class DimTableMetaDefine implements Serializable {

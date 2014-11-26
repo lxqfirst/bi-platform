@@ -26,7 +26,7 @@ import com.baidu.rigel.biplatform.ac.util.Md5Util;
 /**
  * query datasource info
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public interface DataSourceInfo extends Serializable {

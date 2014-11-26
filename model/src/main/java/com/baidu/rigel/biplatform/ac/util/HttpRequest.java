@@ -65,7 +65,7 @@ import org.slf4j.LoggerFactory;
 /**
  * httpclient 4.3 的post和get实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class HttpRequest {

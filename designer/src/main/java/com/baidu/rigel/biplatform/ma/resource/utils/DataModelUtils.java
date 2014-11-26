@@ -42,7 +42,7 @@ import com.google.common.collect.Lists;
 /**
  * 类DataModelUtils.java的实现描述：DataModel操作工具类
  * 
- * @author chenxiaoming01 2013-12-5 下午2:51:58
+ * @author xiaoming.chen 2013-12-5 下午2:51:58
  */
 public class DataModelUtils {
     

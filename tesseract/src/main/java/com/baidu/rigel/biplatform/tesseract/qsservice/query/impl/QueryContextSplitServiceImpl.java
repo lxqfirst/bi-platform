@@ -29,7 +29,7 @@ import com.baidu.rigel.biplatform.tesseract.qsservice.query.vo.QueryContextSplit
 /**
  * 按照查询上下文自动拆分实现
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 @Service

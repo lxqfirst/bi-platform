@@ -63,7 +63,7 @@ import com.google.gson.reflect.TypeToken;
 /**
  * 元数据查询相关接口，包括取维度的members和children
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 

@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * md5 工具类单测
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class Md5UtilTest {

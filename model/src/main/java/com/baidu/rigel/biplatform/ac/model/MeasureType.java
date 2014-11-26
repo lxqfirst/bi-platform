@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ac.model;
 /**
  * 指标类型定义：包括普通指标、自定义指标以及计算指标
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public enum MeasureType {

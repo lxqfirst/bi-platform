@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * 类DICallbackService.java的实现描述：不同Callback的参数封装以及获取对象方法
  * 
- * @author chenxiaoming01 2013-12-19 下午10:00:58
+ * @author xiaoming.chen 2013-12-19 下午10:00:58
  */
 public interface DICallbackService<T> {
 

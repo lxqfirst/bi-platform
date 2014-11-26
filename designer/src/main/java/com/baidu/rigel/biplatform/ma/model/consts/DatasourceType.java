@@ -18,7 +18,7 @@ package com.baidu.rigel.biplatform.ma.model.consts;
 /**
  * 数据源的类型
  * 
- * @author peizhongyi01
+ * @author zhongyi
  *
  *         2014-7-29
  */

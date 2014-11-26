@@ -25,7 +25,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * 占位符工具类,支持占位符格式为 ${name}
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class PlaceHolderUtils {

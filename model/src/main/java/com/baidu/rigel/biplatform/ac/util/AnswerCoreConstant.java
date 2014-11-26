@@ -42,7 +42,7 @@ import com.google.gson.GsonBuilder;
 /**
  * answercore 常量
  * 
- * @author chenxiaoming01
+ * @author xiaoming.chen
  *
  */
 public class AnswerCoreConstant {

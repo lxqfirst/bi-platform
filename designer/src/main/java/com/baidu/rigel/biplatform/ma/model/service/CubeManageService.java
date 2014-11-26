@@ -23,7 +23,7 @@ import com.baidu.rigel.biplatform.ac.model.Schema;
  * 
  * 立方体逻辑模型管理服务
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 public interface CubeManageService {

@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 /**
  * 
- * @author wangyuxue
+ * @author david.wang
  *
  */
 @Resource(name = "ResourceRepository")

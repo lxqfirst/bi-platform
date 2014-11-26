@@ -39,7 +39,7 @@ import com.baidu.rigel.biplatform.ma.report.model.ReportDesignModel;
  * 
  * 报表模型操作工具类，提供操作报表模型的通用方法
  *
- * @author wangyuxue
+ * @author david.wang
  * @version 1.0.0.1
  */
 public class ReportDesignModelUtils {
