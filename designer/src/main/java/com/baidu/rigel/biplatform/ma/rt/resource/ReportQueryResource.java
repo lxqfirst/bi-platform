@@ -33,7 +33,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -159,8 +158,8 @@ public class ReportQueryResource {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/{reportId}/report_vm", method = { RequestMethod.GET },
-            produces = "text/html;charset=utf-8")
+//    @RequestMapping(value = "/{reportId}/report_vm", method = { RequestMethod.GET },
+//            produces = "text/html;charset=utf-8")
     public String queryVM(@PathVariable("reportId") String reportId, HttpServletRequest request,
             HttpServletResponse response) {
         // ServletContext
@@ -275,8 +274,8 @@ public class ReportQueryResource {
         return builder.toString();
     }
 
-    @RequestMapping(value = "/{reportId}/report_json", method = { RequestMethod.GET },
-            produces = "text/plain;charset=utf-8")
+//    @RequestMapping(value = "/{reportId}/report_json", method = { RequestMethod.GET },
+//            produces = "text/plain;charset=utf-8")
     public String queryJson(@PathVariable("reportId") String reportId, HttpServletRequest request,
             HttpServletResponse response) {
         ReportDesignModel model = null;
@@ -299,7 +298,7 @@ public class ReportQueryResource {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/{reportId}/runtime_model", method = { RequestMethod.POST })
+//    @RequestMapping(value = "/{reportId}/runtime_model", method = { RequestMethod.POST })
     public ResponseResult initRunTimeModel(@PathVariable("reportId") String reportId, HttpServletRequest request) {
         // ServletContext
         ServletContext servletContext = request.getSession().getServletContext();
@@ -360,7 +359,7 @@ public class ReportQueryResource {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/{reportId}/runtime/context", method = { RequestMethod.POST })
+//    @RequestMapping(value = "/{reportId}/runtime/context", method = { RequestMethod.POST })
     public ResponseResult updateContext(@PathVariable("reportId") String reportId, HttpServletRequest request) {
         
         Map<String, String[]> contextParams = request.getParameterMap();
@@ -397,7 +396,7 @@ public class ReportQueryResource {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/{reportId}/runtime/extend_area/{areaId}", method = { RequestMethod.POST })
+//    @RequestMapping(value = "/{reportId}/runtime/extend_area/{areaId}", method = { RequestMethod.POST })
     public ResponseResult queryArea(@PathVariable("reportId") String reportId, @PathVariable("areaId") String areaId,
             HttpServletRequest request) {
         /**

@@ -70,6 +70,7 @@ import com.google.common.collect.Maps;
  *
  *         2014-8-5
  */
+@Service
 public class QueryActionBuildServiceImpl implements QueryBuildService {
     
     /**
