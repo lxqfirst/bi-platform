@@ -49,7 +49,7 @@
 		<url-pattern>*.action</url-pattern>
 	</filter-mapping>
 	
-    <!-- Add by peizhongyi01 2014-06-20 for CAS Check -->
+    <!-- Add by  2014-06-20 for CAS Check -->
     <!-- Delete this FILTER for development -->
     <filter>
         <filter-name>casCheckFilter</filter-name>
