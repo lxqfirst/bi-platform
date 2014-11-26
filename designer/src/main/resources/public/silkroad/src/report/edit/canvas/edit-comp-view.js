@@ -3,7 +3,7 @@
  *       删除某一组件
  *       打开组件配置器
  *       接收数据项
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(longze_xq@163.com)
  * @date 2014-8-14
  */
 define([

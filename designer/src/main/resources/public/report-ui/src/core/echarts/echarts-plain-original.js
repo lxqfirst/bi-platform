@@ -410,7 +410,7 @@ var requirejs, require, define;
  * echarts默认配置项
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/config',[],function() {
@@ -2842,10 +2842,7 @@ define('zrender/tool/env',[],function() {
  * zrender: shape仓库
  *
  * @desc zrender是一个轻量级的Canvas类库，MVC封装，数据驱动，提供类Dom事件模型。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
- *
- */
-define(
+ * @author Kener (@Kener-林峰, linzhifeng@baidu.comefine(
     'zrender/shape',[],function(/*require*/) {
         var self = {};
 
@@ -2877,8 +2874,7 @@ define(
  *
  * author : lang(shenyi01@baidu.com)
  */
-define(
-    'zrender/tool/vector',[],function() {
+defirender/tool/vector',[],function() {
         var ArrayCtor
             = typeof Float32Array === 'undefined'
             ? Array
@@ -2969,7 +2965,7 @@ define(
  * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
  *
  * clone：深度克隆
- * merge：合并源对象的属性到目标对象
+ 源对象的属性到目标对象
  * getContext：获取一个自由使用的canvas 2D context，使用原生方法，如isPointInPath，measureText等
  */
 define(
@@ -3462,7 +3458,7 @@ define(
  * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
  *
  * isInside：是否在区域内部
- * isOutside：是否在区域外部
+ * is在区域外部
  * getTextWidth：测算单行文本宽度
  */
 define(
@@ -3959,10 +3955,7 @@ define(
  * zrender: 3x2矩阵操作类
  *
  * author: lang(shenyi01@baidu.com)
- * code from mat2d in http://glmatrix.net/
- */
-
-define(
+ * code from mat2d in http://glmatrix.define(
     'zrender/tool/matrix',[],function() {
 
         var matrix = {
@@ -4069,7 +4062,7 @@ define(
  *
  * getColor：获取色板颜色
  * customPalette : 自定义调色板
- * resetPalette : 重置调色板
+lette : 重置调色板
  *
  * getHighlightColor : 获取默认高亮颜色
  * customHighlight : 自定义默认高亮颜色
@@ -5099,7 +5092,7 @@ define( 'zrender/tool/color',['require','../tool/util'],function(require) {
  * 可配图形属性：
    {
        // 基础属性，详见各shape
-       shape  : {string},       // 必须，shape类标识，需要显式指定
+       shape  :       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
@@ -5911,7 +5904,7 @@ define(
  * 可配图形属性：
    {
        // 基础属性
-       shape  : 'circle',       // 必须，shape类标识，需要显式指定
+       shape  : 'circl// 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
@@ -6031,7 +6024,7 @@ define(
  * Todo：excanvas bug ~ 连续scale保持?? IE8下不建议使用
  * 可配图形属性：
    {
-       // 基础属性
+  属性
        shape  : 'ellipse',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
@@ -6165,7 +6158,7 @@ define(
  * 可配图形属性：
    {
        // 基础属性
-       shape  : 'line',         // 必须，shape类标识，需要显式指定
+       shape  : 'line',         // 必须，sha指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
@@ -6300,8 +6293,7 @@ define(
  * 可配图形属性：
    {
        // 基础属性
-       shape  : 'polygon',      // 必须，shape类标识，需要显式指定
-       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
+       shape  : 'polygon',      // 必须，shape类标识，需要显 id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
@@ -6575,7 +6567,7 @@ define(
    {
        // 基础属性
        shape  : 'brokenLine',         // 必须，shape类标识，需要显式指定
-       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
+    : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
@@ -6734,8 +6726,8 @@ define(
  * 可配图形属性：
    {
        // 基础属性
-       shape  : 'rectangle',       // 必须，shape类标识，需要显式指定
-       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
+       shape  : 're      // 必须，shape类标识，需要显式指定
+       id     : {string} 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
@@ -6929,7 +6921,7 @@ define(
    {
        // 基础属性
        shape  : 'ring',         // 必须，shape类标识，需要显式指定
-       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
+       id     : {string},       // 必须过zrender实例方法newShapeId生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
@@ -7056,7 +7048,7 @@ define(
 define(
     'zrender/tool/math',[],function() {
         /*
-        var _cache = {
+r _cache = {
             sin : {},     //sin缓存
             cos : {}      //cos缓存
         };
@@ -7126,7 +7118,7 @@ define(
    {
        // 基础属性
        shape  : 'sector',       // 必须，shape类标识，需要显式指定
-       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
+       id     : {string},       // 必须，图形唯一标识，可通过zrender实例Id生成
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
@@ -7335,8 +7327,7 @@ define(
    {
        // 基础属性
        shape  : 'text',         // 必须，shape类标识，需要显式指定
-       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShape  zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -7565,7 +7556,7 @@ define(
        // 基础属性
        shape  : 'heart',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+      {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -7702,7 +7693,7 @@ define(
        // 基础属性
        shape  : 'heart',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       zlevel :       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -7839,7 +7830,7 @@ define(
        // 基础属性
        shape  : 'path',         // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       zlevel : {number},默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -8393,7 +8384,7 @@ define('zrender/shape/path',['require','./base','../shape'],function(require) {
        // 基础属性
        shape  : 'image',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       zlevel : {number},       // el，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -8614,7 +8605,7 @@ define(
        // 基础属性
        shape  : 'beziercurve',         // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       zlevel : {number},       // el，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -8767,7 +8758,7 @@ define(
        // 基础属性
        shape  : 'star',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
+       zlevel : {number},       // 默认为0，z层level，决定绘中
        invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
@@ -8935,8 +8926,7 @@ define(
        // 基础属性
        shape  : 'isogon',       // 必须，shape类标识，需要显式指定
        id     : {string},       // 必须，图形唯一标识，可通过zrender实例方法newShapeId生成
-       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
-       invisible : {boolean},   // 默认为false，是否可见
+       zlevel : {number},       // 默认为0，z层level，决定绘画在哪层ca   invisible : {boolean},   // 默认为false，是否可见
 
        // 样式属性，默认状态样式样式属性
        style  : {
@@ -9092,7 +9082,7 @@ define(
 
             // 二次方的缓动（t^2）
             QuadraticIn: function(k) {
-                return k * k;
+      return k * k;
             },
             QuadraticOut: function(k) {
                 return k * (2 - k);
@@ -9855,9 +9845,7 @@ define(
         loadingEffect : 'spin',         // 默认loading特效
         EVENT : {                       // 支持事件列表
             RESIZE : 'resize',          // 窗口大小变化
-            CLICK : 'click',            // 鼠标按钮被（手指）按下，事件对象是：目标图形元素或空
-
-            MOUSEWHEEL : 'mousewheel',  // 鼠标滚轮变化，事件对象是：目标图形元素或空
+            CLICK : 'click',            // 鼠标按钮被（手指）按下，事件对象是：目标图形        MOUSEWHEEL : 'mousewheel',  // 鼠标滚轮变化，事件对象是：目标图形元素或空
             MOUSEMOVE : 'mousemove',    // 鼠标（手指）被移动，事件对象是：目标图形元素或空
             MOUSEOVER : 'mouseover',    // 鼠标移到某图形元素之上，事件对象是：目标图形元素
             MOUSEOUT : 'mouseout',      // 鼠标从某图形元素移开，事件对象是：目标图形元素
@@ -9897,7 +9885,7 @@ define(
  * bubble：气泡
  */
 define(
-    'zrender/tool/loadingEffect',['require','./util','./color','./color','./color','./color','./color','./math'],function(require) {
+    'zrender/tool/loadingEffect',['require','./util','./color','./color','./color','./color','./math'],function(require) {
         var util = require('./util');
         var self;
         var _defaultText = 'Loading...';
@@ -10637,8 +10625,7 @@ define(
         * @param  {event} e 事件.
         * @return {number} 鼠标（手指）x坐标.
         */
-        function getX(e) {
-            return typeof e.zrenderX != 'undefined' && e.zrenderX
+        function ge          return typeof e.zrenderX != 'undefined' && e.zrenderX
                    || typeof e.offsetX != 'undefined' && e.offsetX
                    || typeof e.layerX != 'undefined' && e.layerX
                    || typeof e.clientX != 'undefined' && e.clientX;
@@ -10827,7 +10814,7 @@ define(
  *
  */
 define(
-    'zrender/zrender',['require','./lib/excanvas','./tool/env','./shape','./shape/circle','./shape/ellipse','./shape/line','./shape/polygon','./shape/brokenLine','./shape/rectangle','./shape/ring','./shape/sector','./shape/text','./shape/heart','./shape/droplet','./shape/path','./shape/image','./shape/beziercurve','./shape/star','./shape/isogon','./animation/animation','./tool/util','./tool/util','./config','./tool/loadingEffect','./tool/loadingEffect','./config','./tool/env','./tool/event'],function(require) {
+    'zrender/zrender',['require','./lib/excanvas','./tool/env','./shape','./shape/circle','./shape/ellipse','./shape/line','./shape/polygon','./shape/brokenLine','./shape/rectangle','./shape/ring','./shape/sector','./shape/text','./shape/heart','./shape/droplet','./shape/pape/image','./shape/beziercurve','./shape/star','./shape/isogon','./animation/animation','./tool/util','./tool/util','./config','./tool/loadingEffect','./tool/loadingEffect','./config','./tool/env','./tool/event'],function(require) {
         /*
          * HTML5 Canvas for Internet Explorer!
          * Modern browsers like Firefox, Safari, Chrome and Opera support
@@ -12927,7 +12914,7 @@ define('zrender', ['zrender/zrender'], function (main) { return main; });
        zlevel : {number},       // 默认为0，z层level，决定绘画在哪层canvas中
        invisible : {boolean},   // 默认为false，是否可见
 
-       // 样式属性，默认状态样式样式属性
+       // 样式式属性
        style  : {
            x             : {number},  // 必须，左上角横坐标
            y             : {number},  // 必须，左上角纵坐标
@@ -13470,8 +13457,7 @@ define(
         var matrix = require('zrender/tool/matrix');
         
         function MarkLine() {
-            this.type = 'markLine';
-        }
+            this.type = 'markLi   }
 
         MarkLine.prototype =  {
             /**
@@ -13733,8 +13719,7 @@ define('echarts/chart',[],function(/*require*/) {    //chart
      */
     self.define = function(name, clazz) {
         _chartLibrary[name] = clazz;
-        return self;
-    };
+        return se
 
     /**
      * 获取图形实现
@@ -13765,8 +13750,7 @@ define('echarts/util/ecData',[],function() {
      * @param {*=} special
      * @param {*=} special2
      */
-    function pack(
-        shape, series, seriesIndex, data, dataIndex, name, special, special2
+    function pac shape, series, seriesIndex, data, dataIndex, name, special, special2
     ) {
         var value;
         if (typeof data != 'undefined') {
@@ -13882,7 +13866,7 @@ define('echarts/component/base',['require','../config','../util/ecData','zrender
 
         self.zr =zr;
 
-        self.shapeList = [];
+   shapeList = [];
         
         var _aniMap = {};
         _aniMap[ecConfig.CHART_TYPE_LINE] = true;
@@ -14968,7 +14952,7 @@ define('echarts/chart/calculableBase',['require','../util/ecData','../util/accMa
         var zrUtil = require('zrender/tool/util');
         var self = this;
 
-        self.selectedMap = {};
+        sedMap = {};
 
         self.shapeHandler = {
             onclick : function() {
@@ -15125,7 +15109,7 @@ define('echarts/chart/island',['require','../component/base','./calculableBase',
      * @param {ZRender} zr zrender实例
      * @param {Object} option 图表选项
      */
-    function Island(messageCenter, zr) {
+ n Island(messageCenter, zr) {
         // 基类装饰
         var ComponentBase = require('../component/base');
         ComponentBase.call(this, zr);
@@ -15395,8 +15379,7 @@ define('echarts/component',[],function(/*require*/) {    //component
     };
 
     /**
-     * 获取图形实现
-     * @param {Object} name
+     * 获取图形@param {Object} name
      */
     self.get = function(name) {
         return _componentLibrary[name];
@@ -15419,8 +15402,7 @@ define('echarts/component/title',['require','./base','../config','zrender/tool/a
      * @param {Object} option 图表参数
      */
     function Title(messageCenter, zr, option) {
-        var Base = require('./base');
-        Base.call(this, zr);
+        var Base = require('./bas   Base.call(this, zr);
 
         var ecConfig = require('../config');
         var zrArea = require('zrender/tool/area');
@@ -15704,7 +15686,7 @@ define('echarts/component/categoryAxis',['require','./base','../config','zrender
      * @param {Object} option 类目轴参数
      * @param {Grid} grid 网格对象
      */
-    function CategoryAxis(messageCenter, zr, option, component) {
+    function CategoryAxis(messageCenter, zr, option,) {
         var Base = require('./base');
         Base.call(this, zr);
 
@@ -16460,7 +16442,7 @@ define('echarts/component/valueAxis',['require','./base','../config','zrender/to
      * @param {Grid} grid 网格对象
      * @param {Array} series 数据对象
      */
-    function ValueAxis(messageCenter, zr, option, component, series) {
+    function ValueAxis(messageCenter, zr, option, cseries) {
         var Base = require('./base');
         Base.call(this, zr);
 
@@ -17058,8 +17040,7 @@ define('echarts/component/valueAxis',['require','./base','../config','zrender/to
              console.log('result is :', _min, _max, _valueList);
              console.log('should be : 0 150 [0, 30, 60, 90, 120, 150]',
                         (_min == 0 && _max == 150) ? 'success' : 'failed');
-
-             _min = 10; _max = 1923; console.log(_min, _max); _reformValue();
+    _min = 10; _max = 1923; console.log(_min, _max); _reformValue();
              console.log('result is :', _min, _max, _valueList);
              console.log('should be : 0 2000 [0, 400, 800, 1200, 1600, 2000]',
                         (_min == 0 && _max == 2000) ? 'success' : 'failed');
@@ -17366,7 +17347,7 @@ define('echarts/component/valueAxis',['require','./base','../config','zrender/to
  *    纵轴通常为数值型，但条形图时则纵轴为类目型。
  *
  */
-define('echarts/component/axis',['require','./base','../config','./categoryAxis','./valueAxis','../component'],function (require) {
+define('echarts/component/axis',['require','./base','../config','./categoryAxis','./valueAxis','../component'],function (
     /**
      * 构造函数
      * @param {Object} messageCenter echart消息中心
@@ -17571,7 +17552,7 @@ define('echarts/component/grid',['require','./base','../config','../component'],
      * @param {Object} option 图表选项
      *      @param {number=} option.grid.x 直角坐标系内绘图网格起始横坐标，数值单位px
      *      @param {number=} option.grid.y 直角坐标系内绘图网格起始纵坐标，数值单位px
-     *      @param {number=} option.grid.width 直角坐标系内绘图网格宽度，数值单位px
+     *      @param {number=} option.grid.width 直度，数值单位px
      *      @param {number=} option.grid.height 直角坐标系内绘图网格高度，数值单位px
      */
     function Grid(messageCenter, zr, option) {
@@ -17725,7 +17706,7 @@ define('echarts/component/dataZoom',['require','./base','../config','../componen
      */
     function DataZoom(messageCenter, zr, option, component) {
         var Base = require('./base');
-        Base.call(this, zr);
+       (this, zr);
 
         var ecConfig = require('../config');
 
@@ -18771,8 +18752,7 @@ define('echarts/component/legend',['require','./base','../config','zrender/tool/
      * @param {Object} option 图表参数
      * @param {Object=} selected 用于状态保持
      */
-    function Legend(messageCenter, zr, option, selected) {
-        var Base = require('./base');
+    function Legend(messageCenter, zr, option, sel       var Base = require('./base');
         Base.call(this, zr);
 
         var ecConfig = require('../config');
@@ -19594,7 +19574,7 @@ define('echarts/component/dataRange',['require','./base','../config','zrender/to
      */
     function DataRange(messageCenter, zr, option) {
         var Base = require('./base');
-        Base.call(this, zr);
+     ll(this, zr);
 
         var ecConfig = require('../config');
         var zrArea = require('zrender/tool/area');
@@ -20849,7 +20829,7 @@ define('echarts/component/tooltip',['require','./base','../config','../util/ecDa
      * @param {Object} option 提示框参数
      * @param {HtmlElement} dom 目标对象
      */
-    function Tooltip(messageCenter, zr, option, dom) {
+    function TooltCenter, zr, option, dom) {
         var Base = require('./base');
         Base.call(this, zr);
 
@@ -22251,7 +22231,7 @@ define('echarts/component/toolbox',['require','./base','../config','zrender/conf
         var Base = require('./base');
         Base.call(this, zr);
 
-        var ecConfig = require('../config');
+        var ecConfig = requirig');
         var zrConfig = require('zrender/config');
         var zrUtil = require('zrender/tool/util');
         var zrEvent = require('zrender/tool/event');
@@ -23248,8 +23228,7 @@ define('echarts/component/dataView',['require','./base','../config','../componen
 
         var ecConfig = require('../config');
 
-        var self = this;
-        self.type = ecConfig.COMPONENT_TYPE_DATAVIEW;
+        var self = t   self.type = ecConfig.COMPONENT_TYPE_DATAVIEW;
 
         var _lang = ['Data View', 'close', 'refresh'];
 
@@ -23718,7 +23697,7 @@ define(
         /**
          * 直角坐标转极坐标
          *
-         * @param {number} 横坐标
+         * @per} 横坐标
          * @param {number} 纵坐标
          *
          * @return {Array.<number>} 极坐标[r,theta]
@@ -23753,7 +23732,7 @@ define(
             var zrUtil = require('zrender/tool/util');
 
             var self = this;
-            self.type = ecConfig.COMPONENT_TYPE_POLAR;
+            seecConfig.COMPONENT_TYPE_POLAR;
 
             var polar; 
 
@@ -24665,7 +24644,7 @@ define(
  * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
  *
  */
-define('echarts/echarts',['require','./config','./config','zrender','zrender/tool/util','zrender/tool/event','zrender/config','./util/shape/icon','./util/shape/markLine','./chart','./chart/island','./component','./component/title','./component/axis','./component/categoryAxis','./component/valueAxis','./component/grid','./component/dataZoom','./component/legend','./component/dataRange','./component/tooltip','./component/toolbox','./component/dataView','./component/polar','./util/ecData','./chart','./component','zrender/tool/util','zrender/tool/util','zrender/tool/util','zrender/tool/color','zrender/tool/util','zrender/tool/util','zrender/tool/util'],function(require) {
+define('echarts/echarts',['require','./config','./config','zrender','zrender/tool/util','zrender/tool/event','zrender/config','./util/shape/icon','./util/shape/markLine','./chart','./chart/island','./component','./component/title','./component/axis','./component/categoryAxis','./component/valueAxis','./component/grid','./component/dataZoom','./component/legend','./component/dataRange','./component/tooltip','./component/toolbox','./component/dataView','./component/polar','./util/ecData','./chart','./componeer/tool/util','zrender/tool/util','zrender/tool/util','zrender/tool/color','zrender/tool/util','zrender/tool/util','zrender/tool/util'],function(require) {
     var self = {};
     var echarts = self;     // 提供内部反向使用静态方法；
     self.version = '1.3.7';
@@ -25952,8 +25931,7 @@ define('echarts', ['echarts/echarts'], function (main) { return main; });
            pointList     : {Array},   // 必须，二维数组，二维内容如下
                x         : {number},  // 必须，横坐标
                y         : {number},  // 必须，纵坐标数组
-               size      : {number},  // 必须，半宽
-               type      : {string=}, // 默认为'circle',图形类型
+               size      : {number},                type      : {string=}, // 默认为'circle',图形类型
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度，描边下有效
@@ -26174,7 +26152,7 @@ define('echarts/chart/scatter',['require','../component/base','./calculableBase'
         // 基类装饰
         var ComponentBase = require('../component/base');
         ComponentBase.call(this, zr);
-        // 可计算特性装饰
+
         var CalculableBase = require('./calculableBase');
         CalculableBase.call(this, zr, option);
 
@@ -26553,7 +26531,7 @@ define('echarts/chart/scatter',['require','../component/base','./calculableBase'
            y             : {Array},   // 必须，纵坐标数组
            width         : {number},  // 必须，宽度
            brushType     : {string},  // 默认为fill，绘画方式
-                                      // fill(填充) | stroke(描边) | both(填充+描边)
+                            // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度，描边下有效
@@ -26743,7 +26721,7 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
         var ComponentBase = require('../component/base');
         ComponentBase.call(this, zr);
         // 可计算特性装饰
-        var CalculableBase = require('./calculableBase');
+        var CalculableBase('./calculableBase');
         CalculableBase.call(this, zr, option);
 
         var ecConfig = require('../config');
@@ -27271,7 +27249,7 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
         var ComponentBase = require('../component/base');
         ComponentBase.call(this, zr);
         // 可计算特性装饰
-        var CalculableBase = require('./calculableBase');
+        ableBase = require('./calculableBase');
         CalculableBase.call(this, zr, option);
 
         var ecConfig = require('../config');
@@ -31835,7 +31813,7 @@ define('echarts/chart/force',['require','../component/base','./calculableBase','
            pointList     : {Array},   // 必须，多边形各个顶角坐标
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
-           color         : {color},   // 默认为'#000'，填充颜色，支持rgba
+           color         : {color}'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度，描边下有效
 
@@ -31962,7 +31940,7 @@ define('echarts/chart/line',['require','../component/base','./calculableBase','.
         var ComponentBase = require('../component/base');
         ComponentBase.call(this, zr);
         // 可计算特性装饰
-        var CalculableBase = require('./calculableBase');
+  CalculableBase = require('./calculableBase');
         CalculableBase.call(this, zr, option);
 
         var ecConfig = require('../config');
@@ -32919,7 +32897,7 @@ define('echarts/chart/bar',['require','../component/base','./calculableBase','..
         ComponentBase.call(this, zr);
         // 可计算特性装饰
         var CalculableBase = require('./calculableBase');
-        CalculableBase.call(this, zr, option);
+     bleBase.call(this, zr, option);
 
         var ecConfig = require('../config');
         var ecData = require('../util/ecData');

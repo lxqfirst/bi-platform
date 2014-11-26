@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 全局菜单管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');

@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:   工程基础
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -18,7 +18,7 @@ var xui = {};
  *          [功能]
  *              (1) 各级名空间建立
  *              (2) 交叉引用/文件依赖的一种解决方案（闭包变量注入）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @version: 1.0.1
  */
 
@@ -1137,7 +1137,7 @@ baidu.ejson = function () {
  *
  * @file:    工程直接使用的工具集
  *          在基础提供的工具函数之外，可根据每个工程需要添加工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -1165,7 +1165,7 @@ var xutil = {
  * @file:    节点有序的哈希表
  *           为哈希表提供线性表能力，适合管理有唯一性id的数据集合，
  *           做为队列、链表等结构使用
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -1915,7 +1915,7 @@ var xutil = {
  *              防止返回处理时因相应的dom已不存在而出错。
  *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
  *              参见createSyncWrap方法
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  tangram.ajax, e-json, xutil.ajax
  */
 
@@ -2483,7 +2483,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    列表、数组、集合相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.object
  */
 
@@ -2800,7 +2800,7 @@ var xutil = {
  *
  * @file:   时间相关工具函数集合。
  *          便于工程中统一时间格式，并提供时间相关的数学操作。
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  * @depend: xutil.lang, xutil.number
  */
 
@@ -3291,7 +3291,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DOM相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 (function () {
@@ -3483,7 +3483,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    文件相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -3536,7 +3536,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    函数相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -3577,7 +3577,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    图形图像相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -3637,7 +3637,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    基本工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang, xutil.string
  */
 
@@ -3907,7 +3907,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    数值相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -4088,7 +4088,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    对象相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -4769,7 +4769,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    字符串相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -5019,7 +5019,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    唯一性ID相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -5062,7 +5062,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    时间相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -5302,7 +5302,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    输入验证相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -5380,7 +5380,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    视图和模型的基类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.object
  * @version: 1.0.1
  */
@@ -5825,7 +5825,7 @@ var xutil = {
  *                  防止请求回来后视图、模型已经不存在导致js错误、
  *                  全局视图未清理等问题
  *
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  * @version: 1.0.1
  */
@@ -6963,7 +6963,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    视图基类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  * @usage:   
  *          (1) 须实现xui.XView.domReady函数

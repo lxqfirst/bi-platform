@@ -34,7 +34,7 @@
  *                  防止请求回来后视图、模型已经不存在导致js错误、
  *                  全局视图未清理等问题
  *
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  * @version: 1.0.1
  */

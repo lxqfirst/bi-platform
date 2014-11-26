@@ -1,6 +1,6 @@
 /**
  * @file 可拖放的items
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 
 (function() {

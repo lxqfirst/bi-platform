@@ -4,7 +4,7 @@
  *
  * @change: 修改formatNumber方法，date类数值的format支持。by MENGRAN at 2013-12-06
  * @file:    数值相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 

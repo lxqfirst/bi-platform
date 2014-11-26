@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    含左菜单，右侧是tab页的整体页基类，如果想用这种布局及逻辑，可继承此类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  * @deprecated: 已弃用，因为没必要搞这么多抽象设计得这么复杂，
  *          代码适当堆一块儿反而好找。

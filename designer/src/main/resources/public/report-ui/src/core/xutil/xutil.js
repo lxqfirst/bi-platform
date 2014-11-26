@@ -4,7 +4,7 @@
  *
  * @file:    工程直接使用的工具集
  *          在基础提供的工具函数之外，可根据每个工程需要添加工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**

@@ -1,6 +1,6 @@
 /**
  * @file 报表编辑画布区操作的model
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(longze_xq@163.com)
  * @date 2014-08-05
  */
 define([

@@ -1,6 +1,6 @@
 /**
  * @file 日历组件的配置数据信息
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(longze_xq@163.com)
  * @date 2014-9-10
  */
 define([

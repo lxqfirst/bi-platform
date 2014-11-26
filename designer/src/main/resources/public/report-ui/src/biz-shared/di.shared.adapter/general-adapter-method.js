@@ -5,7 +5,7 @@
  * @file:    通用的默认适配器
  *           一般在di.config.Dict中使用adapterMethods来引用此中方法，
  *           拷贝到目标对象中
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 

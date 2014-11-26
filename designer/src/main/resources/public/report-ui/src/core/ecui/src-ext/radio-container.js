@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    简单的Radio页容器，行为为tab类同，适于tab与contant视图上分离的场景，并且也支持多个tab共享content
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 

@@ -1,6 +1,6 @@
 /**
  * @file 设置报表cube的view
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(longze_xq@163.com)
  * @date: 2014-7-17
  */
 define(['url', 'data-sources/list/main-model'], function (Url, DataSourcesModel) {

@@ -7,7 +7,7 @@
  *              各种组件的类型均从这里获取，不直接引用。
  *              全局实例从这里获取。
  *
- * @author:  sushuang(sushuang@baidu.com),lizhantong(lztlovely@126.com)
+ * @author:  sushuang(sushuang),lizhantong(lztlovely@126.com)
  * @depend:  xui, xutil
  */
 

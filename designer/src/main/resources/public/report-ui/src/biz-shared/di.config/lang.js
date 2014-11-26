@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    data insight 全局(包括console和product)的话术定义
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 $namespace('di.config');

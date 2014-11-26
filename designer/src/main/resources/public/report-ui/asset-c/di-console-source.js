@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    项目起始文件，全局声明
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui.XProject
  */
 
@@ -45,7 +45,7 @@ xutil.object.PATH_DEFAULT_CONTEXT = $getNamespaceBase();
  * @file:    data insight 全局(包括console和product)的ajax的配置
  *          （常量和默认失败处理等）
  *          （如不服此配置，可重载）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.ajax, di.config.lang
  */
 
@@ -187,7 +187,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    data insight 全局(包括console和product)的ajax的配置
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 $namespace('di.config');
@@ -471,7 +471,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    data insight 全局(包括console和product)的话术定义
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 $namespace('di.config');
@@ -542,7 +542,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    data insight 全局(包括console和product)的URL定义
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 $namespace('di.config');
 
@@ -671,7 +671,7 @@ $namespace('di.config');
  * 
  * @file:    全局的提示信息 
  *           (代码拷贝自 rigel.layer。但是tip是“小窍门”的意思，而不是“提示”的意思，所以改成prompt)
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depends: ecui
  */
 
@@ -964,7 +964,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    格式化集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 
@@ -1186,7 +1186,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    提供html片段的解析
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 
@@ -1481,7 +1481,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    业务辅助函数集
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil, tangram.ajax, tangram.json
  */
 
@@ -2499,7 +2499,7 @@ $namespace('di.helper');
  * 
  * @file:    console工程的ajax配置
  *           重载全局配置
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xutil.ajax, config.lang
  */
 
@@ -2526,7 +2526,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console的字典及常量定义
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 (function() {
@@ -2545,7 +2545,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console的话术定义
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 (function() {
@@ -2565,7 +2565,7 @@ $namespace('di.helper');
  * 
  * @file:    console工程的url配置
  *           重载全局配置
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 (function() {
@@ -2591,7 +2591,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console特有的全局的提示信息 
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  tangram.dom, tangram.page, ecui, xui
  */
 
@@ -2611,7 +2611,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console特有的格式化
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xutil, tangram.ajax
  */
 
@@ -2631,7 +2631,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console特有的业务辅助函数集
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xutil, tangram.ajax
  */
 
@@ -2651,7 +2651,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    隐藏的输入，用于传递报表引擎外部传来的参数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -2726,7 +2726,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    离线下载按钮和对话框
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -2895,7 +2895,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表元数据拖拽
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xui, xutil, ecui
  */
 
@@ -3655,7 +3655,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    文字区
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -3769,7 +3769,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 权限数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -3805,7 +3805,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    通用请求参数处理器工厂
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -4034,7 +4034,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    cube树原数据Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -4204,7 +4204,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 时间数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -4252,7 +4252,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -4524,7 +4524,7 @@ $namespace('di.shared.model');
  *              各种组件的类型均从这里获取，不直接引用。
  *              全局实例从这里获取。
  *           
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -6851,7 +6851,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表单模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -7017,7 +7017,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -7424,7 +7424,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    维度选择model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -7692,7 +7692,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 全局菜单管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -7794,7 +7794,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 全局数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -7901,7 +7901,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用管理器] 菜单行为的托管，菜单页的管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -8065,7 +8065,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -8616,7 +8616,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -9267,7 +9267,7 @@ $namespace('di.shared.model');
  *
  * @file:   分页信息对象
  *          可屏蔽前后台对分页对象的定义不一致的情况
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -9434,7 +9434,7 @@ $namespace('di.shared.model');
  *
  * desc:    [通用管理器] panel page关系页管理：
  *          维护页面引用，页面打开先后顺序，当前页面等。适应不同的页面展现方式（如tab方式或窗口方式等）。
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  
  */
 
@@ -9732,7 +9732,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    PanelPageManager的适配器（RADIO型）
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  
  */
 
@@ -9806,7 +9806,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    PanelPageManager的适配器（TAB型）
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  
  */
 
@@ -9900,7 +9900,7 @@ $namespace('di.shared.model');
  * @file:   表格Model的基类，
  *          支持前台分页、排序，后台分页、排序，
  *          各表格页面Model可继承或聚合此类
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  * @depend: xui, xutil, ecui
  */
 
@@ -10261,7 +10261,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 用户数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -10297,7 +10297,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    Base Entity
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -10520,7 +10520,7 @@ $namespace('di.shared.ui');
  *
  * @file:    简单配置面板的基类，做一些共性的事情，
  *           配置面板可继承此类。
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -10957,7 +10957,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图视图组件
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xui, xutil
  */
 
@@ -11316,7 +11316,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表单视图组件
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -11688,7 +11688,7 @@ $namespace('di.shared.ui');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI tab容器
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -11940,7 +11940,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表视图组件
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -12611,7 +12611,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    维度选择面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui
  */
 
@@ -13012,7 +13012,7 @@ $namespace('di.shared.ui');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    折叠面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -13228,7 +13228,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 片段
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -13290,7 +13290,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    VCONTAINER
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -13354,7 +13354,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    VCONTAINER
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -13418,7 +13418,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表原数据选择面板
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -13970,7 +13970,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表原数据选择面板
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xui, xutil
  */
 
@@ -14287,7 +14287,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    容器中子页面基类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -14434,7 +14434,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    默认的参数解析方法集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 
@@ -14686,7 +14686,7 @@ $namespace('di.shared.arg');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    BeakerChart的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -14803,7 +14803,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    CalendarPlus的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -14966,7 +14966,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui input-tree的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15083,7 +15083,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    input（单行输入，以及textarea）的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15115,7 +15115,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15193,7 +15193,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui suggest的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15282,7 +15282,7 @@ $namespace('di.shared.adapter');
  * @file:    通用的默认适配器
  *           一般在di.config.Dict中使用adapterMethods来引用此中方法，
  *           拷贝到目标对象中
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15356,7 +15356,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    HChart的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15424,7 +15424,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15524,7 +15524,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择控件的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15673,7 +15673,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    CalendarPlus的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15845,7 +15845,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    图设置Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -15956,7 +15956,7 @@ $namespace('di.console.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    图设置面板
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -16131,7 +16131,7 @@ $namespace('di.console.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用构件] 顶层全局菜单
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -16264,7 +16264,7 @@ $namespace('di.console.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    含左菜单，右侧是tab页的整体页基类，如果想用这种布局及逻辑，可继承此类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -16402,7 +16402,7 @@ $namespace('di.console.shared.ui');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    报表编辑Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -16550,7 +16550,7 @@ $namespace('di.console.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表编辑
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -16939,7 +16939,7 @@ $namespace('di.console.editor.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    页面预览
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -17087,7 +17087,7 @@ $namespace('di.console.editor.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    报表列表页
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  ecui, xui, xutil
  */
 
@@ -17258,7 +17258,7 @@ $namespace('di.console.mgr.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    报表设计 / 管理页整体
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -17327,7 +17327,7 @@ $namespace('di.console.frame.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    [通用构件] Data Insight页面整体
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -17445,7 +17445,7 @@ $namespace('di.console.frame.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    项目结尾文件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui.XProject
  */
 

@@ -4,7 +4,7 @@
  *
  * @file:    vtpl的很粗暴的“可视化”编辑（代码也很粗暴～）
  *           此类为替换VTplQuickEditor而存在
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xui, xutil
  */
 

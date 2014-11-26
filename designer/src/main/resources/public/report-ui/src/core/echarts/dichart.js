@@ -3,7 +3,7 @@
  * Copyright 2014 Baidu Inc. All rights reserved.
  *
  * @file:    前端图形api组件
- * @author:  majun(majun04@baidu.com)
+ * @author:  majun(majun04)
  * @depend:  echart
  */
  DiChart = {};

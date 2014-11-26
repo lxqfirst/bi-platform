@@ -4,7 +4,7 @@
  * 
  * @file:    console工程的ajax配置
  *           重载全局配置
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xutil.ajax, config.lang
  */
 

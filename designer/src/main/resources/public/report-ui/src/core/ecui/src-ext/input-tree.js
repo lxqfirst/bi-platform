@@ -4,7 +4,7 @@
  * 
  * path:    input-tree.js
  * desc:    树层级输入框
- * author:  cxl(chenxinle@baidu.com)
+ * author:  cxl(chenxinle)
  * date:    2012/03/12
  */
 (function () {

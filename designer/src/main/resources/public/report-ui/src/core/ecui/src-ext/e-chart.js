@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    基于highcharts的js图
- *           (最早源自pl-charts.js by cxl(chenxinle@baidu.com))
+ *           (最早源自pl-charts.js by cxl(chenxinle))
  * @author:  sushuang(sushuang@baidu.com)
  * @depend:  xui, xutil, echarts
  */

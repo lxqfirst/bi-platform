@@ -5,7 +5,7 @@
  * @file:   表格Model的基类，
  *          支持前台分页、排序，后台分页、排序，
  *          各表格页面Model可继承或聚合此类
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  * @depend: xui, xutil
  */
 

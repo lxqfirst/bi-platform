@@ -9,7 +9,7 @@
  *          (3) 做mock时可以写函数，根据请求参数决定mock的请求返回值。
  *          (4) xmock将请求参数和过程打印在浏览器log上，
  *              从而可以检查请求的参数和请求先后顺序等是否正确。
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
 /**

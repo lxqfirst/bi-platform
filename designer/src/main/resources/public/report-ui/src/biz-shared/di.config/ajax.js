@@ -5,7 +5,7 @@
  * @file:    data insight 全局(包括console和product)的ajax的配置
  *          （常量和默认失败处理等）
  *          （如不服此配置，可重载）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.ajax, di.config.lang
  */
 

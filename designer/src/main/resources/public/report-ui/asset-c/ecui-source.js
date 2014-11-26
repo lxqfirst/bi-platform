@@ -11754,7 +11754,7 @@ _eFill       - 用于控制中部宽度的单元格
  *          (2) 在控件中构造较复杂HTML时，使用API方式（用createDom做一个个元素/移动内容）可能会使HTML内容在代码中可读性差。
  *          可以使用模板方式，这里加进了模板的支持（xutil.string.template），
  *          以及根据className定位元素的支持（xutil.dom.q）。
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  xutil
  */
 
@@ -12733,7 +12733,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  *
  * desc:    组件容器
  *          提供子组件的创建及管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -12820,7 +12820,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    TAB页容器基类
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -13142,7 +13142,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    多个选择列组成的控件
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -13867,10 +13867,10 @@ Combox - 定义可输入下拉框行为的基本操作。
  *
  * @file:    IST风格的日历
  *          （支持单日历时间段选择，周月季选择）
- * @author:  sushuang(sushuang@baidu.com) 
+ * @author:  sushuang(sushuang)
  *          (
  *              从Pulse版本的ecui中拷贝而来
- *              (pl-calendar.js by cxl(chenxinle@baidu.com))，
+ *              (pl-calendar.js by cxl(chenxinle))，
  *              并稍做修改
  *          )
  * @depend:  ecui
@@ -16813,7 +16813,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * @file:    富日历的日历层，
  *           支持日、周、月、季不同粒度时间选择，
  *           支持单选、多选、范围选
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -17705,7 +17705,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * @file:    富日历，
  *           支持日、周、月、季不同粒度时间选择，
  *           支持单选、多选、范围选
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -18388,7 +18388,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可定制皮肤的左右结构的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {
@@ -18439,7 +18439,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可切换状态的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {
@@ -18518,7 +18518,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * @file:    烧杯图
  *           此图为“商机池”项目定制。
  *           时间紧，代码写得相当不考究。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui, highcharts
  */
 
@@ -19175,7 +19175,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  *
  * @file:   多维分析表格
  *         （行列锁定，跨多行，垮多列，树状表头等）
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {
@@ -20395,7 +20395,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   面包屑导航
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {
@@ -20567,7 +20567,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  }) ();
 ﻿/**
  * @file 基于ecui.ui.TreeView实现的树视图。
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 (function() {
     var core = ecui;
@@ -21701,7 +21701,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
 }) ();
 /**
  * @file 可拖放的items
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 
 (function() {

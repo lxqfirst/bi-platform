@@ -1,7 +1,7 @@
 ﻿/**
  * @file 处理一些改善用户体验的操作，并且这些操作不涉及与后台的数据交互
  *
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(longze_xq@163.com)
  * @date 2014-8-1
  */
 define(function () {

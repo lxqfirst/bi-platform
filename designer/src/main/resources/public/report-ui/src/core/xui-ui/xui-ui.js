@@ -4,7 +4,7 @@
  *
  * @file:    简单的ui
  *           这些ui是项目中不成体系的ui、简单的ui的集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**

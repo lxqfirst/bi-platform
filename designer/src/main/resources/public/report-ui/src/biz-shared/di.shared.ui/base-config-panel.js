@@ -4,7 +4,7 @@
  *
  * @file:    简单配置面板的基类，做一些共性的事情，
  *           配置面板可继承此类。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 

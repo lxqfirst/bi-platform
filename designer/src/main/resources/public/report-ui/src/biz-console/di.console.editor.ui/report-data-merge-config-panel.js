@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    设置报表数据合并方式,不合并,行合并,列合并
- * @author:  chenxiaoming01(chenxiaoming01@baidu.com)
+ * @author:  chenxiaoming01(chenxiaoming01)
  * @depend:  xui, xutil
  */
 $namespace('di.console.editor.ui');

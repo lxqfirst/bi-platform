@@ -24,7 +24,7 @@
  *              防止返回处理时因相应的dom已不存在而出错。
  *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
  *              参见createSyncWrap方法
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  tangram.ajax, e-json, xutil.ajax
  */
 

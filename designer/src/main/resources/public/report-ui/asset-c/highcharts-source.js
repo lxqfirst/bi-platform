@@ -9264,7 +9264,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 
 })( window );
-// Customized highstock. (any problem, contact sushuang@baidu.com)
+// Customized highstock. (any problem, contact sushuang)
 // All modifications are marked as [CUSTOMIZED].
 // Change log:
 // (1) tooltip move: forbiden animation in IE6/7/8

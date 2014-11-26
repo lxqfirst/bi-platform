@@ -2988,7 +2988,7 @@ div.ui-float-menu-children div.ui-float-menu-children div.ui-float-menu {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    xui-ui的css
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 /**
@@ -3056,10 +3056,7 @@ div.ui-float-menu-children div.ui-float-menu-children div.ui-float-menu {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    data insight 公用（包括console和product等公用）
- * @author:  xxx(xxx@baidu.com)
- */
-
-/**
+ * @author:  xxx(xxx@baidu.com
  * 标记且功能性css，在console会起标记作用
  */
 .di-o_o-body {
@@ -3183,8 +3180,7 @@ div.ui-float-menu-children div.ui-float-menu-children div.ui-float-menu {
  * @author:  xxx(xxx@baidu.com)
  */
 
-/**
- * Dim Select Panel
+/**lect Panel
  */
 .di-dim-select-tree {
     overflow: auto;
@@ -3361,8 +3357,7 @@ div.ui-float-menu-children div.ui-float-menu-children div.ui-float-menu {
  * @author:  xxx(xxx@baidu.com)
  */
 
-.di-table-prompt {
-    font-size: 12px;
+.di-table-profont-size: 12px;
     color: #888;
     padding: 6px 15px 10px 10px;            
     overflow: hidden;
@@ -3699,8 +3694,7 @@ a{
  */
 
 /**
- * 标记且功能性css，在console会起标记作用
- * 规则：去掉c-前缀就是di.css中定义的标记css
+ * 标记且功能性css，在conso* 规则：去掉c-前缀就是di.css中定义的标记css
  */
 .c-di-o_o-body {
     height: auto;

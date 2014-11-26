@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:   工程基础
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -18,8 +18,7 @@ var xui = {};
  *          [功能]
  *              (1) 各级名空间建立
  *              (2) 交叉引用/文件依赖的一种解决方案（闭包变量注入）
- * @author:  sushuang(sushuang@baidu.com)
- * @version: 1.0.1
+ * @author:  sushuang(sushuang@baidu.comion: 1.0.1
  */
 
 /**
@@ -1142,8 +1141,7 @@ baidu.ejson = function () {
  * @author:  sushuang(sushuang@baidu.com)
  */
 
-/**
- * @namespace
+/**pace
  */
 var xutil = {
     lang: {},
@@ -1169,10 +1167,7 @@ var xutil = {
  *           做为队列、链表等结构使用
  * @author:  sushuang(sushuang@baidu.com)
  * @depend:  none
- */
-
-/**
- * @usage 
+* @usage
  *    (1) 作为HashMap
  *        var h1 = new LinkedHashMap();
  *        h1.set('name', 'ss');
@@ -1919,7 +1914,7 @@ var xutil = {
  *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
  *              参见createSyncWrap方法
  * @author:  sushuang(sushuang@baidu.com)
- * @depend:  tangram.ajax, e-json, xutil.ajax
+ * @depend:  tangram.ajax, eil.ajax
  */
 
 (function () {
@@ -2491,8 +2486,7 @@ var xutil = {
  * @depend:  xutil.object
  */
 
-(function () {
-    
+(functi
     var COLLECTION = xutil.collection;
     var OBJECT = xutil.object;
     
@@ -2809,8 +2803,7 @@ var xutil = {
  * @depend: xutil.lang, xutil.number
  */
 
-(function () {
-    
+(funct
     var DATE = xutil.date;
     var LANG = xutil.lang;
     var NUMBER = xutil.number;
@@ -3303,7 +3296,7 @@ var xutil = {
 (function () {
     
     var DOM = xutil.dom;
-    var objProtoToString = Object.prototype.toString;
+    var String = Object.prototype.toString;
     var TRIMER_REG = new RegExp(
             "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
         );
@@ -3496,8 +3489,7 @@ var xutil = {
 
 (function () {
     
-    var FILE = xutil.file;
-            
+    var FILE = xutil.file
     /**
      * 过滤文件名的非法字符
      * 只考虑了windows和linux
@@ -3551,7 +3543,7 @@ var xutil = {
 (function () {
     
     var FN = xutil.fn;
-    var LANG = xutil.lang;
+    vautil.lang;
     var slice = Array.prototype.slice;
     var nativeBind = Function.prototype.bind;
     
@@ -3595,7 +3587,7 @@ var xutil = {
     var GRAPHIC = xutil.graphic; 
 
     /**
-     * 合并外界矩形
+  形
      *
      * @public
      * @param {Object...} bound...，可传入多个。
@@ -3653,7 +3645,7 @@ var xutil = {
 (function () {
     
     var LANG = xutil.lang;
-    var STRING = xutil.string;
+    var util.string;
     var objProto = Object.prototype;
     var objProtoToString = objProto.toString;
     var hasOwnProperty = objProto.hasOwnProperty;
@@ -3926,7 +3918,7 @@ var xutil = {
     var NUMBER = xutil.number;
             
     /**
-     * 得到序数词(1st, 2nd, 3rd, 4th, ...)的英文后缀
+     * 得到序数词(3rd, 4th, ...)的英文后缀
      * 
      * @public
      * @param {number} number 序数的数值
@@ -4106,8 +4098,7 @@ var xutil = {
 (function () {
     
     var OBJECT = xutil.object;
-    var objProtoToString = Object.prototype.toString;
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var objProtoToString = Object.prototype.    var hasOwnProperty = Object.prototype.hasOwnProperty;
     var arraySlice = Array.prototype.slice;
     
     /**
@@ -4789,8 +4780,7 @@ var xutil = {
     
     var STRING = xutil.string;
     var LANG = xutil.lang;
-    var TRIMER = new RegExp(
-            "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
+    var TRIMER = new           "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
         );
     
     /**
@@ -5040,8 +5030,7 @@ var xutil = {
     
     var UID = xutil.uid;
     var INCREASED_UID_BASE_PUBLIC = 1;
-    var INCREASED_UID_BASE_PRIVATE = {};
-    
+    var INCREASED_UID_BASE_PRIV
     /**
      * 获取不重复的随机串（自增，在单浏览器实例，无worker情况下保证唯一）
      * @public
@@ -5084,8 +5073,7 @@ var xutil = {
     
     var URL = xutil.url;
     var LANG = xutil.lang;
-    var objProtoToString = Object.prototype.toString;
-    var arrayProtoSlice = Array.prototype.slice;
+    var objProtoToString = Object.prototype.toS var arrayProtoSlice = Array.prototype.slice;
 
     /**
      * 包装js原生的decodeURIComponent，
@@ -5326,7 +5314,7 @@ var xutil = {
     var VALIDATOR = xutil.validator = {};
 
     var REGEXP_CASH = /^\d+(\.\d{1,2})?$/;
-    var REGEXP_CASH_CAN_NAGE = /^(\+|-)?\d+(\.\d{1,2})?$/;
+    var REGEXP_CASH_CAN(\+|-)?\d+(\.\d{1,2})?$/;
     var REGEXP_EMAIL = /^[_\w-]+(\.[_\w-]+)*@([\w-])+(\.[\w-]+)*((\.[\w]{2,})|(\.[\w]{2,}\.[\w]{2,}))$/;
     var REGEXP_URL = /^[^.。，]+(\.[^.，。]+)+$/;
     var REGEXP_MOBILE = /^1\d{10}$/;
@@ -5407,7 +5395,7 @@ var xutil = {
     // 引用
     //----------------------------------
     
-    var xobject = xutil.object;
+    v = xutil.object;
     var inheritsObject = xobject.inheritsObject;
     var objProtoToString = Object.prototype.toString;
     var arrayProtoSlice = Array.prototype.slice;
@@ -5850,7 +5838,7 @@ var xutil = {
 /**
  *                             -----------------
  *                             |   使用说明    |
- *                             -----------------
+ *                             -------
  * ____________________________________________________________________________
  * @usage 使用XDatasource
  *        [举例] 
@@ -6987,7 +6975,7 @@ var xutil = {
  *          (1) 须实现xui.XView.domReady函数
  *          (2) 页面中使用：
  *              <script type="text/javascript">
- *                  xui.XView.start("aaa.bbb.ccc.SomePageView");
+ *                  xui.XView.start("aaa.bbbageView");
  *              </script>
  *              则启动了SomePageView类
  */
@@ -7079,10 +7067,7 @@ var xutil = {
  
 // DI名空间基础
 xui.XProject.setNamespaceBase(
-    window.__$DI__NS$__ = window.__$DI__NS$__ || {}
-);
-
-// 声明名空间用方法
+    window.__$DI__NS$__ = window.__$DI__NS$__ // 声明名空间用方法
 var $namespace = xui.XProject.namespace;
 
 // 注册依赖连接用方法
@@ -7123,7 +7108,7 @@ $namespace('di.config');
     //--------------------------------
 
     var XAJAX = xutil.ajax;
-    var isFunction = xutil.lang.isFunction;
+ unction = xutil.lang.isFunction;
     var LANG;
     var DIALOG;
     
@@ -7265,7 +7250,7 @@ $namespace('di.config');
     var DICT = $namespace().Dict = function () {
         if (!initialized) {
             // 初始化类引用
-            DICT.CLZ = {};
+            DIC;
             for (var i = 0, clzDef; clzDef = DICT.CLZ_DEFS[i]; i ++) {
                 if (clzDef.clzKey in DICT.CLZ) {
                     throw new Error("dupicate clzKey: " + clzDef.clzKey);
@@ -7325,7 +7310,7 @@ $namespace('di.config');
     /**
      * ajax请求失败
      */
-    LANG.AJAX_FAILURE = function (status) {
+    LANG.AJAX_Function (status) {
         return status + ' SERVER ERROR';
     };
 
@@ -7391,9 +7376,7 @@ $namespace('di.config');
 
         //==[DI=BEGIN]==[NIGEB=ID]=========
         // 此注释不可改动，标记了解析段落的开始
-        //=================================
-
-        {
+        //===============================  {
             /**
              * 默认的clzKey
              */
@@ -7678,7 +7661,7 @@ $namespace('di.config');
 
     //--------------------------------
     // 类型声明
-    //--------------------------------
+    //----------------------
 
     /**
      * 因为URL要作为权限验证，所以在使用时再加WEB_ROOT
@@ -12836,7 +12819,7 @@ $namespace('di.helper');
     // 后续去除此ecui引用
     var ui = ecui;
     var encodeHTML = xutil.string.encodeHTML;
-    var LANG;
+
     var UTIL;
     var DICT;
     var DI_FACTORY;
@@ -13130,7 +13113,7 @@ $namespace('di.helper');
     var xlang = xutil.lang;
     var isFunction = xlang.isFunction;
     var isArray = xlang.isArray;
-    var isString = xlang.isString;
+    var ixlang.isString;
     var hasValue = xlang.hasValue;
     var hasValueNotBlank = xlang.hasValueNotBlank;
     var encodeHTML = xutil.string.encodeHTML;
@@ -13351,7 +13334,7 @@ $namespace('di.helper');
 
     var setByPath = xutil.object.setByPath;
     var getByPath = xutil.object.getByPath;
-    var getParent = xutil.dom.getParent;
+    var getParent = xutil.dom.
     var merge = xutil.object.merge;
     var DICT;
     var DIALOG;
@@ -13626,7 +13609,7 @@ $namespace('di.helper');
 
     var xlang = xutil.lang;
     var isFunction = xlang.isFunction;
-    var isArray = xlang.isArray;
+    var isArray =rray;
     var isString = xlang.isString;
     var stringToDate = xutil.date.stringToDate;
     var hasValue = xlang.hasValue;
@@ -14644,7 +14627,7 @@ $namespace('di.shared.arg');
     var isObject = xutil.lang.isObject;
     var extend = xutil.object.extend;
     var getByPath = xutil.object.getByPath;
-    var setByPath = xutil.object.setByPath;
+    var setBtil.object.setByPath;
     var isArray = xutil.lang.isArray;
     var formatTime = di.helper.Util.formatTime;
     var parseTimeUnitDef = di.helper.Util.parseTimeUnitDef;
@@ -14894,8 +14877,7 @@ $namespace('di.shared.model');
         
     /* 类型声明 */
     var AUTH_MODEL = $namespace().AuthModel = inheritsObject(XDATASOURCE);
-    var AUTH_MODEL_CLASS = AUTH_MODEL.prototype;
-        
+    var AUTH_MODEL_CLASS = AUTH_MODEL.protot
     /**
      * 获得用户Id
      * @public
@@ -14928,8 +14910,7 @@ $namespace('di.shared.model');
     /* 类型声明 */
     var DATE_MODEL = $namespace().DateModel = inheritsObject(XDATASOURCE);
     var DATE_MODEL_CLASS = DATE_MODEL.prototype;
-        
-    /**
+     *
      * 初始化当前值
      * @override
      */
@@ -14977,8 +14958,7 @@ $namespace('di.shared.model');
     var USER_MODEL = $namespace().UserModel = inheritsObject(XDATASOURCE);
     var USER_MODEL_CLASS = USER_MODEL.prototype;
         
-    /**
-     * 获得用户Id
+    /*得用户Id
      * @public
      * 
      * @return {string} 用户id
@@ -15014,7 +14994,7 @@ $namespace('di.shared.model');
     var XDATASOURCE = xui.XDatasource;
     
     $link(function() {
-        var sharedNS = di.shared;
+    aredNS = di.shared;
         USER_MODEL = sharedNS.model.UserModel;
         AUTH_MODEL = sharedNS.model.AuthModel;
         DATE_MODEL = sharedNS.model.DateModel;
@@ -15118,7 +15098,7 @@ $namespace('di.shared.model');
     var DICT = di.config.Dict;
     var DIALOG = di.helper.Dialog;
     var xlang = xutil.lang;
-    var xobject = xutil.object;
+    var xutil.object;
     var xurl = xutil.url;
     var isString = xlang.isString;
     var isArray = xlang.isArray;
@@ -17447,7 +17427,7 @@ $namespace('di.shared.model');
      * 通用请求参数获取器工厂
      * 
      * @class
-     * @param {Object} options 参数
+    {Object} options 参数
      * @param {Object} options.externalParam 报表外部参数
      */
     var COMMON_PARAM_FACTORY = $namespace().CommonParamFactory = 
@@ -17682,8 +17662,7 @@ $namespace('di.shared.adapter');
         xuiDispose: xuiDispose
     };
 
-    /**
-     * 创建ecui控件
+   * 创建ecui控件
      *
      * @public
      * @param {Object} def vui定义
@@ -17752,8 +17731,7 @@ $namespace('di.shared.ui');
     var URL = di.config.URL;
     var inheritsObject = xutil.object.inheritsObject;
     var assign = xutil.object.assign;
-    var addClass = xutil.dom.addClass;
-    var isObject = xutil.lang.isObject;
+    var addClass = xutil.dom.addClass;sObject = xutil.lang.isObject;
     var q = xutil.dom.q;
     var bind = xutil.fn.bind;
     var objKey = xutil.object.objKey;
@@ -17975,7 +17953,7 @@ $namespace('di.shared.ui');
     var q = xutil.dom.q;
     var bind = xutil.fn.bind;
     var objKey = xutil.object.objKey;
-    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var INTERACT_ENTITYed.ui.InteractEntity;
         
     //------------------------------------------
     // 类型声明 
@@ -18035,8 +18013,7 @@ $namespace('di.shared.ui');
     var q = xutil.dom.q;
     var assign = xutil.object.assign;
     var bind = xutil.fn.bind;
-    var objKey = xutil.object.objKey;
-    var XVIEW = xui.XView;
+    var objKey = xutil.object.objar XVIEW = xui.XView;
         
     //------------------------------------------
     // 类型声明 
@@ -18098,7 +18075,7 @@ $namespace('di.shared.ui');
     var assign = xutil.object.assign;
     var bind = xutil.fn.bind;
     var objKey = xutil.object.objKey;
-    var XVIEW = xui.XView;
+    v xui.XView;
         
     //------------------------------------------
     // 类型声明 
@@ -18158,8 +18135,7 @@ $namespace('di.product.display.ui');
     var merge = xutil.object.merge;
     var bind = xutil.fn.bind;
     var DICT = di.config.Dict;
-    var ajaxRequest = baidu.ajax.request;
-    var jsonParse = baidu.json.parse;
+    var ajaxRequest = baidu.ajax.requestjsonParse = baidu.json.parse;
     var DI_FACTORY;
     var GLOBAL_MODEL;
     var URL;
@@ -18667,7 +18643,7 @@ xui.ui = {};
  *
  * Date: Mon Nov 21 21:11:03 2011 -0500
  */
-(function( window, undefined ) {
+(function( window, u {
 
 // Use the correct document accordingly with window argument (sandbox)
 var document = window.document,
@@ -27927,7 +27903,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 //     (this bug is fixed in 1.1.6, but there are another bug in 1.1.6 (#1105), so we still use 1.1.5)
 // (3) add quarter format support in dateFormat
 // (4) add support of user defined rangeSelector
-// (5) fix reflow bug: execute resize (by setTimeout) after chart is destroyed.
+// (5) fix reflow bug: execute resize (by setTimeochart is destroyed.
 
 // ==ClosureCompiler==
 // @compilation_level SIMPLE_OPTIMIZATIONS
@@ -44766,8 +44742,8 @@ extend(Highcharts, {
     var formatNumber = xutil.number.formatNumber;
     var getQuarterBegin = xutil.date.getQuarterBegin;
     var dateToString = xutil.date.dateToString;
-    var stringToDate = xutil.date.stringToDate;
-    var getQuarter = xutil.date.getQuarter;
+    var stringToDl.date.stringToDate;
+    var getQuarter = xgetQuarter;
     var getWeekend = xutil.date.getWeekend;
     var getWorkday = xutil.date.getWorkday;
     var getQuarterBegin = xutil.date.getQuarterBegin;
@@ -46061,7 +46037,7 @@ $namespace('di.shared.adapter');
      *
      * @public
      * @param {Object} def vui的定义
-     * @param {Object} options vui实例创建参数
+     * @param {Objes vui实例创建参数
      * @return {Object} vui adapter实例
      */
     $namespace().HChartVUIAdapter = function(def, options) {
@@ -49145,7 +49121,7 @@ _eFill       - 用于控制中部宽度的单元格
     var addClass = dom.addClass;
     var setStyle = dom.setStyle;
     var removeClass = dom.removeClass;
-    var getMouseX = core.getMouseX;
+  ouseX = core.getMouseX;
     var toNumber = util.toNumber;
     var getParent = dom.getParent;
     var getStyle = dom.getStyle;
@@ -50364,7 +50340,7 @@ $namespace('di.shared.model');
     var extend = xutil.object.extend;
     var logError = UTIL.logError;
     var getUID = xutil.uid.getUID;
-    var XDATASOURCE = xui.XDatasource;
+    var XDATASOURCE = xui.e;
 
     //------------------------------------------
     // 类型声明
@@ -50532,8 +50508,7 @@ $namespace('di.shared.ui');
     var isObject = xutil.lang.isObject;
     var INTERACT_ENTITY = di.shared.ui.InteractEntity;
     var extend = xutil.object.extend;
-
-    //------------------------------------------
+---------------------------------------
     // 类型声明 
     //------------------------------------------
 
@@ -53009,11 +52984,10 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
 
     var children = dom.children;
     var createDom = dom.create;
-    var getParent = dom.getParent;
-    var getPosition = dom.getPosition;
+    var getParent = dom.getPavar getPosition = dom.getPosition;
     var moveElements = dom.moveElements;
     var setText = dom.setText;
-    var addClass = dom.addClass;
+   ass = dom.addClass;
     var formatDate = string.formatDate;
     var getByteLength = string.getByteLength;
     var encodeHTML = string.encodeHTML;
@@ -55054,7 +55028,7 @@ $namespace('di.shared.adapter');
     var GLOBAL_MODEL;
 
     $link(function() {
-        CALENDAR_PLUS = ecui.ui.CalendarPlus;
+        CALEN ecui.ui.CalendarPlus;
         GLOBAL_MODEL = di.shared.model.GlobalModel;
     });
 
@@ -55228,7 +55202,7 @@ $namespace('di.shared.adapter');
      * 
      * @public
      * @param {Object} data 数据
-     * @param {Array.<Object>} data.datasource 数据集
+     Array.<Object>} data.datasource 数据集
      *      每个节点：
      *          {string} text
      *          {string} value
@@ -55299,7 +55273,7 @@ $namespace('di.shared.ui');
         
     //------------------------------------------
     // 类型声明 
-    //------------------------------------------
+    //--------------------------------
 
     /**
      * 折叠面板
@@ -55954,7 +55928,7 @@ _aChildren     - 子控件集合
         extend = util.extend,
         indexOf = array.indexOf,
         extend = util.extend,
-        toNumber = util.toNumber,
+       = util.toNumber,
         getStyle = dom.getStyle,
         first = dom.first,
         insertAfter = dom.insertAfter,
@@ -56257,8 +56231,7 @@ _aChildren     - 子控件集合
         encodeHTML = string.encodeHTML,
         moveElements = dom.moveElements,
         getPosition  = dom.getPosition,
-        inheritsControl = core.inherits,
-        getView = util.getView,
+        inheritsControl = core.inherit getView = util.getView,
         extend = util.extend,
         blank = util.blank,
         triggerEvent = core.triggerEvent,
@@ -56692,7 +56665,7 @@ $namespace('di.shared.adapter');
         return {
             create: create,
             setData: setData,
-            getValue: getValue
+       lue: getValue
         };
     };
 
@@ -57591,8 +57564,7 @@ $namespace('di.shared.adapter');
      */
     $namespace().EcuiSuggestVUIAdapter = function(def, options) {
         return {
-            create: create,
-            getValue: getValueFunc[options.valueType || 'TEXT']
+            create: cr        getValue: getValueFunc[options.valueType || 'TEXT']
         };
     };
 
@@ -57678,10 +57650,10 @@ $namespace('di.shared.adapter');
         setFocused = core.setFocused,
         blank = util.blank,
         triggerEvent = core.triggerEvent,
-        inheritsControl = core.inherits,
+        inheritsControl = its,
         getByteLength = string.getByteLength,
 
-        UI_CONTROL = ui.Control,
+ CONTROL = ui.Control,
         UI_CONTROL_CLASS = UI_CONTROL.prototype,
         UI_INPUT_CONTROL = ui.InputControl,
         UI_INPUT_CONTROL_CLASS = UI_INPUT_CONTROL.prototype,
@@ -57897,7 +57869,7 @@ $namespace('di.shared.adapter');
             null,
             function (el, options) {
                 if (options.skin) {
-                    addClass(el, options.skin);
+                    addClass(s.skin);
                     options.primary = options.skin;
                 }
             },
@@ -58398,7 +58370,7 @@ _eContainer      - 容器 DOM 元素
     // 引了外部包
     var template = xutil.string.template;
     var textLength = xutil.string.textLength;
-    var textSubstr = xutil.string.textSubstr;
+    var textSubstr = xutil.tSubstr;
     var blank = util.blank;
     var q = xutil.dom.q;
 
@@ -58718,8 +58690,7 @@ $namespace('di.shared.ui');
     var INTERACT_ENTITY = di.shared.ui.InteractEntity;
     var TAB_CONTAINER = ecui.ui.TabContainer;
         
-    //------------------------------------------
-    // 类型声明 
+    //-----------------------------------------型声明
     //------------------------------------------
 
     /**
@@ -58971,7 +58942,7 @@ $namespace('di.shared.model');
     var assign = xutil.object.assign;
     var parse = baidu.json.parse;
     var logError = UTIL.logError;
-    var getUID = xutil.uid.getUID;
+    var getUID = getUID;
     var LINKED_HASH_MAP = xutil.LinkedHashMap;
     var XDATASOURCE = xui.XDatasource;
 
@@ -59621,8 +59592,7 @@ $namespace('di.shared.ui');
     var bind = xutil.fn.bind;
     var objKey = xutil.object.objKey;
     var template = xutil.string.template;
-    var ecuiCreate = UTIL.ecuiCreate;
-    var LINKED_HASH_MAP = xutil.LinkedHashMap;
+    var ecuiCreate = UTIL.ecu   var LINKED_HASH_MAP = xutil.LinkedHashMap;
     var getUID = xutil.uid.getIncreasedUID;
     var INTERACT_ENTITY = di.shared.ui.InteractEntity;
     
@@ -59941,8 +59911,7 @@ $namespace('di.shared.adapter');
         return {
             create: CREATE_METHOD[clzKey],
             setData: SET_DATA_METHOD[clzKey],
-            updateData: UPDATE_DATA_METHOD[clzKey]
-        };
+            updateData: UPDATE_DATA_METHO        };
     };
 
     /**
@@ -60092,7 +60061,7 @@ $namespace('di.shared.adapter');
             null,
             null,
             function (el, options) {
-                var type = this.getType();
+      var type = this.getType();
                 this._aStatusList = options.statusList || [];
                 var index;
                 for (var i = 0, o; o = this._aStatusList[i]; i ++) {
@@ -60171,7 +60140,7 @@ $namespace('di.shared.model');
      *
      * @class
      * @extends xui.XDatasource
-     * @param {Function=} options.commonParamGetter      
+     * @param {Function=} options.comtter
      */
     var DI_CHART_MODEL = 
             $namespace().DIChartModel = 
@@ -60439,7 +60408,7 @@ $namespace('di.shared.ui');
         H_CHART = xutil.object.getByPath('xui.ui.HChart');
     });
     
-    //------------------------------------------
+    //--------------------------------
     // 类型声明 
     //------------------------------------------
 
@@ -61172,7 +61141,7 @@ $namespace('di.shared.ui');
             options.targets = options.targets ||'';
             this._aTargetIds = options.targets.split(',') || [];
             options.source = options.source || '';
-            this._aSourceIds = options.source.split(',') || [];
+            thiIds = options.source.split(',') || [];
             this._bConfigBtn = options.configBtn;
             this.$setBody(el);
             this.$initItems();
@@ -61744,7 +61713,7 @@ $namespace('di.shared.model');
     var assign = xutil.object.assign;
     var hasValue = xutil.lang.hasValue;
     var stringToDate = xutil.date.stringToDate;
-    var dateToString = xutil.date.dateToString;
+    var dateToString = xdateToString;
     var textParam = xutil.url.textParam;
     var wrapArrayParam = xutil.url.wrapArrayParam;
     var arrayProtoPush = Array.prototype.push;    
@@ -62412,7 +62381,7 @@ $namespace('di.shared.ui');
     var extend = xutil.object.extend;
     var assign = xutil.object.assign;
     var textLength = xutil.string.textLength;
-    var textSubstr = xutil.string.textSubstr;
+    var textSubstr = xuttextSubstr;
     var stringToDate = xutil.date.stringToDate;
     var trim = xutil.string.trim;
     var bind = xutil.fn.bind;
@@ -62809,7 +62778,7 @@ $namespace('di.shared.vui');
     var UI_DROPPABLE_LIST;
     var UI_DRAGPABLE_LIST;
     var DIM_SELECT_PANEL;
-    var ecuiCreate = UTIL.ecuiCreate;
+    vate = UTIL.ecuiCreate;
     var ecuiDispose = UTIL.ecuiDispose;
 
     $link(function () {
@@ -63573,8 +63542,7 @@ $namespace('di.shared.model');
      * @class
      * @extends xui.XDatasource
      * @param {Function=} options.commonParamGetter      
-     */
-    var DI_TABLE_MODEL = 
+  var DI_TABLE_MODEL =
             $namespace().DITableModel = 
             inheritsObject(XDATASOURCE, constructor);
     var DI_TABLE_MODEL_CLASS = 
@@ -63977,7 +63945,7 @@ $namespace('di.shared.ui');
     var foreachDo = UTIL.foreachDo;
     var DIALOG = di.helper.Dialog;
     var LANG = di.config.Lang;
-    var INTERACT_ENTITY = di.shared.ui.InteractEntity;
+    var INTERACT_ENTITY = di.InteractEntity;
     var OLAP_TABLE;
     var BREADCRUMB;
         
@@ -64653,7 +64621,7 @@ $namespace('di.shared.ui');
 
     //--------------------------------------------------
     // UI_BREADCRUMB 方法
-    //--------------------------------------------------
+    //----------------------------------------
 
     UI_BREADCRUMB_CLASS.$setSize = new Function();
     
@@ -64828,8 +64796,7 @@ $namespace('di.shared.vui');
      * 初始dom中的内容被认为是初始模板。
      * 也可以用参数传入模板。
      * 
-     * @class
-     * @extends xui.XView
+     * @classxtends xui.XView
      * @param {Object} options
      * @param {HTMLElement} options.el 容器元素
      */
@@ -64939,7 +64906,7 @@ $namespace('di.shared.vui');
     var UI_FORM;
 
     $link(function () {
-        UI_BUTTON = getByPath('ecui.ui.HButton');
+        = getByPath('ecui.ui.HButton');
         UI_FORM = getByPath('ecui.ui.Form');
     });
     

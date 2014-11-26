@@ -3,7 +3,7 @@
  * Copyright 2014 Baidu Inc. All rights reserved.
  *
  * @file:    多个复选框的组件
- * @author:  xuezhao(xuezhao@baidu.com)
+ * @author:  xuezhao(xuezhao)
  * @depend:  xui, xutil
  */
 

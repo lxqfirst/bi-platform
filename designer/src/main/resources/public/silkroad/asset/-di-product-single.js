@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:   工程基础
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -18,8 +18,7 @@ var xui = {};
  *          [功能]
  *              (1) 各级名空间建立
  *              (2) 交叉引用/文件依赖的一种解决方案（闭包变量注入）
- * @author:  sushuang(sushuang@baidu.com)
- * @version: 1.0.1
+ * @author:  sushuang(sushuang@baidu.comion: 1.0.1
  */
 
 /**
@@ -1147,8 +1146,7 @@ baidu.ejson = function () {
  * @author:  sushuang(sushuang@baidu.com)
  */
 
-/**
- * @namespace
+/**pace
  */
 var xutil = {
     lang: {},
@@ -1174,10 +1172,7 @@ var xutil = {
  *           做为队列、链表等结构使用
  * @author:  sushuang(sushuang@baidu.com)
  * @depend:  none
- */
-
-/**
- * @usage 
+* @usage
  *    (1) 作为HashMap
  *        var h1 = new LinkedHashMap();
  *        h1.set('name', 'ss');
@@ -1932,7 +1927,7 @@ var xutil = {
  *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
  *              参见createSyncWrap方法
  * @author:  sushuang(sushuang@baidu.com)
- * @depend:  tangram.ajax, e-json, xutil.ajax
+ * @depend:  tangram.ajax, eil.ajax
  */
 
 (function () {
@@ -2513,8 +2508,7 @@ var xutil = {
  * @depend:  xutil.object
  */
 
-(function () {
-    
+(functi
     var COLLECTION = xutil.collection;
     var OBJECT = xutil.object;
     
@@ -2832,8 +2826,7 @@ var xutil = {
  * @depend: xutil.lang, xutil.number
  */
 
-(function () {
-    
+(funct
     var DATE = xutil.date;
     var LANG = xutil.lang;
     var NUMBER = xutil.number;
@@ -3381,7 +3374,7 @@ var xutil = {
 (function () {
     
     var DOM = xutil.dom;
-    var objProtoToString = Object.prototype.toString;
+    var String = Object.prototype.toString;
     var TRIMER_REG = new RegExp(
             "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
         );
@@ -3599,8 +3592,7 @@ var xutil = {
 
 (function () {
     
-    var FILE = xutil.file;
-            
+    var FILE = xutil.file
     /**
      * 过滤文件名的非法字符
      * 只考虑了windows和linux
@@ -3654,7 +3646,7 @@ var xutil = {
 (function () {
     
     var FN = xutil.fn;
-    var LANG = xutil.lang;
+    vautil.lang;
     var slice = Array.prototype.slice;
     var nativeBind = Function.prototype.bind;
     
@@ -3698,7 +3690,7 @@ var xutil = {
     var GRAPHIC = xutil.graphic; 
 
     /**
-     * 合并外界矩形
+  形
      *
      * @public
      * @param {Object...} bound...，可传入多个。
@@ -3756,7 +3748,7 @@ var xutil = {
 (function () {
     
     var LANG = xutil.lang;
-    var STRING = xutil.string;
+    var util.string;
     var objProto = Object.prototype;
     var objProtoToString = objProto.toString;
     var hasOwnProperty = objProto.hasOwnProperty;
@@ -4028,7 +4020,7 @@ var xutil = {
 (function () {
     
     var NUMBER = xutil.number;
-    var DATE = xutil.date; // Add by MENGRAN at 2013-12-6
+    var DATE = xutil.date; // Add  at 2013-12-6
             
     /**
      * 得到序数词(1st, 2nd, 3rd, 4th, ...)的英文后缀
@@ -4230,8 +4222,7 @@ var xutil = {
 (function () {
     
     var OBJECT = xutil.object;
-    var objProtoToString = Object.prototype.toString;
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var objProtoToString = Object.prototype.    var hasOwnProperty = Object.prototype.hasOwnProperty;
     var arraySlice = Array.prototype.slice;
     
     /**
@@ -4913,8 +4904,7 @@ var xutil = {
     
     var STRING = xutil.string;
     var LANG = xutil.lang;
-    var TRIMER = new RegExp(
-            "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
+    var TRIMER = new           "(^[\\s\\t\\xa0\\u3000]+)|([\\u3000\\xa0\\s\\t]+\x24)", "g"
         );
     
     /**
@@ -5221,8 +5211,7 @@ var xutil = {
     
     var UID = xutil.uid;
     var INCREASED_UID_BASE_PUBLIC = 1;
-    var INCREASED_UID_BASE_PRIVATE = {};
-    
+    var INCREASED_UID_BASE_PRIV
     /**
      * 获取不重复的随机串（自增，在单浏览器实例，无worker情况下保证唯一）
      * @public
@@ -5265,8 +5254,7 @@ var xutil = {
     
     var URL = xutil.url;
     var LANG = xutil.lang;
-    var objProtoToString = Object.prototype.toString;
-    var arrayProtoSlice = Array.prototype.slice;
+    var objProtoToString = Object.prototype.toS var arrayProtoSlice = Array.prototype.slice;
 
     /**
      * 包装js原生的decodeURIComponent，
@@ -5518,7 +5506,7 @@ var xutil = {
     var VALIDATOR = xutil.validator = {};
 
     var REGEXP_CASH = /^\d+(\.\d{1,2})?$/;
-    var REGEXP_CASH_CAN_NAGE = /^(\+|-)?\d+(\.\d{1,2})?$/;
+    var REGEXP_CASH_CAN(\+|-)?\d+(\.\d{1,2})?$/;
     var REGEXP_EMAIL = /^[_\w-]+(\.[_\w-]+)*@([\w-])+(\.[\w-]+)*((\.[\w]{2,})|(\.[\w]{2,}\.[\w]{2,}))$/;
     var REGEXP_URL = /^[^.。，]+(\.[^.，。]+)+$/;
     var REGEXP_MOBILE = /^1\d{10}$/;
@@ -5599,7 +5587,7 @@ var xutil = {
     // 引用
     //----------------------------------
     
-    var xobject = xutil.object;
+    v = xutil.object;
     var inheritsObject = xobject.inheritsObject;
     var objProtoToString = Object.prototype.toString;
     var arrayProtoSlice = Array.prototype.slice;
@@ -6042,7 +6030,7 @@ var xutil = {
 /**
  *                             -----------------
  *                             |   使用说明    |
- *                             -----------------
+ *                             -------
  * ____________________________________________________________________________
  * @usage 使用XDatasource
  *        [举例] 
@@ -7186,7 +7174,7 @@ var xutil = {
  *          (1) 须实现xui.XView.domReady函数
  *          (2) 页面中使用：
  *              <script type="text/javascript">
- *                  xui.XView.start("aaa.bbb.ccc.SomePageView");
+ *                  xui.XView.start("aaa.bbbageView");
  *              </script>
  *              则启动了SomePageView类
  */
@@ -7316,10 +7304,7 @@ var xutil = {
  
 // DI名空间基础
 xui.XProject.setNamespaceBase(
-    window.__$DI__NS$__ = window.__$DI__NS$__ || {}
-);
-
-// 声明名空间用方法
+    window.__$DI__NS$__ = window.__$DI__NS$__ // 声明名空间用方法
 var $namespace = xui.XProject.namespace;
 
 // 注册依赖连接用方法
@@ -20760,7 +20745,7 @@ Combox - 定义可输入下拉框行为的基本操作。
         util = core.util,
         string = core.string,
 
-        $fastCreate = core.$fastCreate,
+        $fastCreateastCreate,
         inheritsControl = core.inherits,
         triggerEvent = core.triggerEvent,
         disposeControl = core.dispose,
@@ -20849,8 +20834,7 @@ Combox - 定义可输入下拉框行为的基本操作。
     var string = ecui.string;
     var MAX = Math.max;
 
-    var indexOf = array.indexOf;
-    var $fastCreate = ecui.$fastCreate;
+    var indexOf = array.in var $fastCreate = ecui.$fastCreate;
     var inheritsControl = ecui.inherits;
     var triggerEvent = ecui.triggerEvent;
     var disposeControl = ecui.dispose;
@@ -21170,13 +21154,12 @@ Combox - 定义可输入下拉框行为的基本操作。
 (function() {
 
     var core = ecui;
-    var array = core.array;
-    var dom = core.dom;
+    var array = core. var dom = core.dom;
     var ui = core.ui;
     var string = core.string;
     var util = core.util;
 
-    var DATE = Date;
+    var DA
     var REGEXP = RegExp;
     var DOCUMENT = document;
 
@@ -22096,7 +22079,7 @@ Combox - 定义可输入下拉框行为的基本操作。
         string = core.string,
         util = core.util,
 
-        $fastCreate = core.$fastCreate,
+        $fastCreate = corete,
         getMouseX = core.getMouseX,
         inheritsControl = core.inherits,
         getOptions = core.getOptions,
@@ -24935,7 +24918,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
     var cutil = ui.XCalendarUtil;
 
     var DATE = Date;
-    var REGEXP = RegExp;
+    var REGEp;
     var DOCUMENT = document;
     var objProtoToString = Object.prototype.toString;
 
@@ -25832,7 +25815,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  *     // 不能变为其他表示（如不可写为"Day"、"Week"）
  *     "timeTypeList": [
  *         // 此为日周月季的切换下拉框的内容和文字配置
- *         // 例如，如果只要显示“日”和“月”，那么不配置“周”和“季”即可
+ *  例如，如果只要显示“日”和“月”，那么不配置“周”和“季”即可
  *         { "value": "D", "text": "日" },
  *         { "value": "W", "text": "周" },
  *         { "value": "M", "text": "月" },
@@ -26624,8 +26607,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
     /**
      * 可定制皮肤的左右结构的button
      *
-     * @class
-     * @param {Object} options 选项
+     * @classaram {Object} options 选项
      * @param {string} options.skin 皮肤（的css类）
      * @param {string} options.text 按钮上的文字
      */
@@ -26672,7 +26654,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
     var createDom = ecui.dom.create;
     var triggerEvent = ecui.triggerEvent;
     var addClass = ecui.dom.addClass;
-    var extend = ecui.util.extend;
+    var extend = ectend;
 
     /**
      * 可切换状态的button
@@ -26755,8 +26737,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
     var xajax = xutil.ajax;
     //var URL = di.config.URL;
 
-    var $fastCreate = core.$fastCreate;
-    var inheritsControl = core.inherits;
+    var $fastCreate = core.$fastCreat inheritsControl = core.inherits;
     var triggerEvent = core.triggerEvent;
     var disposeControl = core.dispose;
     var createDom = dom.create;
@@ -28012,7 +27993,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
         $fastCreate = core.$fastCreate,
         inheritsControl = core.inherits,
         triggerEvent = core.triggerEvent,
-        disposeControl = core.dispose,
+        disp = core.dispose,
         $disposeControl = core.$dispose,
         createDom = dom.create,
         first = dom.first,
@@ -29592,7 +29573,7 @@ change:     切换了分页
      * 面包屑导航
      *
      * @class
-     * @extends {ecui.ui.Control}
+   ds {ecui.ui.Control}
      */
     var UI_BREADCRUMB = ui.Breadcrumb =
         inheritsControl(
@@ -29762,7 +29743,7 @@ change:     切换了分页
     var UI_CONTROL_CLASS = UI_CONTROL.prototype;
     var UI_ITEMS = ui.Items;
     var UI_ITEM = ui.Item;
-    var UI_ITEM_CLASS = UI_ITEM.prototype;
+    var UI_ITEM_CLASS =rototype;
 
     ui.IndTree = core.inherits(
         ui.Control,
@@ -30519,9 +30500,9 @@ change:     切换了分页
         attachEvent = util.attachEvent,
         createDom = dom.create,
         addClass = dom.addClass,
-        removeClass = dom.removeClass,
+        remodom.removeClass,
         removeDom = dom.remove,
-        insertAfter = dom.insertAfter,
+    After = dom.insertAfter,
         trim = string.trim,
         setFocused = core.setFocused,
         blank = util.blank,
@@ -30736,7 +30717,7 @@ change:     切换了分页
         setFocused = core.setFocused,
         disposeControl = core.dispose,
         createDom = dom.create,
-        addClass = dom.addClass,
+        addClasdClass,
         children = dom.children,
         encodeHTML = string.encodeHTML,
         moveElements = dom.moveElements,
@@ -32330,7 +32311,7 @@ _uOptions     - 下拉选择框
     var UI_ITEM_CLASS = UI_ITEM.prototype;
 
     ui.DroppableList = core.inherits(
-        UI_CONTROL,
+       L,
         'ui-droppable-list',
         function(el, options) {
         },
@@ -32925,7 +32906,7 @@ xui.ui = {};
 //Going sloppy to avoid 'use strict' string cost, but strict practices should
 //be followed.
 /*jslint sloppy: true */
-/*global setTimeout: false */
+/*global s false */
 
 var requirejs, require, define;
 (function (undef) {
@@ -33341,8 +33322,7 @@ define('echarts/config',[],function() {
         CHART_TYPE_RADAR: 'radar',
         CHART_TYPE_MAP: 'map',
         CHART_TYPE_K: 'k',
-        CHART_TYPE_ISLAND: 'island',
-        CHART_TYPE_FORCE : 'force',
+        CHART_TYPE_ISLAND: 'i      CHART_TYPE_FORCE : 'force',
         CHART_TYPE_CHORD : 'chord',
 
         // 组件类型
@@ -35780,7 +35760,7 @@ define(
 
         /**
          * 获取图形实现
-         * @param {Object} name
+ @param {Object} name
          */
         self.get = function(name) {
             return _shapeLibrary[name];
@@ -35807,7 +35787,7 @@ define(
                 out[1] = y || 0;
                 return out;
             },
-            copy : function(out, v) {
+            copy : ft, v) {
                 out[0] = v[0];
                 out[1] = v[1];
             },
@@ -35900,8 +35880,7 @@ define(
          * @param {Any} source 需要进行拷贝的对象
          * @return {Any} 拷贝后的新对象
          */
-        function clone(source) {
-            // buildInObject, 用于处理无法遍历Date等对象的问题
+        function clone(sour        // buildInObject, 用于处理无法遍历Date等对象的问题
             var buildInObject = {
                 '[object Function]': 1,
                 '[object RegExp]': 1,
@@ -36395,7 +36374,7 @@ define(
          * @param {number} x ： 横坐标
          * @param {number} y ： 纵坐标
          */
-        function isInside(shapeClazz, area, x, y) {
+        sInside(shapeClazz, area, x, y) {
             if (!area || !shapeClazz) {
                 // 无参数或不支持类型
                 return false;
@@ -36893,8 +36872,7 @@ define(
                 out[1] = 0;
                 out[2] = 0;
                 out[3] = 1;
-                out[4] = 0;
-                out[5] = 0;
+                out[4] =          out[5] = 0;
             },
             mul : function(out, m1, m2) {
                out[0] = m1[0] * m2[0] + m1[2] * m2[1];
@@ -37004,7 +36982,7 @@ define(
  * toRGB  : 转为RGB格式
  * toRGBA : 转为RGBA格式
  * toHex  : 转为#RRGGBB格式
- * toHSL  : 转为HSL格式
+ * toHSL式
  * toHSLA : 转为HSLA格式
  * toHSB  : 转为HSB格式
  * toHSBA : 转为HSBA格式
@@ -38024,7 +38002,7 @@ define( 'zrender/tool/color',['require','../tool/util'],function(require) {
        // 变换
        position : {array},        // 默认为[0, 0], shape的坐标
        rotation : {number|array}, // 默认为[0, 0, 0]，shape绕自身旋转的角度，不被translate 影响
-                                  // 后两个值为旋转的origin
+                           后两个值为旋转的origin
        scale : {array},           // 默认为[1, 1, 0, 0], shape纵横缩放比例，不被translate影响
                                   // 后两个值为缩放的origin
 
@@ -38837,8 +38815,7 @@ define(
        style  : {
            x             : {number},  // 必须，圆心横坐标
            y             : {number},  // 必须，圆心纵坐标
-           r             : {number},  // 必须，圆半径
-           brushType     : {string},  // 默认为fill，绘画方式
+           r             : {number},  /          brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
@@ -38958,7 +38935,7 @@ define(
        style  : {
            x             : {number},  // 必须，椭圆心横坐标
            y             : {number},  // 必须，椭圆心纵坐标
-           a             : {number},  // 必须，椭圆横轴半径
+ a             : {number},  // 必须，椭圆横轴半径
            b             : {number},  // 必须，椭圆纵轴半径
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
@@ -39092,7 +39069,7 @@ define(
            xStart        : {number},  // 必须，起点横坐标
            yStart        : {number},  // 必须，起点纵坐标
            xEnd          : {number},  // 必须，终点横坐标
-           yEnd          : {number},  // 必须，终点纵坐标
+               : {number},  // 必须，终点纵坐标
            strokeColor   : {color},   // 默认为'#000'，线条颜色（轮廓），支持rgba
            lineType      : {string},  // 默认为solid，线条类型，solid | dashed | dotted
            lineWidth     : {number},  // 默认为1，线条宽度
@@ -39226,7 +39203,7 @@ define(
        style  : {
            pointList     : {Array},   // 必须，多边形各个顶角坐标
            brushType     : {string},  // 默认为fill，绘画方式
-                                      // fill(填充) | stroke(描边) | both(填充+描边)
+                                      // fill(填充) | stroke((填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度，描边下有效
@@ -39501,7 +39478,7 @@ define(
            pointList     : {Array},   // 必须，各个顶角坐标
            smooth        : {Number},  // 默认为0
            strokeColor   : {color},   // 默认为'#000'，线条颜色（轮廓），支持rgba
-           lineType      : {string},  // 默认为solid，线条类型，solid | dashed | dotted
+        e      : {string},  // 默认为solid，线条类型，solid | dashed | dotted
            lineWidth     : {number},  // 默认为1，线条宽度
            lineCap       : {string},  // 默认为butt，线帽样式。butt | round | square
            lineJoin      : {string},  // 默认为miter，线段连接样式。miter | round | bevel
@@ -39660,9 +39637,8 @@ define(
        style  : {
            x             : {number},  // 必须，左上角横坐标
            y             : {number},  // 必须，左上角纵坐标
-           width         : {number},  // 必须，宽度
-           height        : {number},  // 必须，高度
-           radius        : {array},   // 默认为[0]，圆角 
+           width         : {num必须，宽度
+           height        : {number},  // 必须，高度  radius        : {array},   // 默认为[0]，圆角
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
@@ -39856,7 +39832,7 @@ define(
            y             : {number},  // 必须，圆心纵坐标
            r0            : {number},  // 必须，内圆半径
            r             : {number},  // 必须，外圆半径
-           brushType     : {string},  // 默认为fill，绘画方式
+               : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
@@ -39987,7 +39963,7 @@ define(
         function sin(angle, isDegrees) {
             return Math.sin(isDegrees ? angle * _radians : angle);
             /*
-            angle = (isDegrees ? angle * _radians : angle).toFixed(4);
+  angle = (isDegrees ? angle * _radians : angle).toFixed(4);
             if(typeof _cache.sin[angle] == 'undefined') {
                 _cache.sin[angle] = Math.sin(angle);
             }
@@ -40053,7 +40029,7 @@ define(
            y             : {number},  // 必须，圆心纵坐标
            r0            : {number},  // 默认为0，内圆半径，指定后将出现内弧，同时扇边长度 = r - r0
            r             : {number},  // 必须，外圆半径
-           startAngle    : {number},  // 必须，起始角度[0, 360)
+   artAngle    : {number},  // 必须，起始角度[0, 360)
            endAngle      : {number},  // 必须，结束角度(0, 360]
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
@@ -40262,7 +40238,7 @@ define(
            y             : {number},  // 必须，纵坐标
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
-           color         : {color},   // 默认为'#000'，填充颜色，支持rgba
+               : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，线条颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度
 
@@ -40491,7 +40467,7 @@ define(
            y             : {number},  // 必须，心形内部尖端纵坐标
            a             : {number},  // 必须，心形横宽（中轴线到水平边缘最宽处距离）
            b             : {number},  // 必须，心形纵高（内尖到外尖距离）
-           brushType     : {string},  // 默认为fill，绘画方式
+           brushTyptring},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
@@ -40628,7 +40604,7 @@ define(
            y             : {number},  // 必须，水滴中心纵坐标
            a             : {number},  // 必须，水滴横宽（中心到水平边缘最宽处距离）
            b             : {number},  // 必须，水滴纵高（中心到尖端距离）
-           brushType     : {string},  // 默认为fill，绘画方式
+           brushType     : {stringfill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
@@ -40765,7 +40741,7 @@ define(
                                     //M = moveto
                                     //L = lineto
                                     //H = horizontal lineto
-                                    //V = vertical lineto
+                                vertical lineto
                                     //C = curveto
                                     //S = smooth curveto
                                     //Q = quadratic Belzier curve
@@ -41320,7 +41296,7 @@ define('zrender/shape/path',['require','./base','../shape'],function(require) {
            width         : {number},  // 可选，宽度
            height        : {number},  // 可选，高度
            sx            : {number},  // 可选, 从图片中裁剪的x
-           sy            : {number},  // 可选, 从图片中裁剪的y
+           sy            : {// 可选, 从图片中裁剪的y
            sWidth        : {number},  // 可选, 从图片中裁剪的宽度
            sHeight       : {number},  // 可选, 从图片中裁剪的高度
            image         : {string|Image} // 必须，图片url或者图片对象
@@ -41541,7 +41517,7 @@ define(
            cpX1          : {number},  // 必须，第一个关联点横坐标
            cpY1          : {number},  // 必须，第一个关联点纵坐标
            cpX2          : {number},  // 可选，第二个关联点横坐标  缺省即为二次贝塞尔曲线
-           cpY2          : {number},  // 可选，第二个关联点纵坐标
+   Y2          : {number},  // 可选，第二个关联点纵坐标
            xEnd          : {number},  // 必须，终点横坐标
            yEnd          : {number},  // 必须，终点纵坐标
            strokeColor   : {color},   // 默认为'#000'，线条颜色（轮廓），支持rgba
@@ -41693,8 +41669,7 @@ define(
            y             : {number},  // 必须，n角星外接圆心纵坐标
            r             : {number},  // 必须，n角星外接圆半径
            r0            : {number},  // n角星内部顶点（凹点）的外接圆半径，
-                                      // 如果不指定此参数，则自动计算：取相隔外部顶点连线的交点作内部顶点
-           n             : {number},  // 必须，指明几角星
+                                      // 如果不指定此参数，则自动计算：取相隔外部顶点连线的交点作内部    n             : {number},  // 必须，指明几角星
            brushType     : {string},  // 默认为fill，绘画方式
                                       // fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
@@ -41862,7 +41837,7 @@ define(
            r             : {number},  // 必须，正n边形外接圆半径
            n             : {number},  // 必须，指明正几边形
            brushType     : {string},  // 默认为fill，绘画方式
-                                      // fill(填充) | stroke(描边) | both(填充+描边)
+                             / fill(填充) | stroke(描边) | both(填充+描边)
            color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度，描边下有效
@@ -42023,7 +41998,7 @@ define(
 
             // 三次方的缓动（t^3）
             CubicIn: function(k) {
-                return k * k * k;
+      return k * k * k;
             },
             CubicOut: function(k) {
                 return --k * k * k + 1;
@@ -42779,7 +42754,7 @@ define(
             MOUSEOVER : 'mouseover',    // 鼠标移到某图形元素之上，事件对象是：目标图形元素
             MOUSEOUT : 'mouseout',      // 鼠标从某图形元素移开，事件对象是：目标图形元素
             MOUSEDOWN : 'mousedown',    // 鼠标按钮（手指）被按下，事件对象是：目标图形元素或空
-            MOUSEUP : 'mouseup',        // 鼠标按键（手指）被松开，事件对象是：目标图形元素或空
+            MOUSEUP : 'mouseup',        // 鼠标按键（手指）被松开，事素或空
 
             //
             GLOBALOUT : 'globalout',    // 全局离开，MOUSEOUT触发比较频繁，一次离开优化绑定
@@ -42829,8 +42804,7 @@ define(
 
         /**
          * 获取loading文字图形
-         * @param {Object} textStyle 文字style，同shape/text.style
-         */
+         * @param {Object} textStyle 文字style，同shape/t         */
         function getTextShape(textStyle) {
             return {
                 shape : 'text',
@@ -43566,7 +43540,7 @@ define(
         * @param  {event} e 事件.
         * @return {number} 鼠标（手指）y坐标.
         */
-        function getY(e) {
+    on getY(e) {
             return typeof e.zrenderY != 'undefined' && e.zrenderY
                    || typeof e.offsetY != 'undefined' && e.offsetY
                    || typeof e.layerY != 'undefined' && e.layerY
@@ -43748,7 +43722,7 @@ define(
         /*
          * HTML5 Canvas for Internet Explorer!
          * Modern browsers like Firefox, Safari, Chrome and Opera support
-         * the HTML5 canvas tag to allow 2D command-based drawing.
+         * the HTML5 can allow 2D command-based drawing.
          * ExplorerCanvas brings the same functionality to Internet Explorer.
          * To use, web developers only need to include a single script tag
          * in their existing web pages.
@@ -45852,8 +45826,7 @@ define('zrender', ['zrender/zrender'], function (main) { return main; });
            height        : {number},  // 必须，高度
            iconType      : {string},  // 必须，icon类型
            brushType     : {string},  // 默认为fill，绘画方式
-                                      // fill(填充) | stroke(描边) | both(填充+描边)
-           color         : {color},   // 默认为'#000'，填充颜色，支持rgba
+                                      // fill(填充) | stroke(描边) | bo           color         : {color},   // 默认为'#000'，填充颜色，支持rgba
            strokeColor   : {color},   // 默认为'#000'，描边颜色（轮廓），支持rgba
            lineWidth     : {number},  // 默认为1，线条宽度，描边下有效
 
@@ -46399,7 +46372,7 @@ define(
              * @param updateCallback 需要异步加载资源的shape可以通过这个callback(e)
              *                       让painter更新视图，base.brush没用，需要的话重载brush
              */
-            brush : function(ctx, e, isHighlight) {
+            brush : function(ctx, e, isH{
                 var style = e.style || {};
     
                 if (isHighlight) {
@@ -46674,7 +46647,7 @@ define('echarts/util/ecData',[],function() {
     /**
      * 打包私有数据
      *
-     * @param {shape} shape 修改目标
+     * @pe} shape 修改目标
      * @param {Object} series
      * @param {number} seriesIndex
      * @param {number | Object} data
@@ -46697,7 +46670,7 @@ define('echarts/util/ecData',[],function() {
 
         shape._echartsData =  {
             '_series' : series,
-            '_seriesIndex' : seriesIndex,
+           ndex' : seriesIndex,
             '_data' : data,
             '_dataIndex' : dataIndex,
             '_name' : name,
@@ -46808,8 +46781,7 @@ define('echarts/component/base',['require','../config','../util/ecData','zrender
         _aniMap[ecConfig.CHART_TYPE_PIE] = true;
         _aniMap[ecConfig.CHART_TYPE_RADAR] = true;
         _aniMap[ecConfig.CHART_TYPE_MAP] = true;
-        _aniMap[ecConfig.CHART_TYPE_K] = true;
-        _aniMap[ecConfig.CHART_TYPE_CHORD] = true;
+        _aniMap[ecConfig.CHART_TYPE_K]       _aniMap[ecConfig.CHART_TYPE_CHORD] = true;
 
         /**
          * 获取zlevel基数配置
@@ -47896,7 +47868,7 @@ define('echarts/chart/calculableBase',['require','../util/ecData','../util/accMa
                 var calculableShape = zrUtil.clone(param.target);
                 calculableShape.highlightStyle = {
                     text : '',
-                    r : calculableShape.style.r + 5,
+                    r : calculablee.r + 5,
                     brushType : 'stroke',
                     strokeColor : self.zr.getCalculableColor(),
                     lineWidth : (calculableShape.style.lineWidth || 1) + 12
@@ -48053,7 +48025,7 @@ define('echarts/chart/island',['require','../component/base','./calculableBase',
         var ecConfig = require('../config');
         var ecData = require('../util/ecData');
 
-        var zrEvent = require('zrender/tool/event');
+        var zrEvent = require('zrendent');
 
         var self = this;
         self.type = ecConfig.CHART_TYPE_ISLAND;
@@ -48328,7 +48300,7 @@ define('echarts/component',[],function(/*require*/) {    //component
  * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
  *
  */
-define('echarts/component/title',['require','./base','../config','zrender/tool/area','zrender/tool/util','../component'],function (require) {
+define('echarts/component/title',['require','./base','../config','zrender/tool/area','zrender/tool/util','../c,function (require) {
     /**
      * 构造函数
      * @param {Object} messageCenter echart消息中心
@@ -48349,7 +48321,7 @@ define('echarts/component/title',['require','./base','../config','zrender/tool/a
         var titleOption;                       // 标题选项，共享数据源
         var _zlevelBase = self.getZlevelBase();
 
-        var _itemGroupLocation = {};    // 标题元素组的位置参数，通过计算所得x, y, width, height
+        var _itemGroupLocation// 标题元素组的位置参数，通过计算所得x, y, width, height
 
         function _buildShape() {
             _itemGroupLocation = _getItemGroupLocation();
@@ -48636,7 +48608,7 @@ define('echarts/component/categoryAxis',['require','./base','../config','zrender
         var grid = component.grid;
 
         var _zlevelBase = self.getZlevelBase();
-        var _interval;                              // 标签显示的挑选间隔
+r _interval;                              // 标签显示的挑选间隔
         var _labelData;
 
         function _reformLabel() {
@@ -49393,8 +49365,7 @@ define('echarts/component/valueAxis',['require','./base','../config','zrender/to
         var _zlevelBase = self.getZlevelBase();
         var _min;
         var _max;
-        var _hasData;
-        var _valueList;
+        var         var _valueList;
         var _valueLabel;
 
         function _buildShape() {
@@ -49982,7 +49953,7 @@ define('echarts/component/valueAxis',['require','./base','../config','zrender/to
                         (_min == 0 && _max == 2000) ? 'success' : 'failed');
 
              _min = 10; _max = 78; console.log(_min, _max); _reformValue();
-             console.log('result is :', _min, _max, _valueList);
+             console.lois :', _min, _max, _valueList);
              console.log('should be : 0 100 [0, 20, 40, 60, 80, 100]',
                         (_min == 0 && _max == 100) ? 'success' : 'failed');
 
@@ -50294,7 +50265,7 @@ define('echarts/component/axis',['require','./base','../config','./categoryAxis'
      * @param {Object} component 组件
      * @param {string} axisType 横走or纵轴
      */
-    function Axis(messageCenter, zr, option, component, axisType) {
+    function Axis(messageCeoption, component, axisType) {
         var Base = require('./base');
         Base.call(this, zr);
 
@@ -50503,7 +50474,7 @@ define('echarts/component/grid',['require','./base','../config','../component'],
         var _zlevelBase = self.getZlevelBase();
 
         var _x;
-        var _y;
+   y;
         var _width;
         var _height;
         var _zrWidth;
@@ -50656,7 +50627,7 @@ define('echarts/component/dataZoom',['require','./base','../config','../componen
         var _fillerSize = 30;       // 填充大小
         var _handleSize = 10;       // 手柄大小
         var _location;              // 位置参数，通过计算所得x, y, width, height
-        var _zoom;                  // 缩放参数
+        var _zoom;        // 缩放参数
         var _fillerShae;
         var _startShape;
         var _endShape;
@@ -51701,7 +51672,7 @@ define('echarts/component/legend',['require','./base','../config','zrender/tool/
         var legendOption;                       // 图例选项，共享数据源
         var _zlevelBase = self.getZlevelBase();
 
-        var _itemGroupLocation = {};    // 图例元素组的位置参数，通过计算所得x, y, width, height
+        var _itemGroupLocation = {}; 组的位置参数，通过计算所得x, y, width, height
 
         var _colorIndex = 0;
         var _colorMap = {};
@@ -52523,7 +52494,7 @@ define('echarts/component/dataRange',['require','./base','../config','zrender/to
         var _zlevelBase = self.getZlevelBase();
 
         var _itemGroupLocation = {};    // 值域元素组的位置参数，通过计算所得x, y, width, height
-        var _calculableLocation;        // 可计算元素的位置缓存
+   calculableLocation;        // 可计算元素的位置缓存
         
         var _startShape;
         var _startMask;
@@ -53776,8 +53747,7 @@ define('echarts/component/tooltip',['require','./base','../config','../util/ecDa
         var zrConfig = require('zrender/config');
         var zrShape = require('zrender/shape');
         var zrEvent = require('zrender/tool/event');
-        var zrArea = require('zrender/tool/area');
-        var zrColor = require('zrender/tool/color');
+        var zrArea = require('zrender/tool/area');ar zrColor = require('zrender/tool/color');
         var zrUtil = require('zrender/tool/util');
         var zrShapeBase = require('zrender/shape/base');
 
@@ -55182,7 +55152,7 @@ define('echarts/component/toolbox',['require','./base','../config','zrender/conf
         var _zlevelBase = self.getZlevelBase();
         var _magicType;
         var _magicMap;
-        var _iconList;
+   iconList;
         var _iconShapeMap = {};
         var _itemGroupLocation;
         var _enableColor = 'red';
@@ -56175,7 +56145,7 @@ define('echarts/component/dataView',['require','./base','../config','../componen
         var _textArea = document.createElement('textArea');
         var _buttonRefresh = document.createElement('button');
         var _buttonClose = document.createElement('button');
-        var _hasShow = false;
+        var _hasSho
 
         // 通用样式
         var _gCssText = 'position:absolute;'
@@ -56653,7 +56623,7 @@ define(
 /**
  * echarts组件类：极坐标
  *
- * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
+ * @des于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
  * @author Neil (杨骥, yangji01@baidu.com)
  *
  */
@@ -56686,7 +56656,7 @@ define(
              * 绘制图形
              */
             function _buildShape() {
-                for (var i = 0; i < polar.length; i ++) {
+                for (var i = 0;.length; i ++) {
 
                     self.reformOption(polar[i]);
 
@@ -57593,7 +57563,7 @@ define('echarts/echarts',['require','./config','./config','zrender','zrender/too
      * 入口方法 
      */
     self.init = function(dom/*, theme*/) {
-        dom = dom instanceof Array ? dom[0] : dom;
+        domtanceof Array ? dom[0] : dom;
         if (G_vmlCanvasManager) {
             // IE8-
             var ecConfig = require('./config');
@@ -58877,7 +58847,7 @@ define('echarts', ['echarts/echarts'], function (main) { return main; });
 
            opacity       : {number},  // 默认为1，透明度设置，如果color为rgba，则最终透明度效果叠加
            shadowBlur    : {number},  // 默认为0，阴影模糊度，大于0有效
-           shadowColor   : {color},   // 默认为'#000'，阴影色彩，支持rgba
+           r   : {color},   // 默认为'#000'，阴影色彩，支持rgba
            shadowOffsetX : {number},  // 默认为0，阴影横向偏移，正值往右，负值往左
            shadowOffsetY : {number},  // 默认为0，阴影纵向偏移，正值往下，负值往上
 
@@ -59105,8 +59075,7 @@ define('echarts/chart/scatter',['require','../component/base','./calculableBase'
         var series;                 // 共享数据源，不要修改跟自己无关的项
 
         var _zlevelBase = self.getZlevelBase();
-        
-        var _sIndex2ColorMap = {};  // series默认颜色索引，seriesIndex索引到color
+       var _sIndex2ColorMap = {};  // series默认颜色索引，seriesIndex索引到color
         var _symbol = [
               'circle', 'rectangle', 'triangle', 'diamond',
               'emptyCircle', 'emptyRectangle', 'emptyTriangle', 'emptyDiamond'
@@ -59477,7 +59446,7 @@ define('echarts/chart/scatter',['require','../component/base','./calculableBase'
 
            opacity       : {number},  // 默认为1，透明度设置，如果color为rgba，则最终透明度效果叠加
            shadowBlur    : {number},  // 默认为0，阴影模糊度，大于0有效
-           shadowColor   : {color},   // 默认为'#000'，阴影色彩，支持rgba
+           shadowCollor},   // 默认为'#000'，阴影色彩，支持rgba
            shadowOffsetX : {number},  // 默认为0，阴影横向偏移，正值往右，负值往左
            shadowOffsetY : {number},  // 默认为0，阴影纵向偏移，正值往下，负值往上
 
@@ -59674,7 +59643,7 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
         var _zlevelBase = self.getZlevelBase();
 
         function _buildShape() {
-            self.selectedMap = {};
+        electedMap = {};
 
             // 水平垂直双向series索引 ，position索引到seriesIndex
             var _position2sIndexMap = {
@@ -60202,7 +60171,7 @@ define('echarts/chart/k',['require','../component/base','./calculableBase','../c
         var series;                 // 共享数据源，不要修改跟自己无关的项
         var serie;
 
-        var _zlevelBase = self.getZlevelBase();
+    levelBase = self.getZlevelBase();
 
         var _queryTarget;
 
@@ -64759,7 +64728,7 @@ define('echarts/chart/force',['require','../component/base','./calculableBase','
            opacity       : {number},  // 默认为1，透明度设置，如果color为rgba，则最终透明度效果叠加
            shadowBlur    : {number},  // 默认为0，阴影模糊度，大于0有效
            shadowColor   : {color},   // 默认为'#000'，阴影色彩，支持rgba
-           shadowOffsetX : {number},  // 默认为0，阴影横向偏移，正值往右，负值往左
+           shadowOffsetX : {number},  // 默认为0，阴影横值往左
            shadowOffsetY : {number},  // 默认为0，阴影纵向偏移，正值往下，负值往上
 
            text          : {string},  // 默认为null，附加文本
@@ -64893,7 +64862,7 @@ define('echarts/chart/line',['require','../component/base','./calculableBase','.
 
         var _zlevelBase = self.getZlevelBase();
 
-        var finalPLMap = {}; // 完成的point list(PL)
+        var final; // 完成的point list(PL)
         var _sIndex2ColorMap = {};  // series默认颜色索引，seriesIndex索引到color
         var _symbol = [
               'circle', 'rectangle', 'triangle', 'diamond',
@@ -65850,7 +65819,7 @@ define('echarts/chart/bar',['require','../component/base','./calculableBase','..
 
         var _zlevelBase = self.getZlevelBase();
 
-        var _sIndex2colorMap = {};  // series默认颜色索引，seriesIndex索引到color
+        var _sIndex2col;  // series默认颜色索引，seriesIndex索引到color
 
         function _buildShape() {
             self.selectedMap = {};
@@ -66844,7 +66813,7 @@ define('echarts/chart/pie',['require','../component/base','./calculableBase','..
         var zrColor = require('zrender/tool/color');
 
         var self = this;
-        self.type = ecConfig.CHART_TYPE_PIE;
+        self.type = ecConfig.CHART
 
         var series;                 // 共享数据源，不要修改跟自己无关的项
 
@@ -68038,7 +68007,7 @@ _global['zrender'] = zrender;
                 el.innerHTML = [
                         '<div class="' + type + '-header">',
                         '</div>',
-                        '<div class="' + type + '-content"></div>'
+              '<div class="' + type + '-conten
                 ].join('');
 
                 this._eHeader = el.childNodes[0];
@@ -68643,8 +68612,7 @@ $namespace('di.config');
      * @param {number} status ajax返回状态
      * @param {Object|string} ejsonObj e-json整体返回的数据
      * @param {Function} defaultCase 可用此函数替换默认情况的处理函数
-     */
-    AJAX.handleDefaultFailure = function(status, ejsonObj, defaultCase) {
+     */handleDefaultFailure = function(status, ejsonObj, defaultCase) {
         switch (status) {
             case 100: // 未登陆
             case 201: 
@@ -68797,7 +68765,7 @@ $namespace('di.config');
      */
     DICT.GRAPH_DEFS = [
         { name: 'line', text: '折线', yAxisNameSet: ['left', 'right'] },
-        { name: 'bar', text: '柱', yAxisNameSet: ['left', 'right'] },
+   e: 'bar', text: '柱', yAxisNameSet: ['left', 'right'] },
         { name: 'pie', text: '饼', yAxisNameSet: [] },
         { name: 'beaker', text: '烧杯', yAxisNameSet: []}
     ];
@@ -68920,8 +68888,7 @@ $namespace('di.config');
         return template(
             tpl.join(''),
             ' "<span ' + stl + '>' + otherEditing.join('</span>", "<span ' + stl + '>') + '</span>" '
-        );
-    };
+     };
     LANG.SOME_ERROR = '抱歉，出现错误。';
     LANG.NEED_CREATE = '请先保存再执行此操作';
     LANG.OPT_SUCCESS = '操作成功';
@@ -69122,7 +69089,7 @@ $namespace('di.config');
 
                 {
                     "clzKey": "GENERAL_SNIPPET",
-                    "clzPath": "di.shared.ui.GeneralSnippet",
+          "clzPath": "di.shared.ui.GeneralSnippet",
                     "clzType": "SNIPPET"
                 },
 
@@ -69645,7 +69612,7 @@ $namespace('di.config');
      * @return {string} 运行时的web base
      */
     URL.getWebRoot = function() {
-        return webRoot || $getNamespaceBase().WEB_ROOT || '';
+   n webRoot || $getNamespaceBase().WEB_ROOT || '';
     };
 
     URL.setWebRoot = function(root) {
@@ -69888,7 +69855,7 @@ $namespace('di.helper');
         waitingPrompt.apply(this, arguments);
     };
     DIALOG.hidePrompt = function () {
-        hidePrompt.apply(this, arguments);
+        hidePrompt., arguments);
     };
 
     /**
@@ -70262,7 +70229,7 @@ $namespace('di.helper');
      * @param {Any...} 调用formatter时的从第二个开始的参数
      * @return {Function} formatter
      */
-    var FORMATTER = $namespace().Formatter = function(formatterName) {
+    var FORMATTER = $namesmatter = function(formatterName) {
         var args = arraySlice.call(arguments, 1);
         return function(data) {
             var argsInput = arraySlice.call(arguments, 1);
@@ -70489,8 +70456,7 @@ $namespace('di.helper');
     var STUB_EVENT_CHANNEL_INWARD = 'data-d-inward-d-atad';
     var ID_DELIMITER = '.';
 
-    function setupEventChannel(el, prodDef, diFactory) {
-        var els = getAllEls(el);
+    function setupEventChannel(el, prodDef, diFactory) var els = getAllEls(el);
         var domAttrName = prodDef.domAttrName || DEFAULT_DOM_ATTR_NAME;
 
         // 便利dom节点
@@ -70747,7 +70713,7 @@ $namespace('di.helper');
     var ECUI_CONTROL;
     var DIALOG;
     var LANG;
-    var REGEXP = RegExp;
+    var REGEXP
 
     $link(function () {
         ECUI_CONTROL = getByPath('ecui.ui.Control');
@@ -71906,7 +71872,7 @@ $namespace('di.shared.arg');
      *          [somObj1, 'handlerName1', 'asdf', 'zxcv', ...],
      *          [null, 'handlerName2', 'zxz', 1242, ...]
      *      );
-     * 则得到了一个argHandler，其中会顺序调用handlerName1, handlerName2
+  个argHandler，其中会顺序调用handlerName1, handlerName2
      * handlerName1调用时，'asdf', 'zxcv', ... 会作为后面的参数自动传入，
      * handlerName2同理。
      *
@@ -72204,8 +72170,7 @@ $namespace('di.shared.vui');
     /**
      * 设置数据
      *
-     * @public
-     * @param {Object} data 数据
+     * @publ@param {Object} data 数据
      * @param {(Object|Array}} data.datasource 数据集
      * @param {*} data.value 当前数据
      */
@@ -72278,8 +72243,7 @@ $namespace('di.shared.vui');
         this._eMain.innerHTML = '';
     };
     
-    /**
-     * 设置数据（根据数据源 生成组件内容）
+   * 设置数据（根据数据源 生成组件内容）
      *
      * @param {Object} data 数据对象
      * @param {Array<Object>} data.datasource 数据源
@@ -72417,7 +72381,7 @@ $namespace('di.shared.vui');
      * @extends xui.XView
      * @param {Object} options
      * @param {string} options.skin 皮肤（的css类）
-     * @param {string} options.text 按钮上的文字，默认为'离线下载'
+     *tring} options.text 按钮上的文字，默认为'离线下载'
      * @param {string} options.confirmText 确定按钮上的文字，默认为'确定'
      * @param {string} options.cancelText 取消按钮上的文字，默认为'取消'
      * @param {string} options.headText 提示文字，默认为'请输入邮箱'
@@ -72584,7 +72548,7 @@ $namespace('di.shared.model');
      * 维度选择Model
      *
      * @class
-     * @extends xui.XDatasource
+     * @exXDatasource
      */
     var MULTIDIM_SELECT_MODEL = 
             $namespace().MultiDimSelectModel = 
@@ -72764,7 +72728,7 @@ $namespace('di.shared.ui');
         MULTIDIM_SELECT_MODEL = di.shared.model.MultiDimSelectModel;
     });
 
-    //-----------------------------------
+    //-------------------------
     // 类型声明
     //-----------------------------------
 
@@ -73303,9 +73267,7 @@ $namespace('di.shared.model');
      * 维度选择Model
      *
      * @class
-     * @extends xui.XDatasource
-     */
-    var DIM_SELECT_MODEL = 
+     * @extends xui.XDatasourc    var DIM_SELECT_MODEL =
             $namespace().DimSelectModel = 
             inheritsObject(XDATASOURCE, constructor);
     var DIM_SELECT_MODEL_CLASS = 
@@ -73568,8 +73530,7 @@ $namespace('di.shared.ui');
         DIM_SELECT_MODEL = di.shared.model.DimSelectModel;
     });
 
-    //-----------------------------------
-    // 类型声明
+    //-----------------------------------声明
     //-----------------------------------
 
     /**
@@ -73966,8 +73927,7 @@ $namespace('di.shared.vui');
     /**
      * 元数据（指标维度）条件拖动选择
      * 
-     * @class
-     * @extends xui.XView
+     * @cl @extends xui.XView
      * @param {Object} options
      * @param {HTMLElement} options.el 容器元素
      * @param {Object} options.reportType 类型，
@@ -74745,8 +74705,7 @@ $namespace('di.shared.vui');
             inheritsObject(XOBJECT, constructor);
     var OLAP_META_SELECT_CLASS = OLAP_META_SELECT.prototype;
     
-    var TPL_SEL = [
-        '<span>',
+    var TPL_SEL   '<span>',
             '<span class="olap-meta-select-txt">#{colName}</span>',
             '<span class="olap-meta-select-sel"></span>',
         '</span>'
@@ -76005,7 +75964,7 @@ $namespace('di.shared.vui');
      *
      * @public
      * @param {Object} data 数据对象
-     * @param {Array<Object>} data.datasource 数据源
+ram {Array<Object>} data.datasource 数据源
      */
     SIMPLE_RADIO_CLASS.setData = function (data) {
         render.call(this, data.datasource || []);
@@ -76150,7 +76109,7 @@ $namespace('di.shared.vui');
      * @private
      * @param {Object} options 参数
      */
-    function constructor(options) {
+    fnstructor(options) {
         var el = this._eMain = options.el;
         addClass(el, 'vui-text-area');
 
@@ -76287,7 +76246,7 @@ $namespace('di.shared.adapter');
 
 /**
  * di.shared.model.AuthModel
- * Copyright 2012 Baidu Inc. All rights reserved.
+ * Copyright 2012. All rights reserved.
  *
  * desc:    [通用模型] 权限数据模型
  * author:  sushuang(sushuang@baidu.com)
@@ -76346,8 +76305,7 @@ $namespace('di.shared.model');
         this.businessData = true;
         this._nInitServerTime = parseInt(data.serverTime) || new Date().getTime();
         this._nServerTimeOffset = this._nInitServerTime - (new Date).getTime();
-    };
-    
+
     /**
      * 获得服务器的当前时间
      * 不保证准确的地方：
@@ -76380,7 +76338,7 @@ $namespace('di.shared.model');
     
     /* 外部引用 */
     var inheritsObject = xutil.object.inheritsObject;
-    var XDATASOURCE = xui.XDatasource;
+    var XDATASOURCE = xuice;
         
     /* 类型声明 */
     var USER_MODEL = $namespace().UserModel = inheritsObject(XDATASOURCE);
@@ -76431,7 +76389,7 @@ $namespace('di.shared.model');
     });
     
     /* 类型声明 */
-    var GLOBAL_MODEL = $namespace().GlobalModel = function(options) {
+    var GLOBAL_MODEL = $namespalModel = function(options) {
             if (instance && options) {
                 throw new Error('global model has been created');
             }
@@ -76452,7 +76410,7 @@ $namespace('di.shared.model');
         this._sBizKey = options.bizKey;
 
         // 初始化全局模型
-        this._mUserModel = new USER_MODEL();
+        this._mUseew USER_MODEL();
         this._mAuthModel = new AUTH_MODEL();
         this._mDateModel = new DATE_MODEL();
         this._mDateModel.setData(options);
@@ -76566,7 +76524,7 @@ $namespace('di.shared.model');
     COMMON_PARAM_FACTORY.markParamMode = function(data, paramMode) {
         if (isObject(data)) {
             if (!paramMode || paramMode == 'NORMAL') {
-                delete data[STRINGIFY_FLAG];
+      delete data[STRINGIFY_FLAG];
             }
             else {
                 data[STRINGIFY_FLAG] = paramMode;
@@ -77220,8 +77178,7 @@ $namespace('di.shared.model');
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     var arrayPush = Array.prototype.push;
     var isEcuiControl = UTIL.isEcuiControl;
-    var evalJsonLogic = UTIL.evalJsonLogic;
-    var XOBJECT = xui.XObject;
+    var evalJsonLogic = UTIL.evalJsonLogic;OBJECT = xui.XObject;
     var COMMON_PARAM_FACTORY;
     var ARG_HANDLER_FACTORY;
     var replaceIntoParam = xutil.url.replaceIntoParam;
@@ -79740,8 +79697,7 @@ $namespace('di.shared.ui');
                 // 统一注册事件代理
                 this.$di('registerEventAgent');
 
-                // 禁用自身的notify和attach（只允许使用$di提供的）
-                this.notify = this.attach = this.attachOnce =                 
+                // 禁用自身的notify和attach（只允许使用$di提供的）       this.notify = this.attach = this.attachOnce =
                     function () {
                         throw new Error('Forbiden function');
                     };
@@ -79964,7 +79920,7 @@ $namespace('di.shared.ui');
      * @public
      * @param {!Function} updater 更新器（回调）
      * @param {Object=} scope updater执行的scope，缺省则为window
-     * @param {...*} args updater执行时传递的参数
+ am {...*} args updater执行时传递的参数
      */
     PANEL_PAGE_CLASS.updateView = function(updater, scope, args) {
         if (this._bVisible) {
@@ -80132,8 +80088,7 @@ $namespace('di.shared.adapter');
      *          每项的配置，含有：
      *          options.start 开始时间，绝对值（如2012-12-12）或相对当前时间的值（如-5d）
      *          options.end 结束时间，格式同上
-     * @return {Object} 创建的实例
-     */
+     * @return {Object}  */
     function create(def, options) {
         return ecuiCreate(CALENDAR_PLUS, def.el, null, prepareData(options));
     }
@@ -80299,8 +80254,7 @@ $namespace('di.shared.adapter');
                     i ++
                 ) {
                     xAxisDef.range = range;
-                }
-            }
+                    }
         }
 
         this.setData(data);
@@ -80368,8 +80322,7 @@ $namespace('di.shared.adapter');
             emptyText = LANG.QUERY_ERROR_TEXT;
         }
         this.render(
-            head, tdata, sortInfo, options, emptyText
-        );
+            head, tdata, sortInfo, options, empty   );
     }
 
     // /**
@@ -80446,7 +80399,7 @@ $namespace('di.shared.adapter');
                 [
                     value,
                     function (data) {
-                        func((data.datasource || {}).children || []);
+                        func((data.dataso).children || []);
                     }
                 ]
             );
@@ -80581,11 +80534,7 @@ $namespace('di.shared.adapter');
         // TODO
     }
 
-})();
-
-
-/**
- * di.shared.adapter.EcuiSelectVUIAdapter
+}) * di.shared.adapter.EcuiSelectVUIAdapter
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
@@ -80613,9 +80562,7 @@ $namespace('di.shared.adapter');
             setData: setData,
             getValue: getValue
         };
-    };
-
-    /**
+    *
      * 设置初始化数据
      * 
      * @public
@@ -80649,7 +80596,7 @@ $namespace('di.shared.adapter');
         // 设置默认选中
         var value = data.value;
         value = (
-                getType.call(this) == 'ui-multi-select'
+                getType.call(this) == 'ui-ct'
                     ? value
                     : (value && value[0])
             )
@@ -80753,8 +80700,7 @@ $namespace('di.shared.adapter');
                     function (data) {
                         ctrl.update(data.datasource || []);
                     }
-                ]
-            );
+                    );
         }
 
         return ctrl;
@@ -80840,7 +80786,7 @@ $namespace('di.shared.adapter');
         opt.now = now.getTime();
 
         var defTime = parseTimeUnitDef(options.defaultTime, [now, now]) || {};
-        opt.date = defTime.start || new Date();
+  date = defTime.start || new Date();
         opt.dateEnd = defTime.end;
 
         var range = parseTimeUnitDef(options.range, [now, now]);
@@ -80940,7 +80886,7 @@ $namespace('di.shared.adapter');
     var CREATE_METHOD = {
         OLAP_META_DRAGGER: create4Dragger,
         OLAP_META_IND_SELECT: create4Select,
-        OLAP_META_IND_MULTI_SELECT: create4Select
+        OLAP_META_IND_MULTI_SELECTelect
     };
 
     function create4Dragger(def, options) {
@@ -81098,8 +81044,7 @@ $namespace('di.shared.adapter');
      *          每项的配置，含有：
      *          options.start 开始时间，绝对值（如2012-12-12）或相对当前时间的值（如-5d）
      *          options.end 结束时间，格式同上
-     * @return {Object} 创建的实例
-     */
+     * @return {Object   */
     function create(def, options) {
         return ecuiCreate(X_CALENDAR, def.el, null, prepareInitData(options));
     }
@@ -81270,8 +81215,7 @@ $namespace('di.shared.model');
      * @extends xui.XDatasource
      */
     var CUBE_META_MODEL = 
-            $namespace().CubeMetaModel = 
-            inheritsObject(XDATASOURCE, constructor);
+            $namespace().CubeMetaModel      inheritsObject(XDATASOURCE, constructor);
     var CUBE_META_MODEL_CLASS = 
             CUBE_META_MODEL.prototype;
   
@@ -81587,7 +81531,7 @@ $namespace('di.shared.model');
          * @type {Object}
          * @private
          */
-        this._oRawChartData = {};
+        ChartData = {};
         /**
          * 图前台显示的数据
          *
@@ -81917,7 +81861,7 @@ $namespace('di.shared.model');
 
     /**
      * @override
-     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     * @see xuice.prototype.OPTIONS_NAME
      */
     DI_FORM_MODEL_CLASS.url = new XDATASOURCE.Set(
         {
@@ -82089,7 +82033,7 @@ $namespace('di.shared.model');
     /**
      * @override
      */
-    DI_PLANE_TABLE_MODEL_CLASS.init = function () {};
+    DI_PLANE_TABLE_MODEL_CLASS.inion () {};
 
     /**
      * @override
@@ -82462,7 +82406,7 @@ $namespace('di.shared.model');
 
     /**
      * @override
-     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     * @seasource.prototype.OPTIONS_NAME
      */
     DI_RTPLCLONE_MODEL_CLASS.url = new XDATASOURCE.Set(
         {
@@ -82622,7 +82566,7 @@ $namespace('di.shared.model');
 
     /**
      * @override
-     * @see xui.XDatasource.prototype.OPTIONS_NAME
+     * @see xui.XDatasource.prototype.OP
      */
     DI_TABLE_MODEL_CLASS.url = new XDATASOURCE.Set(
         {
@@ -83056,7 +83000,7 @@ $namespace('di.shared.model');
      * 
      * @return {Constructor#ecui.ui.Control} 当前页面根控件类型
      */
-    GLOBAL_MENU_MANAGER_CLASS.getControlClass = function() {
+    GLOBAL_MENU_MANAGER_CLASolClass = function() {
         var classPath = (this.getSelected() || {}).menuPage;
         return classPath ? getByPath(classPath) : null;
     };
@@ -83154,7 +83098,7 @@ $namespace('di.shared.model');
 //      */    
 //     MENU_PAGE_MANAGER_CLASS.init = function() {
 //         this._uMenu.onchange = bind(this.$menuChangeHandler, this);
-//         this._mPanelPageManager.attach(
+//         this._mPanelPagttach(
 //             'page.active', 
 //             this.$pageActiveHandler, 
 //             this
@@ -83326,8 +83270,7 @@ $namespace('di.shared.model');
      * @param {Function=} options.commonParamGetter    
      */
     var META_CONDITION_MODEL = 
-            $namespace().MetaConditionModel = 
-            inheritsObject(XDATASOURCE, constructor);
+            $namespace().MetaCondition           inheritsObject(XDATASOURCE, constructor);
     var META_CONDITION_MODEL_CLASS = 
             META_CONDITION_MODEL.prototype;
   
@@ -84123,7 +84066,7 @@ $namespace('di.shared.model');
      * @private
      * @param {Object} options 参数
      */
-    function constructor(options) {
+ n constructor(options) {
         /**
          * 类型，TABLE 或者 CHART
          *
@@ -84861,8 +84804,7 @@ $namespace('di.shared.model');
      *          {number} currentPage 当前页号，从1开始
      */
     PAGE_INFO_CLASS.setData = function(pageInfo) {
-        if (pageInfo) {
-            if (pageInfo.disabled != null) {
+        if (page          if (pageInfo.disabled != null) {
                 this.disabled = pageInfo.disabled;
             }
             if (pageInfo.totalRecordCount != null) {
@@ -85024,7 +84966,7 @@ $namespace('di.shared.model');
  * di.shared.model.PanelPageTabAdapter
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
- * @file:    PanelPageManager的适配器（TAB型）
+ * @file:    Paager的适配器（TAB型）
  * @author:  sushuang(sushuang@baidu.com)
  */
 
@@ -85083,7 +85025,7 @@ $namespace('di.shared.model');
      * 得到pageId
      */
     PANEL_PAGE_TAB_ADAPTER.$retrievalPageId = function () {
-        var item = arguments[0];
+  item = arguments[0];
         return item.getMemo();
     }
 
@@ -85178,7 +85120,7 @@ $namespace('di.shared.model');
      * 根据url。如果没有则创建，如果有则打开
      *
      * @public 
-     * @param {string} uri 如di.some.SomePage?pageId=XXX&pageTitle=XXX&otherParam=XXX
+     * @param {string} uri 如mePage?pageId=XXX&pageTitle=XXX&otherParam=XXX
      * @param {Object} options 其他要传入页面的参数（所有在uri中的参数，都可以用这个覆盖）
      * @param {string} options.pageId
      * @param {string} options.pageTitle
@@ -85574,7 +85516,7 @@ $namespace('di.shared.model');
             inheritsObject(XDATASOURCE, constructor);
     var TABLE_MODEL_CLASS = TABLE_MODEL.prototype;
 
-    TABLE_MODEL_CLASS.DEFAULT_PAGE_SIZE = 20;
+    TABLE_MODEFAULT_PAGE_SIZE = 20;
 
     //-------------------------------------------
     // 方法
@@ -85930,7 +85872,7 @@ $namespace('di.shared.ui');
      */
     var BASE_CONFIG_PANEL = $namespace().BaseConfigPanel = 
             inheritsObject(XVIEW, constructor);
-    var BASE_CONFIG_PANEL_CLASS = BASE_CONFIG_PANEL.prototype;
+    varIG_PANEL_CLASS = BASE_CONFIG_PANEL.prototype;
 
     //-----------------------------------
     // 模板
@@ -86503,7 +86445,7 @@ $namespace('di.shared.ui');
         // 暴露给interaction的api
         exportHandler: {
             sync: { datasourceId: 'DATA' },
-            syncX: { datasourceId: 'X_DATA' },
+            syncX: { dd: 'X_DATA' },
             syncLiteOlapChart: { datasourceId: 'LITEOLAPCHART_DATA' },
             syncS: { datasourceId: 'S_DATA' },
             syncSAdd: { datasourceId: 'S_ADD_DATA' },
@@ -86853,7 +86795,7 @@ $namespace('di.shared.ui');
      * @private
      * @param {Object} options 参数
      */
-    DI_FORM_CLASS.$createView = function (options) {
+    DI_FORMeateView = function (options) {
         this._oOptions = extend({}, options);
         options.submitMode = options.submitMode || 'IMMEDIATE';
 
@@ -87317,8 +87259,7 @@ $namespace('di.shared.ui');
     DI_LITEOLAP_CHART_CLASS.DEF = {
         // 暴露给interaction的api
         exportHandler: {
-            sync: { datasourceId: 'DATA' },
-            syncX: { datasourceId: 'X_DATA' },
+            sync: { datasourceId: 'DAT        syncX: { datasourceId: 'X_DATA' },
             syncLiteOlapChart: { datasourceId: 'LITEOLAPCHART_DATA' },
             syncS: { datasourceId: 'S_DATA' },
             syncSAdd: { datasourceId: 'S_ADD_DATA' },
@@ -87663,8 +87604,7 @@ $namespace('di.shared.ui');
         },
         // 主元素的css
         className: 'di-plane-table',
-        // model配置
-        model: {
+        // mod   model: {
             clzPath: 'di.shared.model.DIPlaneTableModel'
         }
     };
@@ -88711,7 +88651,7 @@ $namespace('di.shared.ui');
 
     //------------------------------------------
     // 方法
-    //------------------------------------------
+    //--------------------------------
 
     /**
      * 创建View
@@ -89006,7 +88946,7 @@ $namespace('di.shared.ui');
      * @public
      * @param {Object} options 参数
      */
-    function constructor(options) {
+   constructor(options) {
         var el = this.$di('getEl');
         var o = document.createElement('div');
         el.appendChild(o);
@@ -89265,7 +89205,7 @@ $namespace('di.shared.ui');
         }
     };
 
-    //------------------------------------------
+    //--------------------------------
     // 方法
     //------------------------------------------
 
@@ -90010,7 +89950,7 @@ $namespace('di.shared.ui');
     function constructor(options) {
         var el = this.$di('getEl');
         var o = document.createElement('div');
-        el.appendChild(o);
+        hild(o);
 
         this._bFolded = true;
         this._bAutoDeaf = options.autoDeaf == null 
@@ -90240,7 +90180,7 @@ $namespace('di.shared.ui');
     var q = xutil.dom.q;
     var assign = xutil.object.assign;
     var bind = xutil.fn.bind;
-    var objKey = xutil.object.objKey;
+    var objKey = xutil.oby;
     var XVIEW = xui.XView;
         
     //------------------------------------------
@@ -90299,8 +90239,7 @@ $namespace('di.shared.ui');
 
     var UTIL = di.helper.Util;
     var inheritsObject = xutil.object.inheritsObject;
-    var q = xutil.dom.q;
-    var assign = xutil.object.assign;
+    var q = xut    var assign = xutil.object.assign;
     var bind = xutil.fn.bind;
     var objKey = xutil.object.objKey;
     var XVIEW = xui.XView;
@@ -90362,7 +90301,7 @@ $namespace('di.shared.ui');
     var DICT = di.config.Dict;
     var UTIL = di.helper.Util;
     var DIALOG = di.helper.Dialog;
-    var inheritsObject = xutil.object.inheritsObject;
+    var inheritsObject = xutil.oritsObject;
     var addClass = xutil.dom.addClass;
     var ecuiDispose = UTIL.ecuiDispose;
     var extend = xutil.object.extend;
@@ -90404,8 +90343,7 @@ $namespace('di.shared.ui');
         // 暴露给interaction的api
         exportHandler: {
             sync: { datasourceId: 'DATA' },
-            syncLiteOlapInds: { datasourceId: 'LITEOLAP_INDS_DATA' },
-            clear: {}
+            syncLiteOlapInds: { datasourceId: 'LITEOLAP_INDS_DATA'      clear: {}
         },
         // 主元素的css
         className: 'olap-meta-config',
@@ -90800,7 +90738,7 @@ $namespace('di.shared.ui');
     var META_CONDITOIN = $namespace().MetaCondition = 
         inheritsObject(
             XVIEW,
-            function (options) {
+            futions) {
                 createModel.call(this, options);
                 createView.call(this, options);
             }
@@ -91463,7 +91401,7 @@ $namespace('di.shared.ui');
             syncLiteOlapInds: { datasourceId: 'LITEOLAP_INDS_DATA' },
             clear: {}
         },
-        // 主元素的css
+    的css
         className: 'olap-meta-config',
         // model配置
         model: {
@@ -91869,7 +91807,7 @@ $namespace('di.product.display.ui');
          * 值可为'STUB'或空（默认）
          */
         me._diAgent = options.diAgent;
-        diFactory.setDIAgent(me._diAgent);
+        diFactory.setDIAgent(t);
 
         /**
          * 预存报表镜像id,每次报表刷新时，会向后台提交镜像id
