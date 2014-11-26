@@ -6,7 +6,7 @@
  *          （这个命名不好，历史原因。
  *          其实现在来说应该叫做DIPivotTable或DIOlapTable。
  *          因为并列的有DIPlaneTable。）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 

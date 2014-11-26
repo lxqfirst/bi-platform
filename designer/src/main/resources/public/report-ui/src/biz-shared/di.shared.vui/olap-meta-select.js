@@ -5,7 +5,7 @@
  * @file:    元数据的选择
  *           这是下拉框选择，每个系列组（或column）一个下拉框，
  *           因为系列组可能代表不同的图形（柱、折线），所以要分开下拉框选择
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 

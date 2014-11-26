@@ -3,7 +3,7 @@
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可定制皮肤的左右结构的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {

@@ -5,7 +5,7 @@
  * @file:    脑图
  *           若想改变节点内容或样式，可继承重写BRAIN_CHART_PROTO.Node
  *           若想改变连接线样式，可继承重写BRAIN_CHART_PROTO.Connecter
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  raphael
  */
 

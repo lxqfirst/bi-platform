@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 平面表视图组件（支持分页）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 

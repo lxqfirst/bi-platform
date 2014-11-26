@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    格式化集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 

@@ -4,10 +4,10 @@
  *
  * @file:    IST风格的日历
  *          （支持单日历时间段选择，周月季选择）
- * @author:  sushuang(sushuang@baidu.com) 
+ * @author:  sushuang(sushuang) 
  *          (
  *              从Pulse版本的ecui中拷贝而来
- *              (pl-calendar.js by cxl(chenxinle@baidu.com))，
+ *              (pl-calendar.js by cxl(chenxinle))，
  *              并稍做修改
  *          )
  * @depend:  ecui

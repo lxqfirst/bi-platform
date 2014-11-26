@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:   工程基础
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -18,7 +18,7 @@ var xui = {};
  *          [功能]
  *              (1) 各级名空间建立
  *              (2) 交叉引用/文件依赖的一种解决方案（闭包变量注入）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @version: 1.0.1
  */
 
@@ -1144,7 +1144,7 @@ baidu.ejson = function () {
  *
  * @file:    工程直接使用的工具集
  *          在基础提供的工具函数之外，可根据每个工程需要添加工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -1172,7 +1172,7 @@ var xutil = {
  * @file:    节点有序的哈希表
  *           为哈希表提供线性表能力，适合管理有唯一性id的数据集合，
  *           做为队列、链表等结构使用
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -1931,7 +1931,7 @@ var xutil = {
  *              防止返回处理时因相应的dom已不存在而出错。
  *          (7) 多个请求同步（最后一个请求返回时才执行回调）的支持。
  *              参见createSyncWrap方法
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  tangram.ajax, e-json, xutil.ajax
  */
 
@@ -2509,7 +2509,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    列表、数组、集合相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.object
  */
 
@@ -2828,7 +2828,7 @@ var xutil = {
  * @change: 增加到秒粒度的日期format，增加方法#isValidFormatPattern。by MENGRAN at 2013-12-06
  * @file:   时间相关工具函数集合。
  *          便于工程中统一时间格式，并提供时间相关的数学操作。
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  * @depend: xutil.lang, xutil.number
  */
 
@@ -3375,7 +3375,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DOM相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 (function () {
@@ -3593,7 +3593,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    文件相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -3647,7 +3647,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    函数相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -3689,7 +3689,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    图形图像相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -3749,7 +3749,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    基本工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang, xutil.string
  */
 
@@ -4021,7 +4021,7 @@ var xutil = {
  *
  * @change: 修改formatNumber方法，date类数值的format支持。by MENGRAN at 2013-12-06
  * @file:    数值相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -4223,7 +4223,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    对象相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -4905,7 +4905,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    字符串相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -5213,7 +5213,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    唯一性ID相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 
@@ -5257,7 +5257,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    时间相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -5509,7 +5509,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    输入验证相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.lang
  */
 
@@ -5588,7 +5588,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    视图和模型的基类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.object
  * @version: 1.0.1
  */
@@ -6034,7 +6034,7 @@ var xutil = {
  *                  防止请求回来后视图、模型已经不存在导致js错误、
  *                  全局视图未清理等问题
  *
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  * @version: 1.0.1
  */
@@ -7180,7 +7180,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    视图基类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  * @usage:   
  *          (1) 须实现xui.XView.domReady函数
@@ -7306,7 +7306,7 @@ var xutil = {
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    项目起始文件，全局声明
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui.XProject
  */
 
@@ -20748,7 +20748,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  *
  * desc:    组件容器
  *          提供子组件的创建及管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -20836,7 +20836,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    TAB页容器基类
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 
@@ -21158,10 +21158,10 @@ Combox - 定义可输入下拉框行为的基本操作。
  *
  * @file:    IST风格的日历
  *          （支持单日历时间段选择，周月季选择）
- * @author:  sushuang(sushuang@baidu.com) 
+ * @author:  sushuang(sushuang) 
  *          (
  *              从Pulse版本的ecui中拷贝而来
- *              (pl-calendar.js by cxl(chenxinle@baidu.com))，
+ *              (pl-calendar.js by cxl(chenxinle))，
  *              并稍做修改
  *          )
  * @depend:  ecui
@@ -22084,7 +22084,7 @@ Combox - 定义可输入下拉框行为的基本操作。
  * path:    data-tree.js
  * desc:    数据树
  *          在普通树控件的基础上进行扩展
- * author:  cxl(chenxinle@baidu.com)
+ * author:  cxl(chenxinle)
  * date:    2012/03/12
  */
 (function () {
@@ -24920,7 +24920,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * @file:    富日历的日历层，
  *           支持日、周、月、季不同粒度时间选择，
  *           支持单选、多选、范围选
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -25818,7 +25818,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * @file:    富日历，
  *           支持日、周、月、季不同粒度时间选择，
  *           支持单选、多选、范围选
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 
@@ -26610,7 +26610,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可定制皮肤的左右结构的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {
@@ -26661,7 +26661,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可切换状态的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {
@@ -26740,7 +26740,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  *
  * @file:   多维分析表格
  *         （行列锁定，跨多行，垮多列，树状表头等）
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {
@@ -27998,7 +27998,7 @@ _nDay       - 从本月1号开始计算的天数，如果是上个月，是负�
  * custom-table.js
  * Copyright 2012 Baidu Inc. All rights reserved *
  * desc: 工作台项目定制的table控件，提供的功能包括表头锁定和列锁定、行选中、排序、使用render方法填充和刷新表格；表格支持跨行跨列,最多跨两行
- * author: hades(denghongqi@baidu.com)
+ * author: hades(denghongqi)
  */
 
  (function () {
@@ -29575,7 +29575,7 @@ change:     切换了分页
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   面包屑导航
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {
@@ -29747,7 +29747,7 @@ change:     切换了分页
  }) ();
 /**
  * @file 基于ecui.ui.TreeView实现的树视图。
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 (function() {
     var core = ecui;
@@ -30504,8 +30504,8 @@ change:     切换了分页
  * 
  * path:    count-input.js
  * desc:    带计数的文本输入框(input与textarea)
- * author:  cxl(chenxinle@baidu.com)
- *          modified by sushuang(sushuang@baidu.com) 
+ * author:  cxl(chenxinle)
+ *          modified by sushuang(sushuang) 
  * date:    2012/03/12
  */
 (function () {
@@ -30721,7 +30721,7 @@ change:     切换了分页
  * 
  * path:    input-tree.js
  * desc:    树层级输入框
- * author:  cxl(chenxinle@baidu.com)
+ * author:  cxl(chenxinle)
  * date:    2012/03/12
  */
 (function () {
@@ -32313,7 +32313,7 @@ _uOptions     - 下拉选择框
 }) ();
 /**
  * @file 可拖放的items
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 
 (function() {
@@ -32907,7 +32907,7 @@ _uOptions     - 下拉选择框
  *
  * @file:    简单的ui
  *           这些ui是项目中不成体系的ui、简单的ui的集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 /**
@@ -33327,7 +33327,7 @@ var requirejs, require, define;
  * echarts默认配置项
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/config',[],function() {
@@ -36033,7 +36033,7 @@ return G_vmlCanvasManager;
 /**
  * zrender: 公共辅助函数
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * clone：深度克隆
  * merge：合并源对象的属性到目标对象
@@ -36260,7 +36260,7 @@ define(
 /**
  * 事件扩展
  * @module zrender/mixin/Eventful
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *         pissang (https://www.github.com/pissang)
  */
 define('zrender/mixin/Eventful',['require'],function (require) {
@@ -36528,7 +36528,7 @@ define('zrender/mixin/Eventful',['require'],function (require) {
 /**
  * 事件辅助类
  * @module zrender/tool/event
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  */
 define(
     'zrender/tool/event',['require','../mixin/Eventful'],function(require) {
@@ -36687,7 +36687,7 @@ define('zrender/config',[],function () {
     /**
      * config默认配置项
      * @exports zrender/config
-     * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+     * @author Kener (@Kener-林峰, linzhifeng)
      */
     var config = {
         /**
@@ -36805,7 +36805,7 @@ define(
 
         /**
          * @exports zrender/tool/log
-         * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+         * @author Kener (@Kener-林峰, linzhifeng)
          */
         return function() {
             if (config.debugMode === 0) {
@@ -37288,7 +37288,7 @@ define(
 /**
  * Handler控制模块
  * @module zrender/Handler
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *         errorrik (errorrik@gmail.com)
  */
 
@@ -38733,7 +38733,7 @@ define('zrender/tool/curve',['require','./vector'],function(require) {
 /**
  * zrender: 图形空间辅助类
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *         pissang (https://www.github.com/pissang)
  *
  * isInside：是否在区域内部
@@ -39807,7 +39807,7 @@ define('zrender/mixin/Transformable',['require','../tool/matrix','../tool/vector
 /**
  * 颜色辅助类
  * @module zrender/tool/color
- * @author CrossDo (chenhuaimu@baidu.com)
+ * @author CrossDo (chenhuaimu)
  */
 define('zrender/tool/color',['require','../tool/util'],function(require) {
     var util = require('../tool/util');
@@ -40860,7 +40860,7 @@ define('zrender/tool/color',['require','../tool/util'],function(require) {
 /**
  * shape基类
  * @module zrender/shape/Base
- * @author  Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author  Kener (@Kener-林峰, linzhifeng)
  *          errorrik (errorrik@gmail.com)
  */
 
@@ -41500,7 +41500,7 @@ define(
 
 /**
  * @module zrender/shape/Text
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @example
  *     var Text = require('zrender/shape/Text');
  *     var shape = new Text({
@@ -41712,8 +41712,8 @@ define(
 /**
  * 矩形
  * @module zrender/shape/Rectangle
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com) , 
- *         strwind (@劲风FEI, yaofeifei@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng) , 
+ *         strwind (@劲风FEI, yaofeifei)
  * @example
  *     var Rectangle = require('zrender/shape/Rectangle');
  *     var shape = new Rectangle({
@@ -41919,7 +41919,7 @@ define(
 /**
  * zrender: loading特效类
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *         errorrik (errorrik@gmail.com)
  */
 
@@ -42287,7 +42287,7 @@ define(
 /**
  * Painter绘图模块
  * @module zrender/Painter
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *         errorrik (errorrik@gmail.com)
  *         pissang (https://www.github.com/pissang)
  */
@@ -43437,7 +43437,7 @@ define('zrender/Group',['require','./tool/guid','./tool/util','./mixin/Transform
 /**
  * Storage内容仓库模块
  * @module zrender/Storage
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @author errorrik (errorrik@gmail.com)
  * @author pissang (https://github.com/pissang/)
  */
@@ -44920,7 +44920,7 @@ define(
 
         /**
          * @exports zrender
-         * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+         * @author Kener (@Kener-林峰, linzhifeng)
          *         pissang (https://www.github.com/pissang)
          */
         var zrender = {};
@@ -45400,7 +45400,7 @@ define('zrender', ['zrender/zrender'], function (main) { return main; });
  * echarts层级查找方法
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/util/ecQuery',['zrender/tool/util'],function() {
@@ -45481,7 +45481,7 @@ define('echarts/util/ecQuery',['zrender/tool/util'],function() {
  * echarts数字运算相关
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/util/number',[],function() {
@@ -45552,7 +45552,7 @@ define('echarts/util/number',[],function() {
  * echarts组件基类
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/base',['require','../config','../util/ecQuery','../util/number','zrender/tool/util','zrender/tool/env'],function (require) {
@@ -45777,7 +45777,7 @@ define('echarts/component/base',['require','../config','../util/ecQuery','../uti
 /**
  * zrender: 数学辅助类
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * sin：正弦函数
  * cos：余弦函数
@@ -45833,7 +45833,7 @@ define(
 /**
  * n角星（n>3）
  * @module zrender/shape/Star
- * @author sushuang (宿爽, sushuang@baidu.com)
+ * @author sushuang (宿爽, sushuang)
  * @example
  *     var Star = require('zrender/shape/Star');
  *     var shape = new Star({
@@ -45997,7 +45997,7 @@ define(
 
 /**
  * @module zrender/shape/Heart
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @example
  *   var Heart = require('zrender/shape/Heart');
  *   var shape = new Heart({
@@ -46133,7 +46133,7 @@ define(
 /**
  * 水滴形状
  * @module zrender/shape/Droplet
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @example
  *   var Droplet = require('zrender/shape/Droplet');
  *   var shape = new Droplet({
@@ -46268,7 +46268,7 @@ define(
 /**
  * echarts扩展zrender shape
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：icon
  * 可配图形属性：
@@ -46766,7 +46766,7 @@ define('echarts/util/shape/Icon',['require','zrender/tool/util','zrender/shape/S
 /**
  * 虚线lineTo 
  *
- * author:  Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * author:  Kener (@Kener-林峰, linzhifeng)
  *          errorrik (errorrik@gmail.com)
  */
 define(
@@ -46817,7 +46817,7 @@ define(
 /**
  * 直线
  * @module zrender/shape/Line
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @example
  *   var Line = require('zrender/shape/Line');
  *   var shape = new Line({
@@ -46944,7 +46944,7 @@ define(
  * Catmull-Rom spline 插值折线
  * @module zrender/shape/util/smoothSpline
  * @author pissang (https://www.github.com/pissang) 
- *         Kener (@Kener-林峰, linzhifeng@baidu.com)
+ *         Kener (@Kener-林峰, linzhifeng)
  *         errorrik (errorrik@gmail.com)
  */
 define(
@@ -47018,7 +47018,7 @@ define(
  * 贝塞尔平滑曲线 
  * @module zrender/shape/util/smoothBezier
  * @author pissang (https://www.github.com/pissang) 
- *         Kener (@Kener-林峰, linzhifeng@baidu.com)
+ *         Kener (@Kener-林峰, linzhifeng)
  *         errorrik (errorrik@gmail.com)
  */
 define(
@@ -47118,7 +47118,7 @@ define(
 /**
  * 多边形
  * @module zrender/shape/Polygon
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @example
  *     var Polygon = require('zrender/shape/Polygon');
  *     var shape = new Polygon({
@@ -47393,7 +47393,7 @@ define(
 
 /**
  * 折线
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @module zrender/shape/BrokenLine
  * @example
  *     var BrokenLine = require('zrender/shape/BrokenLine');
@@ -47546,7 +47546,7 @@ define(
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：标线
  */
@@ -47942,7 +47942,7 @@ define('echarts/util/shape/normalIsCover',[],function () {
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：大规模散点图图形
  * 可配图形属性：
@@ -48133,7 +48133,7 @@ define('echarts/util/shape/Symbol',['require','zrender/shape/Base','zrender/shap
  * echarts通用私有数据服务
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/util/ecData',[],function() {
@@ -48248,7 +48248,7 @@ define('echarts/util/ecData',[],function() {
  * echarts图表动画基类
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/util/ecAnimation',['require','zrender/tool/util','zrender/shape/Polygon'],function (require) {
@@ -48792,7 +48792,7 @@ define('echarts/util/ecAnimation',['require','zrender/tool/util','zrender/shape/
 /**
  * 圆形
  * @module zrender/shape/Circle
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @example
  *   var Circle = require('zrender/shape/Circle');
  *   var shape = new Circle({
@@ -48909,7 +48909,7 @@ define(
  * echarts图表特效基类
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/util/ecEffect',['require','../util/ecData','zrender/shape/Circle','zrender/shape/Image','../util/shape/Icon','../util/shape/Symbol','zrender/tool/env'],function (require) {
@@ -49260,7 +49260,7 @@ define('echarts/util/accMath',[],function() {
  * echarts图表基类
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/base',['require','zrender/shape/Image','../util/shape/Icon','../util/shape/MarkLine','../util/shape/Symbol','../config','../util/ecData','../util/ecAnimation','../util/ecEffect','../util/accMath','zrender/tool/util','zrender/tool/area'],function (require) {
@@ -50590,7 +50590,7 @@ define('echarts/chart/base',['require','zrender/shape/Image','../util/shape/Icon
  * echart图表库
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  */
 define('echarts/chart',[],function (/*require*/) {     //chart
     var self = {};
@@ -50621,7 +50621,7 @@ define('echarts/chart',[],function (/*require*/) {     //chart
  * echarts组件：孤岛数据
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/island',['require','../component/base','./base','zrender/shape/Circle','../config','../util/ecData','zrender/tool/util','zrender/tool/event','zrender/tool/color','../util/accMath','../chart'],function (require) {
@@ -50870,7 +50870,7 @@ define('echarts/chart/island',['require','../component/base','./base','zrender/s
  * echart组件库
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component',[],function (/*require*/) {     // component
@@ -50902,7 +50902,7 @@ define('echarts/component',[],function (/*require*/) {     // component
  * echarts组件：提示框
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/dataView',['require','./base','../config','zrender/tool/util','../component'],function (require) {
@@ -51366,7 +51366,7 @@ define('echarts/component/dataView',['require','./base','../config','zrender/too
  * echarts组件：工具箱
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/toolbox',['require','./base','zrender/shape/Line','zrender/shape/Image','zrender/shape/Rectangle','../util/shape/Icon','../config','zrender/tool/util','zrender/config','zrender/tool/event','./dataView','../component'],function (require) {
@@ -52480,7 +52480,7 @@ define('echarts/component/toolbox',['require','./base','zrender/shape/Line','zre
  * echarts组件：图表标题
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/title',['require','./base','zrender/shape/Text','zrender/shape/Rectangle','../config','zrender/tool/util','zrender/tool/area','zrender/tool/color','../component'],function (require) {
@@ -52760,7 +52760,7 @@ define('echarts/component/title',['require','./base','zrender/shape/Text','zrend
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：十字准星
  * 可配图形属性：
@@ -52837,7 +52837,7 @@ define('echarts/util/shape/Cross',['require','zrender/shape/Base','zrender/shape
  * echarts组件：提示框
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/tooltip',['require','./base','../util/shape/Cross','zrender/shape/Line','zrender/shape/Rectangle','../config','../util/ecData','zrender/config','zrender/tool/event','zrender/tool/area','zrender/tool/color','zrender/tool/util','zrender/shape/Base','../component'],function (require) {
@@ -54491,7 +54491,7 @@ define('echarts/component/tooltip',['require','./base','../util/shape/Cross','zr
 /**
  * 圆环
  * @module zrender/shape/Ring
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * @example
  *     var Ring = require('zrender/shape/Ring');
@@ -54605,7 +54605,7 @@ define(
 
 /**
  * 扇形
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  * @module zrender/shape/Sector
  * @example
  *     var Sector = require('zrender/shape/Sector');
@@ -54828,7 +54828,7 @@ define(
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：蜡烛
  * 可配图形属性：
@@ -54945,7 +54945,7 @@ define('echarts/util/shape/Candle',['require','zrender/shape/Base','zrender/tool
  * echarts组件：图例
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/legend',['require','./base','zrender/shape/Text','zrender/shape/Rectangle','zrender/shape/Sector','../util/shape/Icon','../util/shape/Candle','../config','zrender/tool/util','zrender/tool/area','../component'],function (require) {
@@ -55883,7 +55883,7 @@ define('echarts/component/legend',['require','./base','zrender/shape/Text','zren
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：时间轴线
  */
@@ -56066,7 +56066,7 @@ define('echarts/util/shape/Chain',['require','zrender/shape/Base','./Icon','zren
  * echarts组件：时间轴组件
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/timeline',['require','./base','zrender/shape/Rectangle','../util/shape/Icon','../util/shape/Chain','../config','zrender/tool/util','zrender/tool/area','zrender/tool/event','../component'],function (require) {
@@ -57655,7 +57655,7 @@ define(
  * echarts默认主题，开发中
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/theme/default',[],function() {
@@ -57678,7 +57678,7 @@ define('echarts/theme/default',[],function() {
  * echarts
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/echarts',['require','./config','zrender/tool/util','zrender/tool/event','zrender/tool/env','zrender','zrender/config','zrender','./chart/island','./component/toolbox','./component','./component/title','./component/tooltip','./component/legend','./util/ecData','./chart','./component','zrender/tool/color','./component/timeline','zrender','zrender/shape/Image','zrender/loadingEffect/Bar','zrender/loadingEffect/Bubble','zrender/loadingEffect/DynamicLine','zrender/loadingEffect/Ring','zrender/loadingEffect/Spin','zrender/loadingEffect/Whirling','./theme/default'],function (require) {
@@ -59338,7 +59338,7 @@ define('echarts', ['echarts/echarts'], function (main) { return main; });
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：仪表盘指针
  * 可配图形属性：
@@ -59440,7 +59440,7 @@ define('echarts/util/shape/GaugePointer',['require','zrender/shape/Base','zrende
  * echarts图表类：仪表盘
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/gauge',['require','../component/base','./base','../util/shape/GaugePointer','zrender/shape/Text','zrender/shape/Line','zrender/shape/Rectangle','zrender/shape/Circle','zrender/shape/Sector','../config','../util/ecData','../util/accMath','zrender/tool/util','../chart'],function (require) {
@@ -59989,7 +59989,7 @@ define('echarts/chart/gauge',['require','../component/base','./base','../util/sh
  * echarts图表类：漏斗图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/funnel',['require','../component/base','./base','zrender/shape/Text','zrender/shape/Line','zrender/shape/Polygon','../config','../util/ecData','../util/number','zrender/tool/util','zrender/tool/color','zrender/tool/area','../chart'],function (require) {
@@ -60665,7 +60665,7 @@ define('echarts/chart/funnel',['require','../component/base','./base','zrender/s
  * echarts组件： 类目轴
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/categoryAxis',['require','./base','zrender/shape/Text','zrender/shape/Line','zrender/shape/Rectangle','../config','zrender/tool/util','zrender/tool/area','../component'],function (require) {
@@ -61366,7 +61366,7 @@ define('echarts/component/categoryAxis',['require','./base','zrender/shape/Text'
  * echarts组件： 数值轴
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','zrender/shape/Line','zrender/shape/Rectangle','../config','zrender/tool/util','../component'],function (require) {
@@ -61910,7 +61910,7 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
          * 一旦你不得不遇到了需要修改或重写的厄运，希望下面的脚手架能帮助你
          * ps:其实我是想说别搞砸了！升级后至少得保证这些case通过！！
          *
-         * by linzhifeng@baidu.com 2013-1-8
+         * by linzhifeng 2013-1-8
          * --------
          this._valueList = [];
          this.option = {splitNumber:5,power:100,precision:0};
@@ -62231,7 +62231,7 @@ define('echarts/component/valueAxis',['require','./base','zrender/shape/Text','z
  * echarts组件类： 坐标轴
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * 直角坐标系中坐标轴数组，数组中每一项代表一条横轴（纵轴）坐标轴。
  * 标准（1.0）中规定最多同时存在2条横轴和2条纵轴
@@ -62572,7 +62572,7 @@ define('echarts/component/axis',['require','./base','zrender/shape/Line','../con
  * echarts组件： 网格
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/grid',['require','./base','zrender/shape/Rectangle','../config','zrender/tool/util','../component'],function (require) {
@@ -62738,7 +62738,7 @@ define('echarts/component/grid',['require','./base','zrender/shape/Rectangle','.
  * echarts组件：数据区域缩放
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/dataZoom',['require','./base','zrender/shape/Rectangle','zrender/shape/Polygon','../util/shape/Icon','../config','zrender/tool/util','../component','../component'],function (require) {
@@ -63842,7 +63842,7 @@ define('echarts/component/dataZoom',['require','./base','zrender/shape/Rectangle
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：handlePolygon，dataRange手柄
  */
@@ -63896,7 +63896,7 @@ define('echarts/util/shape/HandlePolygon',['require','zrender/shape/Base','zrend
  * echarts组件：值域
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/component/dataRange',['require','./base','zrender/shape/Text','zrender/shape/Rectangle','../util/shape/HandlePolygon','../config','zrender/tool/util','zrender/tool/area','zrender/tool/color','zrender/tool/color','../component'],function (require) {
@@ -65163,7 +65163,7 @@ define('echarts/component/dataRange',['require','./base','zrender/shape/Text','z
  * echarts图表类：散点图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/scatter',['require','../component/base','./base','../util/shape/Symbol','../component/axis','../component/grid','../component/dataZoom','../component/dataRange','../config','zrender/tool/util','zrender/tool/color','../chart'],function (require) {
@@ -65607,7 +65607,7 @@ define('echarts/chart/scatter',['require','../component/base','./base','../util/
  * echarts图表类：K线图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/k',['require','../component/base','./base','../util/shape/Candle','../component/axis','../component/grid','../component/dataZoom','../config','../util/ecData','zrender/tool/util','../chart'],function (require) {
@@ -66106,7 +66106,7 @@ define('echarts/chart/k',['require','../component/base','./base','../util/shape/
 /**
  * echarts坐标处理方法
  *
- * @author Neil (杨骥, yangji01@baidu.com)
+ * @author Neil (杨骥, yangji01)
  */
 
 define(
@@ -66147,7 +66147,7 @@ define(
  * echarts组件类：极坐标
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Neil (杨骥, yangji01@baidu.com)
+ * @author Neil (杨骥, yangji01)
  *
  */
 define('echarts/component/polar',['require','./base','zrender/shape/Text','zrender/shape/Line','zrender/shape/Polygon','zrender/shape/Circle','zrender/shape/Ring','../config','zrender/tool/util','../util/coordinates','../component'],function (require) {
@@ -67165,7 +67165,7 @@ define('echarts/component/polar',['require','./base','zrender/shape/Text','zrend
  * echarts图表类：雷达图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Neil (杨骥, yangji01@baidu.com)
+ * @author Neil (杨骥, yangji01)
  */
 
  define('echarts/chart/radar',['require','../component/base','./base','zrender/shape/Polygon','../component/polar','../config','../util/ecData','zrender/tool/util','zrender/tool/color','../util/accMath','../chart'],function (require) {
@@ -73045,7 +73045,7 @@ define('echarts/chart/force',['require','../component/base','./base','../data/Gr
 /**
  * zrender
  *
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  * shape类：支持半平滑的polygon，折线面积图使用
  * 可配图形属性：
@@ -73149,7 +73149,7 @@ define('echarts/util/shape/HalfSmoothPolygon',['require','zrender/shape/Base','z
  * echarts图表类：折线图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/line',['require','../component/base','./base','zrender/shape/BrokenLine','../util/shape/Icon','../util/shape/HalfSmoothPolygon','../component/axis','../component/grid','../component/dataZoom','../config','../util/ecData','zrender/tool/util','zrender/tool/color','../chart'],function (require) {
@@ -74217,7 +74217,7 @@ define('echarts/chart/line',['require','../component/base','./base','zrender/sha
  * echarts图表类：柱形图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/bar',['require','../component/base','./base','zrender/shape/Rectangle','../component/axis','../component/grid','../component/dataZoom','../config','../util/ecData','zrender/tool/util','zrender/tool/color','../chart'],function (require) {
@@ -75244,7 +75244,7 @@ define('echarts/chart/bar',['require','../component/base','./base','zrender/shap
  * echarts图表类：饼图
  *
  * @desc echarts基于Canvas，纯Javascript图表库，提供直观，生动，可交互，可个性化定制的数据统计图表。
- * @author Kener (@Kener-林峰, linzhifeng@baidu.com)
+ * @author Kener (@Kener-林峰, linzhifeng)
  *
  */
 define('echarts/chart/pie',['require','../component/base','./base','zrender/shape/Text','zrender/shape/Ring','zrender/shape/Circle','zrender/shape/Sector','zrender/shape/BrokenLine','../config','../util/ecData','zrender/tool/util','zrender/tool/math','zrender/tool/color','../chart'],function (require) {
@@ -76229,8 +76229,8 @@ _global['zrender'] = zrender;
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    基于highcharts的js图
- *           (最早源自pl-charts.js by cxl(chenxinle@baidu.com))
- * @author:  sushuang(sushuang@baidu.com)
+ *           (最早源自pl-charts.js by cxl(chenxinle))
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, echarts
  */
 
@@ -76845,7 +76845,7 @@ _global['zrender'] = zrender;
  * @file:    data insight 全局(包括console和product)的ajax的配置
  *          （常量和默认失败处理等）
  *          （如不服此配置，可重载）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil.ajax, di.config.lang
  */
 
@@ -77004,7 +77004,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    data insight 全局(包括console和product)的ajax的配置
- * @author:  sushuang(sushuang@baidu.com), lizhantong(lztlovely@126.com)
+ * @author:  sushuang(sushuang), lizhantong(lztlovely@126.com)
  */
 
 $namespace('di.config');
@@ -77134,7 +77134,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    data insight 全局(包括console和product)的话术定义
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 $namespace('di.config');
@@ -77333,7 +77333,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    描述构件的引用。构建程序（buidlfront会根据此文件生成repo.js）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 (function() {
@@ -77848,7 +77848,7 @@ $namespace('di.config');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    data insight 全局(包括console和product)的URL定义
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 $namespace('di.config');
 
@@ -78091,7 +78091,7 @@ $namespace('di.config');
  * 
  * @file:    全局的提示信息 
  *           (代码拷贝自 rigel.layer。但是tip是“小窍门”的意思，而不是“提示”的意思，所以改成prompt)
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depends: ecui
  */
 
@@ -78472,7 +78472,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    格式化集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 
@@ -78694,7 +78694,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    提供html片段的解析
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 
@@ -78962,7 +78962,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    业务辅助函数集
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil, tangram.ajax, tangram.json
  */
 
@@ -80114,7 +80114,7 @@ $namespace('di.helper');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    默认的参数解析方法集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 
@@ -80405,7 +80405,7 @@ $namespace('di.shared.arg');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    隐藏的输入，用于传递报表引擎外部传来的参数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -80480,7 +80480,7 @@ $namespace('di.shared.vui');
  * Copyright 2014 Baidu Inc. All rights reserved.
  *
  * @file:    多个复选框的组件
- * @author:  xuezhao(xuezhao@baidu.com)
+ * @author:  xuezhao(xuezhao)
  * @depend:  xui, xutil
  */
 
@@ -80624,7 +80624,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    离线下载按钮和对话框
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -80793,7 +80793,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    维度选择model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -80974,7 +80974,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    维度选择面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui
  */
 
@@ -81512,7 +81512,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    维度选择model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -81778,7 +81778,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    维度选择面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui
  */
 
@@ -82174,7 +82174,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表元数据拖拽
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -82952,7 +82952,7 @@ $namespace('di.shared.vui');
  * @file:    元数据的选择
  *           这是下拉框选择，每个系列组（或column）一个下拉框，
  *           因为系列组可能代表不同的图形（柱、折线），所以要分开下拉框选择
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -84202,7 +84202,7 @@ $namespace('di.shared.vui');
  * Copyright 2014 Baidu Inc. All rights reserved.
  *
  * @file:    平铺的单选框组件（暂时使用原生单选框，没有使用图片美化）
- * @author:  xuezhao(xuezhao@baidu.com)
+ * @author:  xuezhao(xuezhao)
  * @depend:  xui, xutil
  */
 
@@ -84350,7 +84350,7 @@ $namespace('di.shared.vui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    文字区
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -84466,7 +84466,7 @@ $namespace('di.shared.vui');
  * @file:    通用的默认适配器
  *           一般在di.config.Dict中使用adapterMethods来引用此中方法，
  *           拷贝到目标对象中
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -84541,7 +84541,7 @@ $namespace('di.shared.adapter');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 权限数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -84574,7 +84574,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 时间数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -84622,7 +84622,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    [通用模型] 用户数据模型
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -84655,7 +84655,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 全局数据模型
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -84766,7 +84766,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    通用请求参数处理器工厂
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -85430,7 +85430,7 @@ $namespace('di.shared.model');
  *              各种组件的类型均从这里获取，不直接引用。
  *              全局实例从这里获取。
  *
- * @author:  sushuang(sushuang@baidu.com),lizhantong(lztlovely@126.com)
+ * @author:  sushuang(sushuang),lizhantong(lztlovely@126.com)
  * @depend:  xui, xutil
  */
 
@@ -87939,7 +87939,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    Base Entity
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -88165,7 +88165,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    容器中子页面基类
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.ui');
@@ -88331,7 +88331,7 @@ $namespace('di.shared.ui');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    CalendarPlus的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88496,7 +88496,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    HChart的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88565,7 +88565,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui提供的平面表控件的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88638,7 +88638,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui input-tree的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88756,7 +88756,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    input（单行输入，以及textarea）的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88789,7 +88789,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui提供的Pager控件的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88840,7 +88840,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -88946,7 +88946,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui suggest的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -89035,7 +89035,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    IstCalendar的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -89138,7 +89138,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择控件的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -89294,7 +89294,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    CalendarPlus的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 
@@ -89469,7 +89469,7 @@ $namespace('di.shared.adapter');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    cube树原数据Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -89776,7 +89776,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -90103,7 +90103,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表单模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -90278,7 +90278,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 平面表模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -90648,7 +90648,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -90808,7 +90808,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -91242,7 +91242,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    [通用模型] 全局菜单管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -91350,7 +91350,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    [通用管理器] 菜单行为的托管，菜单页的管理
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @deprecated: 已弃用，因为没必要搞这么多抽象设计得这么复杂，
  *          代码适当堆一块儿反而好找。
  */
@@ -91526,7 +91526,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -92315,7 +92315,7 @@ $namespace('di.shared.model');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    元数据选择Model
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -93044,7 +93044,7 @@ $namespace('di.shared.model');
  *
  * @file:   分页信息对象
  *          可屏蔽前后台对分页对象的定义不一致的情况
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -93211,7 +93211,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    PanelPageManager的适配器（RADIO型）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -93276,7 +93276,7 @@ $namespace('di.shared.model');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    PanelPageManager的适配器（TAB型）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -93368,7 +93368,7 @@ $namespace('di.shared.model');
  *
  * @file:    [通用管理器] panel page关系页管理：
  *          维护页面引用，页面打开先后顺序，当前页面等。适应不同的页面展现方式（如tab方式或窗口方式等）。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');
@@ -93763,7 +93763,7 @@ $namespace('di.shared.model');
  * @file:   表格Model的基类，
  *          支持前台分页、排序，后台分页、排序，
  *          各表格页面Model可继承或聚合此类
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  * @depend: xui, xutil
  */
 
@@ -94126,7 +94126,7 @@ $namespace('di.shared.model');
  *
  * @file:    简单配置面板的基类，做一些共性的事情，
  *           配置面板可继承此类。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -94692,7 +94692,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图视图组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -95036,7 +95036,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 表单视图组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -95507,7 +95507,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图视图组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -95851,7 +95851,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 平面表视图组件（支持分页）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -96896,7 +96896,7 @@ $namespace('di.shared.ui');
  *          （这个命名不好，历史原因。
  *          其实现在来说应该叫做DIPivotTable或DIOlapTable。
  *          因为并列的有DIPlaneTable。）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -97194,7 +97194,7 @@ $namespace('di.shared.ui');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI tab容器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -97448,7 +97448,7 @@ $namespace('di.shared.ui');
  *          （这个命名不好，历史原因。
  *          其实现在来说应该叫做DIPivotTable或DIOlapTable。
  *          因为并列的有DIPlaneTable。）
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -98198,7 +98198,7 @@ $namespace('di.shared.ui');
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    折叠面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -98414,7 +98414,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DI 片段
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -98474,7 +98474,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    VCONTAINER
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -98536,7 +98536,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    VCONTAINER
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -98598,7 +98598,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表原数据选择面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -98993,7 +98993,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表原数据选择面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -99654,7 +99654,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    多维分析报表原数据选择面板
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 
@@ -100049,7 +100049,7 @@ $namespace('di.shared.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    报表展示页面
- * @author:  sushuang(sushuang@baidu.com), lizhantong(lztlovely@126.com)
+ * @author:  sushuang(sushuang), lizhantong(lztlovely@126.com)
  * @depend:  xui, xutil
  */
 
@@ -100315,7 +100315,7 @@ $namespace('di.product.display.ui');
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    项目结尾文件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui.XProject
  */
 

@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console特有的全局的提示信息 
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  tangram.dom, tangram.page, ecui, xui
  */
 

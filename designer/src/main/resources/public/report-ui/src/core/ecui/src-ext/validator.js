@@ -4,7 +4,7 @@
  * 
  * path:    validator.js
  * desc:    验证器 
- * author:  cxl(chenxinle@baidu.com)
+ * author:  cxl(chenxinle)
  * date:    2012/03/09
  */
 (function () {

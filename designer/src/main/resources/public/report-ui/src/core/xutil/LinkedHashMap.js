@@ -5,7 +5,7 @@
  * @file:    节点有序的哈希表
  *           为哈希表提供线性表能力，适合管理有唯一性id的数据集合，
  *           做为队列、链表等结构使用
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  none
  */
 

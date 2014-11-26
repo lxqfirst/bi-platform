@@ -4,7 +4,7 @@
  *
  * @file:   多维分析表格
  *         （行列锁定，跨多行，垮多列，树状表头等）
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {

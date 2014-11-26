@@ -4,7 +4,7 @@
  * 
  * @file:    console工程的url配置
  *           重载全局配置
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 (function() {

@@ -3,7 +3,7 @@
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   面包屑导航
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function() {

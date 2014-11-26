@@ -1,6 +1,6 @@
 /**
  * @file: 维度组管理
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(v_zhaoxiaoqiang)
  * @date 2014-10-22
  */
 define(['url'], function (Url) {

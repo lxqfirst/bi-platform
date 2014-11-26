@@ -6,7 +6,7 @@
  *           注意！！此文件是嵌入到客户系统，
  *           希望客户系统不使用http缓存此文件（从而方便报表引擎对此文件的升级更新），
  *           这就需要这个文件注意写法，能在压缩后足够小。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depends: ecui
  */
 

@@ -3,7 +3,7 @@
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    ecui提供的平面表控件的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 

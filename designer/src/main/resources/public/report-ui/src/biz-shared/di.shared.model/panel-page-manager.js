@@ -4,7 +4,7 @@
  *
  * @file:    [通用管理器] panel page关系页管理：
  *          维护页面引用，页面打开先后顺序，当前页面等。适应不同的页面展现方式（如tab方式或窗口方式等）。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');

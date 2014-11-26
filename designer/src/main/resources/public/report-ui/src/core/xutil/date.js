@@ -5,7 +5,7 @@
  * @change: 增加到秒粒度的日期format，增加方法#isValidFormatPattern。by MENGRAN at 2013-12-06
  * @file:   时间相关工具函数集合。
  *          便于工程中统一时间格式，并提供时间相关的数学操作。
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  * @depend: xutil.lang, xutil.number
  */
 

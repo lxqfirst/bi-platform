@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    condition config
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xui, xutil
  */
 $namespace('di.console.editor.ui');

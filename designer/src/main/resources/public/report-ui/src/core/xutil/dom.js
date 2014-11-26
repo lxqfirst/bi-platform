@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    DOM相关工具函数
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 (function () {

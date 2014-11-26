@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    [通用管理器] 菜单行为的托管，菜单页的管理
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @deprecated: 已弃用，因为没必要搞这么多抽象设计得这么复杂，
  *          代码适当堆一块儿反而好找。
  */

@@ -4,8 +4,8 @@
  * 
  * path:    count-input.js
  * desc:    带计数的文本输入框(input与textarea)
- * author:  cxl(chenxinle@baidu.com)
- *          modified by sushuang(sushuang@baidu.com) 
+ * author:  cxl(chenxinle)
+ *          modified by sushuang(sushuang) 
  * date:    2012/03/12
  */
 (function () {

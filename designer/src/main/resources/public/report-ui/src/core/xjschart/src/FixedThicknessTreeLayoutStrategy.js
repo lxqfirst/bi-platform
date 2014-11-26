@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    定厚度树布局策略
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 (function() {

@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    注册mock data
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
  
 /** 

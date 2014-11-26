@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * desc:    报表设计 / 管理页整体
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 

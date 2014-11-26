@@ -3,7 +3,7 @@
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    CalendarPlus的适配器
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil, ecui
  */
 

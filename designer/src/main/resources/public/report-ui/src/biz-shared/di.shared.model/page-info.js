@@ -4,7 +4,7 @@
  *
  * @file:   分页信息对象
  *          可屏蔽前后台对分页对象的定义不一致的情况
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
 $namespace('di.shared.model');

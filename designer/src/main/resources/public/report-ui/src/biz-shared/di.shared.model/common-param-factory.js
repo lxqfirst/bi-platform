@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    通用请求参数处理器工厂
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  */
 
 $namespace('di.shared.model');

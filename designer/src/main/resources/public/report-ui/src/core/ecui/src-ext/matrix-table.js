@@ -5,7 +5,7 @@
  * desc:    矩阵表格
  *          支持行列表头树结构，横纵向内容滚动条并表头固定
  *          单元格高宽必须指定，整体高宽必须指定
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  */
 
 (function () {

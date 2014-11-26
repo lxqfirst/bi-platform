@@ -4,7 +4,7 @@
  *
  * @file:    对元数据，设置其是否作为报表的“元数据改变”组件（如元数据拖拽组件、指标选择组件）的候选项。
  *           默认，cube中所有的元数据都是候选项。但是往往这太多了。所以在这里让用户能去掉不需要的。
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 $namespace('di.console.editor.ui');

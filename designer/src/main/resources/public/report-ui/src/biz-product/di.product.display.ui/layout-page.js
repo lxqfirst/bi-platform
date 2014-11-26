@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    报表展示页面
- * @author:  sushuang(sushuang@baidu.com), lizhantong(lztlovely@126.com)
+ * @author:  sushuang(sushuang), lizhantong(lztlovely@126.com)
  * @depend:  xui, xutil
  */
 

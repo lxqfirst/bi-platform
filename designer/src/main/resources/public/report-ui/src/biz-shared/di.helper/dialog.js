@@ -4,7 +4,7 @@
  * 
  * @file:    全局的提示信息 
  *           (代码拷贝自 rigel.layer。但是tip是“小窍门”的意思，而不是“提示”的意思，所以改成prompt)
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depends: ecui
  */
 

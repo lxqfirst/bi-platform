@@ -1,6 +1,6 @@
 /**
  * @file 数据源列表model
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(v_zhaoxiaoqiang)
  * @date 2014-7-17
  */
 define(['url'], function (Url) {

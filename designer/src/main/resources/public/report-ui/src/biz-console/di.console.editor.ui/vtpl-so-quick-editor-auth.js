@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  *
  * @file:    负责vtplSoQuickEditor的权限设置的逻辑
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xui, xutil
  */
 

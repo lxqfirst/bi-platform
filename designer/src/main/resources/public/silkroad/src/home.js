@@ -1,6 +1,6 @@
 /**
  * @file: 报表首页
- * @author: weiboxue(weiboxue@baidu.com)
+ * @author: weiboxue(weiboxue)
  * @date: 2014-11-20
  */
 $(function () {

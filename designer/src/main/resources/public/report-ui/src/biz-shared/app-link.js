@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    项目结尾文件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui.XProject
  */
 

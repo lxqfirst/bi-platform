@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    默认的参数解析方法集合
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xutil
  */
 

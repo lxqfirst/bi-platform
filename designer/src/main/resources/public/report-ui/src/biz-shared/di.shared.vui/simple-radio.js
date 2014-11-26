@@ -3,7 +3,7 @@
  * Copyright 2014 Baidu Inc. All rights reserved.
  *
  * @file:    平铺的单选框组件（暂时使用原生单选框，没有使用图片美化）
- * @author:  xuezhao(xuezhao@baidu.com)
+ * @author:  xuezhao(xuezhao)
  * @depend:  xui, xutil
  */
 

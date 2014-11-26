@@ -3,7 +3,7 @@
  * Copyright 2013 Baidu Inc. All rights reserved
  *
  * @file:   可切换状态的button
- * @author: sushuang(sushuang@baidu.com)
+ * @author: sushuang(sushuang)
  */
 
  (function () {

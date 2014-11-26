@@ -1,6 +1,6 @@
 /**
  * @file
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(v_zhaoxiaoqiang)
  * @date {{date}}
  */
 define(function () {

@@ -104,7 +104,7 @@
     				<span>欢迎 <b><span id="userName"></span></b></span>
     				<a href="#" id="Logout" >[退出]</a>
     				<span>|</span>
-    				<a href="mailto:mengran@baidu.com?subject=Questions and Suggestions for Data-Insight" id="WeedBack">反馈问题及建议</a>
+    				<a href="mailto:mengran?subject=Questions and Suggestions for Data-Insight" id="WeedBack">反馈问题及建议</a>
     				<span style="display:none">|</span>
     				<a style="display:none" href="help.html" class="wired-a" target="_blank">帮助</a>
     			</div>

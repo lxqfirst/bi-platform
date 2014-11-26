@@ -5,7 +5,7 @@
  * @file:    富日历，
  *           支持日、周、月、季不同粒度时间选择，
  *           支持单选、多选、范围选
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  ecui
  */
 

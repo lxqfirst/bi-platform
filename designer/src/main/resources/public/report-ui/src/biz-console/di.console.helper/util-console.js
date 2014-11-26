@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console特有的业务辅助函数集
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  * @depend:  xutil, tangram.ajax, jq.htmlClean
  */
 

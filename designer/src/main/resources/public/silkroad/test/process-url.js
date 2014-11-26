@@ -1,6 +1,6 @@
 /**
  * @file: 重定向url，用于解决地址重复的问题
- * @author: 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author: 赵晓强(v_zhaoxiaoqiang)
  * date: 2014-08-21
  */
 define(function () {

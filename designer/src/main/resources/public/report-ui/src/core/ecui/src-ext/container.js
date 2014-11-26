@@ -4,7 +4,7 @@
  *
  * desc:    组件容器
  *          提供子组件的创建及管理
- * author:  sushuang(sushuang@baidu.com)
+ * author:  sushuang(sushuang)
  * depend:  ecui
  */
 

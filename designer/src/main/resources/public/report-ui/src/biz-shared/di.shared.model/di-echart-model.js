@@ -3,7 +3,7 @@
  * Copyright 2013 Baidu Inc. All rights reserved.
  *
  * @file:    DI 图模型组件
- * @author:  sushuang(sushuang@baidu.com)
+ * @author:  sushuang(sushuang)
  * @depend:  xui, xutil
  */
 

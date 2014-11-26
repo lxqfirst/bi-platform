@@ -1,6 +1,6 @@
 ﻿/**
  * @file 基于ecui.ui.TreeView实现的树视图。
- * @author hades(denghongqi@baidu.com)
+ * @author hades(denghongqi)
  */
 (function() {
     var core = ecui;

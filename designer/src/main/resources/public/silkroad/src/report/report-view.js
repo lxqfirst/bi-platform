@@ -1,6 +1,6 @@
 ﻿/**
  * @file 报表的公共功能 - view
- * @author 赵晓强(v_zhaoxiaoqiang@baidu.com)
+ * @author 赵晓强(v_zhaoxiaoqiang)
  * @date 2014-10-10
  */
 define([

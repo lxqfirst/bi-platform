@@ -3,7 +3,7 @@
  * Copyright 2012 Baidu Inc. All rights reserved.
  * 
  * @file:    console的字典及常量定义
- * @author:  xxx(xxx@baidu.com)
+ * @author:  xxx(xxx)
  */
 
 (function() {
